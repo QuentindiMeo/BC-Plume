@@ -49,43 +49,32 @@ For developers or to get the latest features:
 ### 1️⃣ Setup Development Environment
 
 ```bash
-# Clone or download the repository
-git clone <repository-url>
+git clone https://github.com/QuentindiMeo/mbappe # Clone or download the repository
 cd mbappe
 
-# Install dependencies
-npm install
+npm install # Install dependencies
 ```
 
 ### 2️⃣ Build the Extension
 
 ```bash
-# Quick build (development with source maps)
-npm run build
-
-# Production build (optimized, no source maps)
-npm run prod
-
-# Watch mode for development
-npm run watch
-
-# Full packaging for distribution
-npm run package
+npm run build # Quick build (development with source maps)
+npm run prod # Production build (optimized, no source maps)
+npm run watch # Watch mode for development
+npm run package # Full packaging for distribution
 ```
 
 ### 3️⃣ Development Commands
 
 ```bash
-# Clean build artifacts
-npm run clean
+npm run clean # Clean build artifacts
 
-# Development mode (clean + watch)
-npm run dev
+npm run dev # Development mode (clean + watch)
 
 # Code quality
-npm run lint          # Check code style
-npm run format        # Fix formatting issues
-npm run type-check    # TypeScript type checking only
+npm run lint        # Check code style
+npm run format      # Fix formatting issues
+npm run type-check  # TypeScript type checking only
 ```
 
 ### 4️⃣ Install Built Extension
@@ -124,7 +113,7 @@ If you want to convert SVGs to PNGs for certain browsers:
 ### Option B: With Python (if available)
 
 ```bash
-pip install Pillow cairosvg
+pip install pillow cairosvg
 python convert_icons.py
 ```
 
@@ -175,12 +164,12 @@ python convert_icons.py
 
 ## 🗑️ Uninstallation
 
-### Chrome/Edge/Opera/Brave... (Chromium-based)
+### Chromium-based browsers
 
 1. `chrome://extensions/`
 2. Click "Remove" on the extension
 
-### Firefox
+### Firefox browser
 
 1. `about:addons`
 2. Extensions → Remove

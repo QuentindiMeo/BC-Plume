@@ -1,161 +1,144 @@
-# Bandcamp Player Enhancer
+# MBAPPE - Multimedia Bandcamp Player Enhancer
 
-Une extension multi-navigateurs qui améliore l'expérience d'écoute sur Bandcamp avec un slider de volume et une barre de progression améliorée.
+A cross-browser extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.
 
-**Compatible avec Chrome, Firefox, Edge et autres navigateurs Chromium !**
+**Compatible with Chrome, Firefox, Edge, and other Chromium browsers!**
 
-## 🎵 Fonctionnalités
+## 🎵 Features
 
-- **Player unifié** : Remplace complètement le player Bandcamp par une version améliorée
-- **Contrôles de lecture personnalisés** : Boutons Play/Pause, Reculer/Avancer de 10 secondes avec design moderne
-- **Slider de volume visible** : Contrôle précis du volume avec un slider élégant
-- **Mémorisation du volume** : L'extension se souvient de votre niveau de volume préféré entre les pages
-- **Barre de progression améliorée** : Barre plus épaisse, colorée et avec un curseur visible
-- **Navigation temporelle** : Clic et glissement pour naviguer dans la piste
-- **Affichage du temps** : Temps actuel et durée totale
-- **Interface moderne** : Design avec effet de flou et transparence
-- **Responsive** : S'adapte aux différentes tailles d'écran
+- **Unified player**: Completely replaces the Bandcamp player with an enhanced version
+- **Custom playback controls**: Play/Pause buttons, skip back/forward 10 seconds with a modern design
+- **Visible volume slider**: Precise volume control with a sleek slider
+- **Volume memory**: Remembers your preferred volume level across pages
+- **Enhanced progress bar**: Thicker, colorful bar with a visible thumb
+- **Time navigation**: Click and drag to seek within the track
+- **Modern interface**: Design with blur and transparency effects
 
 ## 🚀 Installation
 
-### Installation Universelle (Un seul manifest !)
+### Universal Installation (One manifest to rule them all!)
 
-**L'extension fonctionne maintenant avec un seul manifest sur tous les navigateurs !**
+**The extension works with a single manifest on all browsers!**
 
-#### Chrome/Edge/Opera :
-1. Ouvrez `chrome://extensions/` (ou `edge://extensions/`)
-2. Activez "Mode développeur"
-3. "Charger l'extension non empaquetée" → Sélectionnez ce dossier
+#### Chrome/Edge/Opera
 
-#### Firefox (109+) :
-1. Ouvrez `about:debugging`
-2. "Ce Firefox" 
-3. "Charger un module temporaire" → Sélectionnez `manifest.json`
+1. Open `chrome://extensions/` (or `edge://extensions/`)
+2. Enable "Developer mode"
+3. "Load unpacked" → Select this folder
 
-#### Build automatique (optionnel) :
-```powershell
-.\build.ps1  # Crée build/universal/ avec fichiers optimisés
-```powershell
-.\build.ps1  # Crée build/universal/ avec fichiers optimisés
+#### Firefox (109+)
+
+1. Open `about:debugging`
+2. "This Firefox"
+3. "Load Temporary Add-on" → Select `manifest.json`
+
+#### Automatic build (optional)
+
+```bash
+npm run package  # Creates build/ folder with all files
 ```
 
-### Méthode 2 : Conversion des icônes (optionnel)
-Si vous voulez des icônes PNG au lieu des SVG :
+### Method 2: Icon conversion (optional)
 
-1. Installez Python avec pip
-2. Installez les dépendances :
-   ```bash
-   pip install Pillow cairosvg
-   ```
-3. Exécutez le script de conversion :
-   ```bash
-   python convert_icons.py
-   ```
-4. Modifiez le `manifest.json` pour utiliser les fichiers `.png` au lieu des `.svg`
+If you want PNG icons instead of SVG:
 
-Sinon, vous pouvez convertir manuellement les fichiers SVG en PNG (16x16, 48x48, 128x128) avec un outil en ligne.
+1. Install Python with pip
+2. Install dependencies:
 
-## 📖 Utilisation
+```bash
+pip install Pillow cairosvg
+```
 
-1. Rendez-vous sur n'importe quelle page Bandcamp avec un player audio
-2. L'extension détecte automatiquement le player et le remplace par sa version améliorée
-3. Interface organisée de haut en bas :
-   - **Barre de progression** (en haut) : Cliquez pour naviguer dans la piste
-   - **Contrôles de lecture** (au milieu) : Play/Pause, reculer/avancer de 10 secondes
-   - **Slider de volume** (en bas) : Ajustez le son (mémorisé entre les pages)
-4. Le player amélioré remplace complètement l'interface Bandcamp originale
+3. Run the conversion script:
 
-## 🛠️ Fonctionnement technique
+```bash
+python convert_icons.py
+```
+
+4. Edit `manifest.json` to use `.png` files instead of `.svg`
+
+Alternatively, you can manually convert SVG files to PNG (16x16, 48x48, 128x128) with an online tool.
+
+## 📖 Usage
+
+1. Go to any Bandcamp page with an audio player
+2. The extension automatically detects the player and replaces it with its enhanced version
+3. Interface layout from top to bottom:
+   - **Progress bar** (top): Click to seek within the track
+   - **Playback controls** (middle): Play/Pause, skip back/forward 10 seconds
+   - **Volume slider** (bottom): Adjust the volume (remembered across pages)
+4. The enhanced player completely replaces the original Bandcamp interface
+
+## 🛠️ Technical details
 
 ### Content Script
-- Se charge sur tous les domaines `*.bandcamp.com`
-- Détecte automatiquement les éléments `<audio>`
-- Injecte les contrôles personnalisés
-- Synchronise avec les événements audio natifs
 
-### Styles CSS
-- Interface moderne avec glassmorphism
-- Variables CSS pour faciliter la personnalisation
-- Responsive design
-- Compatible avec les thèmes Bandcamp existants
+- Runs on all `*.bandcamp.com` domains
+- Injects custom controls
+- Syncs with native audio events
 
-### Compatibilité
-- **Extension Universelle** : Un seul manifest pour tous !
-- **Chrome** : Manifest V3 (version 88+)
-- **Firefox** : Manifest V3 (version 109+)
-- **Edge** : Manifest V3 (version 88+)
-- **Opera** : Manifest V3 (version 74+)
-- **Fallback** : localStorage pour Firefox < 109
-- Fonctionne sur toutes les pages Bandcamp
-- Support des navigations SPA
-- Sauvegarde automatique des préférences
+## 🎨 Customization
 
-## 🎨 Personnalisation
-
-Vous pouvez facilement modifier l'apparence en éditant le fichier `styles.css`. Les principales variables à modifier :
+You can easily modify the appearance by editing the `styles.css` file. Main variables to change:
 
 ```css
-/* Couleurs principales */
-background: #1da0c3; /* Couleur principale */
-background: rgba(0, 0, 0, 0.8); /* Arrière-plan des contrôles */
+/* Main colors */
+background: #1da0c3; /* Primary color */
+background: rgba(0, 0, 0, 0.8); /* Controls background */
 
-/* Tailles */
-height: 8px; /* Hauteur des barres */
-border-radius: 4px; /* Arrondi des éléments */
+/* Sizes */
+height: 8px; /* Bar height */
+border-radius: 4px; /* Element rounding */
 ```
 
-## 🔧 Structure des fichiers
+## 🔧 File structure (what truly matters only)
 
-```
-bandcamp-player-enhancer/
-├── manifest.json          # Configuration de l'extension
-├── content.js             # Script principal
-├── styles.css             # Styles de l'interface
-├── convert_icons.py       # Script de conversion d'icônes
-├── icons/
-│   ├── icon16.svg         # Icône 16x16
-│   ├── icon48.svg         # Icône 48x48
-│   └── icon128.svg        # Icône 128x128
-└── README.md              # Ce fichier
+```txt
+mbappe/
+├── manifest.json          # Extension configuration
+├── src/                   # Main script code
+├── styles.css             # Interface styling
+├── scripts/               # Browser scripts for building
+├── build/                 # Build output directory
+├── INSTALLATION.md        # Installation instructions
+└── README.md              # This file
 ```
 
-## 🐛 Résolution de problèmes
+## 🐛 Troubleshooting
 
-### L'extension ne se charge pas
-- Vérifiez que le mode développeur est activé
-- Rechargez l'extension depuis `chrome://extensions/`
+### The extension doesn't load
 
-### Les contrôles n'apparaissent pas
-- Actualisez la page Bandcamp
-- Vérifiez la console développeur (F12) pour les erreurs
-- Assurez-vous qu'il y a bien un player audio sur la page
+- Make sure developer mode is enabled
+- Reload the extension from `chrome://extensions/`
 
-### Le volume ne fonctionne pas
-- Certains sites peuvent bloquer la modification du volume
-- Essayez de rafraîchir la page
+### Anything else
 
-## 📝 Notes de développement
+- Check the developer console (F12) for errors
+- Make sure there's an audio player on the page
+- Refresh the Bandcamp track/album page
+- Try refreshing the page
 
-Cette extension utilise :
-- **Manifest V3** : Pour Chrome/Edge/Chromium
-- **Manifest V2** : Pour Firefox (rétrocompatibilité)
-- **API Cross-Browser** : Détection automatique Chrome/Firefox
-- **Content Scripts** : Pour interagir avec les pages Bandcamp
-- **Storage API + localStorage** : Sauvegarde des préférences avec fallback
-- **Vanilla JavaScript** : Pas de dépendances externes
-- **CSS moderne** : Flexbox, Grid, et effets visuels avancés
+## 📝 Development notes
 
-Le code est entièrement commenté et structuré pour faciliter les modifications et les contributions.
+This extension uses:
 
-## 🔮 Améliorations futures possibles
+- **Manifest V3**: For modern browser compatibility
+- **Cross-Browser API**: Automatic Chrome/Firefox detection
+- **Content Scripts**: To interact with Bandcamp pages
+- **Storage API + localStorage**: Saves preferences with fallback
+- **Vanilla TypeScript**: No external dependencies
 
-- [ ] Support des raccourcis clavier
-- [ ] Equalizer visuel
-- [ ] Thèmes multiples
-- [ ] Sauvegarde des préférences
-- [ ] Intégration avec les playlists
-- [ ] Mode picture-in-picture
+The code is fully commented and structured for easy modification and contributions.
+
+## 🔮 Possible future improvements
+
+- [ ] Keyboard shortcut support
+- [ ] Visual equalizer
+- [ ] Multiple themes
+- [ ] Preference backup
+- [ ] Playlist integration
+- [ ] Picture-in-picture mode
 
 ---
 
-**Développé avec ❤️ pour améliorer l'expérience Bandcamp**
+Developed with ❤️ to enhance the Bandcamp experience

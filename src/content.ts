@@ -1,9 +1,9 @@
-// Bandcamp Player Enhancer - TypeScript Content Script
+// MBAPPE - TypeScript Content Script
 
 type BrowserAPI = typeof chrome | typeof browser | null;
-type BrowserType = "Chrome/Chromium" | "Firefox" | "Inconnu";
+type BrowserType = "Chromium" | "Firefox" | "Unknown";
 
-interface BandcampHandles {
+interface MbappeObject {
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
   progressBar: HTMLDivElement | null;
@@ -28,119 +28,112 @@ interface DebugControl {
   onclick: string;
 }
 
-(function (): void {
+(() => {
   "use strict";
 
-  console.log("Bandcamp Player Enhancer chargé");
-
-  // Détection du navigateur et API de stockage compatible
+  // Browser detection and compatible storage API
   const browserAPI: BrowserAPI = (() => {
     if (typeof chrome !== "undefined" && chrome.storage) {
       return chrome;
     } else if (typeof browser !== "undefined" && browser.storage) {
       return browser;
     } else {
-      console.warn(
-        "Aucune API de navigateur détectée, utilisation du localStorage comme fallback"
-      );
+      console.warn("No browser API detected, using localStorage as fallback");
       return null;
     }
   })();
-
-  console.log(
-    "Navigateur détecté:",
-    browserAPI
-      ? typeof (globalThis as any).chrome !== "undefined"
-        ? "Chrome/Chromium"
-        : "Firefox"
-      : "Inconnu"
-  );
-
-  let audioElement: HTMLAudioElement | null = null;
-  let volumeSlider: HTMLInputElement | null = null;
-  let progressBar: HTMLDivElement | null = null;
-  let progressFill: HTMLDivElement | null = null;
-  let progressHandle: HTMLDivElement | null = null;
-  let currentTimeDisplay: HTMLSpanElement | null = null;
-  let durationDisplay: HTMLSpanElement | null = null;
-  let isDragging: boolean = false;
-  let savedVolume: number = 1; // Volume par défaut
-
-  // Fonction pour sauvegarder le volume (compatible Chrome + Firefox)
-  function saveVolume(volume: number): void {
-    savedVolume = volume;
-
-    if (browserAPI && browserAPI.storage && browserAPI.storage.local) {
-      // Chrome/Firefox avec API extension
-      browserAPI.storage.local.set({ bandcamp_volume: volume });
+  const browserLocalStorage = browserAPI?.storage?.local;
+  const browserType: BrowserType = (() => {
+    if (browserAPI) {
+      return typeof globalThis.chrome !== "undefined" ? "Chromium" : "Firefox";
     } else {
-      // Fallback avec localStorage
+      return "Unknown";
+    }
+  })();
+  console.info("Detected browser:", browserType);
+
+  const mbappe: MbappeObject = {
+    audioElement: null,
+    volumeSlider: null,
+    progressBar: null,
+    progressFill: null,
+    progressHandle: null,
+    currentTimeDisplay: null,
+    durationDisplay: null,
+    isDragging: false,
+    savedVolume: 1, // Default volume
+  };
+
+  const saveNewVolume = (newVolume: number) => {
+    mbappe.savedVolume = newVolume;
+
+    if (browserLocalStorage !== undefined) {
+      // Chrome/Firefox with extension API
+      browserLocalStorage.set({ bandcamp_volume: newVolume });
+    } else {
+      // Fallback with localStorage
       try {
-        localStorage.setItem("bandcamp_volume", volume.toString());
+        localStorage.setItem("bandcamp_volume", newVolume.toString());
       } catch (e) {
-        console.warn("Impossible de sauvegarder le volume:", e);
+        console.warn("Unable to save volume:", e);
       }
     }
-  }
+  };
 
-  // Fonction pour charger le volume sauvegardé (compatible Chrome + Firefox)
-  function loadSavedVolume(): Promise<number> {
+  const loadSavedVolume = (): Promise<number> => {
     return new Promise((resolve) => {
-      if (browserAPI?.storage?.local) {
-        // Chrome/Firefox avec API extension
-        browserAPI.storage.local.get(
-          ["bandcamp_volume"],
-          (result: VolumeStorage) => {
-            const volume = result.bandcamp_volume || 1; // 1 = 100% par défaut
-            savedVolume = volume;
-            resolve(volume);
-          }
-        );
+      if (browserLocalStorage !== undefined) {
+        // Chrome/Firefox with extension API
+        browserLocalStorage.get(["bandcamp_volume"]).then((result: VolumeStorage) => {
+          const volume = result.bandcamp_volume || 1; // 1 = 100% by default
+          mbappe.savedVolume = volume;
+          resolve(volume);
+        });
       } else {
-        // Fallback avec localStorage
+        // Fallback with localStorage
         try {
           const storedVolume = localStorage.getItem("bandcamp_volume");
           const volume = storedVolume ? parseFloat(storedVolume) : 1;
-          savedVolume = volume;
+          mbappe.savedVolume = volume;
           resolve(volume);
         } catch (e) {
-          console.warn("Impossible de charger le volume:", e);
-          savedVolume = 1;
+          console.warn("Unable to load volume:", e);
+          mbappe.savedVolume = 1;
           resolve(1);
         }
       }
     });
-  }
+  };
 
-  // Fonction pour formater le temps en MM:SS
-  function formatTime(seconds: number): string {
+  // Function to format time as MM:SS
+  const formatTime = (seconds: number): string => {
     if (isNaN(seconds) || !isFinite(seconds)) return "0:00";
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  }
+  };
 
-  // Fonction pour trouver l'élément audio
-  async function findAudioElement(): Promise<HTMLAudioElement | null> {
-    const audio = document.querySelector("audio") as HTMLAudioElement | null;
+  // Function to find the audio element
+  const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
+    const audio = document.querySelector("audio");
     if (audio) {
-      console.log("Élément audio trouvé:", audio);
+      console.info("Audio element found:", audio);
 
-      // Charger et appliquer immédiatement le volume sauvegardé
+      // Load and immediately apply saved volume
       await loadSavedVolume();
-      audio.volume = savedVolume;
-      console.log(`Volume restauré: ${Math.round(savedVolume * 100)}%`);
+      audio.volume = mbappe.savedVolume;
+      console.info(`Restored volume: ${Math.round(mbappe.savedVolume * 100)}%`);
 
       return audio;
     }
     return null;
-  }
+  };
 
-  // Fonction pour créer le slider de volume
-  async function createVolumeSlider(): Promise<HTMLDivElement | null> {
-    if (!audioElement || volumeSlider) return null;
+  // Function to create the volume slider
+  const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
+    if (!mbappe.audioElement || mbappe.volumeSlider) return null;
 
-    // Charger le volume sauvegardé
+    // Load saved volume
     await loadSavedVolume();
 
     const container = document.createElement("div");
@@ -154,25 +147,25 @@ interface DebugControl {
     slider.type = "range";
     slider.min = "0";
     slider.max = "100";
-    slider.value = Math.round(savedVolume * 100).toString();
+    slider.value = Math.round(mbappe.savedVolume * 100).toString();
     slider.className = "bpe-volume-slider";
 
-    // Appliquer le volume sauvegardé à l'élément audio
-    audioElement.volume = savedVolume;
+    // Apply saved volume to audio element
+    mbappe.audioElement.volume = mbappe.savedVolume;
 
     const valueDisplay = document.createElement("div");
     valueDisplay.className = "bpe-volume-value";
     valueDisplay.textContent = `${slider.value}%`;
 
-    // Event listener pour le changement de volume
+    // Event listener for volume change
     slider.addEventListener("input", function (this: HTMLInputElement) {
       const volume = parseInt(this.value) / 100;
-      if (audioElement) {
-        audioElement.volume = volume;
+      if (mbappe.audioElement) {
+        mbappe.audioElement.volume = volume;
         valueDisplay.textContent = `${this.value}%`;
 
-        // Sauvegarder le nouveau volume
-        saveVolume(volume);
+        // Save new volume
+        saveNewVolume(volume);
       }
     });
 
@@ -180,14 +173,12 @@ interface DebugControl {
     container.appendChild(slider);
     container.appendChild(valueDisplay);
 
-    volumeSlider = slider;
+    mbappe.volumeSlider = slider;
     return container;
-  }
+  };
 
-  // Fonction pour cacher les éléments du player original
-  function hideOriginalPlayerElements() {
-    // Sélecteurs des éléments du player Bandcamp à cacher
-    const elementsToHide = [
+  const hideOriginalPlayerElements = () => {
+    const bcElementsToHide = [
       ".progbar",
       ".progbar_empty",
       ".timeindicator",
@@ -206,68 +197,60 @@ interface DebugControl {
       ".playbar",
     ];
 
-    elementsToHide.forEach((selector) => {
-      const elements = document.querySelectorAll(selector);
+    bcElementsToHide.forEach((selector) => {
+      const elements = document.querySelectorAll(selector) as unknown as Array<HTMLElement>;
       elements.forEach((element) => {
         element.style.display = "none";
         element.classList.add("bpe-hidden-original");
       });
     });
 
-    // Cacher aussi les contrôles de volume natifs s'ils existent
-    const volumeControls = document.querySelectorAll(
+    const bcVolumeControls = document.querySelectorAll(
       '[class*="volume"], [class*="vol"]'
-    );
-    volumeControls.forEach((element) => {
-      if (
-        element.tagName.toLowerCase() === "input" &&
-        element.type === "range"
-      ) {
+    ) as unknown as Array<HTMLInputElement>;
+    bcVolumeControls.forEach((element) => {
+      if (element.tagName.toLowerCase() === "input" && element.type === "range") {
         element.style.display = "none";
         element.classList.add("bpe-hidden-original");
       }
     });
 
-    // Cacher les barres de progression natives
-    const progressBars = document.querySelectorAll(
-      'div[style*="width"][style*="%"]'
-    );
-    progressBars.forEach((element) => {
+    const bcProgressBars = document.querySelectorAll('div[style*="width"][style*="%"]');
+    bcProgressBars.forEach((element) => {
       const parent = element.parentElement;
       if (
         parent &&
-        (parent.className.includes("prog") ||
-          parent.className.includes("time") ||
-          parent.className.includes("scrub"))
+        (parent.className.includes("prog") || parent.className.includes("time") || parent.className.includes("scrub"))
       ) {
         parent.style.display = "none";
         parent.classList.add("bpe-hidden-original");
       }
     });
 
-    console.log("Éléments du player original cachés");
-  }
+    console.log("Original player elements hidden");
+  };
 
-  // Fonction pour restaurer les éléments du player original (si nécessaire)
-  function restoreOriginalPlayerElements() {
-    const hiddenElements = document.querySelectorAll(".bpe-hidden-original");
+  // Function to restore original player elements (if needed)
+  const restoreOriginalPlayerElements = () => {
+    const hiddenElements = document.querySelectorAll(".bpe-hidden-original") as unknown as Array<HTMLElement>;
     hiddenElements.forEach((element) => {
       element.style.display = "";
       element.classList.remove("bpe-hidden-original");
     });
 
-    console.log("Éléments du player original restaurés");
-  }
+    console.log("Original player elements restored");
+  };
+  restoreOriginalPlayerElements();
 
-  // Fonction de débogage pour identifier les contrôles Bandcamp
-  function debugBandcampControls() {
-    console.log("=== DEBUG: Éléments de contrôle détectés ===");
+  // Debug function to identify Bandcamp controls
+  const debugBandcampControls = () => {
+    console.debug("=== DEBUG: Detected control elements ===");
 
-    // Chercher tous les boutons et liens possibles
+    // Find all possible buttons and links
     const allButtons = document.querySelectorAll(
       'button, a, div[role="button"], span[onclick]'
-    );
-    const relevantControls = [];
+    ) as unknown as Array<HTMLButtonElement>;
+    const relevantControls: Array<DebugControl> = [];
 
     allButtons.forEach((element, index) => {
       const classes = element.className || "";
@@ -275,7 +258,7 @@ interface DebugControl {
       const text = element.textContent || "";
       const onclick = element.onclick || "";
 
-      // Filtrer les éléments qui pourraient être des contrôles
+      // Filter elements that could be controls
       if (
         classes.includes("play") ||
         classes.includes("pause") ||
@@ -299,91 +282,81 @@ interface DebugControl {
       }
     });
 
-    console.log("Contrôles potentiels trouvés:", relevantControls);
-    console.log("=== FIN DEBUG ===");
+    console.debug("Potential controls found:", relevantControls);
+    console.debug("=== END DEBUG ===");
 
     return relevantControls;
-  }
+  };
 
-  // Fonction pour créer les contrôles de lecture personnalisés
-  function createPlaybackControls() {
+  const createPlaybackControls = () => {
     const container = document.createElement("div");
     container.className = "bpe-playback-controls";
 
-    // Bouton Play/Pause
     const playPauseBtn = document.createElement("button");
     playPauseBtn.className = "bpe-play-pause-btn";
     playPauseBtn.innerHTML = "▶️";
     playPauseBtn.title = "Play/Pause";
 
-    // Bouton Previous (reculer 10s)
     const prevBtn = document.createElement("button");
     prevBtn.className = "bpe-prev-btn";
     prevBtn.innerHTML = "⏪";
-    prevBtn.title = "Reculer de 10 secondes";
+    prevBtn.title = "Rewind 10 seconds";
 
-    // Bouton Next (avancer 10s)
     const nextBtn = document.createElement("button");
     nextBtn.className = "bpe-next-btn";
     nextBtn.innerHTML = "⏩";
-    nextBtn.title = "Avancer de 10 secondes";
+    nextBtn.title = "Forward 10 seconds";
 
-    // Event listeners pour les boutons
-    playPauseBtn.addEventListener("click", function () {
-      if (!audioElement) return;
+    // Event listeners for buttons
+    playPauseBtn.addEventListener("click", () => {
+      if (!mbappe.audioElement) return;
 
-      if (audioElement.paused) {
-        audioElement.play();
+      if (mbappe.audioElement.paused) {
+        mbappe.audioElement.play();
         playPauseBtn.innerHTML = "⏸️";
       } else {
-        audioElement.pause();
+        mbappe.audioElement.pause();
         playPauseBtn.innerHTML = "▶️";
       }
     });
 
-    prevBtn.addEventListener("click", function () {
-      console.log("Bouton Reculer 10s cliqué");
+    prevBtn.addEventListener("click", () => {
+      console.debug("Rewind 10s button clicked");
 
-      if (!audioElement) {
-        console.log("Aucun élément audio trouvé");
+      if (!mbappe.audioElement) {
+        console.warn("No audio element found");
         return;
       }
 
-      // Reculer de 10 secondes
-      const newTime = Math.max(0, audioElement.currentTime - 10);
-      audioElement.currentTime = newTime;
-      console.log(`Temps reculé à: ${Math.round(newTime)}s`);
+      const newTime = Math.max(0, mbappe.audioElement.currentTime - 10);
+      mbappe.audioElement.currentTime = newTime;
+      console.debug(`Time rewound to: ${Math.round(newTime)}s`);
     });
 
-    nextBtn.addEventListener("click", function () {
-      console.log("Bouton Avancer 10s cliqué");
+    nextBtn.addEventListener("click", () => {
+      console.debug("Forward 10s button clicked");
 
-      if (!audioElement) {
-        console.log("Aucun élément audio trouvé");
+      if (!mbappe.audioElement) {
+        console.warn("No audio element found");
         return;
       }
 
-      // Avancer de 10 secondes (sans dépasser la durée)
-      const newTime = Math.min(
-        audioElement.duration || 0,
-        audioElement.currentTime + 10
-      );
-      audioElement.currentTime = newTime;
-      console.log(`Temps avancé à: ${Math.round(newTime)}s`);
+      const newTime = Math.min(mbappe.audioElement.duration || 0, mbappe.audioElement.currentTime + 10);
+      mbappe.audioElement.currentTime = newTime;
+      console.debug(`Time forwarded to: ${Math.round(newTime)}s`);
     });
 
-    // Mettre à jour l'état du bouton play/pause
-    if (audioElement) {
-      audioElement.addEventListener("play", () => {
+    if (mbappe.audioElement) {
+      mbappe.audioElement.addEventListener("play", () => {
         playPauseBtn.innerHTML = "⏸️";
       });
 
-      audioElement.addEventListener("pause", () => {
+      mbappe.audioElement.addEventListener("pause", () => {
         playPauseBtn.innerHTML = "▶️";
       });
 
-      // État initial
-      playPauseBtn.innerHTML = audioElement.paused ? "▶️" : "⏸️";
+      // Initial state
+      playPauseBtn.innerHTML = mbappe.audioElement.paused ? "▶️" : "⏸️";
     }
 
     container.appendChild(prevBtn);
@@ -391,11 +364,10 @@ interface DebugControl {
     container.appendChild(nextBtn);
 
     return container;
-  }
+  };
 
-  // Fonction pour créer la barre de progression custom
-  function createCustomProgressBar() {
-    if (!audioElement || progressBar) return;
+  const createProgressBar = () => {
+    if (!mbappe.audioElement || mbappe.progressBar) return;
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
@@ -428,75 +400,72 @@ interface DebugControl {
     container.appendChild(progressBarElement);
     container.appendChild(timeDisplay);
 
-    // Event listeners pour la barre de progression
     let isMouseDown = false;
 
-    function updateProgress(event) {
-      const rect = progressBarElement.getBoundingClientRect();
-      const percent = Math.max(
-        0,
-        Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)
-      );
-      const newTime = (percent / 100) * audioElement.duration;
-
-      if (!isNaN(newTime) && isFinite(newTime)) {
-        audioElement.currentTime = newTime;
-      }
+    interface BcProgressEvent {
+      clientX: number;
     }
 
-    progressBarElement.addEventListener("mousedown", function (e) {
+    const updateProgress = (event: MouseEvent | BcProgressEvent) => {
+      const rect = progressBarElement.getBoundingClientRect();
+      const percent = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+      const newTime = (percent / 100) * (mbappe.audioElement?.duration ?? 0);
+
+      if (!isNaN(newTime) && isFinite(newTime) && mbappe.audioElement) {
+        mbappe.audioElement.currentTime = newTime;
+      }
+    };
+
+    progressBarElement.addEventListener("mousedown", (e) => {
       isMouseDown = true;
-      isDragging = true;
+      mbappe.isDragging = true;
       updateProgress(e);
     });
 
-    document.addEventListener("mousemove", function (e) {
+    document.addEventListener("mousemove", (e) => {
       if (isMouseDown) {
         updateProgress(e);
       }
     });
 
-    document.addEventListener("mouseup", function () {
+    document.addEventListener("mouseup", () => {
       isMouseDown = false;
-      isDragging = false;
+      mbappe.isDragging = false;
     });
 
     progressBarElement.addEventListener("click", updateProgress);
 
-    progressBar = progressBarElement;
-    progressFill = progressFillElement;
-    progressHandle = progressHandleElement;
-    currentTimeDisplay = currentTime;
-    durationDisplay = duration;
+    mbappe.progressBar = progressBarElement;
+    mbappe.progressFill = progressFillElement;
+    mbappe.progressHandle = progressHandleElement;
+    mbappe.currentTimeDisplay = currentTime;
+    mbappe.durationDisplay = duration;
 
     return container;
-  }
+  };
 
-  // Fonction pour mettre à jour la barre de progression
-  function updateProgressBar() {
-    if (!audioElement || !progressFill || isDragging) return;
+  const updateProgressBar = () => {
+    if (!mbappe.audioElement || !mbappe.progressFill || mbappe.isDragging) return;
 
-    const currentTime = audioElement.currentTime;
-    const duration = audioElement.duration;
+    const currentTime = mbappe.audioElement.currentTime;
+    const duration = mbappe.audioElement.duration;
 
     if (!isNaN(duration) && duration > 0) {
       const percent = (currentTime / duration) * 100;
-      progressFill.style.width = `${percent}%`;
+      mbappe.progressFill.style.width = `${percent}%`;
 
-      if (currentTimeDisplay) {
-        currentTimeDisplay.textContent = formatTime(currentTime);
+      if (mbappe.currentTimeDisplay) {
+        mbappe.currentTimeDisplay.textContent = formatTime(currentTime);
       }
 
-      if (durationDisplay) {
-        durationDisplay.textContent = formatTime(duration);
+      if (mbappe.durationDisplay) {
+        mbappe.durationDisplay.textContent = formatTime(duration);
       }
     }
-  }
+  };
 
-  // Fonction pour injecter les améliorations
-  async function injectEnhancements() {
-    // Chercher le conteneur du player
-    const playerSelectors = [
+  const injectEnhancements = async () => {
+    const bcPlayerSelectors = [
       ".inline_player",
       "#trackInfoInner",
       ".track_play_auxiliary",
@@ -505,137 +474,123 @@ interface DebugControl {
     ];
 
     let playerContainer = null;
-    for (const selector of playerSelectors) {
+    for (const selector of bcPlayerSelectors) {
       playerContainer = document.querySelector(selector);
       if (playerContainer) break;
     }
 
     if (!playerContainer) {
-      console.log("Conteneur du player non trouvé, recherche alternative...");
-      // Chercher près des éléments audio
-      if (audioElement) {
-        playerContainer =
-          audioElement.closest("div") || audioElement.parentElement;
+      console.warn("Player container not found, alternative search...");
+      // Search near audio elements
+      if (mbappe.audioElement) {
+        playerContainer = mbappe.audioElement.closest("div") || mbappe.audioElement.parentElement;
       }
     }
 
     if (!playerContainer) {
-      console.log("Impossible de trouver un conteneur approprié");
+      console.error("Unable to find a suitable container");
       return;
     }
 
-    // Cacher ou supprimer les éléments de l'ancien player
+    // Hide or remove old player elements
     hideOriginalPlayerElements();
 
-    // Créer le conteneur principal pour nos améliorations
+    // Create main container for our enhancements
     const enhancementsContainer = document.createElement("div");
     enhancementsContainer.className = "bpe-enhancements";
 
-    // 1. Ajouter la barre de progression en haut
-    const progressContainer = createCustomProgressBar();
+    const progressContainer = createProgressBar();
     if (progressContainer) {
       enhancementsContainer.appendChild(progressContainer);
     }
 
-    // 2. Créer les contrôles de lecture au milieu
     const playbackControls = createPlaybackControls();
     if (playbackControls) {
       enhancementsContainer.appendChild(playbackControls);
     }
 
-    // 3. Ajouter le slider de volume en bas
     const volumeContainer = await createVolumeSlider();
     if (volumeContainer) {
       enhancementsContainer.appendChild(volumeContainer);
     }
 
-    // Insérer notre player à la place de l'ancien
     playerContainer.appendChild(enhancementsContainer);
 
-    console.log("Player original remplacé avec succès");
-  }
+    console.log("MBAPPE successfully deployed");
+  };
 
-  // Fonction pour initialiser les event listeners audio
-  function setupAudioListeners() {
-    if (!audioElement) return;
+  const setupAudioListeners = () => {
+    if (!mbappe.audioElement) return;
 
-    // Mettre à jour la barre de progression
-    audioElement.addEventListener("timeupdate", updateProgressBar);
-    audioElement.addEventListener("loadedmetadata", updateProgressBar);
-    audioElement.addEventListener("durationchange", updateProgressBar);
+    // Update progress bar
+    mbappe.audioElement.addEventListener("timeupdate", updateProgressBar);
+    mbappe.audioElement.addEventListener("loadedmetadata", updateProgressBar);
+    mbappe.audioElement.addEventListener("durationchange", updateProgressBar);
 
-    // Synchroniser le volume avec notre slider
-    audioElement.addEventListener("volumechange", function () {
-      if (volumeSlider) {
-        volumeSlider.value = Math.round(audioElement.volume * 100);
-        const valueDisplay =
-          volumeSlider.parentElement.querySelector(".bpe-volume-value");
+    // Sync volume with MBAPPE's slider
+    mbappe.audioElement.addEventListener("volumechange", () => {
+      if (mbappe.volumeSlider) {
+        mbappe.volumeSlider.value = `${Math.round(mbappe.audioElement!.volume * 100)}`;
+        const valueDisplay = mbappe.volumeSlider.parentElement!.querySelector(".bpe-volume-value");
         if (valueDisplay) {
-          valueDisplay.textContent = `${volumeSlider.value}%`;
+          valueDisplay.textContent = `${mbappe.volumeSlider.value}%`;
         }
 
-        // Sauvegarder le volume quand il change (même si ce n'est pas via notre slider)
-        saveVolume(audioElement.volume);
+        // Save volume when it changes (even if not via our slider)
+        saveNewVolume(mbappe.audioElement!.volume);
       }
     });
 
-    console.log("Event listeners audio configurés");
-  }
+    console.info("Audio event listeners set up");
+  };
 
-  // Fonction principale d'initialisation
-  async function init() {
-    console.log("Initialisation de Bandcamp Player Enhancer...");
+  // Main initialization function
+  const init = async () => {
+    console.info("Initializing MBAPPE...");
 
-    // Attendre que la page soit complètement chargée
+    // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {
       window.addEventListener("load", init);
       return;
     }
 
-    // Chercher l'élément audio
-    audioElement = await findAudioElement();
-
-    if (!audioElement) {
-      console.log("Élément audio non trouvé, nouvelle tentative dans 2s...");
+    mbappe.audioElement = await findAudioElement();
+    if (!mbappe.audioElement) {
+      console.warn("Audio element not found, retrying in 2s...");
       setTimeout(init, 2000);
       return;
     }
 
-    // Vérifier si les améliorations sont déjà injectées
-    if (document.querySelector(".bpe-enhancements")) {
-      console.log("Améliorations déjà présentes");
-      return;
-    }
+    const mbappeIsAlreadyInjected = document.querySelector(".bpe-enhancements");
+    if (mbappeIsAlreadyInjected) return;
 
-    // Injecter les améliorations
+    // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
 
-    // Debug: afficher les contrôles détectés
+    // Debug: show detected controls
     debugBandcampControls();
 
-    console.log("Bandcamp Player Enhancer initialisé avec succès");
-  }
+    console.log("MBAPPE initialized successfully");
+  };
 
-  // Observer les changements de DOM pour les players qui se chargent dynamiquement
-  const observer = new MutationObserver(function (mutations) {
-    mutations.forEach(async function (mutation) {
+  // Observe DOM changes for players that load dynamically
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
-        // Vérifier si un nouvel élément audio a été ajouté
+        // Check if a new audio element was added
         const newAudio = document.querySelector("audio");
-        if (newAudio && newAudio !== audioElement) {
-          console.log("Nouvel élément audio détecté");
+        if (newAudio && newAudio !== mbappe.audioElement) {
+          console.info("New audio element detected");
 
-          // Charger et appliquer le volume sauvegardé au nouvel élément
+          // Load and apply saved volume to the new element
           await loadSavedVolume();
-          newAudio.volume = savedVolume;
-          console.log(
-            `Volume appliqué au nouvel audio: ${Math.round(savedVolume * 100)}%`
-          );
+          newAudio.volume = mbappe.savedVolume;
+          console.info(`Volume applied to new audio: ${Math.round(mbappe.savedVolume * 100)}%`);
 
-          audioElement = newAudio;
+          mbappe.audioElement = newAudio;
 
-          // Réinitialiser si nécessaire
+          // Reset if needed
           if (!document.querySelector(".bpe-enhancements")) {
             setTimeout(init, 500);
           }
@@ -644,22 +599,21 @@ interface DebugControl {
     });
   });
 
-  // Démarrer l'observation
+  // Start observing
   observer.observe(document.body, {
     childList: true,
     subtree: true,
   });
 
-  // Lancer l'initialisation
   init();
 
-  // Support pour les navigations SPA (Single Page Application)
+  // Support for SPA navigation
   let lastUrl = location.href;
   new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
       lastUrl = url;
-      console.log("Navigation détectée, réinitialisation...");
+      console.log("Navigation detected, resetting...");
       setTimeout(init, 1000);
     }
   }).observe(document, { subtree: true, childList: true });
