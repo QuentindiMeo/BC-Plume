@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Bandcamp Player Enhancer",
+  "version": "1.0.0",
+  "description": "Améliore l'interface du player Bandcamp avec un slider de volume et une barre de lecture améliorée",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "*://*.bandcamp.com/*",
+    "*://bandcamp.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.bandcamp.com/*",
+        "*://bandcamp.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.svg",
+    "48": "icons/icon48.svg",
+    "128": "icons/icon128.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "bandcamp-player-enhancer@extension.local",
+      "strict_min_version": "109.0"
+    }
+  }
+}
