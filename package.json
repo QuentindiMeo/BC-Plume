@@ -1,0 +1,39 @@
+{
+  "author": "Quentin DI MEO",
+  "name": "mbappe_multimedia-bandcamp-pluripotent-player-extension",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "build:production": "tsc --sourceMap false",
+    "clean": "rimraf dist build",
+    "dev": "npm run clean && npm run build:watch",
+    "package": "npm run build:production && npm run package:chrome && npm run package:firefox",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "bandcamp",
+    "browser-extension",
+    "chrome-extension",
+    "firefox-addon",
+    "typescript",
+    "audio-player"
+  ],
+  "devDependencies": {
+    "@types/chrome": "^0.0.254",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "eslint": "^8.55.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

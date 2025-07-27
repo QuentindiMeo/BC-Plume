@@ -4,17 +4,11 @@
   "version": "1.0.0",
   "description": "Améliore l'interface du player Bandcamp avec un slider de volume et une barre de lecture améliorée",
   "permissions": ["storage"],
-  "host_permissions": [
-    "*://*.bandcamp.com/*",
-    "*://bandcamp.com/*"
-  ],
+  "host_permissions": ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
   "content_scripts": [
     {
-      "matches": [
-        "*://*.bandcamp.com/*",
-        "*://bandcamp.com/*"
-      ],
-      "js": ["content.js"],
+      "matches": ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
+      "ts": ["src/content.ts"],
       "css": ["styles.css"],
       "run_at": "document_end"
     }
