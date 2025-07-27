@@ -1,137 +1,199 @@
-# Installation de l'Extension Bandcamp Player Enhancer
+# MBAPPE Installation
 
-## 🎯 Installation Universelle (Recommandée)
+## 🎯 TypeScript-based Extension
 
-Cette extension utilise maintenant un **manifest universel** compatible avec tous les navigateurs modernes !
+This extension is built with **TypeScript** for better type safety and maintainability.  
+It compiles to JavaScript and supports all modern browsers.
 
-### ✅ Prérequis
-- **Chrome/Edge/Opera** : Version 88+ (Manifest V3)
-- **Firefox** : Version 109+ (Manifest V3)
-- **Brave/Vivaldi** : Dernières versions
+### ✅ Prerequisites
 
-### 📥 Installation Rapide
+- **For Users**: Any modern browser (Chrome/Firefox/Edge/Opera)
+- **For Developers**:
+  - Node.js 16.0+
+  - npm 8.0+
+  - TypeScript 5.8+
 
-#### 1️⃣ Télécharger
+### 📥 Installation Methods
+
+## Method 1: Quick Installation (Pre-built)
+
+If you just want to use the extension without building from source:
+
+### 1️⃣ Download
+
+1. Download this repository as a ZIP file (or clone it)
+2. (if ZIP file) Extract it to a folder
+
+### 2️⃣ Browser-specific Installation
+
+#### Chrome/Edge/Opera/Brave... (Chromium-based)
+
+1. Open `chrome://extensions/` (or equivalent)
+2. Enable **"Developer mode"** (top right corner)
+3. Click **"Load unpacked"**
+4. Select the project folder
+5. ✅ The extension is installed!
+
+#### Firefox
+
+1. Open `about:debugging`
+2. Click **"This Firefox"**
+3. Click **"Load Temporary Add-on"**
+4. Select the `manifest.json` file
+5. ✅ The extension is installed!
+
+## Method 2: Build from TypeScript Source
+
+For developers or to get the latest features:
+
+### 1️⃣ Setup Development Environment
+
 ```bash
-git clone https://github.com/votre-username/bandcamp-player-enhancer.git
-cd bandcamp-player-enhancer
+# Clone or download the repository
+git clone <repository-url>
+cd mbappe
+
+# Install dependencies
+npm install
 ```
 
-#### 2️⃣ Installation par Navigateur
+### 2️⃣ Build the Extension
 
-##### Chrome/Edge/Opera/Brave :
-1. Ouvrez `chrome://extensions/` (ou équivalent)
-2. Activez **"Mode développeur"** (coin supérieur droit)
-3. Cliquez **"Charger l'extension non empaquetée"**
-4. Sélectionnez le dossier du projet
-5. ✅ L'extension est installée !
+```bash
+# Quick build (development with source maps)
+npm run build
 
-##### Firefox :
-1. Ouvrez `about:debugging`
-2. Cliquez **"Ce Firefox"**
-3. Cliquez **"Charger un module temporaire"**
-4. Sélectionnez le fichier `manifest.json`
-5. ✅ L'extension est installée !
+# Production build (optimized, no source maps)
+npm run prod
 
-#### 3️⃣ Vérification
-- Rendez-vous sur n'importe quelle page Bandcamp
-- L'interface améliorée apparaît automatiquement
-- Le volume est sauvegardé entre les pages
+# Watch mode for development
+npm run watch
 
-## 🛠️ Build Avancé (Optionnel)
-
-### Création d'un Package
-```powershell
-# Build automatique
-.\build.ps1
-
-# Résultat : build/universal/bandcamp-player-enhancer.zip
+# Full packaging for distribution
+npm run package
 ```
 
-### Structure du Build
+### 3️⃣ Development Commands
+
+```bash
+# Clean build artifacts
+npm run clean
+
+# Development mode (clean + watch)
+npm run dev
+
+# Code quality
+npm run lint          # Check code style
+npm run format        # Fix formatting issues
+npm run type-check    # TypeScript type checking only
 ```
-build/universal/
-├── manifest.json           # Manifest universel
-├── content.js             # Script principal
-├── styles.css             # Styles CSS
-├── icons/                 # Icônes de l'extension
-└── README.md             # Documentation
-```
 
-## 🔧 Conversion des Icônes (Optionnel)
+### 4️⃣ Install Built Extension
 
-Si vous voulez convertir les SVG en PNG pour certains navigateurs :
+After building, you can install the extension:
 
-### Option A : Outil en ligne (recommandé)
-- Allez sur https://convertio.co/svg-png/ ou https://svgtopng.com/
-- Convertissez chaque fichier SVG du dossier `icons/` :
+#### Option A: Direct Installation (Development)
+
+- **Chrome**: Load the main project folder as unpacked extension (manifest.json points to dist/)
+- **Firefox**: Load `manifest.json` as temporary add-on
+
+#### Option B: Browser-Specific Packages (Distribution)
+
+- **Chrome**: Load `build/chrome/` folder as unpacked extension
+- **Firefox**: Load `build/firefox/manifest.json` as temporary add-on
+- **Production**: Use `npm run package` to create optimized packages
+
+## 🎯 Verify Installation
+
+- Go to any Bandcamp page
+- The enhanced interface appears automatically
+- Volume is saved between pages
+
+## 🔧 Icon Conversion (Optional)
+
+If you want to convert SVGs to PNGs for certain browsers:
+
+### Option A: Online Tool (recommended)
+
+- Go to <https://convertio.co/svg-png/> or <https://svgtopng.com/>
+- Convert each SVG file in the `icons/` folder:
   - icon16.svg → icon16.png (16x16 pixels)
-  - icon48.svg → icon48.png (48x48 pixels)  
+  - icon48.svg → icon48.png (48x48 pixels)
   - icon128.svg → icon128.png (128x128 pixels)
 
-### Option B : Avec Python (si disponible)
+### Option B: With Python (if available)
+
 ```bash
 pip install Pillow cairosvg
 python convert_icons.py
 ```
 
-## 🔧 Dépannage
+## 🔧 Troubleshooting
 
-### Problèmes Courants
+### TypeScript Build Issues
 
-#### Firefox : "Extension non compatible"
-- **Solution** : Vérifiez que vous avez Firefox 109+
-- **Alternative** : L'extension utilisera localStorage en fallback
+#### "tsc: command not found"
 
-#### Chrome : "Manifest non valide"
-- **Solution** : Vérifiez que `manifest.json` n'est pas corrompu
-- **Debug** : Consultez la console des extensions
+- **Solution**: Install TypeScript globally: `npm install -g typescript`
+- **Alternative**: Use local version: `npx tsc`
 
-#### Pas d'interface visible
-- **Solution** : Rechargez la page Bandcamp
-- **Debug** : Ouvrez F12 → Console pour voir les logs
+#### Build fails with type errors
 
-### Logs de Debug
-Ouvrez la console (F12) sur Bandcamp pour voir :
-```
-[BPE] Extension loaded successfully
-[BPE] Audio element found: <audio>
-[BPE] Volume loaded: 0.75
-[BPE] UI created successfully
-```
+- **Solution**: Check TypeScript version compatibility
+- **Debug**: Run `npm run type-check` to see specific errors
+- **Fix**: Update type definitions: `npm update @types/chrome @types/node`
 
-## 🔄 Mise à Jour
+#### Missing dist/ folder
 
-### Mise à jour Manuelle
-1. Télécharger la nouvelle version
-2. Remplacer les fichiers existants
-3. Recharger l'extension dans le navigateur
+- **Solution**: Run `npm run build` before installation
+- **Alternative**: Use `npm run dev` for watch mode during development
 
-### Mise à jour via Git
-```bash
-cd bandcamp-player-enhancer
-git pull origin main
-# Recharger l'extension dans le navigateur
-```
+### Browser Extension Issues
 
-## 🗑️ Désinstallation
+#### Firefox: "Extension not compatible"
 
-### Chrome/Edge/Opera :
+- **Solution**: Make sure you have Firefox 109+
+- **Alternative**: The extension will use localStorage as a fallback
+
+#### Chrome: "Invalid manifest"
+
+- **Solution**: Check that `manifest.json` is not corrupted
+- **Debug**: Check the extensions console
+
+#### No visible interface
+
+- **Solution**: Reload the Bandcamp page
+- **Debug**: Open F12 → Console to view logs
+
+## 🔄 Update
+
+### Manual Update
+
+1. Download the newest version from this repository (or `git pull` on `develop`)
+2. (if ZIP file) Replace the existing files
+3. Reload the extension in your browser
+
+## 🗑️ Uninstallation
+
+### Chrome/Edge/Opera/Brave... (Chromium-based)
+
 1. `chrome://extensions/`
-2. Cliquer sur "Supprimer" sur l'extension
+2. Click "Remove" on the extension
 
-### Firefox :
+### Firefox
+
 1. `about:addons`
-2. Extensions → Supprimer
+2. Extensions → Remove
 
-Les préférences sauvegardées sont automatiquement supprimées.
+Saved preferences are automatically deleted.
 
 ---
 
 ## 📞 Support
 
-**Problème ?** Ouvrez une issue sur GitHub avec :
-- Version du navigateur
-- Version de l'extension
-- Description du problème
-- Logs de la console (F12)
+**Having an issue?** Open a GitHub issue, preferably with:
+
+- Browser version
+- Extension version
+- Problem description
+- Console logs (F12)
