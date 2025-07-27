@@ -1,20 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Bandcamp Player Enhancer",
+  "name": "MBAPPE - Multimedia Bandcamp Pluripotent Player Extension",
   "version": "1.0.0",
-  "description": "Améliore l'interface du player Bandcamp avec un slider de volume et une barre de lecture améliorée",
+  "description": "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   "permissions": ["storage"],
-  "host_permissions": [
-    "*://*.bandcamp.com/*",
-    "*://bandcamp.com/*"
-  ],
+  "host_permissions": ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
   "content_scripts": [
     {
-      "matches": [
-        "*://*.bandcamp.com/*",
-        "*://bandcamp.com/*"
-      ],
-      "js": ["content.js"],
+      "matches": ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
+      "js": ["dist/content.js"],
       "css": ["styles.css"],
       "run_at": "document_end"
     }
@@ -26,7 +20,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "bandcamp-player-enhancer@extension.local",
+      "id": "mbappe@extension.local",
       "strict_min_version": "109.0"
     }
   }
