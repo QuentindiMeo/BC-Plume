@@ -1,11 +1,15 @@
 // BC-Plume - TypeScript Content Script
 
-type BrowserAPI = typeof chrome | typeof browser | null;
+interface AnyBrowserStorageAPI {
+  storage: {
+    local: {
+      get: (keys: Array<string>) => Promise<any>;
+      set: (items: any) => Promise<void>;
+    };
+  };
+}
 type BrowserType = "Chromium" | "Firefox" | "unknown";
 
-/**
- * Audio player enhancement handles
- */
 interface PlumeObject {
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
@@ -18,16 +22,12 @@ interface PlumeObject {
   savedVolume: number;
 }
 
-/**
- * Volume storage interface
- */
+// Native Bandcamp volume storage interface
 interface VolumeStorage {
   bandcamp_volume?: number;
 }
 
-/**
- * Debug control information
- */
+// Debug control information
 interface DebugControl {
   index: number;
   tagName: string;
@@ -37,6 +37,7 @@ interface DebugControl {
   onclick: string;
 }
 
+// Native Bandcamp media player progress event interface
 interface BcProgressEvent {
   clientX: number;
 }
@@ -45,11 +46,11 @@ interface BcProgressEvent {
   "use strict";
 
   // Browser detection and compatible storage API
-  const browserAPI: BrowserAPI = (() => {
-    if (typeof chrome !== "undefined" && chrome.storage) {
-      return chrome;
-    } else if (typeof browser !== "undefined" && browser.storage) {
-      return browser;
+  const browserAPI: AnyBrowserStorageAPI | null = (() => {
+    if (typeof (globalThis as any).chrome !== "undefined" && (globalThis as any).chrome.storage) {
+      return (globalThis as any).chrome;
+    } else if (typeof (globalThis as any).browser !== "undefined" && (globalThis as any).browser.storage) {
+      return (globalThis as any).browser;
     } else {
       console.warn("No browser API detected, using localStorage as fallback");
       return null;
@@ -58,13 +59,14 @@ interface BcProgressEvent {
   const browserLocalStorage = browserAPI?.storage?.local;
   const browserType: BrowserType = (() => {
     if (browserAPI) {
-      return typeof globalThis.chrome !== "undefined" ? "Chromium" : "Firefox";
+      return typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
     } else {
       return "unknown";
     }
   })();
   console.info("Detected browser:", browserType);
 
+  // Initialize Plume object
   const plume: PlumeObject = {
     audioElement: null,
     volumeSlider: null,
@@ -156,12 +158,14 @@ interface BcProgressEvent {
     label.className = "bpe-volume-label";
     label.textContent = "Volume";
 
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "100";
-    slider.value = Math.round(plume.savedVolume * 100).toString();
-    slider.className = "bpe-volume-slider";
+    const slider = {
+      ...document.createElement("input"),
+      type: "range",
+      min: "0",
+      max: "100",
+      value: Math.round(plume.savedVolume * 100).toString(),
+      className: "bpe-volume-slider",
+    }
 
     // Apply saved volume to audio element
     plume.audioElement.volume = plume.savedVolume;
@@ -539,7 +543,7 @@ interface BcProgressEvent {
     // Sync volume with PLUME's slider
     plume.audioElement.addEventListener("volumechange", () => {
       if (plume.volumeSlider) {
-        plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
+        plume.volumeSlider.value = Math.round(plume.audioElement!.volume * 100).toString();
         const valueDisplay = plume.volumeSlider.parentElement!.querySelector(".bpe-volume-value");
         if (valueDisplay) {
           valueDisplay.textContent = `${plume.volumeSlider.value}%`;

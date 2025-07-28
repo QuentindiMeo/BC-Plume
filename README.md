@@ -35,7 +35,7 @@ A cross-browser extension that improves the listening experience on Bandcamp wit
 #### Automatic build (optional)
 
 ```bash
-npm run package  # Creates build/ folder with all files
+pnpm run deploy  # Creates build/ folder with all files
 ```
 
 ### Method 2: Icon conversion (optional)

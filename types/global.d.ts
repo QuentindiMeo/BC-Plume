@@ -1,6 +1,9 @@
 // Global type augmentations for browser extension APIs
 
 declare global {
+  // -------- GENERIC TYPES --------
+  type Dict<T> = Record<string, T>;
+
   /**
    * Chrome extension API types
    */
@@ -15,8 +18,8 @@ declare global {
   const browser: {
     storage: {
       local: {
-        get(keys?: string[] | string | null): Promise<Record<string, any>>;
-        set(items: Record<string, any>): Promise<void>;
+        get(keys?: string[] | string | null): Promise<Dict<any>>;
+        set(items: Dict<any>): Promise<void>;
         remove(keys: string | string[]): Promise<void>;
         clear(): Promise<void>;
       };
@@ -32,9 +35,9 @@ declare global {
    */
   namespace chrome.storage {
     interface StorageArea {
-      get(callback: (items: Record<string, any>) => void): void;
-      get(keys: string | string[] | null, callback: (items: Record<string, any>) => void): void;
-      set(items: Record<string, any>, callback?: () => void): void;
+      get(callback: (items: Dict<any>) => void): void;
+      get(keys: string | string[] | null, callback: (items: Dict<any>) => void): void;
+      set(items: Dict<any>, callback?: () => void): void;
     }
   }
 }
@@ -54,7 +57,7 @@ export interface ManifestV2 {
     css?: string[];
     run_at?: "document_start" | "document_end" | "document_idle";
   }>;
-  icons?: Record<string, string>;
+  icons?: Dict<string>;
   applications?: {
     gecko: {
       id: string;
@@ -76,7 +79,7 @@ export interface ManifestV3 {
     css?: string[];
     run_at?: "document_start" | "document_end" | "document_idle";
   }>;
-  icons?: Record<string, string>;
+  icons?: Dict<string>;
   browser_specific_settings?: {
     gecko: {
       id: string;
