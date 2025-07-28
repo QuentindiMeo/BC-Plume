@@ -55,10 +55,10 @@ const manifest = {
   version: "1.0.1",
   description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   permissions: ["storage"],
-  host_permissions: ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
+  host_permissions: ["*://*.bandcamp.com/*"],
   content_scripts: [
     {
-      matches: ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
+      matches: ["*://*.bandcamp.com/album/*", "*://*.bandcamp.com/track/*"],
       js: ["content.js"],
       css: ["styles.css"],
       run_at: "document_end",
