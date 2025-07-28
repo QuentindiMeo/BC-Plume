@@ -1,4 +1,4 @@
-/* Bandcamp Player Enhancer - Styles */
+/* MBAPPE - Styles */
 
 .bpe-volume-label {
   color: #ffffff;
@@ -9,7 +9,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Slider de volume custom */
+/* Custom volume slider */
 .bpe-volume-slider {
   width: 100%;
   height: 6px;
@@ -105,44 +105,12 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Amélioration de la barre native Bandcamp */
-.progbar,
-.progbar_empty {
-  height: 8px !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-}
+/* ===== PLAYER HIERARCHICAL STRUCTURE ===== */
+/* 1. PROGRESS BAR (top) */
+/* 2. PLAYBACK CONTROLS (middle) */
+/* 3. VOLUME (bottom) */
 
-.progbar {
-  background: linear-gradient(90deg, #1da0c3, #2bb8db) !important;
-  box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
-}
-
-.progbar_empty {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Amélioration du player container */
-.playbutton,
-.prevbutton,
-.nextbutton {
-  transition: all 0.2s ease !important;
-}
-
-.playbutton:hover,
-.prevbutton:hover,
-.nextbutton:hover {
-  transform: scale(1.05) !important;
-  filter: brightness(1.1) !important;
-}
-
-/* ===== STRUCTURE HIÉRARCHIQUE DU PLAYER ===== */
-/* 1. BARRE DE PROGRESSION (en haut) */
-/* 2. CONTRÔLES DE LECTURE (au milieu) */
-/* 3. VOLUME (en bas) */
-
-/* Container principal pour nos améliorations */
+/* Main container for our enhancements */
 .bpe-enhancements {
   background: rgba(0, 0, 0, 0.6);
   border-radius: 8px;
@@ -152,7 +120,7 @@
   overflow: hidden;
 }
 
-/* Barre de progression - EN HAUT */
+/* Progress bar - TOP */
 .bpe-progress-container {
   position: relative;
   margin: 0;
@@ -161,7 +129,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Contrôles de lecture - AU MILIEU */
+/* Playback controls - MIDDLE */
 .bpe-playback-controls {
   display: flex;
   justify-content: center;
@@ -172,7 +140,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Container pour le volume - EN BAS */
+/* Container for volume - BOTTOM */
 .bpe-volume-container {
   position: relative;
   margin: 0;
@@ -195,6 +163,15 @@
   color: white;
   backdrop-filter: blur(10px);
 }
+.bpe-playback-controls button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #1da0c3;
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(29, 160, 195, 0.3);
+}
+.bpe-playback-controls button:active {
+  transform: scale(0.95);
+}
 
 .bpe-play-pause-btn {
   width: 60px !important;
@@ -203,24 +180,29 @@
   background: rgba(29, 160, 195, 0.2) !important;
   border-color: #1da0c3 !important;
 }
-
-.bpe-playback-controls button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: #1da0c3;
-  transform: scale(1.1);
-  box-shadow: 0 4px 15px rgba(29, 160, 195, 0.3);
-}
-
 .bpe-play-pause-btn:hover {
   background: rgba(29, 160, 195, 0.4) !important;
   box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5) !important;
 }
 
-.bpe-playback-controls button:active {
-  transform: scale(0.95);
+/* Improved native Bandcamp bar */
+.progbar,
+.progbar_empty {
+  height: 8px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
 }
 
-/* Masquer les éléments originaux */
+.progbar {
+  background: linear-gradient(90deg, #1da0c3, #2bb8db) !important;
+  box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
+}
+
+.progbar_empty {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+/* Hide original elements */
 .bpe-hidden-original {
   display: none !important;
   visibility: hidden !important;
@@ -228,12 +210,12 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  /* Ajustement global pour mobile */
+  /* Global adjustment for mobile */
   .bpe-enhancements {
     margin: 6px 0;
   }
 
-  /* Barre de progression (haut) */
+  /* Progress bar (top) */
   .bpe-progress-container {
     padding: 8px 12px;
   }
@@ -242,7 +224,7 @@
     height: 10px;
   }
 
-  /* Contrôles de lecture (milieu) */
+  /* Playback controls (middle) */
   .bpe-playback-controls {
     padding: 15px;
     gap: 10px;
@@ -260,7 +242,7 @@
     font-size: 18px !important;
   }
 
-  /* Volume (bas) */
+  /* Volume (bottom) */
   .bpe-volume-container {
     padding: 8px 12px;
   }

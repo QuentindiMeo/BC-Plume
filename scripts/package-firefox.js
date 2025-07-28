@@ -54,10 +54,9 @@ staticDirs.forEach((dir) => {
 // Create Firefox manifest (Manifest V2)
 const manifest = {
   manifest_version: 2,
-  name: "Bandcamp Player Enhancer",
-  version: "1.0.0",
-  description:
-    "Améliore l'interface du player Bandcamp avec un slider de volume et une barre de lecture améliorée",
+  name: "MBAPPE - Multimedia Bandcamp Pluripotent Player Extension",
+  version: "1.0.1",
+  description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   permissions: ["storage", "*://*.bandcamp.com/*", "*://bandcamp.com/*"],
   content_scripts: [
     {
@@ -80,10 +79,7 @@ const manifest = {
   },
 };
 
-fs.writeFileSync(
-  path.join(buildDir, "manifest.json"),
-  JSON.stringify(manifest, null, 2)
-);
+fs.writeFileSync(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
 console.log("✅ Created Firefox manifest.json (Manifest V2)");
 console.log("🎉 Firefox extension package ready in build/firefox/");

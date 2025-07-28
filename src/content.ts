@@ -1,7 +1,45 @@
 // MBAPPE - TypeScript Content Script
 
-import { BrowserAPI, BrowserType, DebugControl, MbappeObject, VolumeStorage } from "../types/extension";
-import { BcProgressEvent } from "../types/native";
+type BrowserAPI = typeof chrome | typeof browser | null;
+type BrowserType = "Chromium" | "Firefox" | "unknown";
+
+/**
+ * Audio player enhancement handles
+ */
+interface MbappeObject {
+  audioElement: HTMLAudioElement | null;
+  volumeSlider: HTMLInputElement | null;
+  progressBar: HTMLDivElement | null;
+  progressFill: HTMLDivElement | null;
+  progressHandle: HTMLDivElement | null;
+  currentTimeDisplay: HTMLSpanElement | null;
+  durationDisplay: HTMLSpanElement | null;
+  isDragging: boolean;
+  savedVolume: number;
+}
+
+/**
+ * Volume storage interface
+ */
+interface VolumeStorage {
+  bandcamp_volume?: number;
+}
+
+/**
+ * Debug control information
+ */
+interface DebugControl {
+  index: number;
+  tagName: string;
+  classes: string;
+  title: string;
+  text: string;
+  onclick: string;
+}
+
+interface BcProgressEvent {
+  clientX: number;
+}
 
 (() => {
   "use strict";
