@@ -13,7 +13,7 @@
     "package": "pnpm run build:prod && pnpm run package:chrome && pnpm run package:firefox",
     "package:chrome": "node scripts/package-chrome.js",
     "package:firefox": "node scripts/package-firefox.js",
-    "deploy": "pnpm run build && pnpm run package",
+    "deploy": "pnpm run clean && pnpm run package",
     "lint": "pnpm run prettier && pnpm run eslint",
     "eslint": "eslint src/**/*.ts",
     "eslint:fix": "eslint src/**/*.ts --fix",
