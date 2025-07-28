@@ -1,4 +1,4 @@
-// BC-Plume - TypeScript Content Script
+// Plume - TypeScript Content Script
 
 interface AnyBrowserStorageAPI {
   storage: {
@@ -48,6 +48,14 @@ interface DebugControl {
 
 interface BcProgressEvent {
   clientX: number;
+}
+
+enum BC_ELEM_IDENTIFIERS {
+  previousTrack = ".prevbutton",
+  nextTrack = ".nextbutton",
+  playPause = ".playbutton",
+  currentTrackTitle = ".title_link",
+  audioPlayer = "audio",
 }
 
 (() => {
@@ -136,9 +144,31 @@ interface BcProgressEvent {
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Function to click on the previous track button
+  const clickPreviousTrackButton = () => {
+    const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
+    if (prevButton) {
+      prevButton.click();
+      console.debug("Previous track button clicked");
+    } else {
+      console.warn("Previous track button not found");
+    }
+  };
+
+  // Function to click on the next track button
+  const clickNextTrackButton = () => {
+    const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
+    if (nextButton) {
+      nextButton.click();
+      console.debug("Next track button clicked");
+    } else {
+      console.warn("Next track button not found");
+    }
+  };
+
   // Function to initialize playback (necessary to make Plume buttons effective)
   const initPlayback = () => {
-    const playButton = document.querySelector(".playbutton") as HTMLButtonElement;
+    const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
     if (playButton) {
       // Double-click to ensure playback has started
       playButton.click();
@@ -150,7 +180,7 @@ interface BcProgressEvent {
 
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    const titleElement = document.querySelector(".title-section") as HTMLSpanElement;
+    const titleElement = document.querySelector(BC_ELEM_IDENTIFIERS.currentTrackTitle) as HTMLSpanElement;
     if (titleElement?.textContent) {
       return titleElement.textContent.trim();
     }
@@ -169,7 +199,7 @@ interface BcProgressEvent {
 
   // Function to find the audio element
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
-    const audio = document.querySelector("audio");
+    const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
     if (audio) {
       console.info("Audio element found:", audio);
 
@@ -232,69 +262,24 @@ interface BcProgressEvent {
   };
 
   const hideOriginalPlayerElements = () => {
-    const bcElementsToHide = [
-      ".progbar",
-      ".progbar_empty",
-      ".timeindicator",
-      ".time_indicator",
-      ".volume_ctrl",
-      ".vol_slider",
-      ".volumeslider",
-      ".progress",
-      ".progress-bar",
-      ".tracktime",
-      ".time_total",
-      ".time_elapsed",
-      ".scrubber",
-      ".playhead",
-      ".track-progress",
-      ".playbar",
-    ];
-
-    bcElementsToHide.forEach((selector) => {
-      const elements = document.querySelectorAll(selector) as unknown as Array<HTMLElement>;
-      elements.forEach((element) => {
-        element.style.display = "none";
-        element.classList.add("bpe-hidden-original");
-      });
-    });
-
-    const bcVolumeControls = document.querySelectorAll(
-      '[class*="volume"], [class*="vol"]'
-    ) as unknown as Array<HTMLInputElement>;
-    bcVolumeControls.forEach((element) => {
-      if (element.tagName.toLowerCase() === "input" && element.type === "range") {
-        element.style.display = "none";
-        element.classList.add("bpe-hidden-original");
-      }
-    });
-
-    const bcProgressBars = document.querySelectorAll('div[style*="width"][style*="%"]');
-    bcProgressBars.forEach((element) => {
-      const parent = element.parentElement;
-      if (
-        parent &&
-        (parent.className.includes("prog") || parent.className.includes("time") || parent.className.includes("scrub"))
-      ) {
-        parent.style.display = "none";
-        parent.classList.add("bpe-hidden-original");
-      }
-    });
+    const bcAudioTable = document.querySelector(".inline_player > table") as HTMLTableElement;
+    if (bcAudioTable) {
+      bcAudioTable.style.display = "none";
+      bcAudioTable.classList.add("bpe-hidden-original");
+    }
 
     console.log("Original player elements hidden");
   };
 
   // Function to restore original player elements (if needed)
+  //@ts-ignore This is unused, but kept for debug purposes
   const restoreOriginalPlayerElements = () => {
-    const hiddenElements = document.querySelectorAll(".bpe-hidden-original") as unknown as Array<HTMLElement>;
-    hiddenElements.forEach((element) => {
-      element.style.display = "";
-      element.classList.remove("bpe-hidden-original");
-    });
+    const bcAudioTable = document.querySelector(".bpe-hidden-original") as HTMLTableElement;
+    bcAudioTable.style.display = "unset";
+    bcAudioTable.classList.remove("bpe-hidden-original");
 
     console.log("Original player elements restored");
   };
-  restoreOriginalPlayerElements();
 
   // Debug function to identify Bandcamp controls
   const debugBandcampControls = () => {
@@ -346,35 +331,45 @@ interface BcProgressEvent {
     const container = document.createElement("div");
     container.className = "bpe-playback-controls";
 
+    const trackBackwardBtn = document.createElement("button");
+    trackBackwardBtn.className = "bpe-track-bwd-btn";
+    trackBackwardBtn.innerHTML = "👈";
+    trackBackwardBtn.title = "Go to previous track";
+
+    const timeBackwardBtn = document.createElement("button");
+    timeBackwardBtn.className = "bpe-time-bwd-btn";
+    timeBackwardBtn.innerHTML = "⏪";
+    timeBackwardBtn.title = "Rewind 10 seconds";
+
     const playPauseBtn = document.createElement("button");
     playPauseBtn.className = "bpe-play-pause-btn";
     playPauseBtn.innerHTML = "▶️";
     playPauseBtn.title = "Play/Pause";
 
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "bpe-prev-btn";
-    prevBtn.innerHTML = "⏪";
-    prevBtn.title = "Rewind 10 seconds";
+    const timeForwardBtn = document.createElement("button");
+    timeForwardBtn.className = "bpe-time-fwd-btn";
+    timeForwardBtn.innerHTML = "⏩";
+    timeForwardBtn.title = "Forward 10 seconds";
 
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "bpe-next-btn";
-    nextBtn.innerHTML = "⏩";
-    nextBtn.title = "Forward 10 seconds";
+    const trackForwardBtn = document.createElement("button");
+    trackForwardBtn.className = "bpe-track-fwd-btn";
+    trackForwardBtn.innerHTML = "👉";
+    trackForwardBtn.title = "Go to next track";
 
-    // Event listeners for buttons
-    playPauseBtn.addEventListener("click", () => {
-      if (!plume.audioElement) return;
+    // === Event listeners for buttons ===
+    trackBackwardBtn.addEventListener("click", () => {
+      console.debug("Previous track button clicked");
 
-      if (plume.audioElement.paused) {
-        plume.audioElement.play();
-        playPauseBtn.innerHTML = "⏸️";
-      } else {
-        plume.audioElement.pause();
-        playPauseBtn.innerHTML = "▶️";
+      if (!plume.audioElement) {
+        console.warn("No audio element found");
+        return;
       }
+
+      clickPreviousTrackButton();
+      console.debug("Previous track event dispatched");
     });
 
-    prevBtn.addEventListener("click", () => {
+    timeBackwardBtn.addEventListener("click", () => {
       console.debug("Rewind 10s button clicked");
 
       if (!plume.audioElement) {
@@ -387,7 +382,19 @@ interface BcProgressEvent {
       console.debug(`Time rewound to: ${Math.round(newTime)}s`);
     });
 
-    nextBtn.addEventListener("click", () => {
+    playPauseBtn.addEventListener("click", () => {
+      if (!plume.audioElement) return;
+
+      if (plume.audioElement.paused) {
+        plume.audioElement.play();
+        playPauseBtn.innerHTML = "⏸️";
+      } else {
+        plume.audioElement.pause();
+        playPauseBtn.innerHTML = "▶️";
+      }
+    });
+
+    timeForwardBtn.addEventListener("click", () => {
       console.debug("Forward 10s button clicked");
 
       if (!plume.audioElement) {
@@ -398,6 +405,18 @@ interface BcProgressEvent {
       const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + 10);
       plume.audioElement.currentTime = newTime;
       console.debug(`Time forwarded to: ${Math.round(newTime)}s`);
+    });
+
+    trackForwardBtn.addEventListener("click", () => {
+      console.debug("Next track button clicked");
+
+      if (!plume.audioElement) {
+        console.warn("No audio element found");
+        return;
+      }
+
+      clickNextTrackButton();
+      console.debug("Next track event dispatched");
     });
 
     if (plume.audioElement) {
@@ -413,9 +432,11 @@ interface BcProgressEvent {
       playPauseBtn.innerHTML = plume.audioElement.paused ? "▶️" : "⏸️";
     }
 
-    container.appendChild(prevBtn);
+    container.appendChild(trackBackwardBtn);
+    container.appendChild(timeBackwardBtn);
     container.appendChild(playPauseBtn);
-    container.appendChild(nextBtn);
+    container.appendChild(timeForwardBtn);
+    container.appendChild(trackForwardBtn);
 
     return container;
   };
@@ -546,12 +567,12 @@ interface BcProgressEvent {
     hideOriginalPlayerElements();
 
     // Create main container for our enhancements
-    const enhancementsContainer = document.createElement("div");
-    enhancementsContainer.className = "bpe-enhancements";
+    const plumeContainer = document.createElement("div");
+    plumeContainer.className = "bpe-plume";
 
     const progressContainer = createProgressBar();
     if (progressContainer) {
-      enhancementsContainer.appendChild(progressContainer);
+      plumeContainer.appendChild(progressContainer);
     }
 
     // Create title display
@@ -564,19 +585,19 @@ interface BcProgressEvent {
 
     titleContainer.appendChild(titleText);
     plume.titleDisplay = titleContainer;
-    enhancementsContainer.appendChild(titleContainer);
+    plumeContainer.appendChild(titleContainer);
 
     const playbackControls = createPlaybackControls();
     if (playbackControls) {
-      enhancementsContainer.appendChild(playbackControls);
+      plumeContainer.appendChild(playbackControls);
     }
 
     const volumeContainer = await createVolumeSlider();
     if (volumeContainer) {
-      enhancementsContainer.appendChild(volumeContainer);
+      plumeContainer.appendChild(volumeContainer);
     }
 
-    playerContainer.appendChild(enhancementsContainer);
+    playerContainer.appendChild(plumeContainer);
 
     console.log("BC-Plume successfully deployed");
   };
@@ -593,7 +614,7 @@ interface BcProgressEvent {
     plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
     plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
 
-    // Sync volume with PLUME's slider
+    // Sync volume with Plume's slider
     plume.audioElement.addEventListener("volumechange", () => {
       if (plume.volumeSlider) {
         plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
@@ -627,7 +648,7 @@ interface BcProgressEvent {
       return;
     }
 
-    const plumeIsAlreadyInjected = document.querySelector(".bpe-enhancements");
+    const plumeIsAlreadyInjected = document.querySelector(".bpe-plume");
     if (plumeIsAlreadyInjected) return;
 
     // Inject enhancements
@@ -646,7 +667,7 @@ interface BcProgressEvent {
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
-        const newAudio = document.querySelector("audio");
+        const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
           console.info("New audio element detected");
 
@@ -658,7 +679,7 @@ interface BcProgressEvent {
           plume.audioElement = newAudio;
 
           // Reset if needed
-          if (!document.querySelector(".bpe-enhancements")) {
+          if (!document.querySelector(".bpe-plume")) {
             setTimeout(init, 500);
           }
         }
@@ -666,7 +687,8 @@ interface BcProgressEvent {
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&
-          (mutation.target.classList.contains("title_link") || mutation.target.querySelector(".title_link"))
+          (mutation.target.classList.contains(BC_ELEM_IDENTIFIERS.currentTrackTitle.slice(1)) ||
+            mutation.target.querySelector(BC_ELEM_IDENTIFIERS.currentTrackTitle))
         ) {
           updateTitleDisplay();
         }
