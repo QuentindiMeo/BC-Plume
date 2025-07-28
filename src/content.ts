@@ -1,4 +1,4 @@
-// BC-Plume - TypeScript Content Script
+// Plume - TypeScript Content Script
 
 interface AnyBrowserStorageAPI {
   storage: {
@@ -262,69 +262,24 @@ enum BC_ELEM_IDENTIFIERS {
   };
 
   const hideOriginalPlayerElements = () => {
-    const bcElementsToHide = [
-      ".progbar",
-      ".progbar_empty",
-      ".timeindicator",
-      ".time_indicator",
-      ".volume_ctrl",
-      ".vol_slider",
-      ".volumeslider",
-      ".progress",
-      ".progress-bar",
-      ".tracktime",
-      ".time_total",
-      ".time_elapsed",
-      ".scrubber",
-      ".playhead",
-      ".track-progress",
-      ".playbar",
-    ];
-
-    bcElementsToHide.forEach((selector) => {
-      const elements = document.querySelectorAll(selector) as unknown as Array<HTMLElement>;
-      elements.forEach((element) => {
-        element.style.display = "none";
-        element.classList.add("bpe-hidden-original");
-      });
-    });
-
-    const bcVolumeControls = document.querySelectorAll(
-      '[class*="volume"], [class*="vol"]'
-    ) as unknown as Array<HTMLInputElement>;
-    bcVolumeControls.forEach((element) => {
-      if (element.tagName.toLowerCase() === "input" && element.type === "range") {
-        element.style.display = "none";
-        element.classList.add("bpe-hidden-original");
-      }
-    });
-
-    const bcProgressBars = document.querySelectorAll('div[style*="width"][style*="%"]');
-    bcProgressBars.forEach((element) => {
-      const parent = element.parentElement;
-      if (
-        parent &&
-        (parent.className.includes("prog") || parent.className.includes("time") || parent.className.includes("scrub"))
-      ) {
-        parent.style.display = "none";
-        parent.classList.add("bpe-hidden-original");
-      }
-    });
+    const bcAudioTable = document.querySelector(".inline_player > table") as HTMLTableElement;
+    if (bcAudioTable) {
+      bcAudioTable.style.display = "none";
+      bcAudioTable.classList.add("bpe-hidden-original");
+    }
 
     console.log("Original player elements hidden");
   };
 
   // Function to restore original player elements (if needed)
+  //@ts-ignore This is unused, but kept for debug purposes
   const restoreOriginalPlayerElements = () => {
-    const hiddenElements = document.querySelectorAll(".bpe-hidden-original") as unknown as Array<HTMLElement>;
-    hiddenElements.forEach((element) => {
-      element.style.display = "";
-      element.classList.remove("bpe-hidden-original");
-    });
+    const bcAudioTable = document.querySelector(".bpe-hidden-original") as HTMLTableElement;
+    bcAudioTable.style.display = "unset";
+    bcAudioTable.classList.remove("bpe-hidden-original");
 
     console.log("Original player elements restored");
   };
-  restoreOriginalPlayerElements();
 
   // Debug function to identify Bandcamp controls
   const debugBandcampControls = () => {
@@ -612,12 +567,12 @@ enum BC_ELEM_IDENTIFIERS {
     hideOriginalPlayerElements();
 
     // Create main container for our enhancements
-    const enhancementsContainer = document.createElement("div");
-    enhancementsContainer.className = "bpe-enhancements";
+    const plumeContainer = document.createElement("div");
+    plumeContainer.className = "bpe-plume";
 
     const progressContainer = createProgressBar();
     if (progressContainer) {
-      enhancementsContainer.appendChild(progressContainer);
+      plumeContainer.appendChild(progressContainer);
     }
 
     // Create title display
@@ -630,19 +585,19 @@ enum BC_ELEM_IDENTIFIERS {
 
     titleContainer.appendChild(titleText);
     plume.titleDisplay = titleContainer;
-    enhancementsContainer.appendChild(titleContainer);
+    plumeContainer.appendChild(titleContainer);
 
     const playbackControls = createPlaybackControls();
     if (playbackControls) {
-      enhancementsContainer.appendChild(playbackControls);
+      plumeContainer.appendChild(playbackControls);
     }
 
     const volumeContainer = await createVolumeSlider();
     if (volumeContainer) {
-      enhancementsContainer.appendChild(volumeContainer);
+      plumeContainer.appendChild(volumeContainer);
     }
 
-    playerContainer.appendChild(enhancementsContainer);
+    playerContainer.appendChild(plumeContainer);
 
     console.log("BC-Plume successfully deployed");
   };
@@ -659,7 +614,7 @@ enum BC_ELEM_IDENTIFIERS {
     plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
     plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
 
-    // Sync volume with PLUME's slider
+    // Sync volume with Plume's slider
     plume.audioElement.addEventListener("volumechange", () => {
       if (plume.volumeSlider) {
         plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
@@ -693,7 +648,7 @@ enum BC_ELEM_IDENTIFIERS {
       return;
     }
 
-    const plumeIsAlreadyInjected = document.querySelector(".bpe-enhancements");
+    const plumeIsAlreadyInjected = document.querySelector(".bpe-plume");
     if (plumeIsAlreadyInjected) return;
 
     // Inject enhancements
@@ -724,7 +679,7 @@ enum BC_ELEM_IDENTIFIERS {
           plume.audioElement = newAudio;
 
           // Reset if needed
-          if (!document.querySelector(".bpe-enhancements")) {
+          if (!document.querySelector(".bpe-plume")) {
             setTimeout(init, 500);
           }
         }
