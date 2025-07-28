@@ -111,7 +111,7 @@
 /* 3. VOLUME (bottom) */
 
 /* Main container for our enhancements */
-.bpe-enhancements {
+.bpe-plume {
   background: rgba(0, 0, 0, 0.6);
   border-radius: 8px;
   margin: 8px 0;
@@ -211,7 +211,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   /* Global adjustment for mobile */
-  .bpe-enhancements {
+  .bpe-plume {
     margin: 6px 0;
   }
 
