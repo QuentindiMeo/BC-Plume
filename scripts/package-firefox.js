@@ -54,7 +54,7 @@ staticDirs.forEach((dir) => {
 // Create Firefox manifest (Manifest V2)
 const manifest = {
   manifest_version: 2,
-  name: "MBAPPE - Multimedia Bandcamp Pluripotent Player Extension",
+  name: "PLUME - Player Lightweight Urgent Media Enhancer",
   version: "1.0.1",
   description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   permissions: ["storage", "*://*.bandcamp.com/*", "*://bandcamp.com/*"],

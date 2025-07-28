@@ -1,4 +1,4 @@
-// MBAPPE - TypeScript Content Script
+// PLUME - TypeScript Content Script
 
 type BrowserAPI = typeof chrome | typeof browser | null;
 type BrowserType = "Chromium" | "Firefox" | "unknown";
@@ -6,7 +6,7 @@ type BrowserType = "Chromium" | "Firefox" | "unknown";
 /**
  * Audio player enhancement handles
  */
-interface MbappeObject {
+interface PlumeObject {
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
   progressBar: HTMLDivElement | null;
@@ -65,7 +65,7 @@ interface BcProgressEvent {
   })();
   console.info("Detected browser:", browserType);
 
-  const mbappe: MbappeObject = {
+  const plume: PlumeObject = {
     audioElement: null,
     volumeSlider: null,
     progressBar: null,
@@ -78,7 +78,7 @@ interface BcProgressEvent {
   };
 
   const saveNewVolume = (newVolume: number) => {
-    mbappe.savedVolume = newVolume;
+    plume.savedVolume = newVolume;
 
     if (browserLocalStorage !== undefined) {
       // Chrome/Firefox with extension API
@@ -99,7 +99,7 @@ interface BcProgressEvent {
         // Chrome/Firefox with extension API
         browserLocalStorage.get(["bandcamp_volume"]).then((result: VolumeStorage) => {
           const volume = result.bandcamp_volume || 1; // 1 = 100% by default
-          mbappe.savedVolume = volume;
+          plume.savedVolume = volume;
           resolve(volume);
         });
       } else {
@@ -107,11 +107,11 @@ interface BcProgressEvent {
         try {
           const storedVolume = localStorage.getItem("bandcamp_volume");
           const volume = storedVolume ? parseFloat(storedVolume) : 1;
-          mbappe.savedVolume = volume;
+          plume.savedVolume = volume;
           resolve(volume);
         } catch (e) {
           console.warn("Unable to load volume:", e);
-          mbappe.savedVolume = 1;
+          plume.savedVolume = 1;
           resolve(1);
         }
       }
@@ -134,8 +134,8 @@ interface BcProgressEvent {
 
       // Load and immediately apply saved volume
       await loadSavedVolume();
-      audio.volume = mbappe.savedVolume;
-      console.info(`Restored volume: ${Math.round(mbappe.savedVolume * 100)}%`);
+      audio.volume = plume.savedVolume;
+      console.info(`Restored volume: ${Math.round(plume.savedVolume * 100)}%`);
 
       return audio;
     }
@@ -144,7 +144,7 @@ interface BcProgressEvent {
 
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
-    if (!mbappe.audioElement || mbappe.volumeSlider) return null;
+    if (!plume.audioElement || plume.volumeSlider) return null;
 
     // Load saved volume
     await loadSavedVolume();
@@ -160,11 +160,11 @@ interface BcProgressEvent {
     slider.type = "range";
     slider.min = "0";
     slider.max = "100";
-    slider.value = Math.round(mbappe.savedVolume * 100).toString();
+    slider.value = Math.round(plume.savedVolume * 100).toString();
     slider.className = "bpe-volume-slider";
 
     // Apply saved volume to audio element
-    mbappe.audioElement.volume = mbappe.savedVolume;
+    plume.audioElement.volume = plume.savedVolume;
 
     const valueDisplay = document.createElement("div");
     valueDisplay.className = "bpe-volume-value";
@@ -173,8 +173,8 @@ interface BcProgressEvent {
     // Event listener for volume change
     slider.addEventListener("input", function (this: HTMLInputElement) {
       const volume = parseInt(this.value) / 100;
-      if (mbappe.audioElement) {
-        mbappe.audioElement.volume = volume;
+      if (plume.audioElement) {
+        plume.audioElement.volume = volume;
         valueDisplay.textContent = `${this.value}%`;
 
         // Save new volume
@@ -186,7 +186,7 @@ interface BcProgressEvent {
     container.appendChild(slider);
     container.appendChild(valueDisplay);
 
-    mbappe.volumeSlider = slider;
+    plume.volumeSlider = slider;
     return container;
   };
 
@@ -322,13 +322,13 @@ interface BcProgressEvent {
 
     // Event listeners for buttons
     playPauseBtn.addEventListener("click", () => {
-      if (!mbappe.audioElement) return;
+      if (!plume.audioElement) return;
 
-      if (mbappe.audioElement.paused) {
-        mbappe.audioElement.play();
+      if (plume.audioElement.paused) {
+        plume.audioElement.play();
         playPauseBtn.innerHTML = "⏸️";
       } else {
-        mbappe.audioElement.pause();
+        plume.audioElement.pause();
         playPauseBtn.innerHTML = "▶️";
       }
     });
@@ -336,40 +336,40 @@ interface BcProgressEvent {
     prevBtn.addEventListener("click", () => {
       console.debug("Rewind 10s button clicked");
 
-      if (!mbappe.audioElement) {
+      if (!plume.audioElement) {
         console.warn("No audio element found");
         return;
       }
 
-      const newTime = Math.max(0, mbappe.audioElement.currentTime - 10);
-      mbappe.audioElement.currentTime = newTime;
+      const newTime = Math.max(0, plume.audioElement.currentTime - 10);
+      plume.audioElement.currentTime = newTime;
       console.debug(`Time rewound to: ${Math.round(newTime)}s`);
     });
 
     nextBtn.addEventListener("click", () => {
       console.debug("Forward 10s button clicked");
 
-      if (!mbappe.audioElement) {
+      if (!plume.audioElement) {
         console.warn("No audio element found");
         return;
       }
 
-      const newTime = Math.min(mbappe.audioElement.duration || 0, mbappe.audioElement.currentTime + 10);
-      mbappe.audioElement.currentTime = newTime;
+      const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + 10);
+      plume.audioElement.currentTime = newTime;
       console.debug(`Time forwarded to: ${Math.round(newTime)}s`);
     });
 
-    if (mbappe.audioElement) {
-      mbappe.audioElement.addEventListener("play", () => {
+    if (plume.audioElement) {
+      plume.audioElement.addEventListener("play", () => {
         playPauseBtn.innerHTML = "⏸️";
       });
 
-      mbappe.audioElement.addEventListener("pause", () => {
+      plume.audioElement.addEventListener("pause", () => {
         playPauseBtn.innerHTML = "▶️";
       });
 
       // Initial state
-      playPauseBtn.innerHTML = mbappe.audioElement.paused ? "▶️" : "⏸️";
+      playPauseBtn.innerHTML = plume.audioElement.paused ? "▶️" : "⏸️";
     }
 
     container.appendChild(prevBtn);
@@ -380,7 +380,7 @@ interface BcProgressEvent {
   };
 
   const createProgressBar = () => {
-    if (!mbappe.audioElement || mbappe.progressBar) return;
+    if (!plume.audioElement || plume.progressBar) return;
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
@@ -418,16 +418,16 @@ interface BcProgressEvent {
     const updateProgress = (event: MouseEvent | BcProgressEvent) => {
       const rect = progressBarElement.getBoundingClientRect();
       const percent = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
-      const newTime = (percent / 100) * (mbappe.audioElement?.duration ?? 0);
+      const newTime = (percent / 100) * (plume.audioElement?.duration ?? 0);
 
-      if (!isNaN(newTime) && isFinite(newTime) && mbappe.audioElement) {
-        mbappe.audioElement.currentTime = newTime;
+      if (!isNaN(newTime) && isFinite(newTime) && plume.audioElement) {
+        plume.audioElement.currentTime = newTime;
       }
     };
 
     progressBarElement.addEventListener("mousedown", (e) => {
       isMouseDown = true;
-      mbappe.isDragging = true;
+      plume.isDragging = true;
       updateProgress(e);
     });
 
@@ -439,36 +439,36 @@ interface BcProgressEvent {
 
     document.addEventListener("mouseup", () => {
       isMouseDown = false;
-      mbappe.isDragging = false;
+      plume.isDragging = false;
     });
 
     progressBarElement.addEventListener("click", updateProgress);
 
-    mbappe.progressBar = progressBarElement;
-    mbappe.progressFill = progressFillElement;
-    mbappe.progressHandle = progressHandleElement;
-    mbappe.currentTimeDisplay = currentTime;
-    mbappe.durationDisplay = duration;
+    plume.progressBar = progressBarElement;
+    plume.progressFill = progressFillElement;
+    plume.progressHandle = progressHandleElement;
+    plume.currentTimeDisplay = currentTime;
+    plume.durationDisplay = duration;
 
     return container;
   };
 
   const updateProgressBar = () => {
-    if (!mbappe.audioElement || !mbappe.progressFill || mbappe.isDragging) return;
+    if (!plume.audioElement || !plume.progressFill || plume.isDragging) return;
 
-    const currentTime = mbappe.audioElement.currentTime;
-    const duration = mbappe.audioElement.duration;
+    const currentTime = plume.audioElement.currentTime;
+    const duration = plume.audioElement.duration;
 
     if (!isNaN(duration) && duration > 0) {
       const percent = (currentTime / duration) * 100;
-      mbappe.progressFill.style.width = `${percent}%`;
+      plume.progressFill.style.width = `${percent}%`;
 
-      if (mbappe.currentTimeDisplay) {
-        mbappe.currentTimeDisplay.textContent = formatTime(currentTime);
+      if (plume.currentTimeDisplay) {
+        plume.currentTimeDisplay.textContent = formatTime(currentTime);
       }
 
-      if (mbappe.durationDisplay) {
-        mbappe.durationDisplay.textContent = formatTime(duration);
+      if (plume.durationDisplay) {
+        plume.durationDisplay.textContent = formatTime(duration);
       }
     }
   };
@@ -491,8 +491,8 @@ interface BcProgressEvent {
     if (!playerContainer) {
       console.warn("Player container not found, alternative search...");
       // Search near audio elements
-      if (mbappe.audioElement) {
-        playerContainer = mbappe.audioElement.closest("div") || mbappe.audioElement.parentElement;
+      if (plume.audioElement) {
+        playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
       }
     }
 
@@ -525,28 +525,28 @@ interface BcProgressEvent {
 
     playerContainer.appendChild(enhancementsContainer);
 
-    console.log("MBAPPE successfully deployed");
+    console.log("PLUME successfully deployed");
   };
 
   const setupAudioListeners = () => {
-    if (!mbappe.audioElement) return;
+    if (!plume.audioElement) return;
 
     // Update progress bar
-    mbappe.audioElement.addEventListener("timeupdate", updateProgressBar);
-    mbappe.audioElement.addEventListener("loadedmetadata", updateProgressBar);
-    mbappe.audioElement.addEventListener("durationchange", updateProgressBar);
+    plume.audioElement.addEventListener("timeupdate", updateProgressBar);
+    plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
+    plume.audioElement.addEventListener("durationchange", updateProgressBar);
 
-    // Sync volume with MBAPPE's slider
-    mbappe.audioElement.addEventListener("volumechange", () => {
-      if (mbappe.volumeSlider) {
-        mbappe.volumeSlider.value = `${Math.round(mbappe.audioElement!.volume * 100)}`;
-        const valueDisplay = mbappe.volumeSlider.parentElement!.querySelector(".bpe-volume-value");
+    // Sync volume with PLUME's slider
+    plume.audioElement.addEventListener("volumechange", () => {
+      if (plume.volumeSlider) {
+        plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
+        const valueDisplay = plume.volumeSlider.parentElement!.querySelector(".bpe-volume-value");
         if (valueDisplay) {
-          valueDisplay.textContent = `${mbappe.volumeSlider.value}%`;
+          valueDisplay.textContent = `${plume.volumeSlider.value}%`;
         }
 
         // Save volume when it changes (even if not via our slider)
-        saveNewVolume(mbappe.audioElement!.volume);
+        saveNewVolume(plume.audioElement!.volume);
       }
     });
 
@@ -555,7 +555,7 @@ interface BcProgressEvent {
 
   // Main initialization function
   const init = async () => {
-    console.info("Initializing MBAPPE...");
+    console.info("Initializing PLUME...");
 
     // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {
@@ -563,15 +563,15 @@ interface BcProgressEvent {
       return;
     }
 
-    mbappe.audioElement = await findAudioElement();
-    if (!mbappe.audioElement) {
+    plume.audioElement = await findAudioElement();
+    if (!plume.audioElement) {
       console.warn("Audio element not found, retrying in 2s...");
       setTimeout(init, 2000);
       return;
     }
 
-    const mbappeIsAlreadyInjected = document.querySelector(".bpe-enhancements");
-    if (mbappeIsAlreadyInjected) return;
+    const plumeIsAlreadyInjected = document.querySelector(".bpe-enhancements");
+    if (plumeIsAlreadyInjected) return;
 
     // Inject enhancements
     await injectEnhancements();
@@ -580,7 +580,7 @@ interface BcProgressEvent {
     // Debug: show detected controls
     debugBandcampControls();
 
-    console.log("MBAPPE initialized successfully");
+    console.log("PLUME initialized successfully");
   };
 
   // Observe DOM changes for players that load dynamically
@@ -589,15 +589,15 @@ interface BcProgressEvent {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
         const newAudio = document.querySelector("audio");
-        if (newAudio && newAudio !== mbappe.audioElement) {
+        if (newAudio && newAudio !== plume.audioElement) {
           console.info("New audio element detected");
 
           // Load and apply saved volume to the new element
           await loadSavedVolume();
-          newAudio.volume = mbappe.savedVolume;
-          console.info(`Volume applied to new audio: ${Math.round(mbappe.savedVolume * 100)}%`);
+          newAudio.volume = plume.savedVolume;
+          console.info(`Volume applied to new audio: ${Math.round(plume.savedVolume * 100)}%`);
 
-          mbappe.audioElement = newAudio;
+          plume.audioElement = newAudio;
 
           // Reset if needed
           if (!document.querySelector(".bpe-enhancements")) {
