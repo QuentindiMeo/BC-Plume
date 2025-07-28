@@ -4,13 +4,12 @@
  * Browser API detection types
  */
 export type BrowserAPI = typeof chrome | typeof browser | null;
-
-export type BrowserType = "Chrome/Chromium" | "Firefox" | "Inconnu";
+export type BrowserType = "Chromium" | "Firefox" | "unknown";
 
 /**
  * Audio player enhancement handles
  */
-export interface BandcampHandles {
+export interface MbappeObject {
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
   progressBar: HTMLDivElement | null;

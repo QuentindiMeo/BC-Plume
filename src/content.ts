@@ -1,32 +1,7 @@
 // MBAPPE - TypeScript Content Script
 
-type BrowserAPI = typeof chrome | typeof browser | null;
-type BrowserType = "Chromium" | "Firefox" | "Unknown";
-
-interface MbappeObject {
-  audioElement: HTMLAudioElement | null;
-  volumeSlider: HTMLInputElement | null;
-  progressBar: HTMLDivElement | null;
-  progressFill: HTMLDivElement | null;
-  progressHandle: HTMLDivElement | null;
-  currentTimeDisplay: HTMLSpanElement | null;
-  durationDisplay: HTMLSpanElement | null;
-  isDragging: boolean;
-  savedVolume: number;
-}
-
-interface VolumeStorage {
-  bandcamp_volume?: number;
-}
-
-interface DebugControl {
-  index: number;
-  tagName: string;
-  classes: string;
-  title: string;
-  text: string;
-  onclick: string;
-}
+import { BrowserAPI, BrowserType, DebugControl, MbappeObject, VolumeStorage } from "../types/extension";
+import { BcProgressEvent } from "../types/native";
 
 (() => {
   "use strict";
@@ -47,7 +22,7 @@ interface DebugControl {
     if (browserAPI) {
       return typeof globalThis.chrome !== "undefined" ? "Chromium" : "Firefox";
     } else {
-      return "Unknown";
+      return "unknown";
     }
   })();
   console.info("Detected browser:", browserType);
@@ -401,10 +376,6 @@ interface DebugControl {
     container.appendChild(timeDisplay);
 
     let isMouseDown = false;
-
-    interface BcProgressEvent {
-      clientX: number;
-    }
 
     const updateProgress = (event: MouseEvent | BcProgressEvent) => {
       const rect = progressBarElement.getBoundingClientRect();
