@@ -21,7 +21,7 @@ srcFiles.forEach((file) => {
     fs.copyFileSync(srcPath, destPath);
     console.log(`✅ Copied ${file}`);
   } else {
-    console.error(`❌ Missing ${file} - run 'npm run build' first`);
+    console.error(`❌ Missing ${file} - run 'pnpm run build' first`);
     process.exit(1);
   }
 });

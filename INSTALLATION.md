@@ -9,8 +9,8 @@ It compiles to JavaScript and supports all modern browsers.
 
 - **For Users**: Any modern browser (Chrome/Firefox/Edge/Opera)
 - **For Developers**:
-  - Node.js 16.0+
-  - npm 8.0+
+  - Node.js 18.0+
+  - pnpm 10.0+
   - TypeScript 5.8+
 
 ### 📥 Installation Methods
@@ -49,32 +49,32 @@ For developers or to get the latest features:
 ### 1️⃣ Setup Development Environment
 
 ```bash
-git clone https://github.com/QuentindiMeo/bc-plume # Clone or download the repository
-cd bc-plume
+git clone https://github.com/QuentindiMeo/BC-Plume # Clone or download the repository
+cd BC-Plume
 
-npm install # Install dependencies
+pnpm install    # Install dependencies
 ```
 
 ### 2️⃣ Build the Extension
 
 ```bash
-npm run build # Quick build (development with source maps)
-npm run prod # Production build (optimized, no source maps)
-npm run watch # Watch mode for development
-npm run package # Full packaging for distribution
+pnpm run build  # Quick build (development with source maps)
+pnpm run prod   # Production build (optimized, no source maps)
+pnpm run watch  # Watch mode for development
+pnpm run deploy # Full packaging for distribution
 ```
 
 ### 3️⃣ Development Commands
 
 ```bash
-npm run clean # Clean build artifacts
+pnpm run clean       # Clean build artifacts
 
-npm run dev # Development mode (clean + watch)
+pnpm run dev         # Development mode (clean + watch)
 
 # Code quality
-npm run lint        # Check code style
-npm run format      # Fix formatting issues
-npm run type-check  # TypeScript type checking only
+pnpm run lint        # Check code style
+pnpm run format      # Fix formatting issues
+pnpm run type-check  # TypeScript type checking only
 ```
 
 ### 4️⃣ Install Built Extension
@@ -90,7 +90,7 @@ After building, you can install the extension:
 
 - **Chrome**: Load `build/chrome/` folder as unpacked extension
 - **Firefox**: Load `build/firefox/manifest.json` as temporary add-on
-- **Production**: Use `npm run package` to create optimized packages
+- **Production**: Use `pnpm run deploy` to create optimized packages
 
 ## 🎯 Verify Installation
 
@@ -123,19 +123,19 @@ python convert_icons.py
 
 #### "tsc: command not found"
 
-- **Solution**: Install TypeScript globally: `npm install -g typescript`
+- **Solution**: Install TypeScript globally: `pnpm install -g typescript`
 - **Alternative**: Use local version: `npx tsc`
 
 #### Build fails with type errors
 
 - **Solution**: Check TypeScript version compatibility
-- **Debug**: Run `npm run type-check` to see specific errors
-- **Fix**: Update type definitions: `npm update @types/chrome @types/node`
+- **Debug**: Run `pnpm run type-check` to see specific errors
+- **Fix**: Update type definitions: `pnpm update @types/chrome @types/node`
 
 #### Missing dist/ folder
 
-- **Solution**: Run `npm run build` before installation
-- **Alternative**: Use `npm run dev` for watch mode during development
+- **Solution**: Run `pnpm run build` before installation
+- **Alternative**: Use `pnpm run dev` for watch mode during development
 
 ### Browser Extension Issues
 

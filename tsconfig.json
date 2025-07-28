@@ -23,8 +23,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "resolveJsonModule": true,
-    "types": ["chrome", "node"]
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "types/**/*"],
   "exclude": ["node_modules", "dist", "build"]

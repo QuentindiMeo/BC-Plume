@@ -24,7 +24,7 @@ srcFiles.forEach((file) => {
     fs.writeFileSync(destPath, content);
     console.log(`✅ Copied and adapted ${file} for Firefox`);
   } else {
-    console.error(`❌ Missing ${file} - run 'npm run build' first`);
+    console.error(`❌ Missing ${file} - run 'pnpm run build' first`);
     process.exit(1);
   }
 });

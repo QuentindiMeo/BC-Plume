@@ -8,12 +8,8 @@ interface AnyBrowserStorageAPI {
     };
   };
 }
-type BrowserAPI = AnyBrowserStorageAPI | null;
 type BrowserType = "Chromium" | "Firefox" | "unknown";
 
-/**
- * Audio player enhancement handles
- */
 interface PlumeObject {
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
@@ -22,21 +18,16 @@ interface PlumeObject {
   progressHandle: HTMLDivElement | null;
   currentTimeDisplay: HTMLSpanElement | null;
   durationDisplay: HTMLSpanElement | null;
-  titleDisplay: HTMLDivElement | null;
   isDragging: boolean;
   savedVolume: number;
 }
 
-/**
- * Volume storage interface
- */
+// Native Bandcamp volume storage interface
 interface VolumeStorage {
   bandcamp_volume?: number;
 }
 
-/**
- * Debug control information
- */
+// Debug control information
 interface DebugControl {
   index: number;
   tagName: string;
@@ -46,6 +37,7 @@ interface DebugControl {
   onclick: string;
 }
 
+// Native Bandcamp media player progress event interface
 interface BcProgressEvent {
   clientX: number;
 }
@@ -74,6 +66,7 @@ interface BcProgressEvent {
   })();
   console.info("Detected browser:", browserType);
 
+  // Initialize Plume object
   const plume: PlumeObject = {
     audioElement: null,
     volumeSlider: null,
@@ -82,7 +75,6 @@ interface BcProgressEvent {
     progressHandle: null,
     currentTimeDisplay: null,
     durationDisplay: null,
-    titleDisplay: null,
     isDragging: false,
     savedVolume: 1, // Default volume
   };
@@ -136,37 +128,6 @@ interface BcProgressEvent {
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Function to initialize playback (necessary to make Plume buttons effective)
-  const initPlayback = () => {
-    const playButton = document.querySelector(".playbutton") as HTMLButtonElement;
-    if (playButton) {
-      // Double-click to ensure playback has started
-      playButton.click();
-      playButton.click();
-    } else {
-      console.warn("Play button not found");
-    }
-  };
-
-  // Function to get the current track title from Bandcamp
-  const getCurrentTrackTitle = (): string => {
-    const titleElement = document.querySelector(".title-section") as HTMLSpanElement;
-    if (titleElement?.textContent) {
-      return titleElement.textContent.trim();
-    }
-    return "Unknown Track";
-  };
-
-  // Function to update the title display when track changes
-  const updateTitleDisplay = () => {
-    if (plume.titleDisplay) {
-      const titleText = plume.titleDisplay.querySelector(".bpe-title-text");
-      if (titleText) {
-        titleText.textContent = getCurrentTrackTitle();
-      }
-    }
-  };
-
   // Function to find the audio element
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
     const audio = document.querySelector("audio");
@@ -197,12 +158,14 @@ interface BcProgressEvent {
     label.className = "bpe-volume-label";
     label.textContent = "Volume";
 
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "100";
-    slider.value = Math.round(plume.savedVolume * 100).toString();
-    slider.className = "bpe-volume-slider";
+    const slider = {
+      ...document.createElement("input"),
+      type: "range",
+      min: "0",
+      max: "100",
+      value: Math.round(plume.savedVolume * 100).toString(),
+      className: "bpe-volume-slider",
+    }
 
     // Apply saved volume to audio element
     plume.audioElement.volume = plume.savedVolume;
@@ -554,18 +517,6 @@ interface BcProgressEvent {
       enhancementsContainer.appendChild(progressContainer);
     }
 
-    // Create title display
-    const titleContainer = document.createElement("div");
-    titleContainer.className = "bpe-title-display";
-
-    const titleText = document.createElement("div");
-    titleText.className = "bpe-title-text";
-    titleText.textContent = getCurrentTrackTitle();
-
-    titleContainer.appendChild(titleText);
-    plume.titleDisplay = titleContainer;
-    enhancementsContainer.appendChild(titleContainer);
-
     const playbackControls = createPlaybackControls();
     if (playbackControls) {
       enhancementsContainer.appendChild(playbackControls);
@@ -589,14 +540,10 @@ interface BcProgressEvent {
     plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
     plume.audioElement.addEventListener("durationchange", updateProgressBar);
 
-    // Update title when metadata loads (new track)
-    plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
-    plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
-
     // Sync volume with PLUME's slider
     plume.audioElement.addEventListener("volumechange", () => {
       if (plume.volumeSlider) {
-        plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
+        plume.volumeSlider.value = Math.round(plume.audioElement!.volume * 100).toString();
         const valueDisplay = plume.volumeSlider.parentElement!.querySelector(".bpe-volume-value");
         if (valueDisplay) {
           valueDisplay.textContent = `${plume.volumeSlider.value}%`;
@@ -633,12 +580,11 @@ interface BcProgressEvent {
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
-    initPlayback();
 
     // Debug: show detected controls
     debugBandcampControls();
 
-    console.log("BC-Plume initialized successfully");
+    console.log("PLUME initialized successfully");
   };
 
   // Observe DOM changes for players that load dynamically
@@ -662,14 +608,6 @@ interface BcProgressEvent {
             setTimeout(init, 500);
           }
         }
-
-        // Check if the title section has changed (new track)
-        if (
-          mutation.target instanceof Element &&
-          (mutation.target.classList.contains("title_link") || mutation.target.querySelector(".title_link"))
-        ) {
-          updateTitleDisplay();
-        }
       }
     });
   });
@@ -689,11 +627,7 @@ interface BcProgressEvent {
     if (url !== lastUrl) {
       lastUrl = url;
       console.log("Navigation detected, resetting...");
-      setTimeout(() => {
-        init();
-        // Update title after navigation in case the track changed
-        setTimeout(updateTitleDisplay, 500);
-      }, 1000);
+      setTimeout(init, 1000);
     }
   }).observe(document, { subtree: true, childList: true });
 })();
