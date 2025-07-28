@@ -1,4 +1,4 @@
-// PLUME - TypeScript Content Script
+// BC-Plume - TypeScript Content Script
 
 type BrowserAPI = typeof chrome | typeof browser | null;
 type BrowserType = "Chromium" | "Firefox" | "unknown";
@@ -525,7 +525,7 @@ interface BcProgressEvent {
 
     playerContainer.appendChild(enhancementsContainer);
 
-    console.log("PLUME successfully deployed");
+    console.log("BC-Plume successfully deployed");
   };
 
   const setupAudioListeners = () => {
@@ -555,7 +555,7 @@ interface BcProgressEvent {
 
   // Main initialization function
   const init = async () => {
-    console.info("Initializing PLUME...");
+    console.info("Initializing BC-Plume...");
 
     // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {

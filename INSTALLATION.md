@@ -1,4 +1,4 @@
-# PLUME Installation
+# BC-Plume Installation
 
 ## 🎯 TypeScript-based Extension
 
@@ -49,8 +49,8 @@ For developers or to get the latest features:
 ### 1️⃣ Setup Development Environment
 
 ```bash
-git clone https://github.com/QuentindiMeo/plume # Clone or download the repository
-cd plume
+git clone https://github.com/QuentindiMeo/bc-plume # Clone or download the repository
+cd bc-plume
 
 npm install # Install dependencies
 ```
