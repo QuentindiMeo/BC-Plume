@@ -1,4 +1,9 @@
+# Ignore node modules and build artifacts
 node_modules/
 dist/
 build/
 *lock*
+
+# To prevent committing sensitive files
+manifest.json
+.env*
