@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "MBAPPE - Multimedia Bandcamp Pluripotent Player Extension",
-  "version": "1.0.0",
+  "name": "BC-Plume - Player Lightweight Urgent Media Enhancer",
+  "version": "1.0.1",
   "description": "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   "permissions": ["storage"],
   "host_permissions": ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
@@ -20,7 +20,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "mbappe@extension.local",
+      "id": "bc-plume@extension.local",
       "strict_min_version": "109.0"
     }
   }

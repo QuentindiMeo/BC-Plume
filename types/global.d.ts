@@ -33,10 +33,7 @@ declare global {
   namespace chrome.storage {
     interface StorageArea {
       get(callback: (items: Record<string, any>) => void): void;
-      get(
-        keys: string | string[] | null,
-        callback: (items: Record<string, any>) => void
-      ): void;
+      get(keys: string | string[] | null, callback: (items: Record<string, any>) => void): void;
       set(items: Record<string, any>, callback?: () => void): void;
     }
   }

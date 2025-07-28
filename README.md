@@ -1,4 +1,4 @@
-# MBAPPE - Multimedia Bandcamp Player Enhancer
+# BC-Plume - Player Lightweight Urgent Media Enhancer
 
 A cross-browser extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.
 
@@ -94,7 +94,7 @@ border-radius: 4px; /* Element rounding */
 ## 🔧 File structure (what truly matters only)
 
 ```txt
-mbappe/
+bc-plume/
 ├── manifest.json          # Extension configuration
 ├── src/                   # Main script code
 ├── styles.css             # Interface styling
@@ -133,11 +133,7 @@ The code is fully commented and structured for easy modification and contributio
 ## 🔮 Possible future improvements
 
 - [ ] Keyboard shortcut support
-- [ ] Visual equalizer
-- [ ] Multiple themes
-- [ ] Preference backup
-- [ ] Playlist integration
-- [ ] Picture-in-picture mode
+- [ ] Localization for multiple languages
 
 ---
 

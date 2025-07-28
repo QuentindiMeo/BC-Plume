@@ -1,8 +1,8 @@
 {
   "author": "Quentin DI MEO",
-  "name": "mbappe_multimedia-bandcamp-pluripotent-player-extension",
+  "name": "bc-plume_player-lightweight-urgent-media-enhancer",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   "scripts": {
     "build": "tsc",

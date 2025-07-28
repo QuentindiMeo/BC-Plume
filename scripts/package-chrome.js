@@ -51,10 +51,9 @@ staticDirs.forEach((dir) => {
 // Create Chrome manifest (Manifest V3)
 const manifest = {
   manifest_version: 3,
-  name: "Bandcamp Player Enhancer",
-  version: "1.0.0",
-  description:
-    "Améliore l'interface du player Bandcamp avec un slider de volume et une barre de lecture améliorée",
+  name: "BC-Plume - Player Lightweight Urgent Media Enhancer",
+  version: "1.0.1",
+  description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   permissions: ["storage"],
   host_permissions: ["*://*.bandcamp.com/*", "*://bandcamp.com/*"],
   content_scripts: [
@@ -72,10 +71,7 @@ const manifest = {
   },
 };
 
-fs.writeFileSync(
-  path.join(buildDir, "manifest.json"),
-  JSON.stringify(manifest, null, 2)
-);
+fs.writeFileSync(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
 console.log("✅ Created Chrome manifest.json");
 console.log("🎉 Chrome extension package ready in build/chrome/");
