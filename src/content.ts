@@ -136,9 +136,21 @@ interface BcProgressEvent {
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Function to initialize playback (necessary to make Plume buttons effective)
+  const initPlayback = () => {
+    const playButton = document.querySelector(".playbutton") as HTMLButtonElement;
+    if (playButton) {
+      // Double-click to ensure playback has started
+      playButton.click();
+      playButton.click();
+    } else {
+      console.warn("Play button not found");
+    }
+  };
+
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    const titleElement = document.querySelector(".title-section");
+    const titleElement = document.querySelector(".title-section") as HTMLSpanElement;
     if (titleElement?.textContent) {
       return titleElement.textContent.trim();
     }
@@ -621,6 +633,7 @@ interface BcProgressEvent {
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
+    initPlayback();
 
     // Debug: show detected controls
     debugBandcampControls();
