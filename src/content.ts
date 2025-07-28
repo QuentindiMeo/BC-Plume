@@ -50,6 +50,14 @@ interface BcProgressEvent {
   clientX: number;
 }
 
+enum BC_ELEM_IDENTIFIERS {
+  previousTrack = ".prevbutton",
+  nextTrack = ".nextbutton",
+  playPause = ".playbutton",
+  currentTrackTitle = ".title_link",
+  audioPlayer = "audio",
+}
+
 (() => {
   "use strict";
 
@@ -136,9 +144,31 @@ interface BcProgressEvent {
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Function to click on the previous track button
+  const clickPreviousTrackButton = () => {
+    const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
+    if (prevButton) {
+      prevButton.click();
+      console.debug("Previous track button clicked");
+    } else {
+      console.warn("Previous track button not found");
+    }
+  };
+
+  // Function to click on the next track button
+  const clickNextTrackButton = () => {
+    const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
+    if (nextButton) {
+      nextButton.click();
+      console.debug("Next track button clicked");
+    } else {
+      console.warn("Next track button not found");
+    }
+  };
+
   // Function to initialize playback (necessary to make Plume buttons effective)
   const initPlayback = () => {
-    const playButton = document.querySelector(".playbutton") as HTMLButtonElement;
+    const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
     if (playButton) {
       // Double-click to ensure playback has started
       playButton.click();
@@ -150,7 +180,7 @@ interface BcProgressEvent {
 
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    const titleElement = document.querySelector(".title-section") as HTMLSpanElement;
+    const titleElement = document.querySelector(BC_ELEM_IDENTIFIERS.currentTrackTitle) as HTMLSpanElement;
     if (titleElement?.textContent) {
       return titleElement.textContent.trim();
     }
@@ -169,7 +199,7 @@ interface BcProgressEvent {
 
   // Function to find the audio element
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
-    const audio = document.querySelector("audio");
+    const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
     if (audio) {
       console.info("Audio element found:", audio);
 
@@ -346,35 +376,45 @@ interface BcProgressEvent {
     const container = document.createElement("div");
     container.className = "bpe-playback-controls";
 
+    const trackBackwardBtn = document.createElement("button");
+    trackBackwardBtn.className = "bpe-track-bwd-btn";
+    trackBackwardBtn.innerHTML = "👈";
+    trackBackwardBtn.title = "Go to previous track";
+
+    const timeBackwardBtn = document.createElement("button");
+    timeBackwardBtn.className = "bpe-time-bwd-btn";
+    timeBackwardBtn.innerHTML = "⏪";
+    timeBackwardBtn.title = "Rewind 10 seconds";
+
     const playPauseBtn = document.createElement("button");
     playPauseBtn.className = "bpe-play-pause-btn";
     playPauseBtn.innerHTML = "▶️";
     playPauseBtn.title = "Play/Pause";
 
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "bpe-prev-btn";
-    prevBtn.innerHTML = "⏪";
-    prevBtn.title = "Rewind 10 seconds";
+    const timeForwardBtn = document.createElement("button");
+    timeForwardBtn.className = "bpe-time-fwd-btn";
+    timeForwardBtn.innerHTML = "⏩";
+    timeForwardBtn.title = "Forward 10 seconds";
 
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "bpe-next-btn";
-    nextBtn.innerHTML = "⏩";
-    nextBtn.title = "Forward 10 seconds";
+    const trackForwardBtn = document.createElement("button");
+    trackForwardBtn.className = "bpe-track-fwd-btn";
+    trackForwardBtn.innerHTML = "👉";
+    trackForwardBtn.title = "Go to next track";
 
-    // Event listeners for buttons
-    playPauseBtn.addEventListener("click", () => {
-      if (!plume.audioElement) return;
+    // === Event listeners for buttons ===
+    trackBackwardBtn.addEventListener("click", () => {
+      console.debug("Previous track button clicked");
 
-      if (plume.audioElement.paused) {
-        plume.audioElement.play();
-        playPauseBtn.innerHTML = "⏸️";
-      } else {
-        plume.audioElement.pause();
-        playPauseBtn.innerHTML = "▶️";
+      if (!plume.audioElement) {
+        console.warn("No audio element found");
+        return;
       }
+
+      clickPreviousTrackButton();
+      console.debug("Previous track event dispatched");
     });
 
-    prevBtn.addEventListener("click", () => {
+    timeBackwardBtn.addEventListener("click", () => {
       console.debug("Rewind 10s button clicked");
 
       if (!plume.audioElement) {
@@ -387,7 +427,19 @@ interface BcProgressEvent {
       console.debug(`Time rewound to: ${Math.round(newTime)}s`);
     });
 
-    nextBtn.addEventListener("click", () => {
+    playPauseBtn.addEventListener("click", () => {
+      if (!plume.audioElement) return;
+
+      if (plume.audioElement.paused) {
+        plume.audioElement.play();
+        playPauseBtn.innerHTML = "⏸️";
+      } else {
+        plume.audioElement.pause();
+        playPauseBtn.innerHTML = "▶️";
+      }
+    });
+
+    timeForwardBtn.addEventListener("click", () => {
       console.debug("Forward 10s button clicked");
 
       if (!plume.audioElement) {
@@ -398,6 +450,18 @@ interface BcProgressEvent {
       const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + 10);
       plume.audioElement.currentTime = newTime;
       console.debug(`Time forwarded to: ${Math.round(newTime)}s`);
+    });
+
+    trackForwardBtn.addEventListener("click", () => {
+      console.debug("Next track button clicked");
+
+      if (!plume.audioElement) {
+        console.warn("No audio element found");
+        return;
+      }
+
+      clickNextTrackButton();
+      console.debug("Next track event dispatched");
     });
 
     if (plume.audioElement) {
@@ -413,9 +477,11 @@ interface BcProgressEvent {
       playPauseBtn.innerHTML = plume.audioElement.paused ? "▶️" : "⏸️";
     }
 
-    container.appendChild(prevBtn);
+    container.appendChild(trackBackwardBtn);
+    container.appendChild(timeBackwardBtn);
     container.appendChild(playPauseBtn);
-    container.appendChild(nextBtn);
+    container.appendChild(timeForwardBtn);
+    container.appendChild(trackForwardBtn);
 
     return container;
   };
@@ -646,7 +712,7 @@ interface BcProgressEvent {
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
-        const newAudio = document.querySelector("audio");
+        const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
           console.info("New audio element detected");
 
@@ -666,7 +732,8 @@ interface BcProgressEvent {
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&
-          (mutation.target.classList.contains("title_link") || mutation.target.querySelector(".title_link"))
+          (mutation.target.classList.contains(BC_ELEM_IDENTIFIERS.currentTrackTitle.slice(1)) ||
+            mutation.target.querySelector(BC_ELEM_IDENTIFIERS.currentTrackTitle))
         ) {
           updateTitleDisplay();
         }
