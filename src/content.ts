@@ -653,15 +653,18 @@ enum BC_ELEM_IDENTIFIERS {
     plume.titleDisplay = headerContainer;
     plumeContainer.appendChild(headerContainer);
 
+    const playbackManager = document.createElement("div");
+    playbackManager.className = "bpe-playback-manager";
+
     const progressContainer = createProgressBar();
     if (progressContainer) {
-      plumeContainer.appendChild(progressContainer);
+      playbackManager.appendChild(progressContainer);
     }
-
     const playbackControls = createPlaybackControls();
     if (playbackControls) {
-      plumeContainer.appendChild(playbackControls);
+      playbackManager.appendChild(playbackControls);
     }
+    plumeContainer.appendChild(playbackManager);
 
     const volumeContainer = await createVolumeSlider();
     if (volumeContainer) {
