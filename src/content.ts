@@ -638,11 +638,11 @@ enum BC_ELEM_IDENTIFIERS {
     headerLogo.title = "BC-Plume - Bandcamp Player Enhancements";
     headerContainer.appendChild(headerLogo);
 
-    ("currently playing: ");
     const currentTitleSection = document.createElement("div");
     currentTitleSection.className = "bpe-header-current";
     const currentTitlePretext = document.createElement("span");
-    currentTitlePretext.textContent = "Currently playing: ";
+    currentTitlePretext.className = "bpe-header-title-pretext";
+    currentTitlePretext.textContent = "currently playing: ";
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
     currentTitleText.className = "bpe-header-title";

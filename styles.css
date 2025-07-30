@@ -1,5 +1,11 @@
 /* BC-Plume - Styles */
 
+/* Hide original elements */
+.bpe-hidden-original {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 .bpe-volume-label {
   color: #ffffff;
   font-size: 0.75rem;
@@ -9,7 +15,6 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Custom volume slider */
 .bpe-volume-slider {
   width: 100%;
   height: 0.5rem;
@@ -71,7 +76,7 @@
 
 .bpe-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1da0c3, #2bb8db);
+  background: linear-gradient(90deg, #2bb8db, #1da0c3);
   border-radius: 0.25rem;
   transition: width 0.1s ease;
   position: relative;
@@ -105,12 +110,6 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* ===== PLAYER HIERARCHICAL STRUCTURE ===== */
-/* 1. PROGRESS BAR (top) */
-/* 2. PLAYBACK CONTROLS (middle) */
-/* 3. VOLUME (bottom) */
-
-/* Main container for our enhancements */
 .bpe-plume {
   background: rgba(0, 0, 0, 0.6);
   border-radius: 0.5rem;
@@ -138,7 +137,6 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Container for volume - BOTTOM */
 .bpe-volume-container {
   position: relative;
   margin: 0;
@@ -192,7 +190,7 @@
 }
 
 .progbar {
-  background: linear-gradient(90deg, #1da0c3, #2bb8db) !important;
+  background: linear-gradient(90deg, #2bb8db, #1da0c3) !important;
   box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
 }
 
@@ -200,10 +198,60 @@
   background: rgba(255, 255, 255, 0.15) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
-/* Hide original elements */
-.bpe-hidden-original {
-  display: none !important;
-  visibility: hidden !important;
+
+.bpe-header-current {
+  width: 90%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.bpe-header-display {
+  display: flex;
+  justify-content: flex-end;
+
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bpe-header-logo {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding: 4rem 2rem;
+
+  scale: 0.25;
+  transform-origin: top left;
+}
+
+.bpe-header-title-pretext {
+  font-style: italic;
+}
+
+.bpe-header-title {
+  max-width: 87.5%;
+
+  line-height: 1.25;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bpe-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Responsive */
@@ -245,44 +293,4 @@
   .bpe-volume-slider {
     height: 0.5rem;
   }
-}
-
-/* Title Display Styles */
-.bpe-header-display {
-  margin-bottom: 0.75rem;
-  text-align: center;
-  padding: 0.5rem 0.75rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.bpe-header-logo {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  padding: 1rem;
-
-  scale: 0.25;
-  transform-origin: top left;
-}
-
-.bpe-header-title {
-  color: #ffffff;
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.4;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.bpe-button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
 }
