@@ -180,16 +180,25 @@ interface DebugControl {
   onclick: string;
 }
 
+enum PLUME_ELEM_IDENTIFIERS {
+  bcElements = "div.bpe-hidden-original",
+  plumeContainer = "div.bpe-plume",
+  headerTitle = "div.bpe-header-title",
+  volumeValue = "div.bpe-volume-value",
+}
+
 interface BcProgressEvent {
   clientX: number;
 }
 
 enum BC_ELEM_IDENTIFIERS {
-  previousTrack = ".prevbutton",
-  nextTrack = ".nextbutton",
-  playPause = ".playbutton",
-  currentTrackTitle = ".title_link",
+  previousTrack = "div.prevbutton",
+  nextTrack = "div.nextbutton",
+  playPause = "div.playbutton",
+  onTrackCurrentTrackTitle = "h2.trackTitle",
+  onAlbumCurrentTrackTitle = "a.title_link",
   audioPlayer = "audio",
+  inlinePlayerTable = "div.inline_player > table",
 }
 
 (() => {
@@ -314,9 +323,10 @@ enum BC_ELEM_IDENTIFIERS {
 
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    let titleElement = document.querySelector(BC_ELEM_IDENTIFIERS.currentTrackTitle) as HTMLSpanElement;
+    const titleElement = window.location.pathname.includes("/album/")
+      ? (document.querySelector(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle) as HTMLSpanElement)
+      : (document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement);
     if (titleElement?.textContent) {
-      titleElement.title = titleElement.textContent.trim(); // Set title attribute for accessibility and in case it's a long title that gets truncated
       return titleElement.textContent.trim();
     }
     return "Unknown Track";
@@ -325,9 +335,11 @@ enum BC_ELEM_IDENTIFIERS {
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
     if (plume.titleDisplay) {
-      const titleText = plume.titleDisplay.querySelector(".bpe-header-title");
+      const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
       if (titleText) {
-        titleText.textContent = getCurrentTrackTitle();
+        const currentTrackTitle = getCurrentTrackTitle();
+        titleText.textContent = currentTrackTitle;
+        titleText.title = currentTrackTitle; // see full title on hover in case title is truncated
       }
     }
   };
@@ -397,7 +409,7 @@ enum BC_ELEM_IDENTIFIERS {
   };
 
   const hideOriginalPlayerElements = () => {
-    const bcAudioTable = document.querySelector(".inline_player > table") as HTMLTableElement;
+    const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
     if (bcAudioTable) {
       bcAudioTable.style.display = "none";
       bcAudioTable.classList.add("bpe-hidden-original");
@@ -409,7 +421,7 @@ enum BC_ELEM_IDENTIFIERS {
   // Function to restore original player elements (if needed)
   //@ts-ignore This is unused, but kept for debug purposes
   const restoreOriginalPlayerElements = () => {
-    const bcAudioTable = document.querySelector(".bpe-hidden-original") as HTMLTableElement;
+    const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
     bcAudioTable.style.display = "unset";
     bcAudioTable.classList.remove("bpe-hidden-original");
 
@@ -723,7 +735,9 @@ enum BC_ELEM_IDENTIFIERS {
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
     currentTitleText.className = "bpe-header-title";
-    currentTitleText.textContent = getCurrentTrackTitle();
+    const currentTrackTitle = getCurrentTrackTitle();
+    currentTitleText.textContent = currentTrackTitle;
+    currentTitleText.title = currentTrackTitle; // see full title on hover in case title is truncated
     currentTitleSection.appendChild(currentTitleText);
     headerContainer.appendChild(currentTitleSection);
 
@@ -769,7 +783,9 @@ enum BC_ELEM_IDENTIFIERS {
     plume.audioElement.addEventListener("volumechange", () => {
       if (plume.volumeSlider) {
         plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
-        const valueDisplay = plume.volumeSlider.parentElement!.querySelector(".bpe-volume-value");
+        const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
+          PLUME_ELEM_IDENTIFIERS.volumeValue
+        ) as HTMLSpanElement;
         if (valueDisplay) {
           valueDisplay.textContent = `${plume.volumeSlider.value}%`;
         }
@@ -799,7 +815,7 @@ enum BC_ELEM_IDENTIFIERS {
       return;
     }
 
-    const plumeIsAlreadyInjected = document.querySelector(".bpe-plume");
+    const plumeIsAlreadyInjected = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) return;
 
     // Inject enhancements
@@ -830,7 +846,7 @@ enum BC_ELEM_IDENTIFIERS {
           plume.audioElement = newAudio;
 
           // Reset if needed
-          if (!document.querySelector(".bpe-plume")) {
+          if (!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer)) {
             setTimeout(init, 500);
           }
         }
@@ -838,8 +854,8 @@ enum BC_ELEM_IDENTIFIERS {
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&
-          (mutation.target.classList.contains(BC_ELEM_IDENTIFIERS.currentTrackTitle.slice(1)) ||
-            mutation.target.querySelector(BC_ELEM_IDENTIFIERS.currentTrackTitle))
+          (mutation.target.classList.contains(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle.slice(1)) ||
+            mutation.target.querySelector(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle))
         ) {
           updateTitleDisplay();
         }

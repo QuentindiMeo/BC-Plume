@@ -1,5 +1,36 @@
-<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-  <rect width="16" height="16" rx="3" fill="#1da0c3"/>
-  <path d="M4 6h8v1H4V6zm0 2h8v1H4V8zm0 2h6v1H4v-1z" fill="white"/>
-  <circle cx="12" cy="11" r="1.5" fill="white"/>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #1ba0c3;
+      }
+
+      .cls-2 {
+        fill: #68c6da;
+      }
+
+      .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        stroke: #fff;
+        stroke-miterlimit: 10;
+        stroke-width: 0.1px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" width="16" height="16" rx="2.47"/>
+  <rect class="cls-2" x="6.85" y="12.08" width="8.57" height="1.95" rx="0.73"/>
+  <rect class="cls-3" x="1.09" y="8.25" width="10.05" height="1.29" rx="0.64"/>
+  <rect class="cls-3" x="0.49" y="12.11" width="8.57" height="1.95" rx="0.73"/>
+  <circle class="cls-3" cx="8.61" cy="13.08" r="1.4"/>
+  <circle class="cls-1" cx="8.61" cy="13.08" r="1.09"/>
+  <circle class="cls-3" cx="13.87" cy="8.94" r="1.56"/>
+  <g>
+    <rect class="cls-4" x="5.47" y="4.12" width="4.81" height="0.19" transform="translate(2.3 11.17) rotate(-79.58)"/>
+    <path class="cls-4" d="M8.48,4.81l-.06,0a.09.09,0,0,1,0-.13.89.89,0,0,0,.22-.61,2.59,2.59,0,0,0-.09-.68l-.21-.91a1.86,1.86,0,0,1-.05-.62,2.26,2.26,0,0,0-.6,1.84.11.11,0,0,1-.08.11.12.12,0,0,1-.11-.08A2.46,2.46,0,0,1,8.3,1.57s0,0,0,0a.28.28,0,0,1,.18-.09.08.08,0,0,1,.09,0,.09.09,0,0,1,0,.11.9.9,0,0,0-.06.81l.2.91a2.84,2.84,0,0,1,.1.72,1.08,1.08,0,0,1-.26.73A.13.13,0,0,1,8.48,4.81Z" transform="translate(0 -0.02)"/>
+    <path class="cls-3" d="M7.64,5.6h0a.1.1,0,0,1-.08-.06l-.3-.7a.09.09,0,0,1,.17-.07l.23.55A3.33,3.33,0,0,1,8,4.93a.09.09,0,0,1,.13,0,.1.1,0,0,1,0,.13,3.43,3.43,0,0,0-.43.5A.1.1,0,0,1,7.64,5.6Z" transform="translate(0 -0.02)"/>
+    <path class="cls-3" d="M7.57,6.09h0a.1.1,0,0,1-.08,0l-.3-.7a.11.11,0,0,1,.05-.12.09.09,0,0,1,.12,0l.24.55a3.25,3.25,0,0,1,.35-.39.09.09,0,0,1,.13,0,.09.09,0,0,1,0,.13,4,4,0,0,0-.43.49A.07.07,0,0,1,7.57,6.09Z" transform="translate(0 -0.02)"/>
+  </g>
 </svg>
