@@ -28,20 +28,17 @@
 /**************** Plume styling ****************/
 
 .bpe-plume {
-  overflow: hidden;
-  margin: 0.5rem 0;
   border-radius: 0.5rem;
 
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(0.625rem);
 }
 
 .bpe-header-display {
   display: flex;
   justify-content: flex-end;
   padding: 0.5rem 0.75rem;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -50,7 +47,7 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  padding: 2rem 2rem; /* I keep it light that because the vertical attribute might change if I implement the dynamic display of prev/next track */
+  padding: 0.5rem 2rem;
 
   scale: 0.25;
   transform-origin: top left;
@@ -203,7 +200,7 @@
   padding: 0.75rem 1rem;
   margin: 0;
 
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .bpe-volume-label {
@@ -271,10 +268,6 @@
 /* Responsive */
 @media (max-width: 768px) {
   /* Global adjustment for mobile */
-  .bpe-plume {
-    margin: 0.375rem 0;
-  }
-
   .bpe-progress-container {
     padding: 0.5rem 0.75rem;
   }
