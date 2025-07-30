@@ -1,9 +1,36 @@
-<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-  <rect width="48" height="48" rx="8" fill="#1da0c3"/>
-  <rect x="8" y="14" width="32" height="4" rx="2" fill="white"/>
-  <rect x="8" y="22" width="32" height="4" rx="2" fill="white"/>
-  <rect x="8" y="30" width="24" height="4" rx="2" fill="white"/>
-  <circle cx="38" cy="32" r="4" fill="white"/>
-  <rect x="6" y="38" width="36" height="6" rx="3" fill="rgba(255,255,255,0.3)"/>
-  <rect x="6" y="38" width="18" height="6" rx="3" fill="white"/>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #1ba0c3;
+      }
+
+      .cls-2 {
+        fill: #68c6da;
+      }
+
+      .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        stroke: #fff;
+        stroke-miterlimit: 10;
+        stroke-width: 0.3px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" width="48" height="48" rx="7.41"/>
+  <rect class="cls-2" x="20.55" y="36.25" width="25.71" height="5.86" rx="2.2"/>
+  <rect class="cls-3" x="3.26" y="24.75" width="30.14" height="3.86" rx="1.93"/>
+  <rect class="cls-3" x="1.48" y="36.32" width="25.71" height="5.86" rx="2.2"/>
+  <circle class="cls-3" cx="25.83" cy="39.25" r="4.21"/>
+  <circle class="cls-1" cx="25.83" cy="39.25" r="3.27"/>
+  <circle class="cls-3" cx="41.62" cy="26.82" r="4.67"/>
+  <g>
+    <rect class="cls-4" x="16.4" y="12.32" width="14.43" height="0.56" transform="translate(6.95 33.53) rotate(-79.58)"/>
+    <path class="cls-4" d="M25.44,14.4a.3.3,0,0,1-.19-.07.28.28,0,0,1,0-.4,2.82,2.82,0,0,0,.66-1.81,8.89,8.89,0,0,0-.29-2L25,7.34a5.09,5.09,0,0,1-.16-1.86A6.78,6.78,0,0,0,23,11a.28.28,0,0,1-.56.08A7.29,7.29,0,0,1,24.9,4.66s0,0,.06,0a.9.9,0,0,1,.53-.28.26.26,0,0,1,.28.14.26.26,0,0,1,0,.31,2.78,2.78,0,0,0-.19,2.43l.61,2.73a9.32,9.32,0,0,1,.31,2.18,3.39,3.39,0,0,1-.8,2.18A.34.34,0,0,1,25.44,14.4Z" transform="translate(0 -0.02)"/>
+    <path class="cls-3" d="M22.91,16.75h0a.29.29,0,0,1-.23-.17l-.9-2.1a.28.28,0,1,1,.51-.21l.7,1.65A9.82,9.82,0,0,1,24,14.75a.28.28,0,0,1,.39,0,.29.29,0,0,1,0,.4,10.62,10.62,0,0,0-1.28,1.48A.27.27,0,0,1,22.91,16.75Z" transform="translate(0 -0.02)"/>
+    <path class="cls-3" d="M22.71,18.23h0a.28.28,0,0,1-.23-.16l-.9-2.1a.28.28,0,0,1,.15-.36.27.27,0,0,1,.36.15l.71,1.65a9.74,9.74,0,0,1,1.05-1.17.28.28,0,0,1,.4,0,.29.29,0,0,1,0,.39,10.71,10.71,0,0,0-1.28,1.49A.27.27,0,0,1,22.71,18.23Z" transform="translate(0 -0.02)"/>
+  </g>
 </svg>

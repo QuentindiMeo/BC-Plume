@@ -51,8 +51,8 @@ staticDirs.forEach((dir) => {
 // Create Chrome manifest (Manifest V3)
 const manifest = {
   manifest_version: 3,
-  name: "BC-Plume - Player Lightweight Urgent Media Enhancer",
-  version: "1.0.1",
+  name: "BC-Plume - Bandcamp Player Enhancer",
+  version: "1.2.0",
   description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   permissions: ["storage"],
   host_permissions: ["*://*.bandcamp.com/*"],
