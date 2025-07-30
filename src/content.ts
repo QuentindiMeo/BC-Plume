@@ -183,7 +183,7 @@ interface DebugControl {
 enum PLUME_ELEM_IDENTIFIERS {
   bcElements = "div.bpe-hidden-original",
   plumeContainer = "div.bpe-plume",
-  headerTitle = "div.bpe-header-title",
+  headerTitle = "span.bpe-header-title",
   volumeValue = "div.bpe-volume-value",
 }
 
