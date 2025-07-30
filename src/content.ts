@@ -248,7 +248,7 @@ enum BC_ELEM_IDENTIFIERS {
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
     if (plume.titleDisplay) {
-      const titleText = plume.titleDisplay.querySelector(".bpe-title-text");
+      const titleText = plume.titleDisplay.querySelector(".bpe-header-title");
       if (titleText) {
         titleText.textContent = getCurrentTrackTitle();
       }
@@ -629,21 +629,29 @@ enum BC_ELEM_IDENTIFIERS {
     plumeContainer.className = "bpe-plume";
 
     // Create title display
-    const titleContainer = document.createElement("div");
-    titleContainer.className = "bpe-title-display";
+    const headerContainer = document.createElement("div");
+    headerContainer.className = "bpe-header-display";
 
-    const titleHeader = document.createElement("div");
-    titleHeader.className = "bpe-title-header";
-    titleHeader.innerHTML = PLUME_SVG.logo;
-    titleHeader.title = "BC-Plume - Bandcamp Player Enhancements";
-    titleContainer.appendChild(titleHeader);
-    const titleText = document.createElement("div");
-    titleText.className = "bpe-title-text";
-    titleText.textContent = getCurrentTrackTitle();
-    titleContainer.appendChild(titleText);
+    const headerLogo = document.createElement("div");
+    headerLogo.className = "bpe-header-logo";
+    headerLogo.innerHTML = PLUME_SVG.logo;
+    headerLogo.title = "BC-Plume - Bandcamp Player Enhancements";
+    headerContainer.appendChild(headerLogo);
 
-    plume.titleDisplay = titleContainer;
-    plumeContainer.appendChild(titleContainer);
+    ("currently playing: ");
+    const currentTitleSection = document.createElement("div");
+    currentTitleSection.className = "bpe-header-current";
+    const currentTitlePretext = document.createElement("span");
+    currentTitlePretext.textContent = "Currently playing: ";
+    currentTitleSection.appendChild(currentTitlePretext);
+    const currentTitleText = document.createElement("span");
+    currentTitleText.className = "bpe-header-title";
+    currentTitleText.textContent = getCurrentTrackTitle();
+    currentTitleSection.appendChild(currentTitleText);
+    headerContainer.appendChild(currentTitleSection);
+
+    plume.titleDisplay = headerContainer;
+    plumeContainer.appendChild(headerContainer);
 
     const progressContainer = createProgressBar();
     if (progressContainer) {
