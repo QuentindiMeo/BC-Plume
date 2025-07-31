@@ -1,4 +1,40 @@
-# BC-Plume - Player Lightweight Urgent Media Enhancer
+<div align="center" id="top">
+  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" align="left" />
+  <h1>:scroll: Player Lightweight Urgent Media Enhancer :film_strip:</h1>
+</div>
+
+<div align="center">
+  <a href="#memo-description">Description</a> &#xa0; | &#xa0;
+  <a href="#gear-requirements">Requirements</a> &#xa0; | &#xa0;
+  <a href="#movie_camera-usage--general-information">Usage & General Information</a> &#xa0; | &#xa0;
+  <a href="#card_file_box-project-roadmap">Project Roadmap</a>
+</div>
+
+&#xa0;
+
+<div align="center">
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.0-blue?logo=semver" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
+</div>
+<div align="center">
+  <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?color=yellow&logo=github" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
+  <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
+</div>
+
+&#xa0;
+
+<div align="center">
+  <sup><b>The technical stack at play:</b></sup>
+
+  <img title="TypeScript" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/typeScript.svg" height="96px" alt="TypeScript" />
+  <img title="CSS" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/css.svg" height="96px" alt="CSS" />
+</div>
+
+&#xa0;
+
+## :memo: Description
 
 A cross-browser extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.
 
