@@ -1,5 +1,5 @@
 <div align="center" id="top">
-  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/feat/006_improve-readme/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
+  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
   <h2>:notes:Bandcamp's Player Lightweight Urgent Media Enhancer :feather:</h2>
 </div>
 
@@ -14,6 +14,12 @@
 &#xa0;
 
 <div align="center">
+  <a href="#memo-description"><img src="https://github.com/user-attachments/assets/9140c05d-2b24-4fe1-8bd7-dde66ee4e26b" alt="Demo gif of v1.2.0" width="800px" /></a>
+</div>
+
+&#xa0;
+
+<div align="center">
   <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.0-blue?logo=semver" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
 </div>
@@ -23,16 +29,18 @@
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
 </div>
-
-&#xa0;
-
+&nbsp;
 <div align="center">
-  <sup><b>The technical stack at play:</b></sup>
+  <sup><b>The technical stack at play:</b>&nbsp;</sup>
   <img title="TypeScript" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/typeScript.svg" width="36px" alt="TypeScript" />
   <img title="CSS" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/css.svg" width="36px" alt="CSS" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <sup><b>if you wish to tip me:&nbsp;</b></sup>
+  <a href="https://ko-fi.com/quentindimeo">
+    <img alt="ko-fi tip button" src="https://storage.ko-fi.com/cdn/logomarkLogo.png" height="40px" />
+  </a>
   <a href="https://www.paypal.com/donate/?hosted_button_id=LQCF9J9X4EDZL">
-    <img alt="PayPal donate button" src="https://i.imgur.com/abmsLLY.png" width="128px" />
+    <img alt="PayPal donate button" src="https://i.imgur.com/abmsLLY.png" height="40px" />
   </a>
 </div>
 
@@ -40,12 +48,8 @@
 
 ## :memo: Description
 
-A cross-browser extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.
+A cross-browser extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.  
 **Compatible with Chrome, Firefox, Edge, and other Chromium browsers!**
-
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/ca4b8eaf-0a74-4f83-94e6-9a82d186403f" alt="Demo gif of v1.2.0" width="600px" />
-</div>
 
 ### :musical_note: Features
 
