@@ -44,7 +44,7 @@ A cross-browser extension that improves the listening experience on Bandcamp wit
 **Compatible with Chrome, Firefox, Edge, and other Chromium browsers!**
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/bf433743-d4bb-4ee6-a0de-d9399bb4ef2d" alt="Demo screenshot of v1.2.0" width="600px" />
+  <img src="https://github.com/user-attachments/assets/ca4b8eaf-0a74-4f83-94e6-9a82d186403f" alt="Demo gif of v1.2.0" width="600px" />
 </div>
 
 ### :musical_note: Features
