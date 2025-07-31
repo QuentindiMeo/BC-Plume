@@ -1,7 +1,6 @@
 <div align="center" id="top">
   <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/feat/006_improve-readme/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
   <h2>:notes:Bandcamp's Player Lightweight Urgent Media Enhancer :feather:</h2>
-&#xa0;
 </div>
 
 <div align="center">
@@ -19,9 +18,9 @@
   <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
 </div>
 <div align="center">
-  <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?color=yellow&logo=github" /></a>
-  <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
 </div>
 
@@ -31,6 +30,10 @@
   <sup><b>The technical stack at play:</b></sup>
   <img title="TypeScript" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/typeScript.svg" width="36px" alt="TypeScript" />
   <img title="CSS" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/css.svg" width="36px" alt="CSS" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://www.paypal.com/donate/?hosted_button_id=LQCF9J9X4EDZL">
+    <img alt="PayPal donate button" src="https://i.imgur.com/abmsLLY.png" width="128px" />
+  </a>
 </div>
 
 &#xa0;
@@ -38,12 +41,11 @@
 ## :memo: Description
 
 A cross-browser extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.
+**Compatible with Chrome, Firefox, Edge, and other Chromium browsers!**
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/bf433743-d4bb-4ee6-a0de-d9399bb4ef2d" alt="Demo screenshot of v1.2.0" width="600px" />
 </div>
-
-**Compatible with Chrome, Firefox, Edge, and other Chromium browsers!**
 
 ### :musical_note: Features
 
@@ -55,7 +57,7 @@ A cross-browser extension that improves the listening experience on Bandcamp wit
 
 ## :rocket: Installation
 
-Either install the extension from the Chrome Web Store (_coming soon!_) or the Mozilla Add-ons site (_coming soon!_).
+Either install the extension from the Chrome Web Store (_coming soon!_) or the Mozilla Add-ons site (_coming soon!_).  
 If you want to install it manually, clone this repository and follow the steps below.
 
 ### Universal Installation (One manifest to rule them all!)
@@ -70,24 +72,37 @@ pnpm run deploy
 
 #### Chrome/Edge/Opera
 
-1. Open `chrome://extensions/` (or `edge://extensions/`)
+1. Open a new tab and enter `chrome://extensions/` (or `edge://extensions/`)
 2. Enable "Developer mode"
 3. "Load unpacked" → Select this folder
 
 #### Firefox (109+)
 
-1. Open `about:debugging`
-2. "This Firefox"
+1. Open a new tab and enter `about:debugging`
+2. Click on "This Firefox" on the left sidebar
 3. "Load Temporary Add-on" → Select `manifest.json`
 
 ## :open_book: Usage & General Information
 
-1. Go to any Bandcamp audio or track page
-2. The extension automatically detects the player and replaces it with its enhanced version
+1. Go to any Bandcamp **album or track page**
+2. The extension replaces the Bandcamp player with the Plume player
 3. Interface layout from top to bottom:
+   - **Track title**: Displays the current track name
    - **Progress bar**: Click to seek within the track
    - **Playback controls**: Play/Pause, skip back/forward 10 seconds, go to next/previous track
    - **Volume slider**: Adjust the volume (remembered across pages)
+
+### 📝 Development notes
+
+This extension uses:
+
+- **Manifest V3**: For modern browser compatibility
+- **Cross-Browser API**: Automatic Chrome/Firefox detection
+- **Content Scripts**: To interact with Bandcamp pages
+- **Storage API + localStorage**: Saves preferences with fallback
+- **Vanilla TypeScript**: No external dependencies
+
+The code is fully commented and structured for easy modification and contributions.
 
 ## :bug: Troubleshooting
 
@@ -102,32 +117,19 @@ pnpm run deploy
 - Make sure there's an audio player on the page
 - Refresh the Bandcamp track/album page
 - Try refreshing the page
-- If the issue persists, [open an issue](https://github.com/QuentindiMeo/BC-Plume/issues) with details about your browser and the page URL.
+
+If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Plume/issues) with details about your browser and the page URL.
 
 ## :card_file_box: Project Roadmap
 
-Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/CHANGELOG.md) file.
+Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
-- _**[1.3.0]** Coming later..._: **Pedal To The Metal** — New features are added to Plume. [#???]()
-- _**[1.2.0]** Jul 31 2025_: **Pretty boy** — Plume gets a logo & UI rework. [#010](https://github.com/QuentindiMeo/BC-Plume/pull/28)
-- _**[1.1.0]** Jul 28 2025_: **Release** — The original Bandcamp player is fully replaced by Plume. [#001](https://github.com/QuentindiMeo/BC-Plume/pull/18)
-- _**[1.0.0]** Jul 28 2025_: **Hello World!** — "Project MBAPPE" is drafted.
+- _**[1.3.0]** Coming later..._: **Pedal To The Metal** — New features are added to Plume. [#???](#card_file_box-project-roadmap)
+- _**[1.2.0]** Jul 30 2025_: **Pretty boy** — Plume gets a logo & UI rework. [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
+- _**[1.1.0]** Jul 28 2025_: **First Release** — The original Bandcamp player is fully replaced by Plume. [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18)
+- _**[1.0.0]** Jul 28 2025_: **Hello World!** — The project is drafted, under the name _MBAPPE_.
 
----
-
-## 📝 Development notes
-
-This extension uses:
-
-- **Manifest V3**: For modern browser compatibility
-- **Cross-Browser API**: Automatic Chrome/Firefox detection
-- **Content Scripts**: To interact with Bandcamp pages
-- **Storage API + localStorage**: Saves preferences with fallback
-- **Vanilla TypeScript**: No external dependencies
-
-The code is fully commented and structured for easy modification and contributions.
-
-## 🔮 Possible future improvements
+### 🔮 Possible future improvements
 
 All of them are listed in the [issues](https://github.com/QuentindiMeo/BC-Plume/issues).  
 Those with the 🚀 emoji are new features, those with the ↗️ emoji are improvements!
