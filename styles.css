@@ -1,5 +1,12 @@
 /* BC-Plume - Styles */
 
+/* declare a CSS variable for white */
+:root {
+  --progbar-bg: rgba(0, 0, 0, 0.85);
+  --progbar-fill-bg-left: #2bb8db;
+  --progbar-fill-bg-right: #1da0c3;
+}
+
 /*********** Native elements styling ***********/
 
 .progbar,
@@ -11,7 +18,7 @@
 }
 
 .progbar {
-  background: linear-gradient(90deg, #2bb8db, #1da0c3) !important;
+  background: linear-gradient(90deg, var(--progbar-fill-bg-left), var(--progbar-fill-bg-right)) !important;
   box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
 }
 
@@ -37,7 +44,7 @@
 .bpe-header-display {
   display: flex;
   justify-content: flex-end;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 0.75rem;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 0.5rem;
 }
@@ -71,19 +78,19 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #ffffff;
+  color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .bpe-playback-manager {
-  padding: 0.75rem 1rem;
-  margin-top: 0.2rem;
+  padding: 0.5rem 1rem;
+  margin-top: 0.1rem;
 
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -93,50 +100,49 @@
   margin: 0;
 }
 
-.bpe-progress-bar {
-  position: relative;
+.bpe-progress-slider {
   width: 100%;
   height: 0.5rem;
-  overflow: hidden;
-
-  background: rgba(255, 255, 255, 0.15);
+  margin: 0;
   border-radius: 0.25rem;
+  outline: none;
 
   cursor: pointer;
-}
-
-.bpe-progress-fill {
   position: relative;
-  height: 100%;
 
-  background: linear-gradient(90deg, #2bb8db, #1da0c3);
-  border-radius: 0.25rem;
-  transition: width 0.1s ease;
+  appearance: none;
+  -webkit-appearance: none;
 }
-
-.bpe-progress-handle {
-  position: absolute;
-  top: 50%;
-  right: -0.375rem;
-  width: 0.4rem;
-  height: 0.4rem;
-  transform: translateY(-50%);
-
-  background: #ffffff;
-  border: 0.125rem solid #1da0c3;
+.bpe-progress-slider::-webkit-slider-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: white;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+.bpe-progress-slider::-webkit-slider-thumb:hover {
+  background: lightgray;
+  transform: scale(1.2);
+}
+.bpe-progress-slider::-moz-range-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.bpe-progress-handle:hover {
-  transform: translateY(-50%) scale(1.25);
-}
-
 .bpe-time-display {
-  margin-top: 0.25rem;
-
   display: flex;
   justify-content: space-between;
 
@@ -173,7 +179,7 @@
 }
 .bpe-playback-controls button:hover {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #1da0c3;
+  border-color: var(--progbar-fill-bg-right);
   transform: scale(1.1);
   box-shadow: 0 0.25rem 0.5rem rgba(29, 160, 195, 0.3);
 }
@@ -186,7 +192,7 @@
   height: 3.75rem !important;
 
   background: rgba(29, 160, 195, 0.2) !important;
-  border-color: #1da0c3 !important;
+  border-color: var(--progbar-fill-bg-right) !important;
 }
 .bpe-play-pause-btn:hover {
   background: rgba(29, 160, 195, 0.4) !important;
@@ -203,7 +209,7 @@
 }
 
 .bpe-volume-label {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
   display: block;
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -226,9 +232,9 @@
   -webkit-appearance: none;
 }
 .bpe-volume-slider::-webkit-slider-thumb {
-  width: 1rem;
+  width: 1px;
   height: 1rem;
-  background: #1da0c3;
+  background: var(--progbar-fill-bg-right);
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 
@@ -239,13 +245,13 @@
   -webkit-appearance: none;
 }
 .bpe-volume-slider::-webkit-slider-thumb:hover {
-  background: #2bb8db;
-  transform: scale(1.1);
+  background: var(--progbar-fill-bg-left);
+  transform: scale(1.25);
 }
 .bpe-volume-slider::-moz-range-thumb {
-  width: 1rem;
+  width: 1px;
   height: 1rem;
-  background: #1da0c3;
+  background: var(--progbar-fill-bg-right);
   border: none;
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -255,13 +261,11 @@
 }
 
 .bpe-volume-value {
-  margin-top: 0.25rem;
-
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   text-align: right;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #1da0c3;
+  color: var(--progbar-fill-bg-right);
 }
 
 /* Responsive */
@@ -269,10 +273,6 @@
   /* Global adjustment for mobile */
   .bpe-progress-container {
     padding: 0.5rem 0.75rem;
-  }
-
-  .bpe-progress-bar {
-    height: 0.625rem;
   }
 
   .bpe-playback-controls {

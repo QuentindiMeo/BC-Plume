@@ -15,14 +15,11 @@ type BrowserType = "Chromium" | "Firefox" | "unknown";
  */
 interface PlumeObject {
   audioElement: HTMLAudioElement | null;
-  volumeSlider: HTMLInputElement | null;
-  progressBar: HTMLDivElement | null;
-  progressFill: HTMLDivElement | null;
-  progressHandle: HTMLDivElement | null;
-  currentTimeDisplay: HTMLSpanElement | null;
-  durationDisplay: HTMLSpanElement | null;
   titleDisplay: HTMLDivElement | null;
-  isDragging: boolean;
+  progressSlider: HTMLInputElement | null;
+  elapsedDisplay: HTMLSpanElement | null;
+  durationDisplay: HTMLSpanElement | null;
+  volumeSlider: HTMLInputElement | null;
   savedVolume: number;
 }
 
@@ -154,7 +151,7 @@ enum PLUME_SVG {
 /**
  * Volume storage interface
  */
-interface VolumeStorage {
+interface LocalStorage {
   bandcamp_volume?: number;
 }
 
@@ -188,7 +185,7 @@ enum BC_ELEM_IDENTIFIERS {
   onTrackCurrentTrackTitle = "h2.trackTitle",
   onAlbumCurrentTrackTitle = "a.title_link",
   audioPlayer = "audio",
-  inlinePlayerTable = "div.inline_player > table",
+  inlinePlayerTable = "div.inline_player>table",
 }
 
 (() => {
@@ -217,15 +214,12 @@ enum BC_ELEM_IDENTIFIERS {
 
   const plume: PlumeObject = {
     audioElement: null,
-    volumeSlider: null,
-    progressBar: null,
-    progressFill: null,
-    progressHandle: null,
-    currentTimeDisplay: null,
-    durationDisplay: null,
     titleDisplay: null,
-    isDragging: false,
-    savedVolume: 1, // Default volume
+    progressSlider: null,
+    elapsedDisplay: null,
+    durationDisplay: null,
+    volumeSlider: null,
+    savedVolume: 0.5, // Default volume, 0..1
   };
 
   const saveNewVolume = (newVolume: number) => {
@@ -248,8 +242,8 @@ enum BC_ELEM_IDENTIFIERS {
     return new Promise((resolve) => {
       if (browserLocalStorage !== undefined) {
         // Chrome/Firefox with extension API
-        browserLocalStorage.get(["bandcamp_volume"]).then((result: VolumeStorage) => {
-          const volume = result.bandcamp_volume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
+        browserLocalStorage.get(["bandcamp_volume"]).then((ls: LocalStorage) => {
+          const volume = ls.bandcamp_volume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
           plume.savedVolume = volume;
           resolve(volume);
         });
@@ -354,7 +348,7 @@ enum BC_ELEM_IDENTIFIERS {
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
     if (!plume.audioElement || plume.volumeSlider) return null;
 
-    // Load saved volume
+    // Load saved volume before creating the slider to ensure it's applied
     await loadSavedVolume();
 
     const container = document.createElement("div");
@@ -556,18 +550,16 @@ enum BC_ELEM_IDENTIFIERS {
       console.debug("Next track event dispatched");
     });
 
-    if (plume.audioElement) {
-      plume.audioElement.addEventListener("play", () => {
-        playPauseBtn.innerHTML = PLUME_SVG.playPause;
-      });
+    plume.audioElement?.addEventListener("play", () => {
+      playPauseBtn.innerHTML = PLUME_SVG.playPause;
+    });
 
-      plume.audioElement.addEventListener("pause", () => {
-        playPauseBtn.innerHTML = PLUME_SVG.playPlay;
-      });
+    plume.audioElement?.addEventListener("pause", () => {
+      playPauseBtn.innerHTML = PLUME_SVG.playPlay;
+    });
 
-      // Initial state
-      playPauseBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
-    }
+    // Initial state
+    playPauseBtn.innerHTML = plume.audioElement?.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
 
     container.appendChild(trackBackwardBtn);
     container.appendChild(timeBackwardBtn);
@@ -578,92 +570,63 @@ enum BC_ELEM_IDENTIFIERS {
     return container;
   };
 
-  const createProgressBar = () => {
-    if (!plume.audioElement || plume.progressBar) return;
+  const createProgressContainer = () => {
+    if (!plume.audioElement || plume.progressSlider) return;
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
 
-    const progressBarElement = document.createElement("div");
-    progressBarElement.className = "bpe-progress-bar";
-
-    const progressFillElement = document.createElement("div");
-    progressFillElement.className = "bpe-progress-fill";
-    progressFillElement.style.width = "0%";
-
-    const progressHandleElement = document.createElement("div");
-    progressHandleElement.className = "bpe-progress-handle";
-
-    progressFillElement.appendChild(progressHandleElement);
-    progressBarElement.appendChild(progressFillElement);
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = "1000"; // use 1000 for better granularity: 1000s = 16m40s
+    slider.value = "0";
+    slider.className = "bpe-progress-slider";
 
     const timeDisplay = document.createElement("div");
     timeDisplay.className = "bpe-time-display";
 
-    const currentTime = document.createElement("span");
-    currentTime.textContent = "0:00";
+    const elapsed = document.createElement("span");
+    elapsed.textContent = "0:00";
 
     const duration = document.createElement("span");
     duration.textContent = "0:00";
 
-    timeDisplay.appendChild(currentTime);
+    timeDisplay.appendChild(elapsed);
     timeDisplay.appendChild(duration);
 
-    container.appendChild(progressBarElement);
+    container.appendChild(slider);
     container.appendChild(timeDisplay);
 
-    let isMouseDown = false;
-
-    const updateProgress = (event: MouseEvent | BcProgressEvent) => {
-      const rect = progressBarElement.getBoundingClientRect();
-      const percent = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
-      const newTime = (percent / 100) * (plume.audioElement?.duration ?? 0);
-
-      if (!isNaN(newTime) && isFinite(newTime) && plume.audioElement) {
-        plume.audioElement.currentTime = newTime;
-      }
-    };
-
-    progressBarElement.addEventListener("mousedown", (e) => {
-      isMouseDown = true;
-      plume.isDragging = true;
-      updateProgress(e);
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (isMouseDown) {
-        updateProgress(e);
+    // Event listener for progress change
+    slider.addEventListener("input", function (this: HTMLInputElement) {
+      const progress = parseFloat(this.value) / 1000;
+      if (plume.audioElement) {
+        plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       }
     });
 
-    document.addEventListener("mouseup", () => {
-      isMouseDown = false;
-      plume.isDragging = false;
-    });
-
-    progressBarElement.addEventListener("click", updateProgress);
-
-    plume.progressBar = progressBarElement;
-    plume.progressFill = progressFillElement;
-    plume.progressHandle = progressHandleElement;
-    plume.currentTimeDisplay = currentTime;
+    plume.progressSlider = slider;
+    plume.elapsedDisplay = elapsed;
     plume.durationDisplay = duration;
 
     return container;
   };
 
   const updateProgressBar = () => {
-    if (!plume.audioElement || !plume.progressFill || plume.isDragging) return;
+    if (!plume.audioElement || !plume.progressSlider) return;
 
-    const currentTime = plume.audioElement.currentTime;
+    const elapsed = plume.audioElement.currentTime;
     const duration = plume.audioElement.duration;
 
     if (!isNaN(duration) && duration > 0) {
-      const percent = (currentTime / duration) * 100;
-      plume.progressFill.style.width = `${percent}%`;
+      const percent = (elapsed / duration) * 100;
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${percent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      plume.progressSlider.value = `${percent * 10}`;
+      plume.progressSlider.style.backgroundImage = bgImg;
 
-      if (plume.currentTimeDisplay) {
-        plume.currentTimeDisplay.textContent = formatTime(currentTime);
+      if (plume.elapsedDisplay) {
+        plume.elapsedDisplay.textContent = formatTime(elapsed);
       }
 
       if (plume.durationDisplay) {
@@ -737,7 +700,7 @@ enum BC_ELEM_IDENTIFIERS {
     const playbackManager = document.createElement("div");
     playbackManager.className = "bpe-playback-manager";
 
-    const progressContainer = createProgressBar();
+    const progressContainer = createProgressContainer();
     if (progressContainer) {
       playbackManager.appendChild(progressContainer);
     }
@@ -760,7 +723,7 @@ enum BC_ELEM_IDENTIFIERS {
   const setupAudioListeners = () => {
     if (!plume.audioElement) return;
 
-    // Update progress bar
+    // Update progress container
     plume.audioElement.addEventListener("timeupdate", updateProgressBar);
     plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
     plume.audioElement.addEventListener("durationchange", updateProgressBar);
@@ -805,7 +768,7 @@ enum BC_ELEM_IDENTIFIERS {
       return;
     }
 
-    const plumeIsAlreadyInjected = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
+    const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) return;
 
     // Inject enhancements

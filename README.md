@@ -1,6 +1,6 @@
 <div align="center" id="top">
   <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
-  <h2>:notes:Bandcamp's Player Lightweight Urgent Media Enhancer :feather:</h2>
+  <h2>:notes:Bandcamp Player Lightweight Ultimate Media Enhancer :feather:</h2>
 </div>
 
 <div align="center">
@@ -20,7 +20,7 @@
 &#xa0;
 
 <div align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.0-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.2-blue?logo=semver" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
 </div>
 <div align="center">
