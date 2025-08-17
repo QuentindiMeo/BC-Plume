@@ -14,12 +14,9 @@ type BrowserType = "Chromium" | "Firefox" | "unknown";
  * Audio player enhancement handles
  */
 interface PlumeObject {
-  progressSlider: HTMLInputElement | null;
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
-  progressBar: HTMLDivElement | null;
-  progressFill: HTMLDivElement | null;
-  progressHandle: HTMLDivElement | null;
+  progressSlider: HTMLInputElement | null;
   currentTimeDisplay: HTMLSpanElement | null;
   durationDisplay: HTMLSpanElement | null;
   titleDisplay: HTMLDivElement | null;
@@ -217,12 +214,9 @@ enum BC_ELEM_IDENTIFIERS {
   console.info("Detected browser:", browserType);
 
   const plume: PlumeObject = {
-    progressSlider: null,
     audioElement: null,
     volumeSlider: null,
-    progressBar: null,
-    progressFill: null,
-    progressHandle: null,
+    progressSlider: null,
     currentTimeDisplay: null,
     durationDisplay: null,
     titleDisplay: null,
@@ -579,31 +573,17 @@ enum BC_ELEM_IDENTIFIERS {
   };
 
   const createProgressBar = () => {
-    if (!plume.audioElement || plume.progressBar) return;
+    if (!plume.audioElement || plume.progressSlider) return;
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
 
-    const progressBarElement = document.createElement("div");
-    progressBarElement.className = "bpe-progress-bar";
-
-    const progressFillElement = document.createElement("div");
-    progressFillElement.className = "bpe-progress-fill";
-    progressFillElement.style.width = "0%";
-
-    const progressHandleElement = document.createElement("div");
-    progressHandleElement.className = "bpe-progress-handle";
-
-    progressFillElement.appendChild(progressHandleElement);
-    progressBarElement.appendChild(progressFillElement);
-
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "1000";
-    slider.value = "0";
-    slider.className = "bpe-progress-slider";
-    plume.progressSlider = slider;
+    const progressSlider = document.createElement("input");
+    progressSlider.type = "range";
+    progressSlider.min = "0";
+    progressSlider.max = "1000"; // use 1000 for better granularity: 1000s = 16m40s
+    progressSlider.value = "0";
+    progressSlider.className = "bpe-progress-slider";
 
     const timeDisplay = document.createElement("div");
     timeDisplay.className = "bpe-time-display";
@@ -617,50 +597,18 @@ enum BC_ELEM_IDENTIFIERS {
     timeDisplay.appendChild(currentTime);
     timeDisplay.appendChild(duration);
 
-    container.appendChild(progressBarElement);
+    container.appendChild(progressSlider);
     container.appendChild(timeDisplay);
-    container.appendChild(slider);
-
-    let isMouseDown = false;
 
     // Event listener for progress change
-    slider.addEventListener("input", function (this: HTMLInputElement) {
+    progressSlider.addEventListener("input", function (this: HTMLInputElement) {
       const progress = parseFloat(this.value) / 1000;
       if (plume.audioElement) {
         plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       }
     });
 
-    const updateProgress = (event: MouseEvent | BcProgressEvent) => {
-      const rect = progressBarElement.getBoundingClientRect();
-      const percent = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
-      const newTime = (percent / 100) * (plume.audioElement?.duration ?? 0);
-
-      if (!isNaN(newTime) && isFinite(newTime) && plume.audioElement) {
-        plume.audioElement.currentTime = newTime;
-      }
-    };
-
-    progressBarElement.addEventListener("mousedown", (e) => {
-      isMouseDown = true;
-      plume.isDragging = true;
-      updateProgress(e);
-    });
-
-    document.addEventListener("mousemove", (e) => {
-      if (isMouseDown) {
-        updateProgress(e);
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      isMouseDown = false;
-      plume.isDragging = false;
-    });
-
-    plume.progressBar = progressBarElement;
-    plume.progressFill = progressFillElement;
-    plume.progressHandle = progressHandleElement;
+    plume.progressSlider = progressSlider;
     plume.currentTimeDisplay = currentTime;
     plume.durationDisplay = duration;
 
@@ -668,15 +616,17 @@ enum BC_ELEM_IDENTIFIERS {
   };
 
   const updateProgressBar = () => {
-    if (!plume.audioElement || !plume.progressFill || plume.isDragging) return;
+    if (!plume.audioElement || !plume.progressSlider || plume.isDragging) return;
 
     const currentTime = plume.audioElement.currentTime;
     const duration = plume.audioElement.duration;
 
     if (!isNaN(duration) && duration > 0) {
       const percent = (currentTime / duration) * 100;
-      plume.progressFill.style.width = `${percent}%`;
-      plume.progressSlider!.value = `${percent * 10}`;
+      plume.progressSlider.value = `${percent * 10}`;
+      plume.progressSlider.style.backgroundImage = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${
+        Math.round(percent * 10) / 10
+      }%, var(--progbar-bg) 0%)`;
 
       if (plume.currentTimeDisplay) {
         plume.currentTimeDisplay.textContent = formatTime(currentTime);
