@@ -621,10 +621,9 @@ enum BC_ELEM_IDENTIFIERS {
 
     if (!isNaN(duration) && duration > 0) {
       const percent = (elapsed / duration) * 100;
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${percent.toFixed(1)}%, var(--progbar-bg) 0%)`;
       plume.progressSlider.value = `${percent * 10}`;
-      plume.progressSlider.style.backgroundImage = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${
-        Math.round(percent * 10) / 10
-      }%, var(--progbar-bg) 0%)`;
+      plume.progressSlider.style.backgroundImage = bgImg;
 
       if (plume.elapsedDisplay) {
         plume.elapsedDisplay.textContent = formatTime(elapsed);

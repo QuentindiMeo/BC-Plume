@@ -5,6 +5,9 @@
 
 - _**[1.3.0]** Coming later..._: **Pedal To The Metal** — New features are added to Plume. [#???](#top)
 
+  - _**[1.2.2]** Aug 17 2025_: The progress slider is improved, UI adjustments. [#35](https://github.com/QuentindiMeo/BC-Plume/pull/35)
+  - _**[1.2.1]** Jul 31 2025_: The repo is improved with an extension presentation. [#030](https://github.com/QuentindiMeo/BC-Plume/pull/30)
+
 - _**[1.2.0]** Jul 30 2025_: **Pretty boy** — Plume gets a logo & UI rework. [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
 
 - _**[1.1.0]** Jul 28 2025_: **First Release** — The original Bandcamp player is fully replaced by Plume. [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18_)
