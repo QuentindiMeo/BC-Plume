@@ -219,7 +219,7 @@ enum BC_ELEM_IDENTIFIERS {
     elapsedDisplay: null,
     durationDisplay: null,
     volumeSlider: null,
-    savedVolume: 1, // Default volume, 0..1
+    savedVolume: 0.5, // Default volume, 0..1
   };
 
   const saveNewVolume = (newVolume: number) => {
@@ -242,8 +242,8 @@ enum BC_ELEM_IDENTIFIERS {
     return new Promise((resolve) => {
       if (browserLocalStorage !== undefined) {
         // Chrome/Firefox with extension API
-        browserLocalStorage.get(["bandcamp_volume"]).then((bcVolume: LocalStorage["bandcamp_volume"]) => {
-          const volume = bcVolume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
+        browserLocalStorage.get(["bandcamp_volume"]).then((ls: LocalStorage) => {
+          const volume = ls.bandcamp_volume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
           plume.savedVolume = volume;
           resolve(volume);
         });
