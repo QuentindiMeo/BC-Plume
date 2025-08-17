@@ -14,6 +14,7 @@ type BrowserType = "Chromium" | "Firefox" | "unknown";
  * Audio player enhancement handles
  */
 interface PlumeObject {
+  progressSlider: HTMLInputElement | null;
   audioElement: HTMLAudioElement | null;
   volumeSlider: HTMLInputElement | null;
   progressBar: HTMLDivElement | null;
@@ -216,6 +217,7 @@ enum BC_ELEM_IDENTIFIERS {
   console.info("Detected browser:", browserType);
 
   const plume: PlumeObject = {
+    progressSlider: null,
     audioElement: null,
     volumeSlider: null,
     progressBar: null,
@@ -354,7 +356,7 @@ enum BC_ELEM_IDENTIFIERS {
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
     if (!plume.audioElement || plume.volumeSlider) return null;
 
-    // Load saved volume
+    // Load saved volume before creating the slider to ensure it's applied
     await loadSavedVolume();
 
     const container = document.createElement("div");
@@ -595,6 +597,14 @@ enum BC_ELEM_IDENTIFIERS {
     progressFillElement.appendChild(progressHandleElement);
     progressBarElement.appendChild(progressFillElement);
 
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = "1000";
+    slider.value = "0";
+    slider.className = "bpe-progress-slider";
+    plume.progressSlider = slider;
+
     const timeDisplay = document.createElement("div");
     timeDisplay.className = "bpe-time-display";
 
@@ -609,8 +619,17 @@ enum BC_ELEM_IDENTIFIERS {
 
     container.appendChild(progressBarElement);
     container.appendChild(timeDisplay);
+    container.appendChild(slider);
 
     let isMouseDown = false;
+
+    // Event listener for progress change
+    slider.addEventListener("input", function (this: HTMLInputElement) {
+      const progress = parseFloat(this.value) / 1000;
+      if (plume.audioElement) {
+        plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
+      }
+    });
 
     const updateProgress = (event: MouseEvent | BcProgressEvent) => {
       const rect = progressBarElement.getBoundingClientRect();
@@ -657,6 +676,7 @@ enum BC_ELEM_IDENTIFIERS {
     if (!isNaN(duration) && duration > 0) {
       const percent = (currentTime / duration) * 100;
       plume.progressFill.style.width = `${percent}%`;
+      plume.progressSlider!.value = `${percent * 10}`;
 
       if (plume.currentTimeDisplay) {
         plume.currentTimeDisplay.textContent = formatTime(currentTime);

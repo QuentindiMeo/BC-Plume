@@ -212,6 +212,19 @@
   color: #ffffff;
 }
 
+.bpe-progress-slider {
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  outline: none;
+
+  cursor: pointer;
+  position: relative;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
 .bpe-volume-slider {
   width: 100%;
   height: 0.5rem;
