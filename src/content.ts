@@ -556,18 +556,16 @@ enum BC_ELEM_IDENTIFIERS {
       console.debug("Next track event dispatched");
     });
 
-    if (plume.audioElement) {
-      plume.audioElement.addEventListener("play", () => {
-        playPauseBtn.innerHTML = PLUME_SVG.playPause;
-      });
+    plume.audioElement?.addEventListener("play", () => {
+      playPauseBtn.innerHTML = PLUME_SVG.playPause;
+    });
 
-      plume.audioElement.addEventListener("pause", () => {
-        playPauseBtn.innerHTML = PLUME_SVG.playPlay;
-      });
+    plume.audioElement?.addEventListener("pause", () => {
+      playPauseBtn.innerHTML = PLUME_SVG.playPlay;
+    });
 
-      // Initial state
-      playPauseBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
-    }
+    // Initial state
+    playPauseBtn.innerHTML = plume.audioElement?.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
 
     container.appendChild(trackBackwardBtn);
     container.appendChild(timeBackwardBtn);
@@ -640,8 +638,6 @@ enum BC_ELEM_IDENTIFIERS {
       isMouseDown = false;
       plume.isDragging = false;
     });
-
-    progressBarElement.addEventListener("click", updateProgress);
 
     plume.progressBar = progressBarElement;
     plume.progressFill = progressFillElement;
@@ -805,7 +801,7 @@ enum BC_ELEM_IDENTIFIERS {
       return;
     }
 
-    const plumeIsAlreadyInjected = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
+    const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) return;
 
     // Inject enhancements
