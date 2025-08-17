@@ -15,12 +15,11 @@ type BrowserType = "Chromium" | "Firefox" | "unknown";
  */
 interface PlumeObject {
   audioElement: HTMLAudioElement | null;
-  volumeSlider: HTMLInputElement | null;
-  progressSlider: HTMLInputElement | null;
-  currentTimeDisplay: HTMLSpanElement | null;
-  durationDisplay: HTMLSpanElement | null;
   titleDisplay: HTMLDivElement | null;
-  isDragging: boolean;
+  progressSlider: HTMLInputElement | null;
+  elapsedDisplay: HTMLSpanElement | null;
+  durationDisplay: HTMLSpanElement | null;
+  volumeSlider: HTMLInputElement | null;
   savedVolume: number;
 }
 
@@ -152,7 +151,7 @@ enum PLUME_SVG {
 /**
  * Volume storage interface
  */
-interface VolumeStorage {
+interface LocalStorage {
   bandcamp_volume?: number;
 }
 
@@ -186,7 +185,7 @@ enum BC_ELEM_IDENTIFIERS {
   onTrackCurrentTrackTitle = "h2.trackTitle",
   onAlbumCurrentTrackTitle = "a.title_link",
   audioPlayer = "audio",
-  inlinePlayerTable = "div.inline_player > table",
+  inlinePlayerTable = "div.inline_player>table",
 }
 
 (() => {
@@ -215,13 +214,12 @@ enum BC_ELEM_IDENTIFIERS {
 
   const plume: PlumeObject = {
     audioElement: null,
-    volumeSlider: null,
-    progressSlider: null,
-    currentTimeDisplay: null,
-    durationDisplay: null,
     titleDisplay: null,
-    isDragging: false,
-    savedVolume: 1, // Default volume
+    progressSlider: null,
+    elapsedDisplay: null,
+    durationDisplay: null,
+    volumeSlider: null,
+    savedVolume: 1, // Default volume, 0..1
   };
 
   const saveNewVolume = (newVolume: number) => {
@@ -244,8 +242,8 @@ enum BC_ELEM_IDENTIFIERS {
     return new Promise((resolve) => {
       if (browserLocalStorage !== undefined) {
         // Chrome/Firefox with extension API
-        browserLocalStorage.get(["bandcamp_volume"]).then((result: VolumeStorage) => {
-          const volume = result.bandcamp_volume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
+        browserLocalStorage.get(["bandcamp_volume"]).then((bcVolume: LocalStorage["bandcamp_volume"]) => {
+          const volume = bcVolume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
           plume.savedVolume = volume;
           resolve(volume);
         });
@@ -572,64 +570,64 @@ enum BC_ELEM_IDENTIFIERS {
     return container;
   };
 
-  const createProgressBar = () => {
+  const createProgressContainer = () => {
     if (!plume.audioElement || plume.progressSlider) return;
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
 
-    const progressSlider = document.createElement("input");
-    progressSlider.type = "range";
-    progressSlider.min = "0";
-    progressSlider.max = "1000"; // use 1000 for better granularity: 1000s = 16m40s
-    progressSlider.value = "0";
-    progressSlider.className = "bpe-progress-slider";
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = "1000"; // use 1000 for better granularity: 1000s = 16m40s
+    slider.value = "0";
+    slider.className = "bpe-progress-slider";
 
     const timeDisplay = document.createElement("div");
     timeDisplay.className = "bpe-time-display";
 
-    const currentTime = document.createElement("span");
-    currentTime.textContent = "0:00";
+    const elapsed = document.createElement("span");
+    elapsed.textContent = "0:00";
 
     const duration = document.createElement("span");
     duration.textContent = "0:00";
 
-    timeDisplay.appendChild(currentTime);
+    timeDisplay.appendChild(elapsed);
     timeDisplay.appendChild(duration);
 
-    container.appendChild(progressSlider);
+    container.appendChild(slider);
     container.appendChild(timeDisplay);
 
     // Event listener for progress change
-    progressSlider.addEventListener("input", function (this: HTMLInputElement) {
+    slider.addEventListener("input", function (this: HTMLInputElement) {
       const progress = parseFloat(this.value) / 1000;
       if (plume.audioElement) {
         plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       }
     });
 
-    plume.progressSlider = progressSlider;
-    plume.currentTimeDisplay = currentTime;
+    plume.progressSlider = slider;
+    plume.elapsedDisplay = elapsed;
     plume.durationDisplay = duration;
 
     return container;
   };
 
   const updateProgressBar = () => {
-    if (!plume.audioElement || !plume.progressSlider || plume.isDragging) return;
+    if (!plume.audioElement || !plume.progressSlider) return;
 
-    const currentTime = plume.audioElement.currentTime;
+    const elapsed = plume.audioElement.currentTime;
     const duration = plume.audioElement.duration;
 
     if (!isNaN(duration) && duration > 0) {
-      const percent = (currentTime / duration) * 100;
+      const percent = (elapsed / duration) * 100;
       plume.progressSlider.value = `${percent * 10}`;
       plume.progressSlider.style.backgroundImage = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${
         Math.round(percent * 10) / 10
       }%, var(--progbar-bg) 0%)`;
 
-      if (plume.currentTimeDisplay) {
-        plume.currentTimeDisplay.textContent = formatTime(currentTime);
+      if (plume.elapsedDisplay) {
+        plume.elapsedDisplay.textContent = formatTime(elapsed);
       }
 
       if (plume.durationDisplay) {
@@ -703,7 +701,7 @@ enum BC_ELEM_IDENTIFIERS {
     const playbackManager = document.createElement("div");
     playbackManager.className = "bpe-playback-manager";
 
-    const progressContainer = createProgressBar();
+    const progressContainer = createProgressContainer();
     if (progressContainer) {
       playbackManager.appendChild(progressContainer);
     }
@@ -726,7 +724,7 @@ enum BC_ELEM_IDENTIFIERS {
   const setupAudioListeners = () => {
     if (!plume.audioElement) return;
 
-    // Update progress bar
+    // Update progress container
     plume.audioElement.addEventListener("timeupdate", updateProgressBar);
     plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
     plume.audioElement.addEventListener("durationchange", updateProgressBar);
