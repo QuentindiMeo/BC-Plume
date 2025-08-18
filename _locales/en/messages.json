@@ -1,0 +1,59 @@
+{
+  "ERROR": {
+    "UNABLE_TO_FIND_CONTAINER": "Unable to find a suitable container"
+  },
+  "WARN": {
+    "BROWSER_API__NOT_DETECTED": "No browser API detected, using localStorage as fallback",
+    "AUDIO__NOT_FOUND": "No audio element found",
+    "AUDIO_ELEMENT__NOT_FOUND": "Audio element not found, retrying in 2s...",
+    "PLAYER_CONTAINER_NOT_FOUND": "Player container not found, searching for an alternative...",
+    "PREV_TRACK__NOT_FOUND": "Previous track button not found",
+    "NEXT_TRACK__NOT_FOUND": "Next track button not found",
+    "PLAY_PAUSE__NOT_FOUND": "Play/Pause button not found",
+
+    "VOLUME__NOT_LOADED": "Unable to load volume:",
+    "VOLUME__NOT_SAVED": "Unable to save volume:"
+  },
+  "LOG": {
+    "MOUNT__COMPLETE": "BC-Plume mounted successfully",
+    "INITIALIZATION__START": "BC-Plume initialization...",
+    "INITIALIZATION__COMPLETE": "BC-Plume initialized successfully",
+
+    "NAVIGATION_DETECTED": "Navigation detected, resetting...",
+
+    "ORIGINAL_PLAYER__HIDDEN": "Original player elements hidden",
+    "ORIGINAL_PLAYER__RESTORED": "Original player elements restored"
+  },
+  "INFO.BROWSER__DETECTED": { "message": "Detected browser:" },
+  "INFO": {
+    "BROWSER__DETECTED": { "message": "Detected browser:" },
+
+    "NEW_AUDIO__FOUND": "New audio element detected",
+    "VOLUME__APPLIED1": "Volume applied to new audio:",
+    "VOLUME__APPLIED2": "%",
+    "AUDIO_EVENT_LISTENERS__SET_UP": "Audio event listeners set up",
+
+    "AUDIO__FOUND": "Audio element found",
+    "VOLUME__FOUND": "Restored volume:"
+  },
+  "DEBUG": {
+    "CONTROL_ELEMENTS__DETECTED": "=== DEBUG: Detected control elements ===",
+    "CONTROL_ELEMENTS__FOUND": "Potential controls found:",
+    "CONTROL_ELEMENTS__END": "=== END DEBUG ===",
+    "PREV_TRACK__CLICKED": "Previous track button clicked",
+    "PREV_TRACK__DISPATCHED": "Previous track event dispatched",
+    "REWIND_TIME__CLICKED": "Rewind 10s button clicked",
+    "REWIND_TIME__DISPATCHED1": "Time rewound to:",
+    "REWIND_TIME__DISPATCHED2": "s",
+    "PLAY_PAUSE__CLICKED": "Play/Pause button clicked",
+    "FORWARD_TIME__CLICKED": "Forward 10s button clicked",
+    "FORWARD_TIME__DISPATCHED1": "Time forwarded to:",
+    "FORWARD_TIME__DISPATCHED2": "s",
+    "NEXT_TRACK__CLICKED": "Next track button clicked",
+    "NEXT_TRACK__DISPATCHED": "Next track event dispatched"
+  },
+  "LABEL": {
+    "TRACK_TITLE": "Unknown Track",
+    "VOLUME": "Volume"
+  }
+}
