@@ -1,4 +1,5 @@
 // Plume - TypeScript Content Script
+const version = "_v1.2.2";
 
 interface AnyBrowserStorageAPI {
   storage: {
@@ -188,6 +189,22 @@ enum BC_ELEM_IDENTIFIERS {
   inlinePlayerTable = "div.inline_player>table",
 }
 
+type ConsolePrintingMethod = "debug" | "info" | "log" | "warn" | "error";
+const ConsolePrintingPrefix: Record<ConsolePrintingMethod, string> = {
+  "debug": "DEBUG",
+  "info": "INFO.",
+  "log": "LOG..",
+  "warn": "WARN?",
+  "error": "ERR?!",
+};
+
+const logger = (method: ConsolePrintingMethod, ...messages: any[]) => {
+  const now = new Date()
+  const nowTime = now.toLocaleTimeString();
+  const nowMilliseconds = now.getMilliseconds() < 100 ? `0${now.getMilliseconds()}` : now.getMilliseconds();
+  console[method](`[Plume${version} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...messages);
+};
+
 (() => {
   "use strict";
 
@@ -198,7 +215,7 @@ enum BC_ELEM_IDENTIFIERS {
     } else if (typeof (globalThis as any).browser !== "undefined" && (globalThis as any).browser.storage) {
       return (globalThis as any).browser;
     } else {
-      console.warn("No browser API detected, using localStorage as fallback");
+      logger("warn", "No browser API detected, using localStorage as fallback");
       return null;
     }
   })();
@@ -210,7 +227,7 @@ enum BC_ELEM_IDENTIFIERS {
       return "unknown";
     }
   })();
-  console.info("Detected browser:", browserType);
+  logger("info", "Detected browser:", browserType);
 
   const plume: PlumeObject = {
     audioElement: null,
@@ -233,7 +250,7 @@ enum BC_ELEM_IDENTIFIERS {
       try {
         localStorage.setItem("bandcamp_volume", newVolume.toString());
       } catch (e) {
-        console.warn("Unable to save volume:", e);
+        logger("warn", "Unable to save volume:", e);
       }
     }
   };
@@ -255,7 +272,7 @@ enum BC_ELEM_IDENTIFIERS {
           plume.savedVolume = volume;
           resolve(volume);
         } catch (e) {
-          console.warn("Unable to load volume:", e);
+          logger("warn", "Unable to load volume:", e);
           plume.savedVolume = 1;
           resolve(1);
         }
@@ -276,9 +293,9 @@ enum BC_ELEM_IDENTIFIERS {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
     if (prevButton) {
       prevButton.click();
-      console.debug("Previous track button clicked");
+      logger("debug", "Previous track button clicked");
     } else {
-      console.warn("Previous track button not found");
+      logger("warn", "Previous track button not found");
     }
   };
 
@@ -287,9 +304,9 @@ enum BC_ELEM_IDENTIFIERS {
     const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
     if (nextButton) {
       nextButton.click();
-      console.debug("Next track button clicked");
+      logger("debug", "Next track button clicked");
     } else {
-      console.warn("Next track button not found");
+      logger("warn", "Next track button not found");
     }
   };
 
@@ -301,7 +318,7 @@ enum BC_ELEM_IDENTIFIERS {
       playButton.click();
       playButton.click();
     } else {
-      console.warn("Play button not found");
+      logger("warn", "Play button not found");
     }
   };
 
@@ -332,12 +349,12 @@ enum BC_ELEM_IDENTIFIERS {
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
     const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
     if (audio) {
-      console.info("Audio element found:", audio);
+      logger("info", "Audio element found:", audio);
 
       // Load and immediately apply saved volume
       await loadSavedVolume();
       audio.volume = plume.savedVolume;
-      console.info(`Restored volume: ${Math.round(plume.savedVolume * 100)}%`);
+      logger("info", `Restored volume: ${Math.round(plume.savedVolume * 100)}%`);
 
       return audio;
     }
@@ -399,7 +416,7 @@ enum BC_ELEM_IDENTIFIERS {
       bcAudioTable.classList.add("bpe-hidden-original");
     }
 
-    console.log("Original player elements hidden");
+    logger("log", "Original player elements hidden");
   };
 
   // Function to restore original player elements (if needed)
@@ -409,12 +426,12 @@ enum BC_ELEM_IDENTIFIERS {
     bcAudioTable.style.display = "unset";
     bcAudioTable.classList.remove("bpe-hidden-original");
 
-    console.log("Original player elements restored");
+    logger("log", "Original player elements restored");
   };
 
   // Debug function to identify Bandcamp controls
   const debugBandcampControls = () => {
-    console.debug("=== DEBUG: Detected control elements ===");
+    logger("debug", "=== DEBUG: Detected control elements ===");
 
     // Find all possible buttons and links
     const allButtons = document.querySelectorAll(
@@ -452,8 +469,8 @@ enum BC_ELEM_IDENTIFIERS {
       }
     });
 
-    console.debug("Potential controls found:", relevantControls);
-    console.debug("=== END DEBUG ===");
+    logger("debug", "Potential controls found:", relevantControls);
+    logger("debug", "=== END DEBUG ===");
 
     return relevantControls;
   };
@@ -489,28 +506,28 @@ enum BC_ELEM_IDENTIFIERS {
 
     // === Event listeners for buttons ===
     trackBackwardBtn.addEventListener("click", () => {
-      console.debug("Previous track button clicked");
+      logger("debug", "Previous track button clicked");
 
       if (!plume.audioElement) {
-        console.warn("No audio element found");
+        logger("warn", "No audio element found");
         return;
       }
 
       clickPreviousTrackButton();
-      console.debug("Previous track event dispatched");
+      logger("debug", "Previous track event dispatched");
     });
 
     timeBackwardBtn.addEventListener("click", () => {
-      console.debug("Rewind 10s button clicked");
+      logger("debug", "Rewind 10s button clicked");
 
       if (!plume.audioElement) {
-        console.warn("No audio element found");
+        logger("warn", "No audio element found");
         return;
       }
 
       const newTime = Math.max(0, plume.audioElement.currentTime - 10);
       plume.audioElement.currentTime = newTime;
-      console.debug(`Time rewound to: ${Math.round(newTime)}s`);
+      logger("debug", `Time rewound to: ${Math.round(newTime)}s`);
     });
 
     playPauseBtn.addEventListener("click", () => {
@@ -526,28 +543,28 @@ enum BC_ELEM_IDENTIFIERS {
     });
 
     timeForwardBtn.addEventListener("click", () => {
-      console.debug("Forward 10s button clicked");
+      logger("debug", "Forward 10s button clicked");
 
       if (!plume.audioElement) {
-        console.warn("No audio element found");
+        logger("warn", "No audio element found");
         return;
       }
 
       const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + 10);
       plume.audioElement.currentTime = newTime;
-      console.debug(`Time forwarded to: ${Math.round(newTime)}s`);
+      logger("debug", `Time forwarded to: ${Math.round(newTime)}s`);
     });
 
     trackForwardBtn.addEventListener("click", () => {
-      console.debug("Next track button clicked");
+      logger("debug", "Next track button clicked");
 
       if (!plume.audioElement) {
-        console.warn("No audio element found");
+        logger("warn", "No audio element found");
         return;
       }
 
       clickNextTrackButton();
-      console.debug("Next track event dispatched");
+      logger("debug", "Next track event dispatched");
     });
 
     plume.audioElement?.addEventListener("play", () => {
@@ -651,7 +668,7 @@ enum BC_ELEM_IDENTIFIERS {
     }
 
     if (!playerContainer) {
-      console.warn("Player container not found, alternative search...");
+      logger("warn", "Player container not found, alternative search...");
       // Search near audio elements
       if (plume.audioElement) {
         playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
@@ -659,7 +676,7 @@ enum BC_ELEM_IDENTIFIERS {
     }
 
     if (!playerContainer) {
-      console.error("Unable to find a suitable container");
+      logger("error", "Unable to find a suitable container");
       return;
     }
 
@@ -717,7 +734,7 @@ enum BC_ELEM_IDENTIFIERS {
 
     playerContainer.appendChild(plumeContainer);
 
-    console.log("BC-Plume successfully deployed");
+    logger("log", "BC-Plume mounted successfully");
   };
 
   const setupAudioListeners = () => {
@@ -748,12 +765,12 @@ enum BC_ELEM_IDENTIFIERS {
       }
     });
 
-    console.info("Audio event listeners set up");
+    logger("info", "Audio event listeners set up");
   };
 
   // Main initialization function
   const init = async () => {
-    console.info("Initializing BC-Plume...");
+    logger("info", "Initializing BC-Plume...");
 
     // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {
@@ -763,7 +780,7 @@ enum BC_ELEM_IDENTIFIERS {
 
     plume.audioElement = await findAudioElement();
     if (!plume.audioElement) {
-      console.warn("Audio element not found, retrying in 2s...");
+      logger("warn", "Audio element not found, retrying in 2s...");
       setTimeout(init, 2000);
       return;
     }
@@ -779,7 +796,7 @@ enum BC_ELEM_IDENTIFIERS {
     // Debug: show detected controls
     debugBandcampControls();
 
-    console.log("BC-Plume initialized successfully");
+    logger("log", "BC-Plume initialized successfully");
   };
 
   // Observe DOM changes for players that load dynamically
@@ -789,12 +806,12 @@ enum BC_ELEM_IDENTIFIERS {
         // Check if a new audio element was added
         const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
-          console.info("New audio element detected");
+          logger("info", "New audio element detected");
 
           // Load and apply saved volume to the new element
           await loadSavedVolume();
           newAudio.volume = plume.savedVolume;
-          console.info(`Volume applied to new audio: ${Math.round(plume.savedVolume * 100)}%`);
+          logger("info", `Volume applied to new audio: ${Math.round(plume.savedVolume * 100)}%`);
 
           plume.audioElement = newAudio;
 
@@ -827,15 +844,15 @@ enum BC_ELEM_IDENTIFIERS {
   // Support for SPA navigation
   let lastUrl = location.href;
   new MutationObserver(() => {
-    const url = location.href;
-    if (url !== lastUrl) {
-      lastUrl = url;
-      console.log("Navigation detected, resetting...");
-      setTimeout(() => {
-        init();
-        // Update title after navigation in case the track changed
-        setTimeout(updateTitleDisplay, 500);
-      }, 1000);
-    }
+    const currentPageUrl = location.href;
+    if (currentPageUrl === lastUrl) return;
+
+    lastUrl = currentPageUrl;
+    logger("log", "Navigation detected, resetting...");
+    setTimeout(() => {
+      init();
+      // Update title after navigation in case the track changed
+      setTimeout(updateTitleDisplay, 500);
+    }, 1000);
   }).observe(document, { subtree: true, childList: true });
 })();
