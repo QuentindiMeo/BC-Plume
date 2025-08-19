@@ -233,8 +233,7 @@ const messages = {
     BROWSER__DETECTED: "Detected browser:",
 
     NEW_AUDIO__FOUND: "New audio element detected",
-    VOLUME__APPLIED1: "Volume applied to new audio:",
-    VOLUME__APPLIED2: "%",
+    VOLUME__APPLIED: "Volume applied to new audio:",
     AUDIO_EVENT_LISTENERS__SET_UP: "Audio event listeners set up",
 
     AUDIO__FOUND: "Audio element found",
@@ -260,6 +259,9 @@ const messages = {
     BROWSER: "unknown",
     TRACK_TITLE: "Unknown Track",
     VOLUME: "Volume",
+  },
+  META: {
+    PERCENTAGE: "%",
   },
 };
 
@@ -413,7 +415,10 @@ const messages = {
       // Load and immediately apply saved volume
       await loadSavedVolume();
       audio.volume = plume.savedVolume;
-      logger("info", `${messages.INFO.VOLUME__FOUND} ${Math.round(plume.savedVolume * 100)}%`);
+      logger(
+        "info",
+        `${messages.INFO.VOLUME__FOUND} ${Math.round(plume.savedVolume * 100)}${messages.META.PERCENTAGE}`
+      );
 
       return audio;
     }
@@ -446,14 +451,14 @@ const messages = {
 
     const valueDisplay = document.createElement("div");
     valueDisplay.className = "bpe-volume-value";
-    valueDisplay.textContent = `${slider.value}%`;
+    valueDisplay.textContent = `${slider.value}${messages.META.PERCENTAGE}`;
 
     // Event listener for volume change
     slider.addEventListener("input", function (this: HTMLInputElement) {
       const volume = parseInt(this.value) / 100;
       if (plume.audioElement) {
         plume.audioElement.volume = volume;
-        valueDisplay.textContent = `${this.value}%`;
+        valueDisplay.textContent = `${this.value}${messages.META.PERCENTAGE}`;
 
         // Save new volume
         saveNewVolume(volume);
@@ -822,7 +827,7 @@ const messages = {
           PLUME_ELEM_IDENTIFIERS.volumeValue
         ) as HTMLSpanElement;
         if (valueDisplay) {
-          valueDisplay.textContent = `${plume.volumeSlider.value}%`;
+          valueDisplay.textContent = `${plume.volumeSlider.value}${messages.META.PERCENTAGE}`;
         }
 
         // Save volume when it changes (even if not via our slider)
@@ -878,7 +883,7 @@ const messages = {
           newAudio.volume = plume.savedVolume;
           logger(
             "info",
-            `${messages.INFO.VOLUME__APPLIED1} ${Math.round(plume.savedVolume * 100)}${messages.INFO.VOLUME__APPLIED2}`
+            `${messages.INFO.VOLUME__APPLIED} ${Math.round(plume.savedVolume * 100)}${messages.META.PERCENTAGE}`
           );
 
           plume.audioElement = newAudio;
