@@ -5,6 +5,7 @@
 
 - _**[1.3.0]** Coming later..._: **Pedal To The Metal** — New features are added to Plume. [#???](#top)
 
+  - _**[1.2.3]** Aug 19 2025_: The Plume now go through a logger, everything gets localized (EN, FR). [#38](https://github.com/QuentindiMeo/BC-Plume/pull/38)
   - _**[1.2.2]** Aug 17 2025_: The progress slider is improved, UI adjustments. [#35](https://github.com/QuentindiMeo/BC-Plume/pull/35)
   - _**[1.2.1]** Jul 31 2025_: The repo is improved with an extension presentation. [#030](https://github.com/QuentindiMeo/BC-Plume/pull/30)
 
