@@ -196,99 +196,31 @@ const ConsolePrintingPrefix: Record<ConsolePrintingMethod, string> = {
   error: "ERR?!",
 };
 
-const logger = (method: ConsolePrintingMethod, ...messages: any[]) => {
+const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
   const now = new Date();
   const nowTime = now.toLocaleTimeString();
   const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
-  console[method](`[Plume${version} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...messages);
-};
-
-const messages = {
-  ERROR: {
-    UNABLE_TO_FIND_CONTAINER: "Unable to find a suitable container",
-  },
-  WARN: {
-    BROWSER_API__NOT_DETECTED: "No browser API detected, using localStorage as fallback",
-    AUDIO__NOT_FOUND: "No audio element found",
-    AUDIO_ELEMENT__NOT_FOUND: "Audio element not found, retrying in 2s...",
-    PLAYER_CONTAINER_NOT_FOUND: "Player container not found, searching for an alternative...",
-    PREV_TRACK__NOT_FOUND: "Previous track button not found",
-    NEXT_TRACK__NOT_FOUND: "Next track button not found",
-    PLAY_PAUSE__NOT_FOUND: "Play/Pause button not found",
-
-    VOLUME__NOT_LOADED: "Unable to load volume:",
-    VOLUME__NOT_SAVED: "Unable to save volume:",
-  },
-  LOG: {
-    MOUNT__COMPLETE: "BC-Plume mounted successfully",
-    INITIALIZATION__START: "BC-Plume initialization...",
-    INITIALIZATION__COMPLETE: "BC-Plume initialized successfully",
-
-    NAVIGATION_DETECTED: "Navigation detected, resetting...",
-
-    ORIGINAL_PLAYER__HIDDEN: "Original player elements hidden",
-    ORIGINAL_PLAYER__RESTORED: "Original player elements restored",
-  },
-  INFO: {
-    BROWSER__DETECTED: "Detected browser:",
-
-    NEW_AUDIO__FOUND: "New audio element detected",
-    VOLUME__APPLIED: "Volume applied to new audio:",
-    AUDIO_EVENT_LISTENERS__SET_UP: "Audio event listeners set up",
-
-    AUDIO__FOUND: "Audio element found",
-    VOLUME__FOUND: "Restored volume:",
-  },
-  DEBUG: {
-    CONTROL_ELEMENTS__DETECTED: "=== DEBUG: Detected control elements ===",
-    CONTROL_ELEMENTS__FOUND: "Potential controls found:",
-    CONTROL_ELEMENTS__END: "=== END DEBUG ===",
-    PREV_TRACK__CLICKED: "Previous track button clicked",
-    PREV_TRACK__DISPATCHED: "Previous track event dispatched",
-    REWIND_TIME__CLICKED: "Rewind 10s button clicked",
-    REWIND_TIME__DISPATCHED1: "Time rewound to:",
-    REWIND_TIME__DISPATCHED2: "s",
-    PLAY_PAUSE__CLICKED: "Play/Pause button clicked",
-    FORWARD_TIME__CLICKED: "Forward 10s button clicked",
-    FORWARD_TIME__DISPATCHED1: "Time forwarded to:",
-    FORWARD_TIME__DISPATCHED2: "s",
-    NEXT_TRACK__CLICKED: "Next track button clicked",
-    NEXT_TRACK__DISPATCHED: "Next track event dispatched",
-  },
-  LABEL: {
-    BROWSER: "unknown",
-    TRACK_TITLE: "Unknown Track",
-    VOLUME: "Volume",
-  },
-  META: {
-    PERCENTAGE: "%",
-  },
+  console[method](`[Plume${version} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
 };
 
 (() => {
   "use strict";
 
   // Browser detection and compatible storage API
-  const browserAPI: BrowserAPI | null = (() => {
+  const browserAPI: BrowserAPI = (() => {
     if (typeof (globalThis as any).chrome !== "undefined" && (globalThis as any).chrome.storage) {
       return (globalThis as any).chrome;
     } else if (typeof (globalThis as any).browser !== "undefined" && (globalThis as any).browser.storage) {
       return (globalThis as any).browser;
     } else {
-      logger("warn", messages.WARN.BROWSER_API__NOT_DETECTED);
-      return null;
+      logger("warn", (globalThis as any).chrome.getString("WARN__BROWSER_API__NOT_DETECTED"));
+      return (globalThis as any).chrome; // Assume Chromium-based as fallback
     }
   })();
-  const browserLocalStorage = browserAPI?.storage?.local;
-  const browserType: string = (() => {
-    if (browserAPI) {
-      return typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
-    } else {
-      return messages.LABEL.BROWSER;
-    }
-  })();
-  const i18n = browserAPI?.i18n;
-  logger("info", i18n?.getMessage("INFO__BROWSER__DETECTED"), browserType);
+  const browserLocalStorage = browserAPI.storage.local;
+  const browserType = typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
+  const getString = browserAPI.i18n.getMessage;
+  logger("info", getString("INFO__BROWSER__DETECTED"), browserType);
 
   const plume: PlumeObject = {
     audioElement: null,
@@ -311,7 +243,7 @@ const messages = {
       try {
         localStorage.setItem("bandcamp_volume", newVolume.toString());
       } catch (e) {
-        logger("warn", messages.WARN.VOLUME__NOT_SAVED, e);
+        logger("warn", getString("WARN__VOLUME__NOT_SAVED"), e);
       }
     }
   };
@@ -333,7 +265,7 @@ const messages = {
           plume.savedVolume = volume;
           resolve(volume);
         } catch (e) {
-          logger("warn", messages.WARN.VOLUME__NOT_LOADED, e);
+          logger("warn", getString("WARN__VOLUME__NOT_LOADED"), e);
           plume.savedVolume = 1;
           resolve(1);
         }
@@ -354,9 +286,9 @@ const messages = {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
     if (prevButton) {
       prevButton.click();
-      logger("debug", messages.DEBUG.PREV_TRACK__CLICKED);
+      logger("debug", getString("DEBUG__PREV_TRACK__CLICKED"));
     } else {
-      logger("warn", messages.WARN.PREV_TRACK__NOT_FOUND);
+      logger("warn", getString("WARN__PREV_TRACK__NOT_FOUND"));
     }
   };
 
@@ -365,9 +297,9 @@ const messages = {
     const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
     if (nextButton) {
       nextButton.click();
-      logger("debug", messages.DEBUG.NEXT_TRACK__CLICKED);
+      logger("debug", getString("DEBUG__NEXT_TRACK__CLICKED"));
     } else {
-      logger("warn", messages.WARN.NEXT_TRACK__NOT_FOUND);
+      logger("warn", getString("WARN__NEXT_TRACK__NOT_FOUND"));
     }
   };
 
@@ -379,7 +311,7 @@ const messages = {
       playButton.click();
       playButton.click();
     } else {
-      logger("warn", messages.WARN.PLAY_PAUSE__NOT_FOUND);
+      logger("warn", getString("WARN__PLAY_PAUSE__NOT_FOUND"));
     }
   };
 
@@ -391,7 +323,7 @@ const messages = {
     if (titleElement?.textContent) {
       return titleElement.textContent.trim();
     }
-    return messages.LABEL.TRACK_TITLE;
+    return getString("LABEL__TRACK_UNKNOWN");
   };
 
   // Function to update the title display when track changes
@@ -410,14 +342,14 @@ const messages = {
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
     const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
     if (audio) {
-      logger("info", messages.INFO.AUDIO__FOUND, audio);
+      logger("info", getString("INFO__AUDIO__FOUND"), audio);
 
       // Load and immediately apply saved volume
       await loadSavedVolume();
       audio.volume = plume.savedVolume;
       logger(
         "info",
-        `${messages.INFO.VOLUME__FOUND} ${Math.round(plume.savedVolume * 100)}${messages.META.PERCENTAGE}`
+        `${getString("INFO__VOLUME__FOUND")} ${Math.round(plume.savedVolume * 100)}${getString("META__PERCENTAGE")}`
       );
 
       return audio;
@@ -437,7 +369,7 @@ const messages = {
 
     const label = document.createElement("label");
     label.className = "bpe-volume-label";
-    label.textContent = messages.LABEL.VOLUME;
+    label.textContent = getString("LABEL__VOLUME");
 
     const slider = document.createElement("input");
     slider.type = "range";
@@ -451,14 +383,14 @@ const messages = {
 
     const valueDisplay = document.createElement("div");
     valueDisplay.className = "bpe-volume-value";
-    valueDisplay.textContent = `${slider.value}${messages.META.PERCENTAGE}`;
+    valueDisplay.textContent = `${slider.value}${getString("META__PERCENTAGE")}`;
 
     // Event listener for volume change
     slider.addEventListener("input", function (this: HTMLInputElement) {
       const volume = parseInt(this.value) / 100;
       if (plume.audioElement) {
         plume.audioElement.volume = volume;
-        valueDisplay.textContent = `${this.value}${messages.META.PERCENTAGE}`;
+        valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
         // Save new volume
         saveNewVolume(volume);
@@ -480,7 +412,7 @@ const messages = {
       bcAudioTable.classList.add("bpe-hidden-original");
     }
 
-    logger("log", messages.LOG.ORIGINAL_PLAYER__HIDDEN);
+    logger("log", getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
   };
 
   // Function to restore original player elements (if needed)
@@ -490,12 +422,12 @@ const messages = {
     bcAudioTable.style.display = "unset";
     bcAudioTable.classList.remove("bpe-hidden-original");
 
-    logger("log", messages.LOG.ORIGINAL_PLAYER__RESTORED);
+    logger("log", getString("LOG__ORIGINAL_PLAYER__RESTORED"));
   };
 
   // Debug function to identify Bandcamp controls
   const debugBandcampControls = () => {
-    logger("debug", messages.DEBUG.CONTROL_ELEMENTS__DETECTED);
+    logger("debug", getString("DEBUG__CONTROL_ELEMENTS__DETECTED"));
 
     // Find all possible buttons and links
     const allButtons = document.querySelectorAll(
@@ -533,8 +465,8 @@ const messages = {
       }
     });
 
-    logger("debug", messages.DEBUG.CONTROL_ELEMENTS__FOUND, relevantControls);
-    logger("debug", messages.DEBUG.CONTROL_ELEMENTS__END);
+    logger("debug", getString("DEBUG__CONTROL_ELEMENTS__FOUND"), relevantControls);
+    logger("debug", getString("DEBUG__CONTROL_ELEMENTS__END"));
 
     return relevantControls;
   };
@@ -546,46 +478,46 @@ const messages = {
     const trackBackwardBtn = document.createElement("button");
     trackBackwardBtn.className = "bpe-track-bwd-btn";
     trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
-    trackBackwardBtn.title = "Go to previous track";
+    trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
 
     const timeBackwardBtn = document.createElement("button");
     timeBackwardBtn.className = "bpe-time-bwd-btn";
     timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
-    timeBackwardBtn.title = "Rewind 10 seconds";
+    timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
 
     const playPauseBtn = document.createElement("button");
     playPauseBtn.className = "bpe-play-pause-btn";
     playPauseBtn.innerHTML = PLUME_SVG.playPlay;
-    playPauseBtn.title = "Play/Pause";
+    playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
 
     const timeForwardBtn = document.createElement("button");
     timeForwardBtn.className = "bpe-time-fwd-btn";
     timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
-    timeForwardBtn.title = "Forward 10 seconds";
+    timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
 
     const trackForwardBtn = document.createElement("button");
     trackForwardBtn.className = "bpe-track-fwd-btn";
     trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
-    trackForwardBtn.title = "Go to next track";
+    trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
 
     // === Event listeners for buttons ===
     trackBackwardBtn.addEventListener("click", () => {
-      logger("debug", messages.DEBUG.PREV_TRACK__CLICKED);
+      logger("debug", getString("DEBUG__PREV_TRACK__CLICKED"));
 
       if (!plume.audioElement) {
-        logger("warn", messages.WARN.AUDIO__NOT_FOUND);
+        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
         return;
       }
 
       clickPreviousTrackButton();
-      logger("debug", messages.DEBUG.PREV_TRACK__DISPATCHED);
+      logger("debug", getString("DEBUG__PREV_TRACK__DISPATCHED"));
     });
 
     timeBackwardBtn.addEventListener("click", () => {
-      logger("debug", messages.DEBUG.REWIND_TIME__CLICKED);
+      logger("debug", getString("DEBUG__REWIND_TIME__CLICKED"));
 
       if (!plume.audioElement) {
-        logger("warn", messages.WARN.AUDIO__NOT_FOUND);
+        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
         return;
       }
 
@@ -593,7 +525,9 @@ const messages = {
       plume.audioElement.currentTime = newTime;
       logger(
         "debug",
-        `${messages.DEBUG.REWIND_TIME__DISPATCHED1} ${Math.round(newTime)}${messages.DEBUG.REWIND_TIME__DISPATCHED2}`
+        `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
+          "DEBUG__REWIND_TIME__DISPATCHED2"
+        )}`
       );
     });
 
@@ -610,10 +544,10 @@ const messages = {
     });
 
     timeForwardBtn.addEventListener("click", () => {
-      logger("debug", messages.DEBUG.FORWARD_TIME__CLICKED);
+      logger("debug", getString("DEBUG__FORWARD_TIME__CLICKED"));
 
       if (!plume.audioElement) {
-        logger("warn", messages.WARN.AUDIO__NOT_FOUND);
+        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
         return;
       }
 
@@ -621,20 +555,22 @@ const messages = {
       plume.audioElement.currentTime = newTime;
       logger(
         "debug",
-        `${messages.DEBUG.FORWARD_TIME__DISPATCHED1} ${Math.round(newTime)}${messages.DEBUG.FORWARD_TIME__DISPATCHED2}`
+        `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
+          "DEBUG__FORWARD_TIME__DISPATCHED2"
+        )}`
       );
     });
 
     trackForwardBtn.addEventListener("click", () => {
-      logger("debug", messages.DEBUG.NEXT_TRACK__CLICKED);
+      logger("debug", getString("DEBUG__NEXT_TRACK__CLICKED"));
 
       if (!plume.audioElement) {
-        logger("warn", messages.WARN.AUDIO__NOT_FOUND);
+        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
         return;
       }
 
       clickNextTrackButton();
-      logger("debug", messages.DEBUG.NEXT_TRACK__DISPATCHED);
+      logger("debug", getString("DEBUG__NEXT_TRACK__DISPATCHED"));
     });
 
     plume.audioElement?.addEventListener("play", () => {
@@ -738,7 +674,7 @@ const messages = {
     }
 
     if (!playerContainer) {
-      logger("warn", messages.WARN.PLAYER_CONTAINER_NOT_FOUND);
+      logger("warn", getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
       // Search near audio elements
       if (plume.audioElement) {
         playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
@@ -746,7 +682,7 @@ const messages = {
     }
 
     if (!playerContainer) {
-      logger("error", messages.ERROR.UNABLE_TO_FIND_CONTAINER);
+      logger("error", getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
       return;
     }
 
@@ -771,7 +707,7 @@ const messages = {
     currentTitleSection.className = "bpe-header-current";
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.className = "bpe-header-title-pretext";
-    currentTitlePretext.textContent = "currently playing:";
+    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT");
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
     currentTitleText.className = "bpe-header-title";
@@ -804,7 +740,7 @@ const messages = {
 
     playerContainer.appendChild(plumeContainer);
 
-    logger("log", messages.LOG.MOUNT__COMPLETE);
+    logger("log", getString("LOG__MOUNT__COMPLETE"));
   };
 
   const setupAudioListeners = () => {
@@ -827,7 +763,7 @@ const messages = {
           PLUME_ELEM_IDENTIFIERS.volumeValue
         ) as HTMLSpanElement;
         if (valueDisplay) {
-          valueDisplay.textContent = `${plume.volumeSlider.value}${messages.META.PERCENTAGE}`;
+          valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
         }
 
         // Save volume when it changes (even if not via our slider)
@@ -835,12 +771,12 @@ const messages = {
       }
     });
 
-    logger("info", messages.INFO.AUDIO_EVENT_LISTENERS__SET_UP);
+    logger("info", getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
   };
 
   // Main initialization function
   const init = async () => {
-    logger("info", messages.LOG.INITIALIZATION__START);
+    logger("info", getString("LOG__INITIALIZATION__START"));
 
     // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {
@@ -850,7 +786,7 @@ const messages = {
 
     plume.audioElement = await findAudioElement();
     if (!plume.audioElement) {
-      logger("warn", messages.WARN.AUDIO_ELEMENT__NOT_FOUND);
+      logger("warn", getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
       setTimeout(init, 2000);
       return;
     }
@@ -866,7 +802,7 @@ const messages = {
     // Debug: show detected controls
     debugBandcampControls();
 
-    logger("log", messages.LOG.INITIALIZATION__COMPLETE);
+    logger("log", getString("LOG__INITIALIZATION__COMPLETE"));
   };
 
   // Observe DOM changes for players that load dynamically
@@ -876,14 +812,16 @@ const messages = {
         // Check if a new audio element was added
         const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
-          logger("info", messages.INFO.NEW_AUDIO__FOUND);
+          logger("info", getString("INFO__NEW_AUDIO__FOUND"));
 
           // Load and apply saved volume to the new element
           await loadSavedVolume();
           newAudio.volume = plume.savedVolume;
           logger(
             "info",
-            `${messages.INFO.VOLUME__APPLIED} ${Math.round(plume.savedVolume * 100)}${messages.META.PERCENTAGE}`
+            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(plume.savedVolume * 100)}${getString(
+              "META__PERCENTAGE"
+            )}`
           );
 
           plume.audioElement = newAudio;
@@ -921,7 +859,7 @@ const messages = {
     if (currentPageUrl === lastUrl) return;
 
     lastUrl = currentPageUrl;
-    logger("log", messages.LOG.NAVIGATION_DETECTED);
+    logger("log", getString("LOG__NAVIGATION_DETECTED"));
     setTimeout(() => {
       init();
       // Update title after navigation in case the track changed

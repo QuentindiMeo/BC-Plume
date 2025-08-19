@@ -35,7 +35,13 @@
   "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Next track button clicked" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
-  "LABEL__TRACK_TITLE": { "message": "Unknown Track" },
+  "LABEL__TRACK_CURRENT": { "message": "currently playing:" },
+  "LABEL__TRACK_UNKNOWN": { "message": "Unknown Track" },
+  "LABEL__TRACK_BACKWARD": { "message": "Go to previous track" },
+  "LABEL__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
+  "LABEL__PLAY_PAUSE": { "message": "Play/Pause" },
+  "LABEL__TIME_FORWARD": { "message": "Forward 10 seconds" },
+  "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
   "LABEL__VOLUME": { "message": "Volume" },
   "META__PERCENTAGE": { "message": "%" }
 }
