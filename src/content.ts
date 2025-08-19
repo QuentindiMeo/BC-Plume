@@ -419,10 +419,12 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     logger("log", getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
   };
 
-  // Function to restore original player elements (if needed)
-  //@ts-ignore This is unused, but kept for debug purposes
+  // Function to restore original player elements (use it for debug purposes)
   const restoreOriginalPlayerElements = () => {
     const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
+
+    if (!bcAudioTable) return; // eliminate onInit function call
+
     bcAudioTable.style.display = "unset";
     bcAudioTable.classList.remove("bpe-hidden-original");
 
@@ -691,6 +693,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     }
 
     // Hide or remove old player elements
+    restoreOriginalPlayerElements(); // to prevent unused function
     hideOriginalPlayerElements();
 
     // Create main container for our enhancements
