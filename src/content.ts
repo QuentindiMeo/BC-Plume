@@ -213,12 +213,16 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     } else if (typeof (globalThis as any).browser !== "undefined" && (globalThis as any).browser.storage) {
       return (globalThis as any).browser;
     } else {
-      logger("warn", (globalThis as any).chrome.getString("WARN__BROWSER_API__NOT_DETECTED"));
+      logger("warn", (globalThis as any).chrome.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
       return (globalThis as any).chrome; // Assume Chromium-based as fallback
     }
   })();
   const browserLocalStorage = browserAPI.storage.local;
   const browserType = typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
+  if (!browserAPI.i18n.getMessage) {
+    // Fallback for browsers without i18n support (safety net for if browser detection failed)
+    browserAPI.i18n.getMessage = (key: string) => key;
+  }
   const getString = browserAPI.i18n.getMessage;
   logger("info", getString("INFO__BROWSER__DETECTED"), browserType);
 
