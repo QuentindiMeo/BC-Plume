@@ -232,10 +232,10 @@
   -webkit-appearance: none;
 }
 .bpe-volume-slider::-webkit-slider-thumb {
-  width: 1px;
+  width: .25rem;
   height: 1rem;
   background: var(--progbar-fill-bg-right);
-  border-radius: 50%;
+  border-radius: 33%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 
   cursor: pointer;
@@ -247,13 +247,13 @@
 .bpe-volume-slider::-webkit-slider-thumb:hover {
   background: var(--progbar-fill-bg-left);
   transform: scale(1.25);
+  border-radius: 33%;
 }
 .bpe-volume-slider::-moz-range-thumb {
-  width: 1px;
+  width: .25rem;
   height: 1rem;
   background: var(--progbar-fill-bg-right);
-  border: none;
-  border-radius: 50%;
+  border-radius: 25%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 
   cursor: pointer;

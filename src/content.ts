@@ -650,7 +650,8 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
 
     if (!isNaN(duration) && duration > 0) {
       const percent = (elapsed / duration) * 100;
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${percent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
       plume.progressSlider.value = `${percent * 10}`;
       plume.progressSlider.style.backgroundImage = bgImg;
 
