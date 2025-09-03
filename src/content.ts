@@ -666,8 +666,9 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     }
   };
 
+  const isGrayscale = (rgb: [number, number, number]): boolean => RGBToHSL(...rgb)[1] === 0;
   const adjustForContrast = (rgb: [number, number, number], minContrast: number): string => {
-    const bgRgb: [number, number, number] = [13, 13, 13];
+    const bgRgb: [number, number, number] = [18, 18, 18];
     function luminance(r: number, g: number, b: number) {
       let a = [r, g, b].map(v => {
         v /= 255;
@@ -693,7 +694,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
   }
   const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
-    const bgRgb: [number, number, number] = [13, 13, 13];
+    const bgRgb: [number, number, number] = [18, 18, 18];
     const luminance = (rgb: [number, number, number]): number => {
       const [r, g, b] = rgb.map((c) => {
         c /= 255;
@@ -705,6 +706,26 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     const L1 = luminance(rgb);
     const L2 = luminance(bgRgb);
     return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  }
+  const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h: number = 0, s: number = 0, l: number = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return [h * 360, s * 100, l * 100];
   }
 
   const getTrackTitleElement = (): HTMLSpanElement => {
@@ -718,18 +739,24 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
   };
 
-  // This magic value is arbitrary; it comes from experimentation with color contrast
-  const WCAG_MAGIC_THRESHOLD = 5;
+  // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
+  const WCAG_CONTRAST = 4.5;
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
-    const trackColorContrast = measureContrastRatioWCAG(trackColor.match(/\d+/g)!.map(Number) as [number, number, number]);
-    const artistColorContrast = measureContrastRatioWCAG(artistColor.match(/\d+/g)!.map(Number) as [number, number, number]);
-    let preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
-    const preferredColorContrast = trackColorContrast > artistColorContrast ? trackColorContrast : artistColorContrast;
-    if (preferredColorContrast <= WCAG_MAGIC_THRESHOLD) {
+    const trackColorRGB = trackColor.match(/\d+/g)!.map(Number) as [number, number, number];
+    const artistColorRGB = artistColor.match(/\d+/g)!.map(Number) as [number, number, number];
+    const trackColorContrast = measureContrastRatioWCAG(trackColorRGB);
+    const artistColorContrast = measureContrastRatioWCAG(artistColorRGB);
+    let preferredColor: string;
+    if (trackColorContrast > WCAG_CONTRAST && artistColorContrast > WCAG_CONTRAST) {
+      preferredColor = RGBToHSL(...trackColorRGB)[1] > RGBToHSL(...artistColorRGB)[1] ? trackColor : artistColor;
+    } else {
+      preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
       const preferredColorRgb = preferredColor.match(/\d+/g)!.map(Number) as [number, number, number];
-      preferredColor = adjustForContrast(preferredColorRgb, WCAG_MAGIC_THRESHOLD);
+      preferredColor = adjustForContrast(preferredColorRgb, WCAG_CONTRAST);
+      if (isGrayscale(preferredColorRgb))
+        preferredColor = "rgba(255, 255, 255, 0.5)";
     }
     return preferredColor;
   };
