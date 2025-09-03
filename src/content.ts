@@ -666,117 +666,46 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     }
   };
 
-  const evaluateOKLCH = (rgb: string): [number, number, number] => {
-    let [r, g, b] = rgb.match(/\d+/g)!.map(Number);
+  const adjustForContrast = (rgb: [number, number, number], minContrast: number): string => {
+    const bgRgb: [number, number, number] = [13, 13, 13];
+    function luminance(r: number, g: number, b: number) {
+      let a = [r, g, b].map(v => {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+    }
 
-    // Apply gamma correction (sRGB → linear RGB)
-    [r, g, b] = [r / 255, g / 255, b / 255].map(v =>
-      v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
-    );
+    function contrast(c1: [number, number, number], c2: [number, number, number]) {
+      let L1 = luminance(...c1);
+      let L2 = luminance(...c2);
+      return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+    }
 
-    // --- RGB → OKLab ---
-    const l = 0.4122214708*r + 0.5363325363*g + 0.0514459929*b;
-    const m = 0.2119034982*r + 0.6806995451*g + 0.1073969566*b;
-    const s = 0.0883024619*r + 0.2817188376*g + 0.6299787005*b;
+    let current = [...rgb] as [number, number, number];
+    let factor = 0;
+    while (contrast(current, bgRgb) < minContrast && factor < 1) {
+      factor += 0.05; // step
+      current = current.map((c) => Math.round(c + (255 - c) * factor)) as [number, number, number];
+    }
 
-    const l_ = Math.cbrt(l);
-    const m_ = Math.cbrt(m);
-    const s_ = Math.cbrt(s);
-
-    const L = 0.2104542553*l_ + 0.7936177850*m_ - 0.0040720468*s_;
-    const A = 1.9779984951*l_ - 2.4285922050*m_ + 0.4505937099*s_;
-    const B = 0.0259040371*l_ + 0.7827717662*m_ - 0.8086757660*s_;
-
-    // --- OKLab → OKLCH ---
-    const C = Math.sqrt(A*A + B*B);
-    let H = Math.atan2(B, A) * 180 / Math.PI;
-    if (H < 0) H += 360;
-
-    // Return in standard CSS-style OKLCH ranges, rounded to 2 decimal places
-    const rL = Math.round(L * 100) / 100;
-    const rC = Math.round(C * 100) / 100;
-    const rH = Math.round(H * 100) / 100;
-    return [rL, rC, rH]; // L ∈ [0,1], C ∈ [0, ~0.4], H ∈ [0,360)
-  };
-  const convertCIELCHToRGB = ([L, C, H]: [number, number, number]): string => {
-    const convertOKLCHToRGB = ([L, C, H]: [number, number, number]): string => {
-      // Convert hue to radians
-      const hRad = (H / 180) * Math.PI;
-
-      // --- OKLCH → OKLab ---
-      const A = C * Math.cos(hRad);
-      const B = C * Math.sin(hRad);
-
-      // --- OKLab → LMS cube root space ---
-      const l_ = L + 0.3963377774*A + 0.2158037573*B;
-      const m_ = L - 0.1055613458*A - 0.0638541728*B;
-      const s_ = L - 0.0894841775*A - 1.2914855480*B;
-
-      const l3 = l_ ** 3;
-      const m3 = m_ ** 3;
-      const s3 = s_ ** 3;
-
-      // --- LMS → linear sRGB ---
-      let r = +4.0767416621*l3 - 3.3077115913*m3 + 0.2309699292*s3;
-      let g = -1.2684380046*l3 + 2.6097574011*m3 - 0.3413193965*s3;
-      let b = -0.0041960863*l3 - 0.7034186147*m3 + 1.7076147010*s3;
-
-      // --- linear → sRGB gamma corrected ---
-      [r, g, b] = [r, g, b].map(v =>
-        v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1/2.4) - 0.055
-      );
-
-      // Clamp to [0..255], round to 2 decimal places
-      const to255 = (v: number) => Math.round(Math.max(0, Math.min(255, Math.round(v * 255))) * 100) / 100;
-
-      return `rgb(${to255(r)}, ${to255(g)}, ${to255(b)})`;
-    };
-    const convertCIELCHToOKLCH = ([L, C, H]: [number, number, number]): [number, number, number] => {
-      // --- CIELCH → CIELAB ---
-      const hRad = (H / 180) * Math.PI;
-      const a = C * Math.cos(hRad);
-      const b = C * Math.sin(hRad);
-
-      // --- CIELAB → XYZ (D65) ---
-      const fy = (L + 16) / 116;
-      const fx = fy + a / 500;
-      const fz = fy - b / 200;
-      const finv = (t: number) => {
-        const t3 = t * t * t;
-        return t3 > 0.008856 ? t3 : (t - 16/116) / 7.787;
-      };
-      const X = 0.95047 * finv(fx);
-      const Y = 1.00000 * finv(fy);
-      const Z = 1.08883 * finv(fz);
-
-      // --- XYZ → linear sRGB ---
-      let r =  3.2406*X + (-1.5372)*Y + (-0.4986)*Z;
-      let g = -0.9689*X +  1.8758*Y +  0.0415*Z;
-      let b2 =  0.0557*X + (-0.2040)*Y +  1.0570*Z;
-
-      // --- linear sRGB → OKLab (via LMS) ---
-      const l = 0.4122214708*r + 0.5363325363*g + 0.0514459929*b2;
-      const m = 0.2119034982*r + 0.6806995451*g + 0.1073969566*b2;
-      const s = 0.0883024619*r + 0.2817188376*g + 0.6299787005*b2;
-
-      const l_ = Math.cbrt(l);
-      const m_ = Math.cbrt(m);
-      const s_ = Math.cbrt(s);
-
-      const L_ok = 0.2104542553*l_ + 0.7936177850*m_ - 0.0040720468*s_;
-      const A_ok = 1.9779984951*l_ - 2.4285922050*m_ + 0.4505937099*s_;
-      const B_ok = 0.0259040371*l_ + 0.7827717662*m_ - 0.8086757660*s_;
-
-      const C_ok = Math.hypot(A_ok, B_ok);
-      let H_ok = Math.atan2(B_ok, A_ok) * 180 / Math.PI;
-      if (H_ok < 0) H_ok += 360;
-
-      return [L_ok, C_ok, H_ok]; // OKLCH with L in 0..1
+    // return as rgb(r, g, b)
+    return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
+  }
+  const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
+    const bgRgb: [number, number, number] = [13, 13, 13];
+    const luminance = (rgb: [number, number, number]): number => {
+      const [r, g, b] = rgb.map((c) => {
+        c /= 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
 
-    const asOKLCH = convertCIELCHToOKLCH([L, C, H]);
-    return convertOKLCHToRGB(asOKLCH);
-  };
+    const L1 = luminance(rgb);
+    const L2 = luminance(bgRgb);
+    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  }
 
   const getTrackTitleElement = (): HTMLSpanElement => {
     return document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement;
@@ -789,16 +718,20 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
   };
 
-  // Magic values for CIELCH; both are arbitrary after toying with the OKLCH editor and converting a sweet spot to its CIELCH equivalent
-  const CIELCH_MAGIC_LIGHTNESS = 82;
-  const CIELCH_MAGIC_CHROMA = 42;
+  // This magic value is arbitrary; it comes from experimentation with color contrast
+  const WCAG_MAGIC_THRESHOLD = 5;
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
-    const trackOKLCH = evaluateOKLCH(trackColor);
-    const artistOKLCH = evaluateOKLCH(artistColor);
-    const preferredColorOKLCH = trackOKLCH[0] > artistOKLCH[0] ? trackOKLCH : artistOKLCH;
-    return convertCIELCHToRGB([CIELCH_MAGIC_LIGHTNESS, CIELCH_MAGIC_CHROMA, preferredColorOKLCH[2]]);
+    const trackColorContrast = measureContrastRatioWCAG(trackColor.match(/\d+/g)!.map(Number) as [number, number, number]);
+    const artistColorContrast = measureContrastRatioWCAG(artistColor.match(/\d+/g)!.map(Number) as [number, number, number]);
+    let preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
+    const preferredColorContrast = trackColorContrast > artistColorContrast ? trackColorContrast : artistColorContrast;
+    if (preferredColorContrast <= WCAG_MAGIC_THRESHOLD) {
+      const preferredColorRgb = preferredColor.match(/\d+/g)!.map(Number) as [number, number, number];
+      preferredColor = adjustForContrast(preferredColorRgb, WCAG_MAGIC_THRESHOLD);
+    }
+    return preferredColor;
   };
 
   const injectEnhancements = async () => {
