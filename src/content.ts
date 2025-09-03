@@ -670,7 +670,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     let [r, g, b] = rgb.match(/\d+/g)!.map(Number);
 
     // Apply gamma correction (sRGB → linear RGB)
-    [r, g, b] = [r, g, b].map(v =>
+    [r, g, b] = [r / 255, g / 255, b / 255].map(v =>
       v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
     );
 
@@ -789,6 +789,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
   };
 
+  // Magic values for CIELCH; both are arbitrary after toying with the OKLCH editor and converting a sweet spot to its CIELCH equivalent
   const CIELCH_MAGIC_LIGHTNESS = 82;
   const CIELCH_MAGIC_CHROMA = 42;
   const getAppropriatePretextColor = (): string => {
