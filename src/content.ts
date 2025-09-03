@@ -666,47 +666,6 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     }
   };
 
-  const isGrayscale = (rgb: [number, number, number]): boolean => RGBToHSL(...rgb)[1] === 0;
-  const adjustForContrast = (rgb: [number, number, number], minContrast: number): string => {
-    const bgRgb: [number, number, number] = [18, 18, 18];
-    function luminance(r: number, g: number, b: number) {
-      let a = [r, g, b].map(v => {
-        v /= 255;
-        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
-    }
-
-    function contrast(c1: [number, number, number], c2: [number, number, number]) {
-      let L1 = luminance(...c1);
-      let L2 = luminance(...c2);
-      return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
-    }
-
-    let current = [...rgb] as [number, number, number];
-    let factor = 0;
-    while (contrast(current, bgRgb) < minContrast && factor < 1) {
-      factor += 0.05; // step
-      current = current.map((c) => Math.round(c + (255 - c) * factor)) as [number, number, number];
-    }
-
-    // return as rgb(r, g, b)
-    return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
-  }
-  const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
-    const bgRgb: [number, number, number] = [18, 18, 18];
-    const luminance = (rgb: [number, number, number]): number => {
-      const [r, g, b] = rgb.map((c) => {
-        c /= 255;
-        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    };
-
-    const L1 = luminance(rgb);
-    const L2 = luminance(bgRgb);
-    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
-  }
   const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
     r /= 255;
     g /= 255;
@@ -727,6 +686,33 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     }
     return [h * 360, s * 100, l * 100];
   }
+  const isGrayscale = (rgb: [number, number, number]): boolean => RGBToHSL(...rgb)[1] === 0;
+  const getLuminance = (rgb: [number, number, number]): number => {
+    const [r, g, b] = rgb.map((c) => {
+      c /= 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
+    const bgRgb: [number, number, number] = [18, 18, 18];
+
+    const L1 = getLuminance(rgb);
+    const L2 = getLuminance(bgRgb);
+    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  }
+  const CONTRAST_ADJUSTMENT_STEP = 0.05;
+  const adjustForContrast = (rgb: [number, number, number], minContrast: number): string => {
+    let current = [...rgb] as [number, number, number];
+    let factor = 0;
+    while (measureContrastRatioWCAG(current) < minContrast && factor < 1) {
+      factor += CONTRAST_ADJUSTMENT_STEP;
+      current = current.map((c) => Math.round(c + (255 - c) * factor)) as [number, number, number];
+    }
+
+    // return as rgb(r, g, b)
+    return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
+  }
 
   const getTrackTitleElement = (): HTMLSpanElement => {
     return document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement;
@@ -741,6 +727,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
 
   // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
   const WCAG_CONTRAST = 4.5;
+  const FALLBACK_GRAY = "rgb(127, 127, 127)";
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
@@ -748,17 +735,17 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     const artistColorRGB = artistColor.match(/\d+/g)!.map(Number) as [number, number, number];
     const trackColorContrast = measureContrastRatioWCAG(trackColorRGB);
     const artistColorContrast = measureContrastRatioWCAG(artistColorRGB);
-    let preferredColor: string;
     if (trackColorContrast > WCAG_CONTRAST && artistColorContrast > WCAG_CONTRAST) {
-      preferredColor = RGBToHSL(...trackColorRGB)[1] > RGBToHSL(...artistColorRGB)[1] ? trackColor : artistColor;
+      const trackColorSaturation = RGBToHSL(...trackColorRGB)[1];
+      const artistColorSaturation = RGBToHSL(...artistColorRGB)[1];
+      return trackColorSaturation > artistColorSaturation ? trackColor : artistColor;
     } else {
-      preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
+      const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
       const preferredColorRgb = preferredColor.match(/\d+/g)!.map(Number) as [number, number, number];
-      preferredColor = adjustForContrast(preferredColorRgb, WCAG_CONTRAST);
       if (isGrayscale(preferredColorRgb))
-        preferredColor = "rgba(255, 255, 255, 0.5)";
+        return FALLBACK_GRAY;
+      return adjustForContrast(preferredColorRgb, WCAG_CONTRAST);
     }
-    return preferredColor;
   };
 
   const injectEnhancements = async () => {
