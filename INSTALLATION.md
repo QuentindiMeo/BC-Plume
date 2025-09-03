@@ -1,4 +1,7 @@
-# BC-Plume Installation
+<div align="center" id="top">
+  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
+  <h2>:gear: Plume Installation :nut_and_bolt:</h2>
+</div>
 
 ## 🎯 TypeScript-based Extension
 
@@ -188,3 +191,7 @@ Saved preferences are automatically deleted.
 - Extension version
 - Problem description
 - Console logs (F12)
+
+<br />
+
+[Back to top](#top)

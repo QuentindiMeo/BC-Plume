@@ -1,5 +1,5 @@
 <div align="center" id="top">
-  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/feat/006_improve-readme/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
+  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
   <h2>:card_file_box: Plume's Changelog :card_file_box:</h2>
 </div>
 
@@ -17,3 +17,7 @@
   - _**[1.0.1]** Jul 28 2025_: The project is renamed to _Plume_, GitHub Issue templates are added. [#009](https://github.com/QuentindiMeo/BC-Plume/pull/9)
 
 - _**[1.0.0]** Jul 28 2025_: **Hello World!** — The project is drafted, under the name _MBAPPE_. [#001](https://github.com/QuentindiMeo/BC-Plume/pull/1)
+
+<br />
+
+[Back to top](#top)
