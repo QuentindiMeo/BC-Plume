@@ -689,7 +689,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     const trackCount = trackRows.length;
     const trackRowTitles: HTMLSpanElement[] = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === title) + 1;
-    return trackRows.length ? `(${currentTrackNumber}/${trackCount})` : "";
+    return (trackRows.length && currentTrackNumber) ? `(${currentTrackNumber}/${trackCount})` : "";
   };
 
   const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
@@ -984,9 +984,8 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     logger("log", getString("LOG__NAVIGATION_DETECTED"));
     setTimeout(() => {
       init();
-      // Update title after navigation in case the track changed
       setTimeout(updateTitleDisplay, 500);
-      setTimeout(updatePretextDisplay, 600);
+      setTimeout(updatePretextDisplay, 600); // slight delay to ensure track display is updated
     }, 1000);
   }).observe(document, { subtree: true, childList: true });
 })();
