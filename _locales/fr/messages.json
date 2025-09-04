@@ -37,7 +37,15 @@
   "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
-  "LABEL__TRACK_CURRENT": { "message": "en cours de lecture :" },
+  "LABEL__TRACK_CURRENT": {
+    "message": "en cours de lecture $PISTE$ :",
+    "placeholders": {
+      "piste": {
+        "content": "$1",
+        "example": "(1/4)"
+      }
+    }
+  },
   "LABEL__TRACK_UNKNOWN": { "message": "Titre de la piste inconnu" },
   "LABEL__TRACK_BACKWARD": { "message": "Aller à la piste précédente" },
   "LABEL__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },

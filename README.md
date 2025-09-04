@@ -14,13 +14,13 @@
 &#xa0;
 
 <div align="center">
-  <a href="#memo-description"><img src="https://github.com/user-attachments/assets/9140c05d-2b24-4fe1-8bd7-dde66ee4e26b" alt="Demo gif of v1.2.0" width="800px" /></a>
+  <a href="#memo-description"><img src="https://github.com/user-attachments/assets/751b88bd-15c1-4ce8-b185-2cdb990dbfcf" alt="Demo gif of v1.2.4" width="800px" /></a>
 </div>
 
 &#xa0;
 
 <div align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.2-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.4-blue?logo=semver" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
 </div>
 <div align="center">

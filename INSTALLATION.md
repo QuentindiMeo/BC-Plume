@@ -1,9 +1,12 @@
-# BC-Plume Installation
+<div align="center" id="top">
+  <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
+  <h2>:gear: Plume Installation :nut_and_bolt:</h2>
+</div>
 
 ## 🎯 TypeScript-based Extension
 
 This extension is built with **TypeScript** for better type safety and maintainability.  
-It compiles to JavaScript and supports all modern browsers.
+It compiles to JavaScript and supports all common modern browsers (Chromium- & Firefox-based).
 
 ### ✅ Prerequisites
 
@@ -50,12 +53,12 @@ For developers or to get the latest features:
 
 ```bash
 git clone https://github.com/QuentindiMeo/BC-Plume # Clone or download the repository
-cd BC-Plume
-
-pnpm install    # Install dependencies
+cd BC-Plume && pnpm install    # Install dependencies
 ```
 
 ### 2️⃣ Build the Extension
+
+Select one of the following according to your desired purpose:
 
 ```bash
 pnpm run build  # Quick build (development with source maps)
@@ -66,10 +69,12 @@ pnpm run deploy # Full packaging for distribution
 
 ### 3️⃣ Development Commands
 
+Select one of the following according to your desired purpose:
+
 ```bash
 pnpm run clean       # Clean build artifacts
 
-pnpm run dev         # Development mode (clean + watch)
+pnpm run dev         # Get into a raw development mode (= clean + watch)
 
 # Code quality
 pnpm run lint        # Check code style
@@ -88,34 +93,34 @@ After building, you can install the extension:
 
 #### Option B: Browser-Specific Packages (Distribution)
 
+- **Production**: Use `pnpm run deploy` to create optimized packages
 - **Chrome**: Load `build/chrome/` folder as unpacked extension
 - **Firefox**: Load `build/firefox/manifest.json` as temporary add-on
-- **Production**: Use `pnpm run deploy` to create optimized packages
 
 ## 🎯 Verify Installation
 
 - Go to any Bandcamp page
-- The enhanced interface appears automatically
-- Volume is saved between pages
+- The enhanced interface loads
+- Volume is saved between pages (uses browser cache)
 
 ## 🔧 Icon Conversion (Optional)
 
 If you want to convert SVGs to PNGs for certain browsers:
 
-### Option A: Online Tool (recommended)
+### Option A: With Python (recommended)
+
+```bash
+pip install pillow cairosvg
+python convert_icons.py
+```
+
+### Option B: Online Tool
 
 - Go to <https://convertio.co/svg-png/> or <https://svgtopng.com/>
 - Convert each SVG file in the `icons/` folder:
   - icon16.svg → icon16.png (16x16 pixels)
   - icon48.svg → icon48.png (48x48 pixels)
   - icon128.svg → icon128.png (128x128 pixels)
-
-### Option B: With Python (if available)
-
-```bash
-pip install pillow cairosvg
-python convert_icons.py
-```
 
 ## 🔧 Troubleshooting
 
@@ -186,3 +191,7 @@ Saved preferences are automatically deleted.
 - Extension version
 - Problem description
 - Console logs (F12)
+
+<br />
+
+[Back to top](#top)

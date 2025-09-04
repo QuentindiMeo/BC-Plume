@@ -1,5 +1,5 @@
 // Plume - TypeScript Content Script
-const version = "_v1.2.3";
+const version = "_v1.2.4";
 
 interface BrowserAPI {
   storage: {
@@ -9,7 +9,7 @@ interface BrowserAPI {
     };
   };
   i18n: {
-    getMessage: (key: string) => string;
+    getMessage: (key: string, ...args: any[]) => string;
   };
 }
 
@@ -173,18 +173,23 @@ interface DebugControl {
 enum PLUME_ELEM_IDENTIFIERS {
   bcElements = "div.bpe-hidden-original",
   plumeContainer = "div.bpe-plume",
+  headerTitlePretext = "span.bpe-header-title-pretext",
   headerTitle = "span.bpe-header-title",
   volumeValue = "div.bpe-volume-value",
 }
 
 enum BC_ELEM_IDENTIFIERS {
-  previousTrack = "div.prevbutton",
-  nextTrack = "div.nextbutton",
+  inlinePlayerTable = "div.inline_player>table",
+  audioPlayer = "audio",
   playPause = "div.playbutton",
   onTrackCurrentTrackTitle = "h2.trackTitle",
   onAlbumCurrentTrackTitle = "a.title_link",
-  audioPlayer = "audio",
-  inlinePlayerTable = "div.inline_player>table",
+  previousTrack = "div.prevbutton",
+  nextTrack = "div.nextbutton",
+  nameSection = "div#name-section",
+  trackList = "table#track_table",
+  trackRow = "tr.track_row_view",
+  trackTitle = "span.track-title",
 }
 
 type ConsolePrintingMethod = "debug" | "info" | "log" | "warn" | "error";
@@ -221,7 +226,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
   const browserType = typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
   if (!browserAPI.i18n.getMessage) {
     // Fallback for browsers without i18n support (safety net for if browser detection failed)
-    browserAPI.i18n.getMessage = (key: string) => key;
+    browserAPI.i18n.getMessage = (key: string, ..._: any[]) => key;
   }
   const getString = browserAPI.i18n.getMessage;
   logger("info", getString("INFO__BROWSER__DETECTED"), browserType);
@@ -330,15 +335,26 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     return getString("LABEL__TRACK_UNKNOWN");
   };
 
+  // Function to update the pretext display (track numbering)
+  const updatePretextDisplay = () => {
+    if (plume.titleDisplay) {
+      const preText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
+      if (!preText) return;
+
+      const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
+      preText.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
+    }
+  };
+
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
     if (plume.titleDisplay) {
       const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
-      if (titleText) {
-        const currentTrackTitle = getCurrentTrackTitle();
-        titleText.textContent = currentTrackTitle;
-        titleText.title = currentTrackTitle; // see full title on hover in case title is truncated
-      }
+      if (!titleText) return;
+
+      const currentTrackTitle = getCurrentTrackTitle();
+      titleText.textContent = currentTrackTitle;
+      titleText.title = currentTrackTitle; // see full title on hover in case title is truncated
     }
   };
 
@@ -419,10 +435,12 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     logger("log", getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
   };
 
-  // Function to restore original player elements (if needed)
-  //@ts-ignore This is unused, but kept for debug purposes
+  // Function to restore original player elements (use it for debug purposes)
   const restoreOriginalPlayerElements = () => {
     const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
+
+    if (!bcAudioTable) return; // eliminate onInit function call
+
     bcAudioTable.style.display = "unset";
     bcAudioTable.classList.remove("bpe-hidden-original");
 
@@ -648,7 +666,8 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
 
     if (!isNaN(duration) && duration > 0) {
       const percent = (elapsed / duration) * 100;
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${percent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
       plume.progressSlider.value = `${percent * 10}`;
       plume.progressSlider.style.backgroundImage = bgImg;
 
@@ -659,6 +678,99 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
       if (plume.durationDisplay) {
         plume.durationDisplay.textContent = formatTime(duration);
       }
+    }
+  };
+
+  const getTrackNumberingString = (title: string | undefined): string => {
+    const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    if (!trackTable) return "";
+
+    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+    const trackCount = trackRows.length;
+    const trackRowTitles: HTMLSpanElement[] = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
+    const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === title) + 1;
+    return (trackRows.length && currentTrackNumber) ? `(${currentTrackNumber}/${trackCount})` : "";
+  };
+
+  const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h: number = 0, s: number = 0, l: number = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return [h * 360, s * 100, l * 100];
+  }
+  const isGrayscale = (rgb: [number, number, number]): boolean => RGBToHSL(...rgb)[1] === 0;
+  const getLuminance = (rgb: [number, number, number]): number => {
+    const [r, g, b] = rgb.map((c) => {
+      c /= 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
+    const bgRgb: [number, number, number] = [18, 18, 18];
+
+    const L1 = getLuminance(rgb);
+    const L2 = getLuminance(bgRgb);
+    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  }
+  const CONTRAST_ADJUSTMENT_STEP = 0.05;
+  const adjustForContrast = (rgb: [number, number, number], minContrast: number): string => {
+    let current = [...rgb] as [number, number, number];
+    let factor = 0;
+    while (measureContrastRatioWCAG(current) < minContrast && factor < 1) {
+      factor += CONTRAST_ADJUSTMENT_STEP;
+      current = current.map((c) => Math.round(c + (255 - c) * factor)) as [number, number, number];
+    }
+
+    // return as rgb(r, g, b)
+    return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
+  }
+
+  const getTrackTitleElement = (): HTMLSpanElement => {
+    return document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement;
+  };
+
+  const getArtistNameElement = (): HTMLSpanElement => {
+    const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.nameSection) as HTMLElement;
+    const nameSectionLinks = nameSection.querySelectorAll("span");
+    const artistElementIdx = nameSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
+    return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
+  };
+
+  // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
+  const WCAG_CONTRAST = 4.5;
+  const FALLBACK_GRAY = "rgb(127, 127, 127)";
+  const getAppropriatePretextColor = (): string => {
+    const trackColor = getComputedStyle(getTrackTitleElement()).color;
+    const artistColor = getComputedStyle(getArtistNameElement()).color;
+    const trackColorRGB = trackColor.match(/\d+/g)!.map(Number) as [number, number, number];
+    const artistColorRGB = artistColor.match(/\d+/g)!.map(Number) as [number, number, number];
+    const trackColorContrast = measureContrastRatioWCAG(trackColorRGB);
+    const artistColorContrast = measureContrastRatioWCAG(artistColorRGB);
+    if (trackColorContrast > WCAG_CONTRAST && artistColorContrast > WCAG_CONTRAST) {
+      const trackColorSaturation = RGBToHSL(...trackColorRGB)[1];
+      const artistColorSaturation = RGBToHSL(...artistColorRGB)[1];
+      return trackColorSaturation > artistColorSaturation ? trackColor : artistColor;
+    } else {
+      const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
+      const preferredColorRgb = preferredColor.match(/\d+/g)!.map(Number) as [number, number, number];
+      if (isGrayscale(preferredColorRgb))
+        return FALLBACK_GRAY;
+      return adjustForContrast(preferredColorRgb, WCAG_CONTRAST);
     }
   };
 
@@ -691,6 +803,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     }
 
     // Hide or remove old player elements
+    restoreOriginalPlayerElements(); // to prevent unused function
     hideOriginalPlayerElements();
 
     // Create main container for our enhancements
@@ -711,7 +824,9 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     currentTitleSection.className = "bpe-header-current";
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.className = "bpe-header-title-pretext";
-    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT");
+    const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
+    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
+    currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
     currentTitleText.className = "bpe-header-title";
@@ -757,7 +872,9 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
 
     // Update title when metadata loads (new track)
     plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
+    plume.audioElement.addEventListener("loadedmetadata", updatePretextDisplay);
     plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
+    plume.audioElement.addEventListener("loadstart", updatePretextDisplay);
 
     // Sync volume with Plume's slider
     plume.audioElement.addEventListener("volumechange", () => {
@@ -843,6 +960,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
             mutation.target.querySelector(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle))
         ) {
           updateTitleDisplay();
+          updatePretextDisplay();
         }
       }
     });
@@ -866,8 +984,8 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     logger("log", getString("LOG__NAVIGATION_DETECTED"));
     setTimeout(() => {
       init();
-      // Update title after navigation in case the track changed
       setTimeout(updateTitleDisplay, 500);
+      setTimeout(updatePretextDisplay, 600); // slight delay to ensure track display is updated
     }, 1000);
   }).observe(document, { subtree: true, childList: true });
 })();
