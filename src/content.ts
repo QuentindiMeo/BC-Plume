@@ -29,6 +29,7 @@ interface PlumeObject {
   savedVolume: number;
 }
 const PLUME_DEFAULT_VALUES: Partial<PlumeObject> = {
+  durationDisplayMethod: "duration",
   savedVolume: 0.5, // Default volume, 0..1
 };
 
@@ -391,9 +392,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
     if (!plume.audioElement || plume.volumeSlider) return null;
 
-    // Load saved volume before creating the slider to ensure it's applied
-    await loadSavedVolume();
-
     const container = document.createElement("div");
     container.className = "bpe-volume-container";
 
@@ -635,8 +633,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     }
 
     if (browserCache !== undefined) {
-      // Chrome/Firefox with extension API
-      browserCache.set({ bandcamp_duration_display: newMethod });
+      browserCache.set({ [PLUME_CACHE_KEYS.durationDisplayMethod]: newMethod });
     } else {
       // Fallback with localStorage
       try {
@@ -661,7 +658,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
         try {
           const storedDurationDisplayMethod = localStorage.getItem(PLUME_CACHE_KEYS.durationDisplayMethod);
           const durationDisplayMethod: TimeDisplayMethod = storedDurationDisplayMethod
-            ? JSON.parse(storedDurationDisplayMethod)
+            ? (storedDurationDisplayMethod as TimeDisplayMethod)
             : "duration";
           plume.durationDisplayMethod = durationDisplayMethod;
           resolve(durationDisplayMethod);
@@ -676,8 +673,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   const createProgressContainer = async () => {
     if (!plume.audioElement || plume.progressSlider) return;
-
-    await loadDurationDisplayMethod();
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
@@ -697,6 +692,8 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     const duration = document.createElement("span");
     duration.textContent = "0:00";
+    duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
+    duration.className = "bpe-duration-display";
 
     timeDisplay.appendChild(elapsed);
     timeDisplay.appendChild(duration);
@@ -989,7 +986,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     // Ensure duration display method is applied
     await loadDurationDisplayMethod();
-    plume.durationDisplayMethod = plume.durationDisplayMethod || "duration";
     logger("info", `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
 
     // Inject enhancements
@@ -1014,7 +1010,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
           // Ensure duration display method is applied
           await loadDurationDisplayMethod();
-          plume.durationDisplayMethod = plume.durationDisplayMethod || "duration";
           logger("info", `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
 
           // Load and apply saved volume to the new element

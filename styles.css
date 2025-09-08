@@ -151,6 +151,10 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.bpe-duration-display {
+  cursor: pointer;
+}
+
 .bpe-playback-controls {
   margin-bottom: 0.25rem;
 
