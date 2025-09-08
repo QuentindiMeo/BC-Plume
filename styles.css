@@ -17,7 +17,7 @@
 }
 .inline_player.scrolled {
   top: .5rem !important;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .progbar,
