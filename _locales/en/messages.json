@@ -1,5 +1,6 @@
 {
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
   "WARN__AUDIO__NOT_FOUND": { "message": "No audio element found" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },

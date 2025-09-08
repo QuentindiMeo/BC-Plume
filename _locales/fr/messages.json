@@ -1,5 +1,6 @@
 {
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossible de trouver un conteneur approprié" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Élément parent du lecteur non trouvé" },
   "WARN__BROWSER_API__NOT_DETECTED": {
     "message": "Aucune API de navigateur détectée, utilisation de localStorage comme solution de repli"
   },
