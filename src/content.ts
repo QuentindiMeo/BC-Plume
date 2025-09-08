@@ -1,5 +1,5 @@
 // Plume - TypeScript Content Script
-const version = "_v1.2.4";
+const version = "_v1.2.5";
 
 interface BrowserAPI {
   storage: {
