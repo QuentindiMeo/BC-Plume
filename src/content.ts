@@ -191,6 +191,7 @@ enum PLUME_ELEM_IDENTIFIERS {
 }
 
 enum BC_ELEM_IDENTIFIERS {
+  playerParent = "div.inline_player",
   inlinePlayerTable = "div.inline_player>table",
   audioPlayer = "audio",
   playPause = "div.playbutton",
@@ -998,6 +999,18 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     logger("log", getString("LOG__INITIALIZATION__COMPLETE"));
   };
+
+  const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
+  const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0] as HTMLDivElement;
+  const triggerHeight = plumeParentDiv.offsetTop;
+  window.addEventListener('scroll', () => { // Check if plume is in viewport height for sticky styling
+    const plumeIsInVH = window.scrollY < triggerHeight;
+    if (!plumeIsInVH) {
+      plumeParentDiv.classList.add('scrolled');
+    } else {
+      plumeParentDiv.classList.remove('scrolled');
+    }
+  });
 
   // Observe DOM changes for players that load dynamically
   const observer = new MutationObserver((mutations) => {
