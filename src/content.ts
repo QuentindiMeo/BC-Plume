@@ -13,6 +13,8 @@ interface BrowserAPI {
   };
 }
 
+type TimeDisplayMethod = "duration" | "remaining";
+
 /**
  * Audio player enhancement handles
  */
@@ -22,9 +24,13 @@ interface PlumeObject {
   progressSlider: HTMLInputElement | null;
   elapsedDisplay: HTMLSpanElement | null;
   durationDisplay: HTMLSpanElement | null;
+  durationDisplayMethod: TimeDisplayMethod;
   volumeSlider: HTMLInputElement | null;
   savedVolume: number;
 }
+const PLUME_DEFAULT_VALUES: Partial<PlumeObject> = {
+  savedVolume: 0.5, // Default volume, 0..1
+};
 
 enum PLUME_SVG {
   logo = `
@@ -152,10 +158,15 @@ enum PLUME_SVG {
 }
 
 /**
- * Volume storage interface
+ * Cache interface
  */
+enum PLUME_CACHE_KEYS {
+  durationDisplayMethod = "bandcamp_duration_display_method",
+  volume = "bandcamp_volume",
+}
 interface LocalStorage {
-  bandcamp_volume?: number;
+  [PLUME_CACHE_KEYS.durationDisplayMethod]?: TimeDisplayMethod;
+  [PLUME_CACHE_KEYS.volume]?: number;
 }
 
 /**
@@ -192,8 +203,8 @@ enum BC_ELEM_IDENTIFIERS {
   trackTitle = "span.track-title",
 }
 
-type ConsolePrintingMethod = "debug" | "info" | "log" | "warn" | "error";
-const ConsolePrintingPrefix: Record<ConsolePrintingMethod, string> = {
+type ConsolePrintingLevel = "debug" | "info" | "log" | "warn" | "error";
+const ConsolePrintingPrefix: Record<ConsolePrintingLevel, string> = {
   debug: "DEBUG",
   info: "INFO.",
   log: "LOG..",
@@ -201,7 +212,7 @@ const ConsolePrintingPrefix: Record<ConsolePrintingMethod, string> = {
   error: "ERR?!",
 };
 
-const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
+const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   const now = new Date();
   const nowTime = now.toLocaleTimeString();
   const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
@@ -222,7 +233,7 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
       return (globalThis as any).chrome; // Assume Chromium-based as fallback
     }
   })();
-  const browserLocalStorage = browserAPI.storage.local;
+  const browserCache = browserAPI.storage.local;
   const browserType = typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
   if (!browserAPI.i18n.getMessage) {
     // Fallback for browsers without i18n support (safety net for if browser detection failed)
@@ -237,20 +248,20 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
     progressSlider: null,
     elapsedDisplay: null,
     durationDisplay: null,
+    durationDisplayMethod: "duration",
     volumeSlider: null,
-    savedVolume: 0.5, // Default volume, 0..1
+    savedVolume: PLUME_DEFAULT_VALUES.savedVolume!,
   };
 
   const saveNewVolume = (newVolume: number) => {
     plume.savedVolume = newVolume;
 
-    if (browserLocalStorage !== undefined) {
-      // Chrome/Firefox with extension API
-      browserLocalStorage.set({ bandcamp_volume: newVolume });
+    if (browserCache !== undefined) {
+      browserCache.set({ [PLUME_CACHE_KEYS.volume]: newVolume });
     } else {
       // Fallback with localStorage
       try {
-        localStorage.setItem("bandcamp_volume", newVolume.toString());
+        localStorage.setItem(PLUME_CACHE_KEYS.volume, newVolume.toString());
       } catch (e) {
         logger("warn", getString("WARN__VOLUME__NOT_SAVED"), e);
       }
@@ -259,17 +270,16 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
 
   const loadSavedVolume = (): Promise<number> => {
     return new Promise((resolve) => {
-      if (browserLocalStorage !== undefined) {
-        // Chrome/Firefox with extension API
-        browserLocalStorage.get(["bandcamp_volume"]).then((ls: LocalStorage) => {
-          const volume = ls.bandcamp_volume || 0.5; // 0.5 = 50% volume by default since Bandcamp is loud
+      if (browserCache !== undefined) {
+        browserCache.get([PLUME_CACHE_KEYS.volume]).then((ls: LocalStorage) => {
+          const volume = ls[PLUME_CACHE_KEYS.volume] || PLUME_DEFAULT_VALUES.savedVolume!;
           plume.savedVolume = volume;
           resolve(volume);
         });
       } else {
         // Fallback with localStorage
         try {
-          const storedVolume = localStorage.getItem("bandcamp_volume");
+          const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.volume);
           const volume = storedVolume ? parseFloat(storedVolume) : 1;
           plume.savedVolume = volume;
           resolve(volume);
@@ -412,7 +422,6 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
         plume.audioElement.volume = volume;
         valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
-        // Save new volume
         saveNewVolume(volume);
       }
     });
@@ -676,7 +685,11 @@ const logger = (method: ConsolePrintingMethod, ...toPrint: any[]) => {
       }
 
       if (plume.durationDisplay) {
-        plume.durationDisplay.textContent = formatTime(duration);
+        if (plume.durationDisplayMethod === "duration") {
+          plume.durationDisplay.textContent = formatTime(duration);
+        } else {
+          plume.durationDisplay.textContent = "-" + formatTime(duration - elapsed);
+        }
       }
     }
   };
