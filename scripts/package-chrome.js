@@ -66,9 +66,9 @@ const manifest = {
     },
   ],
   icons: {
-    16: "icons/icon16.svg",
-    48: "icons/icon48.svg",
-    128: "icons/icon128.svg",
+    16: "icons/icon16.png",
+    48: "icons/icon48.png",
+    128: "icons/icon128.png",
   },
 };
 
