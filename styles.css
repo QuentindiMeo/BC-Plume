@@ -9,6 +9,17 @@
 
 /*********** Native elements styling ***********/
 
+.inline_player { /* parent component */
+  position: sticky !important;
+  top: 0;
+  z-index: 9; /* ensure it stays above other contents, especially the album collection promotion */
+  transition: background-color 0.2s ease, top 0.2s ease !important;
+}
+.inline_player.scrolled {
+  top: .5rem !important;
+  background: rgba(0, 0, 0, 0.6);
+}
+
 .progbar,
 .progbar_empty {
   height: 0.5rem !important;
