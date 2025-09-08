@@ -1,9 +1,11 @@
 {
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
   "WARN__AUDIO__NOT_FOUND": { "message": "No audio element found" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },
+  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "Unable to load time display method:" },
   "WARN__PREV_TRACK__NOT_FOUND": { "message": "Previous track button not found" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Next track button not found" },
   "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Play/Pause button not found" },
@@ -17,6 +19,7 @@
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },
   "INFO__BROWSER__DETECTED": { "message": "Detected browser:" },
   "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
+  "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Time display method applied:" },
   "INFO__VOLUME__APPLIED": { "message": "Volume applied to new audio:" },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Audio event listeners set up" },
   "INFO__AUDIO__FOUND": { "message": "Audio element found" },
@@ -44,6 +47,7 @@
       }
     }
   },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "LABEL__TRACK_UNKNOWN": { "message": "Unknown Track" },
   "LABEL__TRACK_BACKWARD": { "message": "Go to previous track" },
   "LABEL__TIME_BACKWARD": { "message": "Rewind 10 seconds" },

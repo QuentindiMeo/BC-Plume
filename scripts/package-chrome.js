@@ -52,7 +52,7 @@ staticDirs.forEach((dir) => {
 const manifest = {
   manifest_version: 3,
   name: "BC-Plume - Bandcamp Player Enhancer",
-  version: "1.2.4",
+  version: "1.2.5",
   description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   default_locale: "en",
   permissions: ["storage"],
@@ -66,9 +66,9 @@ const manifest = {
     },
   ],
   icons: {
-    16: "icons/icon16.svg",
-    48: "icons/icon48.svg",
-    128: "icons/icon128.svg",
+    16: "icons/icon16.png",
+    48: "icons/icon48.png",
+    128: "icons/icon128.png",
   },
 };
 
