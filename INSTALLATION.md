@@ -58,7 +58,14 @@ cd BC-Plume && pnpm install    # Install dependencies
 
 ### 2️⃣ Build the Extension
 
-Select one of the following according to your desired purpose:
+First off, create the build artifacts:
+
+```bash
+npm install -g pnpm # If you don't have pnpm installed, install it globally as it's evidently superior
+pnpm i              # Install project dependencies
+```
+
+Then, select one of the following according to your desired purpose:
 
 ```bash
 pnpm run build  # Quick build (development with source maps)
