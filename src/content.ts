@@ -187,10 +187,10 @@ interface DebugControl {
 
 enum PLUME_ELEM_IDENTIFIERS {
   bcElements = "div.bpe-hidden-original",
-  plumeContainer = "div.bpe-plume",
-  headerTitlePretext = "span.bpe-header-title-pretext",
-  headerTitle = "span.bpe-header-title",
-  volumeValue = "div.bpe-volume-value",
+  plumeContainer = "div#bpe-plume",
+  headerTitlePretext = "span#bpe-header-title-pretext",
+  headerTitle = "span#bpe-header-title",
+  volumeValue = "div#bpe-volume-value",
 }
 
 enum BC_ELEM_IDENTIFIERS {
@@ -370,15 +370,24 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     }
   };
 
+  const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
+  const LATIN_CHAR_HEIGHT = 19; // in px, for calculation
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
-    if (plume.titleDisplay) {
-      const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
-      if (!titleText) return;
+    if (!plume.titleDisplay) return;
 
-      const currentTrackTitle = getCurrentTrackTitle();
-      titleText.textContent = currentTrackTitle;
-      titleText.title = currentTrackTitle; // see full title on hover in case title is truncated
+    const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
+    if (!titleText) return;
+
+    const currentTrackTitle = getCurrentTrackTitle();
+    titleText.textContent = currentTrackTitle;
+    titleText.title = currentTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
+
+    if (titleText.offsetHeight != LATIN_CHAR_HEIGHT) {
+      const deltaPaddingPx = titleText.offsetHeight - LATIN_CHAR_HEIGHT; // calculate in px
+      const logo = document.getElementById("bpe-header-logo") as HTMLDivElement;
+      if (!logo) return;
+      logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingPx / 16}rem`;
     }
   };
 
@@ -406,10 +415,10 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     if (plume.volumeSlider) return null;
 
     const container = document.createElement("div");
-    container.className = "bpe-volume-container";
+    container.id = "bpe-volume-container";
 
     const label = document.createElement("label");
-    label.className = "bpe-volume-label";
+    label.id = "bpe-volume-label";
     label.textContent = getString("LABEL__VOLUME");
 
     const slider = document.createElement("input");
@@ -417,13 +426,13 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     slider.min = "0";
     slider.max = "100";
     slider.value = Math.round(plume.savedVolume * 100).toString();
-    slider.className = "bpe-volume-slider";
+    slider.id = "bpe-volume-slider";
 
     // Apply saved volume to audio element
     plume.audioElement!.volume = plume.savedVolume;
 
     const valueDisplay = document.createElement("div");
-    valueDisplay.className = "bpe-volume-value";
+    valueDisplay.id = "bpe-volume-value";
     valueDisplay.textContent = `${slider.value}${getString("META__PERCENTAGE")}`;
 
     // Event listener for volume change
@@ -515,30 +524,30 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   const createPlaybackControls = () => {
     const container = document.createElement("div");
-    container.className = "bpe-playback-controls";
+    container.id = "bpe-playback-controls";
 
     const trackBackwardBtn = document.createElement("button");
-    trackBackwardBtn.className = "bpe-track-bwd-btn";
+    trackBackwardBtn.id = "bpe-track-bwd-btn";
     trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
     trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
 
     const timeBackwardBtn = document.createElement("button");
-    timeBackwardBtn.className = "bpe-time-bwd-btn";
+    timeBackwardBtn.id = "bpe-time-bwd-btn";
     timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
     timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
 
     const playPauseBtn = document.createElement("button");
-    playPauseBtn.className = "bpe-play-pause-btn";
+    playPauseBtn.id = "bpe-play-pause-btn";
     playPauseBtn.innerHTML = PLUME_SVG.playPlay;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
 
     const timeForwardBtn = document.createElement("button");
-    timeForwardBtn.className = "bpe-time-fwd-btn";
+    timeForwardBtn.id = "bpe-time-fwd-btn";
     timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
     timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
 
     const trackForwardBtn = document.createElement("button");
-    trackForwardBtn.className = "bpe-track-fwd-btn";
+    trackForwardBtn.id = "bpe-track-fwd-btn";
     trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
     trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
 
@@ -667,17 +676,17 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     if (plume.progressSlider) return;
 
     const container = document.createElement("div");
-    container.className = "bpe-progress-container";
+    container.id = "bpe-progress-container";
 
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = "0";
     slider.max = "1000"; // use 1000 for better granularity: 1000s = 16m40s
     slider.value = "0";
-    slider.className = "bpe-progress-slider";
+    slider.id = "bpe-progress-slider";
 
     const timeDisplay = document.createElement("div");
-    timeDisplay.className = "bpe-time-display";
+    timeDisplay.id = "bpe-time-display";
 
     const elapsed = document.createElement("span");
     elapsed.textContent = "0:00";
@@ -685,7 +694,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     const duration = document.createElement("span");
     duration.textContent = "0:00";
     duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
-    duration.className = "bpe-duration-display";
+    duration.id = "bpe-duration-display";
 
     timeDisplay.appendChild(elapsed);
     timeDisplay.appendChild(duration);
@@ -869,28 +878,28 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     // Create main container for our enhancements
     const plumeContainer = document.createElement("div");
-    plumeContainer.className = "bpe-plume";
+    plumeContainer.id = "bpe-plume";
 
     // Create title display
     const headerContainer = document.createElement("div");
-    headerContainer.className = "bpe-header-display";
+    headerContainer.id = "bpe-header-display";
 
     const headerLogo = document.createElement("div");
-    headerLogo.className = "bpe-header-logo";
+    headerLogo.id = "bpe-header-logo";
     headerLogo.innerHTML = PLUME_SVG.logo;
     headerLogo.title = "BC-Plume - Bandcamp Player Enhancer";
     headerContainer.appendChild(headerLogo);
 
     const currentTitleSection = document.createElement("div");
-    currentTitleSection.className = "bpe-header-current";
+    currentTitleSection.id = "bpe-header-current";
     const currentTitlePretext = document.createElement("span");
-    currentTitlePretext.className = "bpe-header-title-pretext";
+    currentTitlePretext.id = "bpe-header-title-pretext";
     const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
     currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
     currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
-    currentTitleText.className = "bpe-header-title";
+    currentTitleText.id = "bpe-header-title";
     const currentTrackTitle = getCurrentTrackTitle();
     currentTitleText.textContent = currentTrackTitle;
     currentTitleText.title = currentTrackTitle; // see full title on hover in case title is truncated
@@ -901,7 +910,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     plumeContainer.appendChild(headerContainer);
 
     const playbackManager = document.createElement("div");
-    playbackManager.className = "bpe-playback-manager";
+    playbackManager.id = "bpe-playback-manager";
 
     const progressContainer = await createProgressContainer();
     if (progressContainer) {
