@@ -103,11 +103,12 @@ After building, you can install the extension:
 - The enhanced interface loads
 - Volume is saved between pages (uses browser cache)
 
-## 🔧 Icon Conversion (Optional)
+## 🔧 Icon Conversion
 
-If you want to convert SVGs to PNGs for certain browsers:
+Firefox uses the SVG icons directly, but Chromium-based browsers require PNG format.
+If you intend on changing the icons, we recommend creating PNG versions from the SVG files.
 
-### Option A: With Python (recommended)
+### Option A: With our Python script (recommended)
 
 ```bash
 pip install pillow cairosvg
