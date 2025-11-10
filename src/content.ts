@@ -28,9 +28,12 @@ interface PlumeObject {
   volumeSlider: HTMLInputElement | null;
   savedVolume: number;
 }
-const PLUME_DEFAULT_VALUES: Pick<PlumeObject, "durationDisplayMethod" | "savedVolume"> = {
+const PLUME_DEF: Pick<PlumeObject, "durationDisplayMethod" | "savedVolume"> = {
   durationDisplayMethod: "duration",
   savedVolume: 0.5, // Default volume, 0..1
+};
+const PLUME_CONSTANTS = {
+  TIME_BEFORE_RESTART: 5, // seconds before track restarts on backward button click
 };
 
 enum PLUME_SVG {
@@ -254,7 +257,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     durationDisplay: null,
     durationDisplayMethod: "duration",
     volumeSlider: null,
-    savedVolume: PLUME_DEFAULT_VALUES.savedVolume,
+    savedVolume: PLUME_DEF.savedVolume,
   };
 
   const saveNewVolume = (newVolume: number) => {
@@ -276,7 +279,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     return new Promise((resolve) => {
       if (browserCacheExists) {
         browserCache.get([PLUME_CACHE_KEYS.volume]).then((ls: LocalStorage) => {
-          const volume = ls[PLUME_CACHE_KEYS.volume] || PLUME_DEFAULT_VALUES.savedVolume;
+          const volume = ls[PLUME_CACHE_KEYS.volume] || PLUME_DEF.savedVolume;
           plume.savedVolume = volume;
           resolve(volume);
         });
@@ -307,12 +310,19 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   // Function to click on the previous track button
   const clickPreviousTrackButton = () => {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
-    if (prevButton) {
-      prevButton.click();
-      logger("debug", getString("DEBUG__PREV_TRACK__CLICKED"));
-    } else {
+    if (!prevButton) {
       logger("warn", getString("WARN__PREV_TRACK__NOT_FOUND"));
+      return null;
     }
+
+    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART) {
+      prevButton.click();
+    } else {
+      // Restart current track instead, if more than X seconds have elapsed
+      plume.audioElement!.currentTime = 0;
+      logger("info", getString("DEBUG__PREV_TRACK__RESTARTED"));
+    }
+    return true;
   };
 
   // Function to click on the next track button
@@ -541,7 +551,8 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
         return;
       }
 
-      clickPreviousTrackButton();
+      const rv = clickPreviousTrackButton();
+      if (rv === null) return; // previous track button not found
       logger("debug", getString("DEBUG__PREV_TRACK__DISPATCHED"));
     });
 
@@ -652,7 +663,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
       if (browserCacheExists) {
         browserCache.get([PLUME_CACHE_KEYS.durationDisplayMethod]).then((ls: LocalStorage) => {
           const durationDisplayMethod =
-            ls[PLUME_CACHE_KEYS.durationDisplayMethod] || PLUME_DEFAULT_VALUES.durationDisplayMethod;
+            ls[PLUME_CACHE_KEYS.durationDisplayMethod] || PLUME_DEF.durationDisplayMethod;
           plume.durationDisplayMethod = durationDisplayMethod;
           resolve(durationDisplayMethod);
         });
