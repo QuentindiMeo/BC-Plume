@@ -75,5 +75,7 @@
         "example": "Titre de la piste"
       }
     }
-  }
+  },
+  "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
+  "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" }
 }

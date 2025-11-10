@@ -394,11 +394,12 @@ const browserCacheExists = browserCache !== undefined;
     label.textContent = getString("LABEL__VOLUME");
 
     const slider = document.createElement("input");
+    slider.id = "bpe-volume-slider";
     slider.type = "range";
     slider.min = "0";
     slider.max = VOLUME_SLIDER_GRANULARITY.toString();
     slider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
-    slider.id = "bpe-volume-slider";
+    slider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
     // Apply saved volume to audio element
     plume.audioElement!.volume = plume.savedVolume;
@@ -595,11 +596,12 @@ const browserCacheExists = browserCache !== undefined;
     const container = document.createElement("div");
     container.id = "bpe-progress-container";
     const slider = document.createElement("input");
+    slider.id = "bpe-progress-slider";
     slider.type = "range";
     slider.min = "0";
     slider.max = PROGRESS_SLIDER_GRANULARITY.toString();
     slider.value = "0";
-    slider.id = "bpe-progress-slider";
+    slider.ariaLabel = getString("ARIA__PROGRESS_SLIDER");
 
     const timeDisplay = document.createElement("div");
     timeDisplay.id = "bpe-time-display";
