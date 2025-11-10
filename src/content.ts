@@ -1,5 +1,6 @@
 // Plume - TypeScript for song page and album page display
-const version = "_v1.2.5";
+const APP_VERSION = "_v1.2.5";
+const APP_NAME = "BC-Plume - Bandcamp Player Enhancer";
 
 interface BrowserAPI {
   storage: {
@@ -13,23 +14,33 @@ interface BrowserAPI {
   };
 }
 
-type TimeDisplayMethod = "duration" | "remaining";
+enum BROWSER_TYPE {
+  CHROMIUM = "Chromium",
+  FIREFOX = "Firefox",
+}
+type BrowserType = `${BROWSER_TYPE}`; // Type alias for string literal types
+
+enum TIME_DISPLAY_METHOD {
+  DURATION = "duration",
+  REMAINING = "remaining",
+}
+type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`; // Type alias for string literal types
 
 /**
  * Audio player enhancement handles
  */
-interface PlumeObject {
+interface PlumeCore {
   audioElement: HTMLAudioElement | null;
   titleDisplay: HTMLDivElement | null;
   progressSlider: HTMLInputElement | null;
   elapsedDisplay: HTMLSpanElement | null;
   durationDisplay: HTMLSpanElement | null;
-  durationDisplayMethod: TimeDisplayMethod;
+  durationDisplayMethod: TimeDisplayMethodType;
   volumeSlider: HTMLInputElement | null;
   savedVolume: number;
 }
-const PLUME_DEF: Pick<PlumeObject, "durationDisplayMethod" | "savedVolume"> = {
-  durationDisplayMethod: "duration",
+const PLUME_DEF: Pick<PlumeCore, "durationDisplayMethod" | "savedVolume"> = {
+  durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
   savedVolume: 0.5, // Default volume, 0..1
 };
 const PLUME_CONSTANTS = {
@@ -165,12 +176,12 @@ enum PLUME_SVG {
  * Cache interface
  */
 enum PLUME_CACHE_KEYS {
-  durationDisplayMethod = "bandcamp_duration_display_method",
-  volume = "bandcamp_volume",
+  DURATION_DISPLAY_METHOD = "plume_duration_display_method",
+  VOLUME = "plume_volume",
 }
 interface LocalStorage {
-  [PLUME_CACHE_KEYS.durationDisplayMethod]?: TimeDisplayMethod;
-  [PLUME_CACHE_KEYS.volume]?: number;
+  [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: TimeDisplayMethodType | undefined;
+  [PLUME_CACHE_KEYS.VOLUME]: number | undefined;
 }
 
 /**
@@ -187,10 +198,10 @@ interface DebugControl {
 
 enum PLUME_ELEM_IDENTIFIERS {
   bcElements = "div.bpe-hidden-original",
-  plumeContainer = "div.bpe-plume",
-  headerTitlePretext = "span.bpe-header-title-pretext",
-  headerTitle = "span.bpe-header-title",
-  volumeValue = "div.bpe-volume-value",
+  plumeContainer = "div#bpe-plume",
+  headerTitlePretext = "span#bpe-header-title-pretext",
+  headerTitle = "span#bpe-header-title",
+  volumeValue = "div#bpe-volume-value",
 }
 
 enum BC_ELEM_IDENTIFIERS {
@@ -208,24 +219,32 @@ enum BC_ELEM_IDENTIFIERS {
   trackTitle = "span.track-title",
 }
 
-type ConsolePrintingLevel = "debug" | "info" | "log" | "warn" | "error";
-const ConsolePrintingPrefix: Record<ConsolePrintingLevel, string> = {
-  debug: "DEBUG",
-  info: "INFO.",
-  log: "LOG..",
-  warn: "WARN?",
-  error: "ERR?!",
-};
-
-const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
-  const now = new Date();
-  const nowTime = now.toLocaleTimeString();
-  const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
-  console[method](`[Plume${version} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
+enum CPL { // Console Printing Level
+  DEBUG = "debug",
+  INFO = "info",
+  LOG = "log",
+  WARN = "warn",
+  ERROR = "error",
+}
+type CPLType = `${CPL}`;
+const ConsolePrintingPrefix: Record<CPLType, string> = {
+  [CPL.DEBUG]: "DEBUG",
+  [CPL.INFO]: "INFO.",
+  [CPL.LOG]: "LOG..",
+  [CPL.WARN]: "WARN?",
+  [CPL.ERROR]: "ERR?!",
 };
 
 (() => {
   "use strict";
+
+  // Customized console logger with timestamp and level
+  const logger = (method: CPLType, ...toPrint: any[]) => {
+    const now = new Date();
+    const nowTime = now.toLocaleTimeString();
+    const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
+    console[method](`[Plume${APP_VERSION} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
+  };
 
   const chromeApi = (globalThis as any).chrome;
   const firefoxApi = (globalThis as any).browser;
@@ -236,8 +255,8 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     } else if (firefoxApi !== undefined && firefoxApi.storage) {
       return firefoxApi;
     } else {
-      logger("warn", chromeApi.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
-      return chromeApi; // Assume Chromium-based as fallback
+      logger(CPL.WARN, (globalThis as any).chrome.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
+      return (globalThis as any).chrome; // Assume Chromium-based as fallback
     }
   })();
   const browserCache = browserApi.storage.local;
@@ -246,72 +265,14 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     browserApi.i18n.getMessage = (key: string, ..._: any[]) => key;
   }
   const getString = browserApi.i18n.getMessage;
-  logger("info", getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox" : "Chromium");
+  logger(CPL.INFO, getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox-based" : "Chromium-based");
   const browserCacheExists = browserCache !== undefined;
-
-  const plume: PlumeObject = {
-    audioElement: null,
-    titleDisplay: null,
-    progressSlider: null,
-    elapsedDisplay: null,
-    durationDisplay: null,
-    durationDisplayMethod: "duration",
-    volumeSlider: null,
-    savedVolume: PLUME_DEF.savedVolume,
-  };
-
-  const saveNewVolume = (newVolume: number) => {
-    plume.savedVolume = newVolume;
-
-    if (browserCacheExists) {
-      browserCache.set({ [PLUME_CACHE_KEYS.volume]: newVolume });
-    } else {
-      // Fallback with localStorage
-      try {
-        localStorage.setItem(PLUME_CACHE_KEYS.volume, newVolume.toString());
-      } catch (e) {
-        logger("warn", getString("WARN__VOLUME__NOT_SAVED"), e);
-      }
-    }
-  };
-
-  const loadSavedVolume = (): Promise<number> => {
-    return new Promise((resolve) => {
-      if (browserCacheExists) {
-        browserCache.get([PLUME_CACHE_KEYS.volume]).then((ls: LocalStorage) => {
-          const volume = ls[PLUME_CACHE_KEYS.volume] || PLUME_DEF.savedVolume;
-          plume.savedVolume = volume;
-          resolve(volume);
-        });
-      } else {
-        // Fallback with localStorage
-        try {
-          const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.volume);
-          const volume = storedVolume ? Number.parseFloat(storedVolume) : 1;
-          plume.savedVolume = volume;
-          resolve(volume);
-        } catch (e) {
-          logger("warn", getString("WARN__VOLUME__NOT_LOADED"), e);
-          plume.savedVolume = 1;
-          resolve(1);
-        }
-      }
-    });
-  };
-
-  // Function to format time as MM:SS
-  const formatTime = (seconds: number): string => {
-    if (Number.isNaN(seconds) || !Number.isFinite(seconds)) return "0:00";
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  };
 
   // Function to click on the previous track button
   const clickPreviousTrackButton = () => {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
     if (!prevButton) {
-      logger("warn", getString("WARN__PREV_TRACK__NOT_FOUND"));
+      logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
       return null;
     }
 
@@ -320,7 +281,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     } else {
       // Restart current track instead, if more than X seconds have elapsed
       plume.audioElement!.currentTime = 0;
-      logger("info", getString("DEBUG__PREV_TRACK__RESTARTED"));
+      logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
     }
     return true;
   };
@@ -330,9 +291,9 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
     if (nextButton) {
       nextButton.click();
-      logger("debug", getString("DEBUG__NEXT_TRACK__CLICKED"));
+      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
     } else {
-      logger("warn", getString("WARN__NEXT_TRACK__NOT_FOUND"));
+      logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
     }
   };
 
@@ -344,137 +305,58 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
       playButton.click();
       playButton.click();
     } else {
-      logger("warn", getString("WARN__PLAY_PAUSE__NOT_FOUND"));
+      logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
     }
   };
 
-  // Function to get the current track title from Bandcamp
-  const getCurrentTrackTitle = (): string => {
-    const titleElement = globalThis.location.pathname.includes("/album/")
-      ? (document.querySelector(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle) as HTMLSpanElement)
-      : (document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement);
-    if (titleElement?.textContent) {
-      return titleElement.textContent.trim();
-    }
-    return getString("LABEL__TRACK_UNKNOWN");
-  };
-
-  // Function to update the pretext display (track numbering)
-  const updatePretextDisplay = () => {
-    if (plume.titleDisplay) {
-      const preText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
-      if (!preText) return;
-
-      const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
-      preText.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
-    }
-  };
-
-  // Function to update the title display when track changes
-  const updateTitleDisplay = () => {
-    if (plume.titleDisplay) {
-      const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
-      if (!titleText) return;
-
-      const currentTrackTitle = getCurrentTrackTitle();
-      titleText.textContent = currentTrackTitle;
-      titleText.title = currentTrackTitle; // see full title on hover in case title is truncated
-    }
+  const loadSavedVolume = (): Promise<number> => {
+    return new Promise((resolve) => {
+      if (browserCacheExists) {
+        browserCache.get([PLUME_CACHE_KEYS.VOLUME]).then((ls: LocalStorage) => {
+          const volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
+          plume.savedVolume = volume;
+          resolve(volume);
+        });
+      } else {
+        // Fallback with localStorage
+        try {
+          const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.VOLUME);
+          const volume = storedVolume ? Number.parseFloat(storedVolume) : 1;
+          plume.savedVolume = volume;
+          resolve(volume);
+        } catch (e) {
+          logger(CPL.WARN, getString("WARN__VOLUME__NOT_LOADED"), e);
+          plume.savedVolume = 1;
+          resolve(1);
+        }
+      }
+    });
   };
 
   // Function to find the audio element
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
     const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
-    if (audio) {
-      logger("info", getString("INFO__AUDIO__FOUND"), audio);
+    if (!audio) return null;
+    logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 
-      // Load and immediately apply saved volume
-      await loadSavedVolume();
-      audio.volume = plume.savedVolume;
-      logger(
-        "info",
-        `${getString("INFO__VOLUME__FOUND")} ${Math.round(plume.savedVolume * 100)}${getString("META__PERCENTAGE")}`
-      );
+    // Load and immediately apply saved volume
+    await loadSavedVolume();
+    audio.volume = plume.savedVolume;
+    logger(
+      CPL.INFO,
+      `${getString("INFO__VOLUME__FOUND")} ${Math.round(plume.savedVolume * 100)}${getString("META__PERCENTAGE")}`
+    );
 
-      return audio;
-    }
-    return null;
-  };
-
-  // Function to create the volume slider
-  const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
-    if (plume.volumeSlider) return null;
-
-    const container = document.createElement("div");
-    container.className = "bpe-volume-container";
-
-    const label = document.createElement("label");
-    label.className = "bpe-volume-label";
-    label.textContent = getString("LABEL__VOLUME");
-
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "100";
-    slider.value = Math.round(plume.savedVolume * 100).toString();
-    slider.className = "bpe-volume-slider";
-
-    // Apply saved volume to audio element
-    plume.audioElement!.volume = plume.savedVolume;
-
-    const valueDisplay = document.createElement("div");
-    valueDisplay.className = "bpe-volume-value";
-    valueDisplay.textContent = `${slider.value}${getString("META__PERCENTAGE")}`;
-
-    // Event listener for volume change
-    slider.addEventListener("input", function (this: HTMLInputElement) {
-      const volume = Number.parseInt(this.value) / 100;
-      if (plume.audioElement) {
-        plume.audioElement.volume = volume;
-        valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
-
-        saveNewVolume(volume);
-      }
-    });
-
-    container.appendChild(label);
-    container.appendChild(slider);
-    container.appendChild(valueDisplay);
-
-    plume.volumeSlider = slider;
-    return container;
-  };
-
-  const hideOriginalPlayerElements = () => {
-    const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
-    if (bcAudioTable) {
-      bcAudioTable.style.display = "none";
-      bcAudioTable.classList.add("bpe-hidden-original");
-    }
-
-    logger("log", getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
-  };
-
-  // Function to restore original player elements (use it for debug purposes)
-  const restoreOriginalPlayerElements = () => {
-    const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
-
-    if (!bcAudioTable) return; // eliminate onInit function call
-
-    bcAudioTable.style.display = "unset";
-    bcAudioTable.classList.remove("bpe-hidden-original");
-
-    logger("log", getString("LOG__ORIGINAL_PLAYER__RESTORED"));
+    return audio;
   };
 
   // Debug function to identify Bandcamp controls
   const debugBandcampControls = () => {
-    logger("debug", getString("DEBUG__CONTROL_ELEMENTS__DETECTED"));
+    logger(CPL.DEBUG, getString("DEBUG__CONTROL_ELEMENTS__DETECTED"));
 
     // Find all possible buttons and links
-    const allButtons = document.querySelectorAll(
-      'button, a, div[role="button"], span[onclick]'
-    ) as unknown as Array<HTMLButtonElement>;
+    const buttonIdentifiers = 'button, a, div[role="button"], span[onclick]';
+    const allButtons = document.querySelectorAll(buttonIdentifiers) as unknown as Array<HTMLButtonElement>;
     const relevantControls: Array<DebugControl> = [];
 
     allButtons.forEach((element, index) => {
@@ -507,57 +389,119 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
       }
     });
 
-    logger("debug", getString("DEBUG__CONTROL_ELEMENTS__FOUND"), relevantControls);
-    logger("debug", getString("DEBUG__CONTROL_ELEMENTS__END"));
+    logger(CPL.DEBUG, getString("DEBUG__CONTROL_ELEMENTS__FOUND"), relevantControls);
+    logger(CPL.DEBUG, getString("DEBUG__CONTROL_ELEMENTS__END"));
 
     return relevantControls;
   };
 
+  // Function to save the new volume from the slider to browser cache
+  const saveNewVolume = (newVolume: number) => {
+    plume.savedVolume = newVolume;
+
+    if (browserCacheExists) {
+      browserCache.set({ [PLUME_CACHE_KEYS.VOLUME]: newVolume });
+    } else {
+      // Fallback with localStorage
+      try {
+        localStorage.setItem(PLUME_CACHE_KEYS.VOLUME, newVolume.toString());
+      } catch (e) {
+        logger(CPL.WARN, getString("WARN__VOLUME__NOT_SAVED"), e);
+      }
+    }
+  };
+
+  const VOLUME_SLIDER_GRANULARITY = 100;
+  // Function to create the volume slider
+  const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
+    if (plume.volumeSlider) return null;
+
+    const container = document.createElement("div");
+    container.id = "bpe-volume-container";
+
+    const label = document.createElement("label");
+    label.id = "bpe-volume-label";
+    label.textContent = getString("LABEL__VOLUME");
+
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = VOLUME_SLIDER_GRANULARITY.toString();
+    slider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
+    slider.id = "bpe-volume-slider";
+
+    // Apply saved volume to audio element
+    plume.audioElement!.volume = plume.savedVolume;
+
+    const valueDisplay = document.createElement("div");
+    valueDisplay.id = "bpe-volume-value";
+    valueDisplay.textContent = `${slider.value}${getString("META__PERCENTAGE")}`;
+
+    // Event listener for volume change
+    slider.addEventListener("input", function (this: HTMLInputElement) {
+      const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
+      if (plume.audioElement) {
+        plume.audioElement.volume = volume;
+        valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
+
+        saveNewVolume(volume);
+      }
+    });
+
+    container.appendChild(label);
+    container.appendChild(slider);
+    container.appendChild(valueDisplay);
+
+    plume.volumeSlider = slider;
+    return container;
+  };
+
+  const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
   const createPlaybackControls = () => {
     const container = document.createElement("div");
-    container.className = "bpe-playback-controls";
+    container.id = "bpe-playback-controls";
 
     const trackBackwardBtn = document.createElement("button");
-    trackBackwardBtn.className = "bpe-track-bwd-btn";
+    trackBackwardBtn.id = "bpe-track-bwd-btn";
     trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
     trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
 
     const timeBackwardBtn = document.createElement("button");
-    timeBackwardBtn.className = "bpe-time-bwd-btn";
+    timeBackwardBtn.id = "bpe-time-bwd-btn";
     timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
     timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
 
     const playPauseBtn = document.createElement("button");
-    playPauseBtn.className = "bpe-play-pause-btn";
+    playPauseBtn.id = "bpe-play-pause-btn";
     playPauseBtn.innerHTML = PLUME_SVG.playPlay;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
 
     const timeForwardBtn = document.createElement("button");
-    timeForwardBtn.className = "bpe-time-fwd-btn";
+    timeForwardBtn.id = "bpe-time-fwd-btn";
     timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
     timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
 
     const trackForwardBtn = document.createElement("button");
-    trackForwardBtn.className = "bpe-track-fwd-btn";
+    trackForwardBtn.id = "bpe-track-fwd-btn";
     trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
     trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
 
     // === Event listeners for buttons ===
     trackBackwardBtn.addEventListener("click", () => {
-      logger("debug", getString("DEBUG__PREV_TRACK__CLICKED"));
+      logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
 
       const rv = clickPreviousTrackButton();
       if (rv === null) return; // previous track button not found
-      logger("debug", getString("DEBUG__PREV_TRACK__DISPATCHED"));
+      logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
     });
 
     timeBackwardBtn.addEventListener("click", () => {
-      logger("debug", getString("DEBUG__REWIND_TIME__CLICKED"));
+      logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
-      const newTime = Math.max(0, plume.audioElement!.currentTime - 10);
+      const newTime = Math.max(0, plume.audioElement!.currentTime - TIME_STEP_DURATION);
       plume.audioElement!.currentTime = newTime;
       logger(
-        "debug",
+        CPL.DEBUG,
         `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
           "DEBUG__REWIND_TIME__DISPATCHED2"
         )}`
@@ -575,12 +519,12 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     });
 
     timeForwardBtn.addEventListener("click", () => {
-      logger("debug", getString("DEBUG__FORWARD_TIME__CLICKED"));
+      logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
-      const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + 10);
+      const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + TIME_STEP_DURATION);
       plume.audioElement!.currentTime = newTime;
       logger(
-        "debug",
+        CPL.DEBUG,
         `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
           "DEBUG__FORWARD_TIME__DISPATCHED2"
         )}`
@@ -588,10 +532,10 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     });
 
     trackForwardBtn.addEventListener("click", () => {
-      logger("debug", getString("DEBUG__NEXT_TRACK__CLICKED"));
+      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
       clickNextTrackButton();
-      logger("debug", getString("DEBUG__NEXT_TRACK__DISPATCHED"));
+      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
     });
 
     plume.audioElement?.addEventListener("play", () => {
@@ -614,70 +558,52 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     return container;
   };
 
-  const saveDurationDisplayMethod = (newMethod: TimeDisplayMethod) => {
+  // Function to format time as MM:SS
+  const formatTime = (seconds: number): string => {
+    if (Number.isNaN(seconds) || !Number.isFinite(seconds)) return "0:00";
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const saveDurationDisplayMethod = (newMethod: TimeDisplayMethodType) => {
     plume.durationDisplayMethod = newMethod;
 
     const player = plume.audioElement;
-    if (plume.durationDisplayMethod === "duration") {
-      plume.durationDisplay!.textContent = formatTime(player!.duration);
+    if (!player || !plume.durationDisplay || !plume.elapsedDisplay) return;
+    if (plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION) {
+      plume.durationDisplay.textContent = formatTime(player.duration);
     } else {
-      plume.durationDisplay!.textContent = "-" + formatTime(player!.duration - player!.currentTime);
+      plume.durationDisplay.textContent = "-" + formatTime(player.duration - player.currentTime);
     }
 
     if (browserCacheExists) {
-      browserCache.set({ [PLUME_CACHE_KEYS.durationDisplayMethod]: newMethod });
+      browserCache.set({ [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: newMethod });
     } else {
       // Fallback with localStorage
       try {
-        localStorage.setItem(PLUME_CACHE_KEYS.durationDisplayMethod, newMethod);
+        localStorage.setItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, newMethod);
       } catch (e) {
-        logger("warn", getString("WARN__VOLUME__NOT_SAVED"), e);
+        logger(CPL.WARN, getString("WARN__VOLUME__NOT_SAVED"), e);
       }
     }
   };
 
-  const loadDurationDisplayMethod = (): Promise<TimeDisplayMethod> => {
-    return new Promise((resolve) => {
-      if (browserCacheExists) {
-        browserCache.get([PLUME_CACHE_KEYS.durationDisplayMethod]).then((ls: LocalStorage) => {
-          const durationDisplayMethod =
-            ls[PLUME_CACHE_KEYS.durationDisplayMethod] || PLUME_DEF.durationDisplayMethod;
-          plume.durationDisplayMethod = durationDisplayMethod;
-          resolve(durationDisplayMethod);
-        });
-      } else {
-        // Fallback with localStorage
-        try {
-          const storedDurationDisplayMethod = localStorage.getItem(PLUME_CACHE_KEYS.durationDisplayMethod);
-          const durationDisplayMethod: TimeDisplayMethod = storedDurationDisplayMethod
-            ? (storedDurationDisplayMethod as TimeDisplayMethod)
-            : "duration";
-          plume.durationDisplayMethod = durationDisplayMethod;
-          resolve(durationDisplayMethod);
-        } catch (e) {
-          logger("warn", getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
-          plume.durationDisplayMethod = "duration";
-          resolve("duration");
-        }
-      }
-    });
-  };
-
+  const PROGRESS_SLIDER_GRANULARITY = 1000; // use 1000 for better granularity: 1000s = 16m40s
   const createProgressContainer = async () => {
     if (plume.progressSlider) return;
 
     const container = document.createElement("div");
-    container.className = "bpe-progress-container";
-
+    container.id = "bpe-progress-container";
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = "0";
-    slider.max = "1000"; // use 1000 for better granularity: 1000s = 16m40s
+    slider.max = PROGRESS_SLIDER_GRANULARITY.toString();
     slider.value = "0";
-    slider.className = "bpe-progress-slider";
+    slider.id = "bpe-progress-slider";
 
     const timeDisplay = document.createElement("div");
-    timeDisplay.className = "bpe-time-display";
+    timeDisplay.id = "bpe-time-display";
 
     const elapsed = document.createElement("span");
     elapsed.textContent = "0:00";
@@ -685,7 +611,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     const duration = document.createElement("span");
     duration.textContent = "0:00";
     duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
-    duration.className = "bpe-duration-display";
+    duration.id = "bpe-duration-display";
 
     timeDisplay.appendChild(elapsed);
     timeDisplay.appendChild(duration);
@@ -696,13 +622,16 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     // Event listener to invert duration display method on click
     duration.addEventListener("click", () => {
       if (plume.durationDisplay && plume.audioElement) {
-        saveDurationDisplayMethod(plume.durationDisplayMethod === "duration" ? "remaining" : "duration");
+        saveDurationDisplayMethod(plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION
+          ? TIME_DISPLAY_METHOD.REMAINING
+          : TIME_DISPLAY_METHOD.DURATION
+        );
       }
     });
 
     // Event listener for progress change
     slider.addEventListener("input", function (this: HTMLInputElement) {
-      const progress = Number.parseFloat(this.value) / 1000;
+      const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
       if (plume.audioElement) {
         plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       }
@@ -713,44 +642,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     plume.durationDisplay = duration;
 
     return container;
-  };
-
-  const updateProgressBar = () => {
-    if (!plume.progressSlider) return;
-
-    const elapsed = plume.audioElement!.currentTime;
-    const duration = plume.audioElement!.duration;
-
-    if (!Number.isNaN(duration) && duration > 0) {
-      const percent = (elapsed / duration) * 100;
-      const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-      plume.progressSlider.value = `${percent * 10}`;
-      plume.progressSlider.style.backgroundImage = bgImg;
-
-      if (plume.elapsedDisplay) {
-        plume.elapsedDisplay.textContent = formatTime(elapsed);
-      }
-
-      if (plume.durationDisplay) {
-        if (plume.durationDisplayMethod === "duration") {
-          plume.durationDisplay.textContent = formatTime(duration);
-        } else {
-          plume.durationDisplay.textContent = "-" + formatTime(duration - elapsed);
-        }
-      }
-    }
-  };
-
-  const getTrackNumberingString = (title: string | undefined): string => {
-    const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
-    if (!trackTable) return "";
-
-    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
-    const trackCount = trackRows.length;
-    const trackRowTitles: HTMLSpanElement[] = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
-    const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === title) + 1;
-    return (trackRows.length && currentTrackNumber) ? `(${currentTrackNumber}/${trackCount})` : "";
   };
 
   const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
@@ -788,8 +679,9 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     const L2 = getLuminance(bgRgb);
     return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
   }
+
   const CONTRAST_ADJUSTMENT_STEP = 0.05;
-  const adjustForContrast = (rgb: [number, number, number], minContrast: number): string => {
+  const adjustColorContrast = (rgb: [number, number, number], minContrast: number): string => {
     let current = [...rgb] as [number, number, number];
     let factor = 0;
     while (measureContrastRatioWCAG(current) < minContrast && factor < 1) {
@@ -801,10 +693,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
   }
 
-  const getTrackTitleElement = (): HTMLSpanElement => {
-    return document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement;
-  };
-
   const getArtistNameElement = (): HTMLSpanElement => {
     const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.nameSection) as HTMLElement;
     const nameSectionLinks = nameSection.querySelectorAll("span");
@@ -812,9 +700,12 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
   };
 
-  // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
-  const WCAG_CONTRAST = 4.5;
-  const FALLBACK_GRAY = "rgb(127, 127, 127)";
+  const getTrackTitleElement = (): HTMLSpanElement => {
+    return document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement;
+  };
+
+  const WCAG_CONTRAST = 4.5; // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
+  const FALLBACK_GRAY = "rgb(127, 127, 127)"; // fallback gray if the best color is grayscale, to ensure visibility on Plume's dark background
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
@@ -826,17 +717,64 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
       const trackColorSaturation = RGBToHSL(...trackColorRGB)[1];
       const artistColorSaturation = RGBToHSL(...artistColorRGB)[1];
       return trackColorSaturation > artistColorSaturation ? trackColor : artistColor;
+    } else if (trackColorContrast > WCAG_CONTRAST || artistColorContrast > WCAG_CONTRAST) {
+      return trackColorContrast > WCAG_CONTRAST ? trackColor : artistColor;
     } else {
       const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
       const preferredColorRgb = preferredColor.match(/\d+/g)!.map(Number) as [number, number, number];
       if (isGrayscale(preferredColorRgb))
         return FALLBACK_GRAY;
-      return adjustForContrast(preferredColorRgb, WCAG_CONTRAST);
+      return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST);
     }
   };
 
-  const injectEnhancements = async () => {
-    const bcPlayerSelectors = [
+  // Function to get the current track numbering string (e.g. "(3/10)")
+  const getTrackNumberingString = (title: string | undefined): string => {
+    const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    if (!trackTable) return "";
+
+    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+    const trackCount = trackRows.length;
+    const trackRowTitles: HTMLSpanElement[] = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
+    const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === title) + 1;
+    return (trackRows.length && currentTrackNumber) ? `(${currentTrackNumber}/${trackCount})` : "";
+  };
+
+  // Function to get the current track title from Bandcamp
+  const getCurrentTrackTitle = (): string => {
+    const titleElement = globalThis.location.pathname.includes("/album/")
+      ? (document.querySelector(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle) as HTMLSpanElement)
+      : (document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement);
+    if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
+
+    return titleElement.textContent.trim();
+  };
+
+  // Function to hide original Bandcamp player elements
+  const hideOriginalPlayerElements = () => {
+    const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
+    if (bcAudioTable) {
+      bcAudioTable.style.display = "none";
+      bcAudioTable.classList.add("bpe-hidden-original");
+    }
+
+    logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
+  };
+
+  // Function to restore original player elements (use it for debug purposes)
+  const restoreOriginalPlayerElements = () => {
+    const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
+    if (!bcAudioTable) return; // eliminate onInit function call
+
+    bcAudioTable.style.display = "unset";
+    bcAudioTable.classList.remove("bpe-hidden-original");
+
+    logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__RESTORED"));
+  };
+
+  // Function to find the original Bandcamp player container
+  const findOriginalPlayerContainer = (): HTMLDivElement | null => {
+    const BC_PLAYER_SELECTORS = [
       ".inline_player",
       "#trackInfoInner",
       ".track_play_auxiliary",
@@ -845,13 +783,13 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     ];
 
     let playerContainer = null;
-    for (const selector of bcPlayerSelectors) {
+    for (const selector of BC_PLAYER_SELECTORS) {
       playerContainer = document.querySelector(selector);
-      if (playerContainer) break;
+      if (playerContainer) break; // found the original player container!
     }
 
     if (!playerContainer) {
-      logger("warn", getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
+      logger(CPL.WARN, getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
       // Search near audio elements
       if (plume.audioElement) {
         playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
@@ -859,38 +797,45 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     }
 
     if (!playerContainer) {
-      logger("error", getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
-      return;
+      logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
+      return null;
     }
 
-    // Hide or remove old player elements
-    restoreOriginalPlayerElements(); // to prevent unused function
+    return playerContainer as HTMLDivElement;
+  };
+
+  const injectEnhancements = async () => {
+    const bcPlayerContainer = findOriginalPlayerContainer();
+    if (!bcPlayerContainer) return;
+
+    restoreOriginalPlayerElements(); // call it to prevent "unused function" linter warning
+    // Hide old player elements
     hideOriginalPlayerElements();
 
     // Create main container for our enhancements
     const plumeContainer = document.createElement("div");
-    plumeContainer.className = "bpe-plume";
+    plumeContainer.id = "bpe-plume";
 
     // Create title display
     const headerContainer = document.createElement("div");
-    headerContainer.className = "bpe-header-display";
+    headerContainer.id = "bpe-header-display";
 
     const headerLogo = document.createElement("div");
-    headerLogo.className = "bpe-header-logo";
+    headerLogo.id = "bpe-header-logo";
     headerLogo.innerHTML = PLUME_SVG.logo;
-    headerLogo.title = "BC-Plume - Bandcamp Player Enhancer";
+    headerLogo.title = APP_NAME;
     headerContainer.appendChild(headerLogo);
 
     const currentTitleSection = document.createElement("div");
-    currentTitleSection.className = "bpe-header-current";
+    currentTitleSection.id = "bpe-header-current";
     const currentTitlePretext = document.createElement("span");
-    currentTitlePretext.className = "bpe-header-title-pretext";
+    currentTitlePretext.id = "bpe-header-title-pretext";
     const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
     currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
     currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
-    currentTitleText.className = "bpe-header-title";
+    currentTitleText.id = "bpe-header-title";
     const currentTrackTitle = getCurrentTrackTitle();
     currentTitleText.textContent = currentTrackTitle;
     currentTitleText.title = currentTrackTitle; // see full title on hover in case title is truncated
@@ -901,7 +846,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     plumeContainer.appendChild(headerContainer);
 
     const playbackManager = document.createElement("div");
-    playbackManager.className = "bpe-playback-manager";
+    playbackManager.id = "bpe-playback-manager";
 
     const progressContainer = await createProgressContainer();
     if (progressContainer) {
@@ -918,11 +863,74 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
       plumeContainer.appendChild(volumeContainer);
     }
 
-    playerContainer.appendChild(plumeContainer);
+    bcPlayerContainer.appendChild(plumeContainer);
 
-    logger("log", getString("LOG__MOUNT__COMPLETE"));
+    logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
   };
 
+  // Function to update the pretext display (track numbering)
+  const updatePretextDisplay = () => {
+    if (plume.titleDisplay) {
+      const preText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
+      if (!preText) return;
+
+      const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
+      preText.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
+    }
+  };
+
+  const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
+  const LATIN_CHAR_HEIGHT = 19; // in px, for calculation
+  // Function to update the title display when track changes
+  const updateTitleDisplay = () => {
+    if (!plume.titleDisplay) return;
+
+    const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
+    if (!titleText) return;
+
+    const currentTrackTitle = getCurrentTrackTitle();
+    titleText.textContent = currentTrackTitle;
+    titleText.title = currentTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
+
+    if (titleText.offsetHeight != LATIN_CHAR_HEIGHT) {
+      const logo = document.getElementById("bpe-header-logo") as HTMLDivElement;
+      if (!logo) return;
+
+      const deltaPaddingPx = titleText.offsetHeight - LATIN_CHAR_HEIGHT; // calculate difference in px
+      const deltaPaddingRem = deltaPaddingPx / 16; // 16px = 1rem
+      logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingRem}rem`;
+    }
+  };
+
+  // Function to update the progress bar and time displays as audio plays or metadata change
+  const updateProgressBar = () => {
+    if (!plume.progressSlider) return;
+
+    const elapsed = plume.audioElement!.currentTime;
+    const duration = plume.audioElement!.duration;
+
+    if (!Number.isNaN(duration) && duration > 0) {
+      const percent = (elapsed / duration) * 100;
+      const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+      plume.progressSlider.style.backgroundImage = bgImg;
+
+      if (plume.elapsedDisplay) {
+        plume.elapsedDisplay.textContent = formatTime(elapsed);
+      }
+
+      if (plume.durationDisplay) {
+        if (plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION) {
+          plume.durationDisplay.textContent = formatTime(duration);
+        } else {
+          plume.durationDisplay.textContent = "-" + formatTime(duration - elapsed);
+        }
+      }
+    }
+  };
+
+  // Function to set up event listeners on the audio element: progress, metadata, volume
   const setupAudioListeners = () => {
     // Update progress container
     plume.audioElement!.addEventListener("timeupdate", updateProgressBar);
@@ -937,26 +945,80 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     // Sync volume with Plume's slider
     plume.audioElement!.addEventListener("volumechange", () => {
-      if (plume.volumeSlider) {
-        plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
-        const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
-          PLUME_ELEM_IDENTIFIERS.volumeValue
-        ) as HTMLSpanElement;
-        if (valueDisplay) {
-          valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
-        }
+      if (!plume.volumeSlider) return;
 
-        // Save volume when it changes (even if not via our slider)
-        saveNewVolume(plume.audioElement!.volume);
+      plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * VOLUME_SLIDER_GRANULARITY)}`;
+      const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
+        PLUME_ELEM_IDENTIFIERS.volumeValue
+      ) as HTMLSpanElement;
+      if (valueDisplay) {
+        valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
+
+      saveNewVolume(plume.audioElement!.volume);
     });
 
-    logger("info", getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
+    logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
+  };
+
+  let scrollIsTicking = false; // this variable must be outside the function scope to have persistent state
+  const SCROLLED_CLASSNAME = "scrolled"; // from `styles.css`
+  // Function to create a scroll listener to apply a specific styling to the player when it's out of viewport
+  const createPlumeStickinessListener = () => {
+    const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
+    const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0];
+    if (!plumeParentDiv) {
+      logger(CPL.ERROR, getString("ERROR__PLAYER_PARENT__NOT_FOUND"));
+      return;
+    }
+
+    const triggerHeight = (plumeParentDiv as HTMLDivElement).offsetTop;
+    window.addEventListener("scroll", () => { // Check if plume is in viewport height for sticky styling
+      if (scrollIsTicking) return;
+      globalThis.requestAnimationFrame(() => {
+        const plumeIsInViewport = window.scrollY < triggerHeight;
+        if (plumeIsInViewport) {
+          plumeParentDiv.classList.remove(SCROLLED_CLASSNAME);
+        } else {
+          plumeParentDiv.classList.add(SCROLLED_CLASSNAME);
+        }
+        scrollIsTicking = false;
+      });
+      scrollIsTicking = true;
+    });
+  };
+
+  // Function to load the duration display method from browser cache (duration or remaining)
+  const loadDurationDisplayMethod = (): Promise<TimeDisplayMethodType> => {
+    return new Promise((resolve) => {
+      if (browserCacheExists) {
+        browserCache.get([PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]).then((ls: LocalStorage) => {
+          const durationDisplayMethod =
+            ls[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] || PLUME_DEF.durationDisplayMethod;
+          plume.durationDisplayMethod = durationDisplayMethod;
+          resolve(durationDisplayMethod);
+        });
+      } else {
+        // Fallback with localStorage
+        try {
+          const storedDurationDisplayMethod = localStorage.getItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD);
+          const durationDisplayMethod: TimeDisplayMethodType = storedDurationDisplayMethod
+            ? (storedDurationDisplayMethod as TimeDisplayMethodType)
+            : TIME_DISPLAY_METHOD.DURATION;
+          plume.durationDisplayMethod = durationDisplayMethod;
+          resolve(durationDisplayMethod);
+        } catch (e) {
+          logger(CPL.WARN, getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
+          plume.durationDisplayMethod = TIME_DISPLAY_METHOD.DURATION;
+          resolve(TIME_DISPLAY_METHOD.DURATION);
+        }
+      }
+    });
   };
 
   // Main initialization function
   const init = async () => {
-    logger("info", getString("LOG__INITIALIZATION__START"));
+    logger(CPL.INFO, getString("LOG__INITIALIZATION__START"));
 
     // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {
@@ -966,8 +1028,8 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     plume.audioElement = await findAudioElement();
     if (!plume.audioElement) {
-      logger("warn", getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
-      setTimeout(init, 2000);
+      logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
+      setTimeout(init, 1000); // retry after 1 second
       return;
     }
 
@@ -976,7 +1038,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     // Ensure duration display method is applied
     await loadDurationDisplayMethod();
-    logger("info", `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
+    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
 
     // Inject enhancements
     await injectEnhancements();
@@ -986,30 +1048,19 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     // Debug: show detected controls
     debugBandcampControls();
 
-    logger("log", getString("LOG__INITIALIZATION__COMPLETE"));
+    logger(CPL.LOG, getString("LOG__INITIALIZATION__COMPLETE"));
   };
 
-  const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
-  const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0];
-  if (plumeParentDiv === undefined) {
-    logger("error", getString("ERROR__PLAYER_PARENT__NOT_FOUND"));
-  } else {
-    let ticking = false;
-    const triggerHeight = (plumeParentDiv as HTMLDivElement).offsetTop;
-    window.addEventListener('scroll', () => { // Check if plume is in viewport height for sticky styling
-      if (ticking) return;
-      globalThis.requestAnimationFrame(() => {
-        const plumeIsInVH = globalThis.scrollY < triggerHeight;
-        if (plumeIsInVH) {
-          plumeParentDiv.classList.remove('scrolled');
-        } else {
-          plumeParentDiv.classList.add('scrolled');
-        }
-        ticking = false;
-      });
-      ticking = true;
-    });
-  }
+  const plume: PlumeCore = {
+    audioElement: null,
+    titleDisplay: null,
+    progressSlider: null,
+    elapsedDisplay: null,
+    durationDisplay: null,
+    durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+    volumeSlider: null,
+    savedVolume: PLUME_DEF.savedVolume,
+  };
 
   // Observe DOM changes for players that load dynamically
   const observer = new MutationObserver((mutations) => {
@@ -1018,17 +1069,17 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
         // Check if a new audio element was added
         const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
-          logger("info", getString("INFO__NEW_AUDIO__FOUND"));
+          logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
           // Ensure duration display method is applied
           await loadDurationDisplayMethod();
-          logger("info", `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
+          logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
 
           // Load and apply saved volume to the new element
           await loadSavedVolume();
           newAudio.volume = plume.savedVolume;
           logger(
-            "info",
+            CPL.INFO,
             `${getString("INFO__VOLUME__APPLIED")} ${Math.round(plume.savedVolume * 100)}${getString(
               "META__PERCENTAGE"
             )}`
@@ -1062,6 +1113,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   });
 
   init();
+  createPlumeStickinessListener();
 
   // Support for SPA navigation
   let lastUrl = location.href;
@@ -1070,7 +1122,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     if (currentPageUrl === lastUrl) return;
 
     lastUrl = currentPageUrl;
-    logger("log", getString("LOG__NAVIGATION_DETECTED"));
+    logger(CPL.LOG, getString("LOG__NAVIGATION_DETECTED"));
     setTimeout(() => {
       init();
       setTimeout(updateTitleDisplay, 500);

@@ -58,7 +58,14 @@ cd BC-Plume && pnpm install    # Install dependencies
 
 ### 2️⃣ Build the Extension
 
-Select one of the following according to your desired purpose:
+First off, create the build artifacts:
+
+```bash
+npm install -g pnpm # If you don't have pnpm installed, install it globally as it's evidently superior
+pnpm i              # Install project dependencies
+```
+
+Then, select one of the following according to your desired purpose:
 
 ```bash
 pnpm run build  # Quick build (development with source maps)
@@ -103,11 +110,12 @@ After building, you can install the extension:
 - The enhanced interface loads
 - Volume is saved between pages (uses browser cache)
 
-## 🔧 Icon Conversion (Optional)
+## 🔧 Icon Conversion
 
-If you want to convert SVGs to PNGs for certain browsers:
+Firefox uses the SVG icons directly, but Chromium-based browsers require PNG format.
+If you intend on changing the icons, we recommend creating PNG versions from the SVG files.
 
-### Option A: With Python (recommended)
+### Option A: With our Python script (recommended)
 
 ```bash
 pip install pillow cairosvg

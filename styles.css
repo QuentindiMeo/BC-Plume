@@ -18,7 +18,7 @@
 
   transition: background-color 0.2s ease, margin 0.2s ease !important;
 }
-.inline_player.scrolled {
+.inline_player.scrolled { /* when the user scrolls low enough, Plume becomes sticky */
   top: .5rem;
   margin: 0;
   background-color: rgba(0, 0, 0, 0.8);
@@ -49,13 +49,13 @@
 
 /**************** Plume styling ****************/
 
-.bpe-plume {
+#bpe-plume {
   border-radius: .5rem;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.bpe-header-display {
+#bpe-header-display {
   display: flex;
   justify-content: flex-end;
   padding: 0.75rem 0.75rem;
@@ -63,17 +63,17 @@
   border-radius: 0.5rem;
 }
 
-.bpe-header-logo {
+#bpe-header-logo {
+  transform-origin: top left;
   position: absolute;
   top: 0px;
   left: 0px;
   padding: 1rem 2rem;
 
   scale: 0.25;
-  transform-origin: top left;
 }
 
-.bpe-header-current {
+#bpe-header-current {
   width: 80%;
 
   display: flex;
@@ -81,11 +81,11 @@
   align-items: flex-end;
 }
 
-.bpe-header-title-pretext {
+#bpe-header-title-pretext {
   font-style: italic;
 }
 
-.bpe-header-title {
+#bpe-header-title {
   max-width: 95%;
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -98,23 +98,21 @@
   text-overflow: ellipsis;
 }
 
-.bpe-playback-manager {
+#bpe-playback-manager {
   padding: 0.5rem 1rem;
   margin-top: 0.1rem;
 
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.bpe-progress-container {
+#bpe-progress-container {
   position: relative;
   margin: 0;
 }
 
-.bpe-progress-slider {
+#bpe-progress-slider {
   width: 100%;
   height: 0.5rem;
   margin: 0;
@@ -127,7 +125,7 @@
   appearance: none;
   -webkit-appearance: none;
 }
-.bpe-progress-slider::-webkit-slider-thumb {
+#bpe-progress-slider::-webkit-slider-thumb {
   width: 0.75rem;
   height: 0.75rem;
   background: white;
@@ -140,11 +138,11 @@
   appearance: none;
   -webkit-appearance: none;
 }
-.bpe-progress-slider::-webkit-slider-thumb:hover {
-  background: lightgray;
+#bpe-progress-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
+  background: lightgray;
 }
-.bpe-progress-slider::-moz-range-thumb {
+#bpe-progress-slider::-moz-range-thumb {
   width: 0.75rem;
   height: 0.75rem;
   background: white;
@@ -155,8 +153,12 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
+#bpe-progress-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: lightgray;
+}
 
-.bpe-time-display {
+#bpe-time-display {
   display: flex;
   justify-content: space-between;
 
@@ -165,11 +167,11 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.bpe-duration-display {
+#bpe-duration-display {
   cursor: pointer;
 }
 
-.bpe-playback-controls {
+#bpe-playback-controls {
   margin-bottom: 0.25rem;
 
   display: flex;
@@ -178,7 +180,7 @@
   gap: 0.75rem;
 }
 
-.bpe-playback-controls button {
+#bpe-playback-controls button {
   width: 3.25rem;
   height: 3.25rem;
   background: rgba(255, 255, 255, 0.1);
@@ -195,29 +197,29 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.bpe-playback-controls button:hover {
+#bpe-playback-controls button:hover {
+  transform: scale(1.1);
   background: rgba(255, 255, 255, 0.2);
   border-color: var(--progbar-fill-bg-right);
-  transform: scale(1.1);
   box-shadow: 0 0.25rem 0.5rem rgba(29, 160, 195, 0.3);
 }
-.bpe-playback-controls button:active {
+#bpe-playback-controls button:active {
   transform: scale(0.95);
 }
 
-.bpe-play-pause-btn {
+#bpe-play-pause-btn {
   width: 3.75rem !important;
   height: 3.75rem !important;
 
   background: rgba(29, 160, 195, 0.2) !important;
   border-color: var(--progbar-fill-bg-right) !important;
 }
-.bpe-play-pause-btn:hover {
+#bpe-play-pause-btn:hover {
   background: rgba(29, 160, 195, 0.4) !important;
   box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5) !important;
 }
 
-.bpe-volume-container {
+#bpe-volume-container {
   position: relative;
   padding: 0.75rem 1rem;
   margin: 0;
@@ -226,7 +228,7 @@
   border-radius: 0.5rem;
 }
 
-.bpe-volume-label {
+#bpe-volume-label {
   margin-bottom: 0.2rem;
   display: block;
 
@@ -236,7 +238,7 @@
   color: #ffffff;
 }
 
-.bpe-volume-slider {
+#bpe-volume-slider {
   width: 100%;
   height: 0.5rem;
   background: rgba(255, 255, 255, 0.2);
@@ -249,25 +251,7 @@
   appearance: none;
   -webkit-appearance: none;
 }
-.bpe-volume-slider::-webkit-slider-thumb {
-  width: .25rem;
-  height: 1rem;
-  background: var(--progbar-fill-bg-right);
-  border-radius: 33%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  appearance: none;
-  -webkit-appearance: none;
-}
-.bpe-volume-slider::-webkit-slider-thumb:hover {
-  background: var(--progbar-fill-bg-left);
-  transform: scale(1.25);
-  border-radius: 33%;
-}
-.bpe-volume-slider::-moz-range-thumb {
+#bpe-volume-slider::-webkit-slider-thumb {
   width: .25rem;
   height: 1rem;
   background: var(--progbar-fill-bg-right);
@@ -276,9 +260,31 @@
 
   cursor: pointer;
   transition: all 0.2s ease;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+#bpe-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  background: var(--progbar-fill-bg-left);
+  border-radius: 33%;
+}
+#bpe-volume-slider::-moz-range-thumb {
+  width: .25rem;
+  height: 1.125rem;
+  background: var(--progbar-fill-bg-right);
+  border: none;
+  border-radius: 20%;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+#bpe-volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: var(--progbar-fill-bg-left);
 }
 
-.bpe-volume-value {
+#bpe-volume-value {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   text-align: right;
   font-size: 0.75rem;
@@ -289,32 +295,32 @@
 /* Responsive */
 @media (max-width: 768px) {
   /* Global adjustment for mobile */
-  .bpe-progress-container {
+  #bpe-progress-container {
     padding: 0.5rem 0.75rem;
   }
 
-  .bpe-playback-controls {
+  #bpe-playback-controls {
     padding: 1rem;
     gap: 0.625rem;
   }
 
-  .bpe-playback-controls button {
+  #bpe-playback-controls button {
     width: 4.25rem;
     height: 4.25rem;
     font-size: 0.875rem;
   }
 
-  .bpe-play-pause-btn {
+  #bpe-play-pause-btn {
     width: 3.25rem !important;
     height: 3.25rem !important;
     font-size: 1.125rem !important;
   }
 
-  .bpe-volume-container {
+  #bpe-volume-container {
     padding: 0.5rem 0.75rem;
   }
 
-  .bpe-volume-slider {
+  #bpe-volume-slider {
     height: 0.5rem;
   }
 }
