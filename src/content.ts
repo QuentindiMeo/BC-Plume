@@ -1,6 +1,6 @@
 // Plume - TypeScript for song page and album page display
-const APP_VERSION = "_v1.2.5";
 const APP_NAME = "BC-Plume - Bandcamp Player Enhancer";
+const APP_VERSION = "v1.2.5";
 
 interface BrowserAPI {
   storage: {
@@ -239,7 +239,7 @@ const logger = (method: CPLType, ...toPrint: any[]) => {
   const now = new Date();
   const nowTime = now.toLocaleTimeString();
   const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
-  console[method](`[Plume${APP_VERSION} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
+  console[method](`[Plume_${APP_VERSION} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
 };
 
 // Browser detection and compatible storage API
@@ -826,7 +826,7 @@ const browserCacheExists = browserCache !== undefined;
 
     const headerLogo = document.createElement("div");
     headerLogo.id = "bpe-header-logo";
-    headerLogo.innerHTML = PLUME_SVG.logo;
+    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="bpe-header-logo__version">${APP_VERSION}</p>`;
     headerLogo.title = APP_NAME;
     headerContainer.appendChild(headerLogo);
 
