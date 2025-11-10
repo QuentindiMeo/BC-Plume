@@ -320,6 +320,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     } else {
       // Restart current track instead, if more than X seconds have elapsed
       plume.audioElement!.currentTime = 0;
+      logger("info", getString("DEBUG__PREV_TRACK__RESTARTED"));
     }
     return true;
   };
