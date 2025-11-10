@@ -907,7 +907,7 @@ const browserCacheExists = browserCache !== undefined;
     titleText.textContent = currentTrackTitle;
     titleText.title = currentTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
-    if (titleText.offsetHeight != LATIN_CHAR_HEIGHT) {
+    if (titleText.offsetHeight !== LATIN_CHAR_HEIGHT) {
       const logo = document.getElementById("bpe-header-logo") as HTMLDivElement;
       if (!logo) return;
 
