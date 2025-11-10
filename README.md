@@ -37,11 +37,11 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <sup><b>if you wish to tip me:&nbsp;</b></sup>
   <a href="https://ko-fi.com/quentindimeo">
-    <img alt="ko-fi tip button" src="https://storage.ko-fi.com/cdn/logomarkLogo.png" height="40px" />
+    <img alt="ko-fi tip button" src="https://storage.ko-fi.com/cdn/brandasset/v2/support_me_on_kofi_blue.png" height="40px" />
   </a>
-  <a href="https://www.paypal.com/donate/?hosted_button_id=LQCF9J9X4EDZL">
+  <!-- <a href="https://www.paypal.com/donate/?hosted_button_id=LQCF9J9X4EDZL">
     <img alt="PayPal donate button" src="https://i.imgur.com/abmsLLY.png" height="40px" />
-  </a>
+  </a> -->
 </div>
 
 &#xa0;
@@ -113,7 +113,8 @@ Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/B
 ### 🔮 Possible future improvements
 
 All of them are listed in the [issues](https://github.com/QuentindiMeo/BC-Plume/issues).  
-Those with the 🚀 emoji are new features, those with the ↗️ emoji are improvements!
+Those with the 🚀 emoji are new features, those with the ↗️ emoji are improvements!  
+Don't hesitate to suggest new ideas by **opening an issue** yourself!
 
 ---
 
