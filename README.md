@@ -105,7 +105,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
 - _**[1.3.0]** if you want it..._: **Pedal To The Metal** — New features are added to Plume. [#???](#card_file_box-project-roadmap)
-- _**[1.2.5]** Sep 08 2025_: official release — Word is spread on Reddit that Plume is now solid. [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48)
+- _**[1.2.5]** Sep 08 2025_: official release — Word is spread on Reddit, Plume is ready for use. [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48)
 - _**[1.2.0]** Jul 30 2025_: **Pretty boy** — Plume gets a logo & UI rework. [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
 - _**[1.1.0]** Jul 28 2025_: **First Release** — The original Bandcamp player is fully replaced by Plume. [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18)
 - _**[1.0.0]** Jul 28 2025_: **Hello World!** — The project is drafted, under the name _MBAPPE_.
