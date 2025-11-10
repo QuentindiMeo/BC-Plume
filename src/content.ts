@@ -219,6 +219,7 @@ enum BC_ELEM_IDENTIFIERS {
   trackTitle = "span.track-title",
 }
 
+// Customized console logger with timestamp and level
 enum CPL { // Console Printing Level
   DEBUG = "debug",
   INFO = "info",
@@ -234,68 +235,37 @@ const ConsolePrintingPrefix: Record<CPLType, string> = {
   [CPL.WARN]: "WARN?",
   [CPL.ERROR]: "ERR?!",
 };
+const logger = (method: CPLType, ...toPrint: any[]) => {
+  const now = new Date();
+  const nowTime = now.toLocaleTimeString();
+  const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
+  console[method](`[Plume${APP_VERSION} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
+};
+
+// Browser detection and compatible storage API
+const chromeApi = (globalThis as any).chrome;
+const firefoxApi = (globalThis as any).browser;
+const browserApi: BrowserAPI = (() => {
+  if (chromeApi !== undefined && chromeApi.storage) {
+    return chromeApi;
+  } else if (firefoxApi !== undefined && firefoxApi.storage) {
+    return firefoxApi;
+  } else {
+    logger(CPL.WARN, (globalThis as any).chrome.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
+    return (globalThis as any).chrome; // Assume Chromium-based as fallback
+  }
+})();
+const browserCache = browserApi.storage.local;
+if (!browserApi.i18n.getMessage) {
+  // Fallback for browsers without i18n support (safety net for if browser detection failed)
+  browserApi.i18n.getMessage = (key: string, ..._: any[]) => key;
+}
+const getString = browserApi.i18n.getMessage;
+logger(CPL.INFO, getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox-based" : "Chromium-based");
+const browserCacheExists = browserCache !== undefined;
 
 (() => {
   "use strict";
-
-  // Customized console logger with timestamp and level
-  const logger = (method: CPLType, ...toPrint: any[]) => {
-    const now = new Date();
-    const nowTime = now.toLocaleTimeString();
-    const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
-    console[method](`[Plume${APP_VERSION} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
-  };
-
-  const chromeApi = (globalThis as any).chrome;
-  const firefoxApi = (globalThis as any).browser;
-  // Browser detection and compatible storage API
-  const browserApi: BrowserAPI = (() => {
-    if (chromeApi !== undefined && chromeApi.storage) {
-      return chromeApi;
-    } else if (firefoxApi !== undefined && firefoxApi.storage) {
-      return firefoxApi;
-    } else {
-      logger(CPL.WARN, (globalThis as any).chrome.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
-      return (globalThis as any).chrome; // Assume Chromium-based as fallback
-    }
-  })();
-  const browserCache = browserApi.storage.local;
-  if (!browserApi.i18n.getMessage) {
-    // Fallback for browsers without i18n support (safety net for if browser detection failed)
-    browserApi.i18n.getMessage = (key: string, ..._: any[]) => key;
-  }
-  const getString = browserApi.i18n.getMessage;
-  logger(CPL.INFO, getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox-based" : "Chromium-based");
-  const browserCacheExists = browserCache !== undefined;
-
-  // Function to click on the previous track button
-  const clickPreviousTrackButton = () => {
-    const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
-    if (!prevButton) {
-      logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
-      return null;
-    }
-
-    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART) {
-      prevButton.click();
-    } else {
-      // Restart current track instead, if more than X seconds have elapsed
-      plume.audioElement!.currentTime = 0;
-      logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
-    }
-    return true;
-  };
-
-  // Function to click on the next track button
-  const clickNextTrackButton = () => {
-    const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
-    if (nextButton) {
-      nextButton.click();
-      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-    } else {
-      logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
-    }
-  };
 
   // Function to initialize playback (necessary to make Plume buttons effective)
   const initPlayback = () => {
@@ -454,6 +424,35 @@ const ConsolePrintingPrefix: Record<CPLType, string> = {
 
     plume.volumeSlider = slider;
     return container;
+  };
+
+  // Function to click on the previous track button
+  const clickPreviousTrackButton = () => {
+    const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
+    if (!prevButton) {
+      logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
+      return null;
+    }
+
+    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART) {
+      prevButton.click();
+    } else {
+      // Restart current track instead, if more than X seconds have elapsed
+      plume.audioElement!.currentTime = 0;
+      logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
+    }
+    return true;
+  };
+
+  // Function to click on the next track button
+  const clickNextTrackButton = () => {
+    const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
+    if (nextButton) {
+      nextButton.click();
+      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+    } else {
+      logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
+    }
   };
 
   const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
@@ -796,17 +795,15 @@ const ConsolePrintingPrefix: Record<CPLType, string> = {
       }
     }
 
-    if (!playerContainer) {
-      logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
-      return null;
-    }
-
-    return playerContainer as HTMLDivElement;
+    return playerContainer ? (playerContainer as HTMLDivElement) : null;
   };
 
   const injectEnhancements = async () => {
     const bcPlayerContainer = findOriginalPlayerContainer();
-    if (!bcPlayerContainer) return;
+    if (!bcPlayerContainer) {
+      logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
+      return;
+    }
 
     restoreOriginalPlayerElements(); // call it to prevent "unused function" linter warning
     // Hide old player elements
