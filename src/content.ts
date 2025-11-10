@@ -830,6 +830,7 @@ const browserCacheExists = browserCache !== undefined;
     headerLogo.innerHTML = PLUME_SVG.logo + `<p id="bpe-header-logo__version">${APP_VERSION}</p>`;
     headerLogo.href = PLUME_KO_FI_URL;
     headerLogo.target = "_blank";
+    headerLogo.rel = "noopener noreferrer";
     headerLogo.ariaLabel = APP_NAME;
     headerLogo.title = getString("ARIA__LOGO_LINK");
     headerContainer.appendChild(headerLogo);
