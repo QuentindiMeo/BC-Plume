@@ -40,11 +40,11 @@
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Next track button clicked" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
   "LABEL__TRACK_CURRENT": {
-    "message": "currently playing $NUMBERING$:",
+    "message": "currently playing ($NUMBERING$):",
     "placeholders": {
       "numbering": {
         "content": "$1",
-        "example": "(1/4)"
+        "example": "1/4"
       }
     }
   },
@@ -56,5 +56,22 @@
   "LABEL__TIME_FORWARD": { "message": "Forward 10 seconds" },
   "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
   "LABEL__VOLUME": { "message": "Volume" },
-  "META__PERCENTAGE": { "message": "%" }
+  "META__PERCENTAGE": { "message": "%" },
+  "ARIA__TRACK_CURRENT": {
+    "message": "$TRACK_TITLE$ is currently playing (track $TRACK_NUMBER$ out of $TOTAL_TRACKS$)",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "1"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "4"
+      },
+      "track_title": {
+        "content": "$3",
+        "example": "Song Title"
+      }
+    }
+  }
 }
