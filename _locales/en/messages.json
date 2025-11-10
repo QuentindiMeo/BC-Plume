@@ -58,7 +58,7 @@
   "LABEL__VOLUME": { "message": "Volume" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__TRACK_CURRENT": {
-    "message": "$TRACK_TITLE$ is currently playing (track $TRACK_NUMBER$ out of $TOTAL_TRACKS$)",
+    "message": "The track $TRACK_TITLE$ is currently playing (track $TRACK_NUMBER$ out of $TOTAL_TRACKS$)",
     "placeholders": {
       "track_number": {
         "content": "$1",

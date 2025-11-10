@@ -60,7 +60,7 @@
   "LABEL__VOLUME": { "message": "Volume" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__TRACK_CURRENT": {
-    "message": "$TITRE_PISTE$ est en cours de lecture (piste $NUMERO_PISTE$ sur $TOTAL_PISTES$)",
+    "message": "Le morceau $TITRE_PISTE$ est en cours de lecture (piste $NUMERO_PISTE$ sur $TOTAL_PISTES$)",
     "placeholders": {
       "numero_piste": {
         "content": "$1",
