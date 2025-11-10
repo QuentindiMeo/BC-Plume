@@ -1,6 +1,7 @@
 // Plume - TypeScript for song page and album page display
-const APP_NAME = "BC-Plume - Bandcamp Player Enhancer";
+const APP_NAME = "Plume - Bandcamp Player Enhancer";
 const APP_VERSION = "v1.2.5";
+const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
 
 interface BrowserAPI {
   storage: {
@@ -824,10 +825,14 @@ const browserCacheExists = browserCache !== undefined;
     const headerContainer = document.createElement("div");
     headerContainer.id = "bpe-header-display";
 
-    const headerLogo = document.createElement("div");
+    const headerLogo = document.createElement("a");
     headerLogo.id = "bpe-header-logo";
     headerLogo.innerHTML = PLUME_SVG.logo + `<p id="bpe-header-logo__version">${APP_VERSION}</p>`;
-    headerLogo.title = APP_NAME;
+    headerLogo.href = PLUME_KO_FI_URL;
+    headerLogo.target = "_blank";
+    headerLogo.rel = "noopener noreferrer";
+    headerLogo.ariaLabel = APP_NAME;
+    headerLogo.title = getString("ARIA__LOGO_LINK");
     headerContainer.appendChild(headerLogo);
 
     const initialTrackTitle = getCurrentTrackTitle();
