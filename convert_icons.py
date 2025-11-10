@@ -1,31 +1,29 @@
-# Script pour convertir les icônes SVG en PNG
-# Vous pouvez utiliser ce script si vous avez Python avec les bonnes dépendances
-# Sinon, vous pouvez utiliser un outil en ligne pour convertir les SVG en PNG
+# Script to convert SVG icons to PNG format for a browser extension (especially Chromium-based)
+# You can use this script if you have Python with the right dependencies
+# Otherwise, you can use an online tool to convert SVG to PNG
 
 try:
-    from PIL import Image
-    import cairosvg
-    import io
-    
-    def convert_svg_to_png(svg_path, png_path, size):
-        # Convertir SVG en PNG
-        png_data = cairosvg.svg2png(url=svg_path, output_width=size, output_height=size)
-        
-        # Sauvegarder le PNG
-        with open(png_path, 'wb') as f:
-            f.write(png_data)
-        
-        print(f"Converti: {svg_path} -> {png_path}")
-    
-    # Convertir les icônes
-    convert_svg_to_png('icons/icon16.svg', 'icons/icon16.png', 16)
-    convert_svg_to_png('icons/icon48.svg', 'icons/icon48.png', 48)
-    convert_svg_to_png('icons/icon128.svg', 'icons/icon128.png', 128)
-    
-    print("Toutes les icônes ont été converties avec succès!")
-    
+    from cairosvg import svg2png
 except ImportError:
-    print("Pour convertir les SVG en PNG, installez les dépendances :")
+    print("To convert SVG to PNG, install the dependencies:")
     print("pip install Pillow cairosvg")
-    print("Ou utilisez un outil en ligne pour convertir les fichiers SVG en PNG")
-    print("Les tailles requises sont : 16x16, 48x48, et 128x128 pixels")
+    print("... or use an online tool to convert SVG files to PNG")
+    print("Required sizes are: 16x16, 48x48, and 128x128 pixels")
+
+def convert_svg_to_png(svg_path: str, png_path: str, size: int) -> None:
+    # Convert SVG to PNG
+    png_data = svg2png(url=svg_path, output_width=size, output_height=size)
+
+    # Save the PNG
+    with open(png_path, 'wb') as f:
+        f.write(png_data)
+    print(f"Successfully converted: {svg_path} -> {png_path}")
+
+def main() -> None:
+    convert_svg_to_png("icons/icon16.svg", "icons/icon16.png", 16)
+    convert_svg_to_png("icons/icon48.svg", "icons/icon48.png", 48)
+    convert_svg_to_png("icons/icon128.svg", "icons/icon128.png", 128)
+    print("All icons have been successfully converted!")
+
+if __name__ == "__main__":
+    main()

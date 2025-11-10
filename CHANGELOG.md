@@ -5,6 +5,7 @@
 
 - _**[1.3.0]** if you want it..._: **Pedal To The Metal** — New features are added to Plume. [#???](#top)
 
+  - _**[1.2.6]** Nov 10 2025_: Nicer volume slider, a11y labels, track restart and codebase refactoring. [#60](https://github.com/QuentindiMeo/BC-Plume/pull/60)
   - _**[1.2.5]** Sep 08 2025_: The duration display can now be deductive, the player remains if you scroll down. [#48](https://github.com/QuentindiMeo/BC-Plume/pull/48)
   - _**[1.2.4]** Sep 04 2025_: The track display is reworked, and shows track numbering, the volume slider is reworked. [#42](https://github.com/QuentindiMeo/BC-Plume/pull/42)
   - _**[1.2.3]** Aug 19 2025_: Plume prints go through a logger, Plume gets localized (EN, FR). [#38](https://github.com/QuentindiMeo/BC-Plume/pull/38)
