@@ -28,7 +28,7 @@ interface PlumeObject {
   volumeSlider: HTMLInputElement | null;
   savedVolume: number;
 }
-const PLUME_DEFAULT_VALUES: Partial<PlumeObject> = {
+const PLUME_DEFAULT_VALUES: Pick<PlumeObject, "durationDisplayMethod" | "savedVolume"> = {
   durationDisplayMethod: "duration",
   savedVolume: 0.5, // Default volume, 0..1
 };
@@ -224,25 +224,27 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 (() => {
   "use strict";
 
+  const chromeApi = (globalThis as any).chrome;
+  const firefoxApi = (globalThis as any).browser;
   // Browser detection and compatible storage API
-  const browserAPI: BrowserAPI = (() => {
-    if (typeof (globalThis as any).chrome !== "undefined" && (globalThis as any).chrome.storage) {
-      return (globalThis as any).chrome;
-    } else if (typeof (globalThis as any).browser !== "undefined" && (globalThis as any).browser.storage) {
-      return (globalThis as any).browser;
+  const browserApi: BrowserAPI = (() => {
+    if (chromeApi !== undefined && chromeApi.storage) {
+      return chromeApi;
+    } else if (firefoxApi !== undefined && firefoxApi.storage) {
+      return firefoxApi;
     } else {
-      logger("warn", (globalThis as any).chrome.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
-      return (globalThis as any).chrome; // Assume Chromium-based as fallback
+      logger("warn", chromeApi.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
+      return chromeApi; // Assume Chromium-based as fallback
     }
   })();
-  const browserCache = browserAPI.storage.local;
-  const browserType = typeof (globalThis as any).chrome !== "undefined" ? "Chromium" : "Firefox";
-  if (!browserAPI.i18n.getMessage) {
+  const browserCache = browserApi.storage.local;
+  if (!browserApi.i18n.getMessage) {
     // Fallback for browsers without i18n support (safety net for if browser detection failed)
-    browserAPI.i18n.getMessage = (key: string, ..._: any[]) => key;
+    browserApi.i18n.getMessage = (key: string, ..._: any[]) => key;
   }
-  const getString = browserAPI.i18n.getMessage;
-  logger("info", getString("INFO__BROWSER__DETECTED"), browserType);
+  const getString = browserApi.i18n.getMessage;
+  logger("info", getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox" : "Chromium");
+  const browserCacheExists = browserCache !== undefined;
 
   const plume: PlumeObject = {
     audioElement: null,
@@ -252,13 +254,13 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     durationDisplay: null,
     durationDisplayMethod: "duration",
     volumeSlider: null,
-    savedVolume: PLUME_DEFAULT_VALUES.savedVolume!,
+    savedVolume: PLUME_DEFAULT_VALUES.savedVolume,
   };
 
   const saveNewVolume = (newVolume: number) => {
     plume.savedVolume = newVolume;
 
-    if (browserCache !== undefined) {
+    if (browserCacheExists) {
       browserCache.set({ [PLUME_CACHE_KEYS.volume]: newVolume });
     } else {
       // Fallback with localStorage
@@ -272,9 +274,9 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   const loadSavedVolume = (): Promise<number> => {
     return new Promise((resolve) => {
-      if (browserCache !== undefined) {
+      if (browserCacheExists) {
         browserCache.get([PLUME_CACHE_KEYS.volume]).then((ls: LocalStorage) => {
-          const volume = ls[PLUME_CACHE_KEYS.volume] || PLUME_DEFAULT_VALUES.savedVolume!;
+          const volume = ls[PLUME_CACHE_KEYS.volume] || PLUME_DEFAULT_VALUES.savedVolume;
           plume.savedVolume = volume;
           resolve(volume);
         });
@@ -282,7 +284,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
         // Fallback with localStorage
         try {
           const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.volume);
-          const volume = storedVolume ? parseFloat(storedVolume) : 1;
+          const volume = storedVolume ? Number.parseFloat(storedVolume) : 1;
           plume.savedVolume = volume;
           resolve(volume);
         } catch (e) {
@@ -296,7 +298,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   // Function to format time as MM:SS
   const formatTime = (seconds: number): string => {
-    if (isNaN(seconds) || !isFinite(seconds)) return "0:00";
+    if (Number.isNaN(seconds) || !Number.isFinite(seconds)) return "0:00";
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
@@ -338,7 +340,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    const titleElement = window.location.pathname.includes("/album/")
+    const titleElement = globalThis.location.pathname.includes("/album/")
       ? (document.querySelector(BC_ELEM_IDENTIFIERS.onAlbumCurrentTrackTitle) as HTMLSpanElement)
       : (document.querySelector(BC_ELEM_IDENTIFIERS.onTrackCurrentTrackTitle) as HTMLSpanElement);
     if (titleElement?.textContent) {
@@ -633,7 +635,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
       plume.durationDisplay!.textContent = "-" + formatTime(player!.duration - player!.currentTime);
     }
 
-    if (browserCache !== undefined) {
+    if (browserCacheExists) {
       browserCache.set({ [PLUME_CACHE_KEYS.durationDisplayMethod]: newMethod });
     } else {
       // Fallback with localStorage
@@ -647,10 +649,10 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   const loadDurationDisplayMethod = (): Promise<TimeDisplayMethod> => {
     return new Promise((resolve) => {
-      if (browserCache !== undefined) {
+      if (browserCacheExists) {
         browserCache.get([PLUME_CACHE_KEYS.durationDisplayMethod]).then((ls: LocalStorage) => {
           const durationDisplayMethod =
-            ls[PLUME_CACHE_KEYS.durationDisplayMethod] || PLUME_DEFAULT_VALUES.durationDisplayMethod!;
+            ls[PLUME_CACHE_KEYS.durationDisplayMethod] || PLUME_DEFAULT_VALUES.durationDisplayMethod;
           plume.durationDisplayMethod = durationDisplayMethod;
           resolve(durationDisplayMethod);
         });
@@ -711,7 +713,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     // Event listener for progress change
     slider.addEventListener("input", function (this: HTMLInputElement) {
-      const progress = parseFloat(this.value) / 1000;
+      const progress = Number.parseFloat(this.value) / 1000;
       if (plume.audioElement) {
         plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       }
@@ -730,7 +732,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     const elapsed = plume.audioElement.currentTime;
     const duration = plume.audioElement.duration;
 
-    if (!isNaN(duration) && duration > 0) {
+    if (!Number.isNaN(duration) && duration > 0) {
       const percent = (elapsed / duration) * 100;
       const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
       const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
@@ -1002,19 +1004,19 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
   const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0];
-  if (!plumeParentDiv) {
+  if (plumeParentDiv === undefined) {
     logger("error", getString("ERROR__PLAYER_PARENT__NOT_FOUND"));
   } else {
     let ticking = false;
     const triggerHeight = (plumeParentDiv as HTMLDivElement).offsetTop;
     window.addEventListener('scroll', () => { // Check if plume is in viewport height for sticky styling
       if (ticking) return;
-      window.requestAnimationFrame(() => {
-        const plumeIsInVH = window.scrollY < triggerHeight;
-        if (!plumeIsInVH) {
-          plumeParentDiv.classList.add('scrolled');
-        } else {
+      globalThis.requestAnimationFrame(() => {
+        const plumeIsInVH = globalThis.scrollY < triggerHeight;
+        if (plumeIsInVH) {
           plumeParentDiv.classList.remove('scrolled');
+        } else {
+          plumeParentDiv.classList.add('scrolled');
         }
         ticking = false;
       });
