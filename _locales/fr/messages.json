@@ -42,11 +42,11 @@
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
   "LABEL__TRACK_CURRENT": {
-    "message": "en cours de lecture $PISTE$ :",
+    "message": "en cours de lecture ($PISTE$) :",
     "placeholders": {
       "piste": {
         "content": "$1",
-        "example": "(1/4)"
+        "example": "1/4"
       }
     }
   },
@@ -58,5 +58,24 @@
   "LABEL__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__VOLUME": { "message": "Volume" },
-  "META__PERCENTAGE": { "message": " %" }
+  "META__PERCENTAGE": { "message": " %" },
+  "ARIA__TRACK_CURRENT": {
+    "message": "Le morceau $TITRE_PISTE$ est en cours de lecture (piste $NUMERO_PISTE$ sur $TOTAL_PISTES$)",
+    "placeholders": {
+      "numero_piste": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_pistes": {
+        "content": "$2",
+        "example": "10"
+      },
+      "titre_piste": {
+        "content": "$3",
+        "example": "Titre de la piste"
+      }
+    }
+  },
+  "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
+  "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" }
 }

@@ -10,7 +10,7 @@ interface BrowserAPI {
     };
   };
   i18n: {
-    getMessage: (key: string, ...args: any[]) => string;
+    getMessage: (key: string, substitutions?: any, options?: object) => string;
   };
 }
 
@@ -258,7 +258,7 @@ const browserApi: BrowserAPI = (() => {
 const browserCache = browserApi.storage.local;
 if (!browserApi.i18n.getMessage) {
   // Fallback for browsers without i18n support (safety net for if browser detection failed)
-  browserApi.i18n.getMessage = (key: string, ..._: any[]) => key;
+  browserApi.i18n.getMessage = (key: string, _?: any[]) => key;
 }
 const getString = browserApi.i18n.getMessage;
 logger(CPL.INFO, getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox-based" : "Chromium-based");
@@ -394,11 +394,12 @@ const browserCacheExists = browserCache !== undefined;
     label.textContent = getString("LABEL__VOLUME");
 
     const slider = document.createElement("input");
+    slider.id = "bpe-volume-slider";
     slider.type = "range";
     slider.min = "0";
     slider.max = VOLUME_SLIDER_GRANULARITY.toString();
     slider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
-    slider.id = "bpe-volume-slider";
+    slider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
     // Apply saved volume to audio element
     plume.audioElement!.volume = plume.savedVolume;
@@ -595,11 +596,12 @@ const browserCacheExists = browserCache !== undefined;
     const container = document.createElement("div");
     container.id = "bpe-progress-container";
     const slider = document.createElement("input");
+    slider.id = "bpe-progress-slider";
     slider.type = "range";
     slider.min = "0";
     slider.max = PROGRESS_SLIDER_GRANULARITY.toString();
     slider.value = "0";
-    slider.id = "bpe-progress-slider";
+    slider.ariaLabel = getString("ARIA__PROGRESS_SLIDER");
 
     const timeDisplay = document.createElement("div");
     timeDisplay.id = "bpe-time-display";
@@ -727,16 +729,21 @@ const browserCacheExists = browserCache !== undefined;
     }
   };
 
-  // Function to get the current track numbering string (e.g. "(3/10)")
-  const getTrackNumberingString = (title: string | undefined): string => {
+  type TrackQuantifiers = {
+    current: number;
+    total: number;
+  };
+  // Function to get the current track quantifiers (e.g. 3rd out of 10)
+  const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
     const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
-    if (!trackTable) return "";
+    if (!trackTable) return { current: 0, total: 0 };
 
     const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
     const trackCount = trackRows.length;
-    const trackRowTitles: HTMLSpanElement[] = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
-    const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === title) + 1;
-    return (trackRows.length && currentTrackNumber) ? `(${currentTrackNumber}/${trackCount})` : "";
+    const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
+    const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
+    logger(CPL.DEBUG, `Current track number: ${currentTrackNumber}, Total tracks: ${trackCount}`);
+    return { current: currentTrackNumber, total: trackCount };
   };
 
   // Function to get the current track title from Bandcamp
@@ -823,19 +830,23 @@ const browserCacheExists = browserCache !== undefined;
     headerLogo.title = APP_NAME;
     headerContainer.appendChild(headerLogo);
 
+    const initialTrackTitle = getCurrentTrackTitle();
+    const initialTq = getTrackQuantifiers(initialTrackTitle);
     const currentTitleSection = document.createElement("div");
     currentTitleSection.id = "bpe-header-current";
+    currentTitleSection.tabIndex = 0; // make it focusable for screen readers
+    currentTitleSection.ariaLabel = getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle]);
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.id = "bpe-header-title-pretext";
-    const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
-    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
+    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`);
     currentTitlePretext.style.color = getAppropriatePretextColor();
+    currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitlePretext);
     const currentTitleText = document.createElement("span");
     currentTitleText.id = "bpe-header-title";
-    const currentTrackTitle = getCurrentTrackTitle();
-    currentTitleText.textContent = currentTrackTitle;
-    currentTitleText.title = currentTrackTitle; // see full title on hover in case title is truncated
+    currentTitleText.textContent = initialTrackTitle;
+    currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
+    currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitleText);
     headerContainer.appendChild(currentTitleSection);
 
@@ -871,8 +882,10 @@ const browserCacheExists = browserCache !== undefined;
       const preText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
       if (!preText) return;
 
-      const currentTrackNumberingString = getTrackNumberingString(getCurrentTrackTitle());
-      preText.textContent = getString("LABEL__TRACK_CURRENT", currentTrackNumberingString);
+      const newTrackTitle = getCurrentTrackTitle();
+      const newTq = getTrackQuantifiers(newTrackTitle);
+      preText.textContent = getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`);
+      preText.ariaLabel = getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle]);
     }
   };
 
