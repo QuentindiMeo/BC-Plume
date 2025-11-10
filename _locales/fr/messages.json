@@ -59,6 +59,7 @@
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__VOLUME": { "message": "Volume" },
   "META__PERCENTAGE": { "message": " %" },
+  "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
   "ARIA__TRACK_CURRENT": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture (piste $NUMERO_PISTE$ sur $TOTAL_PISTES$)",
     "placeholders": {
