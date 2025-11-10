@@ -271,11 +271,9 @@ const ConsolePrintingPrefix: Record<CPLType, string> = {
   // Function to click on the previous track button
   const clickPreviousTrackButton = () => {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
-    if (prevButton) {
-      prevButton.click();
-      logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
-    } else {
+    if (!prevButton) {
       logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
+      return null;
     }
 
     if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART) {
@@ -315,7 +313,7 @@ const ConsolePrintingPrefix: Record<CPLType, string> = {
     return new Promise((resolve) => {
       if (browserCacheExists) {
         browserCache.get([PLUME_CACHE_KEYS.VOLUME]).then((ls: LocalStorage) => {
-          const volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume!;
+          const volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
           plume.savedVolume = volume;
           resolve(volume);
         });
