@@ -1,4 +1,4 @@
-// Plume - TypeScript Content Script
+// Plume - TypeScript for song page and album page display
 const version = "_v1.2.5";
 
 interface BrowserAPI {
@@ -403,7 +403,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
-    if (!plume.audioElement || plume.volumeSlider) return null;
+    if (plume.volumeSlider) return null;
 
     const container = document.createElement("div");
     container.className = "bpe-volume-container";
@@ -420,7 +420,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     slider.className = "bpe-volume-slider";
 
     // Apply saved volume to audio element
-    plume.audioElement.volume = plume.savedVolume;
+    plume.audioElement!.volume = plume.savedVolume;
 
     const valueDisplay = document.createElement("div");
     valueDisplay.className = "bpe-volume-value";
@@ -428,7 +428,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     // Event listener for volume change
     slider.addEventListener("input", function (this: HTMLInputElement) {
-      const volume = parseInt(this.value) / 100;
+      const volume = Number.parseInt(this.value) / 100;
       if (plume.audioElement) {
         plume.audioElement.volume = volume;
         valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
@@ -546,11 +546,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     trackBackwardBtn.addEventListener("click", () => {
       logger("debug", getString("DEBUG__PREV_TRACK__CLICKED"));
 
-      if (!plume.audioElement) {
-        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
-
       const rv = clickPreviousTrackButton();
       if (rv === null) return; // previous track button not found
       logger("debug", getString("DEBUG__PREV_TRACK__DISPATCHED"));
@@ -559,13 +554,8 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     timeBackwardBtn.addEventListener("click", () => {
       logger("debug", getString("DEBUG__REWIND_TIME__CLICKED"));
 
-      if (!plume.audioElement) {
-        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
-
-      const newTime = Math.max(0, plume.audioElement.currentTime - 10);
-      plume.audioElement.currentTime = newTime;
+      const newTime = Math.max(0, plume.audioElement!.currentTime - 10);
+      plume.audioElement!.currentTime = newTime;
       logger(
         "debug",
         `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
@@ -575,13 +565,11 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     });
 
     playPauseBtn.addEventListener("click", () => {
-      if (!plume.audioElement) return;
-
-      if (plume.audioElement.paused) {
-        plume.audioElement.play();
+      if (plume.audioElement!.paused) {
+        plume.audioElement!.play();
         playPauseBtn.innerHTML = PLUME_SVG.playPause;
       } else {
-        plume.audioElement.pause();
+        plume.audioElement!.pause();
         playPauseBtn.innerHTML = PLUME_SVG.playPlay;
       }
     });
@@ -589,13 +577,8 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
     timeForwardBtn.addEventListener("click", () => {
       logger("debug", getString("DEBUG__FORWARD_TIME__CLICKED"));
 
-      if (!plume.audioElement) {
-        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
-
-      const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + 10);
-      plume.audioElement.currentTime = newTime;
+      const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + 10);
+      plume.audioElement!.currentTime = newTime;
       logger(
         "debug",
         `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
@@ -606,11 +589,6 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
 
     trackForwardBtn.addEventListener("click", () => {
       logger("debug", getString("DEBUG__NEXT_TRACK__CLICKED"));
-
-      if (!plume.audioElement) {
-        logger("warn", getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
 
       clickNextTrackButton();
       logger("debug", getString("DEBUG__NEXT_TRACK__DISPATCHED"));
@@ -686,7 +664,7 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   };
 
   const createProgressContainer = async () => {
-    if (!plume.audioElement || plume.progressSlider) return;
+    if (plume.progressSlider) return;
 
     const container = document.createElement("div");
     container.className = "bpe-progress-container";
@@ -738,10 +716,10 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   };
 
   const updateProgressBar = () => {
-    if (!plume.audioElement || !plume.progressSlider) return;
+    if (!plume.progressSlider) return;
 
-    const elapsed = plume.audioElement.currentTime;
-    const duration = plume.audioElement.duration;
+    const elapsed = plume.audioElement!.currentTime;
+    const duration = plume.audioElement!.duration;
 
     if (!Number.isNaN(duration) && duration > 0) {
       const percent = (elapsed / duration) * 100;
@@ -946,21 +924,19 @@ const logger = (method: ConsolePrintingLevel, ...toPrint: any[]) => {
   };
 
   const setupAudioListeners = () => {
-    if (!plume.audioElement) return;
-
     // Update progress container
-    plume.audioElement.addEventListener("timeupdate", updateProgressBar);
-    plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
-    plume.audioElement.addEventListener("durationchange", updateProgressBar);
+    plume.audioElement!.addEventListener("timeupdate", updateProgressBar);
+    plume.audioElement!.addEventListener("loadedmetadata", updateProgressBar);
+    plume.audioElement!.addEventListener("durationchange", updateProgressBar);
 
     // Update title when metadata loads (new track)
-    plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
-    plume.audioElement.addEventListener("loadedmetadata", updatePretextDisplay);
-    plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
-    plume.audioElement.addEventListener("loadstart", updatePretextDisplay);
+    plume.audioElement!.addEventListener("loadedmetadata", updateTitleDisplay);
+    plume.audioElement!.addEventListener("loadedmetadata", updatePretextDisplay);
+    plume.audioElement!.addEventListener("loadstart", updateTitleDisplay);
+    plume.audioElement!.addEventListener("loadstart", updatePretextDisplay);
 
     // Sync volume with Plume's slider
-    plume.audioElement.addEventListener("volumechange", () => {
+    plume.audioElement!.addEventListener("volumechange", () => {
       if (plume.volumeSlider) {
         plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * 100)}`;
         const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
