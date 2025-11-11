@@ -280,7 +280,7 @@
   -webkit-appearance: none;
 }
 #bpe-volume-slider::-webkit-slider-thumb:hover {
-  scale: 1.1;
+  scale: 1.15;
   background: var(--progbar-fill-bg-left);
 }
 #bpe-volume-slider::-moz-range-thumb {
@@ -294,7 +294,7 @@
   transition: all 0.2s ease;
 }
 #bpe-volume-slider::-moz-range-thumb:hover {
-  scale: 1.1;
+  scale: 1.15;
   background: var(--progbar-fill-bg-left);
 }
 
