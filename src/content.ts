@@ -483,6 +483,8 @@ const browserCacheExists = browserCache !== undefined;
     });
   };
 
+  const fullscreenBtnId = PLUME_ELEM_IDENTIFIERS.fullscreenBtnLabel.split("#")[1];
+  const fullscreenBtnLabel = getString("LABEL__FULLSCREEN_TOGGLE");
   const toggleFullscreenMode = () => {
     const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
 
@@ -490,21 +492,14 @@ const browserCacheExists = browserCache !== undefined;
       existingOverlay.remove();
       document.body.style.overflow = "auto";
 
-      // Restore toggle icon
-      const fullscreenBtn = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenBtn) as HTMLButtonElement;
-      if (fullscreenBtn) {
-        fullscreenBtn.innerHTML = `${PLUME_SVG.fullscreen}<span id="bpe-fullscreen-btn-label">Enter fullscreen mode</span>${PLUME_SVG.fullscreen}`;
-        fullscreenBtn.title = "Fullscreen Mode";
-      }
-
-      logger(CPL.INFO, "Exited fullscreen mode");
+      logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
       return;
     }
 
     // Enter fullscreen
     const coverArt = document.querySelector(BC_ELEM_IDENTIFIERS.coverArt) as HTMLImageElement;
     if (!coverArt) {
-      logger(CPL.WARN, "Cover art not found");
+      logger(CPL.WARN, getString("WARN__COVER_ART__NOT_FOUND"));
       return;
     }
 
@@ -530,11 +525,6 @@ const browserCacheExists = browserCache !== undefined;
 
     // Clone the plume module (right side)
     const plumeContainer = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer) as HTMLDivElement;
-    if (!plumeContainer) {
-      logger(CPL.WARN, "Plume container not found");
-      return;
-    }
-
     const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
     plumeClone.id = PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1];
 
@@ -550,19 +540,16 @@ const browserCacheExists = browserCache !== undefined;
 
     // Hide the fullscreen button section in the cloned module
     const clonedFullscreenBtn = plumeClone.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer) as HTMLButtonElement;
-    if (clonedFullscreenBtn) {
-      clonedFullscreenBtn.style.display = "none";
-    }
+    clonedFullscreenBtn.style.display = "none";
 
     contentContainer.appendChild(plumeClone);
-
     overlay.appendChild(contentContainer);
 
     // Create exit fullscreen button in top right corner
     const exitBtn = document.createElement("button");
     exitBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenExitBtn.split("#")[1];
     exitBtn.innerHTML = PLUME_SVG.fullscreenExit;
-    exitBtn.title = "Exit Fullscreen";
+    exitBtn.title = getString("ARIA__EXIT_FULLSCREEN_BTN");
     exitBtn.addEventListener("click", () => {
       toggleFullscreenMode();
     });
@@ -615,14 +602,13 @@ const browserCacheExists = browserCache !== undefined;
     document.body.style.overflow = "hidden";
     setupFullscreenFocusTrap();
 
-    logger(CPL.INFO, "Entered fullscreen mode");
+    logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
   };
 
   const createFullscreenBtnContainer = (): HTMLDivElement => {
     const fullscreenBtn: HTMLButtonElement = document.createElement("button");
     fullscreenBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtn.split("#")[1];
-    fullscreenBtn.innerHTML = `${PLUME_SVG.fullscreen}<span id="bpe-fullscreen-btn-label">Enter fullscreen mode</span>${PLUME_SVG.fullscreen}`;
-    fullscreenBtn.title = "Fullscreen Mode";
+    fullscreenBtn.innerHTML = `<span id="${fullscreenBtnId}">${fullscreenBtnLabel}</span>${PLUME_SVG.fullscreen}`;
     fullscreenBtn.addEventListener("click", () => {
       toggleFullscreenMode();
     });
@@ -1002,7 +988,7 @@ const browserCacheExists = browserCache !== undefined;
     const trackCount = trackRows.length;
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
-    logger(CPL.DEBUG, `Current track number: ${currentTrackNumber}, Total tracks: ${trackCount}`);
+    logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackCount]));
     return { current: currentTrackNumber, total: trackCount };
   };
 

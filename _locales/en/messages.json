@@ -11,6 +11,7 @@
   "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Play/Pause button not found" },
   "WARN__VOLUME__NOT_LOADED": { "message": "Unable to load volume:" },
   "WARN__VOLUME__NOT_SAVED": { "message": "Unable to save volume:" },
+  "WARN__COVER_ART__NOT_FOUND": { "message": "Cover art not found" },
   "LOG__MOUNT__COMPLETE": { "message": "BC-Plume mounted successfully" },
   "LOG__INITIALIZATION__START": { "message": "BC-Plume initialization..." },
   "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume initialized successfully" },
@@ -24,6 +25,8 @@
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Audio event listeners set up" },
   "INFO__AUDIO__FOUND": { "message": "Audio element found" },
   "INFO__VOLUME__FOUND": { "message": "Restored volume:" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Entered fullscreen mode" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
   "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Detected control elements ===" },
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Potential controls found:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== END DEBUG ===" },
@@ -39,6 +42,19 @@
   "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Next track button clicked" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Current track number: $TRACK_NUMBER$, Total tracks: $TOTAL_TRACKS$",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
   "LABEL__TRACK_CURRENT": {
     "message": "currently playing ($NUMBERING$):",
     "placeholders": {
@@ -48,14 +64,15 @@
       }
     }
   },
-  "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "LABEL__TRACK_UNKNOWN": { "message": "Unknown Track" },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "LABEL__TRACK_BACKWARD": { "message": "Restart track / Go to previous track" },
   "LABEL__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
   "LABEL__PLAY_PAUSE": { "message": "Play/Pause" },
   "LABEL__TIME_FORWARD": { "message": "Forward 10 seconds" },
   "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
   "LABEL__VOLUME": { "message": "Volume" },
+  "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
   "ARIA__TRACK_CURRENT": {
@@ -76,5 +93,6 @@
     }
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Audio progress slider" },
-  "ARIA__VOLUME_SLIDER": { "message": "Volume slider" }
+  "ARIA__VOLUME_SLIDER": { "message": "Volume slider" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" }
 }

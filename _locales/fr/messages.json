@@ -13,6 +13,7 @@
   "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Bouton Play/Pause non trouvé" },
   "WARN__VOLUME__NOT_LOADED": { "message": "Impossible de charger le volume :" },
   "WARN__VOLUME__NOT_SAVED": { "message": "Impossible de sauvegarder le volume :" },
+  "WARN__COVER_ART__NOT_FOUND": { "message": "Pochette non trouvée" },
   "LOG__MOUNT__COMPLETE": { "message": "BC-Plume monté avec succès" },
   "LOG__INITIALIZATION__START": { "message": "BC-Plume en cours d'initialisation..." },
   "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume initialisé avec succès" },
@@ -26,6 +27,8 @@
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Écouteurs d'événements audio configurés" },
   "INFO__AUDIO__FOUND": { "message": "Élément audio trouvé" },
   "INFO__VOLUME__FOUND": { "message": "Volume restauré :" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Mode plein écran activé" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Mode plein écran désactivé" },
   "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Éléments de contrôle détectés ===" },
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Contrôles potentiels trouvés :" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
@@ -41,6 +44,19 @@
   "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Numéro de piste actuelle : $NUMERO_PISTE$, Total de pistes : $TOTAL_PISTES$",
+    "placeholders": {
+      "numero_piste": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_pistes": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
   "LABEL__TRACK_CURRENT": {
     "message": "en cours de lecture ($PISTE$) :",
     "placeholders": {
@@ -50,14 +66,15 @@
       }
     }
   },
-  "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "LABEL__TRACK_UNKNOWN": { "message": "Titre de la piste inconnu" },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "LABEL__TRACK_BACKWARD": { "message": "Recommencer / Aller à la piste précédente" },
   "LABEL__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
   "LABEL__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__VOLUME": { "message": "Volume" },
+  "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
   "ARIA__TRACK_CURRENT": {
@@ -78,5 +95,6 @@
     }
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
-  "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" }
+  "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" }
 }
