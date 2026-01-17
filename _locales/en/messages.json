@@ -76,6 +76,15 @@
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
+  "ARIA__TRACK": {
+    "message": "The track $TRACK_TITLE$ is currently playing",
+    "placeholders": {
+      "track_title": {
+        "content": "$1",
+        "example": "Song Title"
+      }
+    }
+  },
   "ARIA__TRACK_CURRENT": {
     "message": "The track $TRACK_TITLE$ is currently playing (track $TRACK_NUMBER$ out of $TOTAL_TRACKS$)",
     "placeholders": {
