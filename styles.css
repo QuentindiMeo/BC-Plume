@@ -113,6 +113,7 @@
 }
 
 #bpe-playback-manager {
+  position: relative;
   padding: 0.5rem 1rem;
   margin-top: 0.1rem;
 
@@ -306,6 +307,49 @@
   color: var(--progbar-fill-bg-right);
 }
 
+#bpe-fullscreen-btn-container {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+#bpe-fullscreen-btn {
+  width: min-content !important;
+  height: 2rem !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0.5rem;
+  backdrop-filter: blur(0.625rem);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  margin: 0;
+
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 10;
+}
+#bpe-fullscreen-btn:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+#bpe-fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+#bpe-fullscreen-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+#bpe-fullscreen-btn-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   /* Global adjustment for mobile */
@@ -336,5 +380,184 @@
 
   #bpe-volume-slider {
     height: 0.5rem;
+  }
+}
+
+/* Fullscreen Mode Styles */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#bpe-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+#bpe-fullscreen-exit-btn {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10001;
+
+  width: 3rem;
+  height: 3rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 0.125rem solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  animation: fadeIn 0.5s ease-out;
+}
+#bpe-fullscreen-exit-btn:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.9);
+  border-color: var(--progbar-fill-bg-right);
+  box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5);
+}
+#bpe-fullscreen-exit-btn:active {
+  transform: scale(0.95);
+}
+
+#bpe-fullscreen-exit-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+#bpe-fullscreen-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #000;
+
+  /* Heavy blur and dimming */
+  filter: blur(2rem) brightness(0.3);
+
+  /* Make background inert */
+  pointer-events: none;
+  user-select: none;
+}
+
+#bpe-fullscreen-content {
+  position: relative;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+
+  width: 90%;
+  max-width: 60vw;
+  height: 80vh;
+
+  pointer-events: all;
+}
+
+#bpe-fullscreen-coverart {
+  flex: 0 0 auto;
+  max-width: 45%;
+  max-height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-3rem); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(3rem); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+
+#bpe-fullscreen-coverart img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+
+  border-radius: 0.5rem;
+  box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
+
+  animation: slideInLeft 0.5s ease-out;
+}
+
+#bpe-plume-fullscreen {
+  flex: 1 1 auto;
+  max-width: 25vw;
+
+  /* Make the plume module interactable */
+  pointer-events: all;
+
+  /* Add some shadow for better visibility */
+  box-shadow: 0 0.625rem 3.125rem rgba(0, 0, 0, 0.8);
+
+  /* Smooth transition */
+  transition: transform 0.3s ease;
+
+  animation: slideInRight 0.5s ease-out;
+}
+#bpe-plume-fullscreen:hover {
+  transform: scale(1.02);
+}
+
+/* Ensure fullscreen plume module keeps buttons centered and doesn't show the shift behavior */
+#bpe-plume-fullscreen #bpe-playback-controls {
+  justify-content: center !important;
+  padding-left: 0 !important;
+}
+
+#bpe-plume-fullscreen #bpe-fullscreen-btn {
+  display: none !important;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  #bpe-fullscreen-content {
+    flex-direction: column;
+    gap: 2rem;
+    height: auto;
+    padding: 2rem 0;
+  }
+
+  #bpe-fullscreen-coverart {
+    max-width: 70%;
+    max-height: 40vh;
+  }
+
+  #bpe-plume-fullscreen {
+    max-width: 90%;
   }
 }
