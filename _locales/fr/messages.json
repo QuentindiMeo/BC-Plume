@@ -96,5 +96,6 @@
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
   "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" },
-  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" }
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
+  "ARIA__COVER_ART": { "message": "Image de la pochette" }
 }

@@ -417,12 +417,12 @@ const browserCacheExists = browserCache !== undefined;
     });
     headerContainerObserver.observe(plume.titleDisplay!, { childList: true, subtree: true });
 
+    const cloneProgressSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
     const progressSliderObserver = new MutationObserver(() => {
       cloneProgressSlider.value = plume.progressSlider!.value;
       cloneProgressSlider.style.backgroundImage = plume.progressSlider!.style.backgroundImage;
     });
     progressSliderObserver.observe(plume.progressSlider!, { attributes: true, attributeFilter: ['value', 'style'] });
-    const cloneProgressSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
     cloneProgressSlider.addEventListener("input", function(this: HTMLInputElement) {
       const originalSlider = original.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
       originalSlider.value = this.value;
@@ -481,16 +481,29 @@ const browserCacheExists = browserCache !== undefined;
       const cloneVolumeDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
       cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
     });
+
+    // Return cleanup function to disconnect all observers
+    return () => {
+      headerContainerObserver.disconnect();
+      progressSliderObserver.disconnect();
+      elapsedObserver.disconnect();
+      durationObserver.disconnect();
+    };
   };
 
   const fullscreenBtnId = PLUME_ELEM_IDENTIFIERS.fullscreenBtnLabel.split("#")[1];
   const fullscreenBtnLabel = getString("LABEL__FULLSCREEN_TOGGLE");
+  let fullscreenCleanupCallback: (() => void) | null = null;
   const toggleFullscreenMode = () => {
     const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
 
     if (existingOverlay) {
       existingOverlay.remove();
       document.body.style.overflow = "auto";
+
+      // Cleanup observers
+      fullscreenCleanupCallback?.();
+      fullscreenCleanupCallback = null;
 
       logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
       return;
@@ -509,7 +522,8 @@ const browserCacheExists = browserCache !== undefined;
     // Create background with cover art (blurred and dimmed)
     const background = document.createElement("div");
     background.id = PLUME_ELEM_IDENTIFIERS.fullscreenBackground.split("#")[1];
-    background.style.backgroundImage = `url(${coverArt.src})`;
+    const coverArtUrl = encodeURI(coverArt.src);
+    background.style.backgroundImage = `url("${coverArtUrl}")`;
     overlay.appendChild(background);
 
     const contentContainer = document.createElement("div");
@@ -519,7 +533,7 @@ const browserCacheExists = browserCache !== undefined;
     coverArtContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArtContainer.split("#")[1];
     const coverArtImg = document.createElement("img");
     coverArtImg.src = coverArt.src;
-    coverArtImg.alt = "album or single cover art";
+    coverArtImg.alt = getString("ARIA__COVER_ART");
     coverArtContainer.appendChild(coverArtImg);
     contentContainer.appendChild(coverArtContainer);
 
@@ -596,7 +610,7 @@ const browserCacheExists = browserCache !== undefined;
     });
 
     // Sync all controls with the original plume module
-    setupFullscreenControlSync(plumeContainer, plumeClone);
+    fullscreenCleanupCallback = setupFullscreenControlSync(plumeContainer, plumeClone);
 
     document.body.appendChild(overlay);
     document.body.style.overflow = "hidden";
@@ -609,6 +623,7 @@ const browserCacheExists = browserCache !== undefined;
     const fullscreenBtn: HTMLButtonElement = document.createElement("button");
     fullscreenBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtn.split("#")[1];
     fullscreenBtn.innerHTML = `<span id="${fullscreenBtnId}">${fullscreenBtnLabel}</span>${PLUME_SVG.fullscreen}`;
+    fullscreenBtn.ariaLabel = fullscreenBtnLabel;
     fullscreenBtn.addEventListener("click", () => {
       toggleFullscreenMode();
     });
@@ -616,7 +631,7 @@ const browserCacheExists = browserCache !== undefined;
     container.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer.split("#")[1];
     container.appendChild(fullscreenBtn);
     return container;
-  }
+  };
 
   // Function to save the new volume from the slider to browser cache
   const saveNewVolume = (newVolume: number) => {
@@ -772,7 +787,7 @@ const browserCacheExists = browserCache !== undefined;
         "DEBUG__REWIND_TIME__DISPATCHED2"
       )}`
     );
-  }
+  };
 
   const handlePlayPause = (playPauseBtns: HTMLButtonElement[]) => {
     if (plume.audioElement!.paused) {
@@ -782,7 +797,7 @@ const browserCacheExists = browserCache !== undefined;
       plume.audioElement!.pause();
       playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPlay);
     }
-  }
+  };
 
   const handleTimeForward = () => {
     logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
@@ -795,14 +810,14 @@ const browserCacheExists = browserCache !== undefined;
         "DEBUG__FORWARD_TIME__DISPATCHED2"
       )}`
     );
-  }
+  };
 
   const handleTrackForward = () => {
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
     clickNextTrackButton();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
-  }
+  };
 
   // Function to format time as MM:SS
   const formatTime = (seconds: number): string => {
@@ -984,7 +999,7 @@ const browserCacheExists = browserCache !== undefined;
     const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
     if (!trackTable) return { current: 0, total: 0 };
 
-    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow)
+    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
     const trackCount = trackRows.length;
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;

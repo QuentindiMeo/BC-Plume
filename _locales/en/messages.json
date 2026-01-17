@@ -94,5 +94,6 @@
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Audio progress slider" },
   "ARIA__VOLUME_SLIDER": { "message": "Volume slider" },
-  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" }
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
+  "ARIA__COVER_ART": { "message": "Cover Art Image" }
 }
