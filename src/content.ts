@@ -1,6 +1,6 @@
 // Plume - TypeScript for song page and album page display
 const APP_NAME = "Plume - Bandcamp Player Enhancer";
-const APP_VERSION = "v1.2.6";
+const APP_VERSION = "v1.2.6.0";
 const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
 
 interface BrowserAPI {
@@ -171,6 +171,22 @@ enum PLUME_SVG {
       <path d="M2 17L9.00232 12L2 7V17Z" fill="currentColor" />
     </svg>
   `,
+  fullscreen = `
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor" />
+      <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor" />
+      <path d="M17 17H14V19H19V14H17V17Z" fill="currentColor" />
+      <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor" />
+    </svg>
+  `,
+  fullscreenExit = `
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 16H8V19H10V14H5V16Z" fill="currentColor" />
+      <path d="M8 8H5V10H10V5H8V8Z" fill="currentColor" />
+      <path d="M14 19H16V16H19V14H14V19Z" fill="currentColor" />
+      <path d="M16 8V5H14V10H19V8H16Z" fill="currentColor" />
+    </svg>
+  `,
 }
 
 /**
@@ -322,7 +338,7 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   // Debug function to identify Bandcamp controls
-  const debugBandcampControls = () => {
+  const debugBandcampControls = (): Array<DebugControl> => {
     logger(CPL.DEBUG, getString("DEBUG__CONTROL_ELEMENTS__DETECTED"));
 
     // Find all possible buttons and links
@@ -365,6 +381,286 @@ const browserCacheExists = browserCache !== undefined;
 
     return relevantControls;
   };
+
+  const setupFullscreenControlSync = (original: HTMLDivElement, clone: HTMLDivElement) => {
+    console.log("hello")
+    // Sync play/pause button - directly control the audio element
+    const clonePlayPauseBtn = clone.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
+    if (clonePlayPauseBtn) {
+      clonePlayPauseBtn.addEventListener("click", () => {
+        if (plume.audioElement!.paused) {
+          plume.audioElement!.play();
+          clonePlayPauseBtn.innerHTML = PLUME_SVG.playPause;
+        } else {
+          plume.audioElement!.pause();
+          clonePlayPauseBtn.innerHTML = PLUME_SVG.playPlay;
+        }
+      });
+    }
+
+    // Sync track backward button - directly trigger the action
+    const cloneTrackBackwardBtn = clone.querySelector("#bpe-track-bwd-btn") as HTMLButtonElement;
+    if (cloneTrackBackwardBtn) {
+      cloneTrackBackwardBtn.addEventListener("click", () => {
+        logger(CPL.DEBUG, "Fullscreen: Previous track clicked");
+        clickPreviousTrackButton();
+      });
+    }
+
+
+    // Sync track forward button - directly trigger the action
+    const cloneTrackForwardBtn = clone.querySelector("#bpe-track-fwd-btn") as HTMLButtonElement;
+    if (cloneTrackForwardBtn) {
+      cloneTrackForwardBtn.addEventListener("click", () => {
+        logger(CPL.DEBUG, "Fullscreen: Next track clicked");
+        clickNextTrackButton();
+      });
+    }
+
+    // Sync time backward button - directly control the audio element
+    const cloneTimeBackwardBtn = clone.querySelector("#bpe-time-bwd-btn") as HTMLButtonElement;
+    if (cloneTimeBackwardBtn) {
+      cloneTimeBackwardBtn.addEventListener("click", () => {
+        logger(CPL.DEBUG, "Fullscreen: Rewind time clicked");
+        if (plume.audioElement) {
+          const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
+          plume.audioElement.currentTime = newTime;
+        }
+      });
+    }
+
+    // Sync time forward button - directly control the audio element
+    const cloneTimeForwardBtn = clone.querySelector("#bpe-time-fwd-btn") as HTMLButtonElement;
+    if (cloneTimeForwardBtn) {
+      cloneTimeForwardBtn.addEventListener("click", () => {
+        logger(CPL.DEBUG, "Fullscreen: Forward time clicked");
+        if (plume.audioElement) {
+          const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
+          plume.audioElement.currentTime = newTime;
+        }
+      });
+    }
+
+    // Sync progress slider
+    const cloneProgressSlider = clone.querySelector("#bpe-progress-slider") as HTMLInputElement;
+    if (cloneProgressSlider) {
+      cloneProgressSlider.addEventListener("input", function(this: HTMLInputElement) {
+        const originalSlider = original.querySelector("#bpe-progress-slider") as HTMLInputElement;
+        if (originalSlider) {
+          originalSlider.value = this.value;
+          originalSlider.dispatchEvent(new Event("input"));
+        }
+      });
+    }
+
+    // Sync volume slider
+    const cloneVolumeSlider = clone.querySelector("#bpe-volume-slider") as HTMLInputElement;
+    if (cloneVolumeSlider) {
+      cloneVolumeSlider.addEventListener("input", function(this: HTMLInputElement) {
+        const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
+        if (plume.audioElement) {
+          plume.audioElement.volume = volume;
+          saveNewVolume(volume);
+
+          // Update the volume display in fullscreen
+          const cloneVolumeDisplay = clone.querySelector("#bpe-volume-value") as HTMLDivElement;
+          if (cloneVolumeDisplay) {
+            cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
+          }
+        }
+      });
+    }
+
+    // Sync duration display click
+    const cloneDurationDisplay = clone.querySelector("#bpe-duration-display") as HTMLSpanElement;
+    if (cloneDurationDisplay) {
+      cloneDurationDisplay.addEventListener("click", () => {
+        const originalDisplay = original.querySelector("#bpe-duration-display") as HTMLSpanElement;
+        originalDisplay?.click();
+      });
+    }
+
+    // Listen to audio element play/pause events to update the fullscreen play button
+    if (plume.audioElement) {
+      const updatePlayPauseIcon = () => {
+        const clonePlayBtn = clone.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
+        if (clonePlayBtn && plume.audioElement) {
+          clonePlayBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+        }
+      };
+
+      plume.audioElement.addEventListener("play", updatePlayPauseIcon);
+      plume.audioElement.addEventListener("pause", updatePlayPauseIcon);
+
+      // Set initial state
+      updatePlayPauseIcon();
+    }
+
+    // Keep the cloned module updated with audio state
+    const updateClonedState = () => {
+      if (!document.getElementById("bpe-fullscreen-overlay")) return;
+
+      // Update play/pause icon
+      const clonePlayBtn = clone.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
+      const originalPlayBtn = original.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
+      if (clonePlayBtn && originalPlayBtn) {
+        clonePlayBtn.innerHTML = originalPlayBtn.innerHTML;
+      }
+
+      // Update progress slider
+      const cloneProgress = clone.querySelector("#bpe-progress-slider") as HTMLInputElement;
+      const originalProgress = original.querySelector("#bpe-progress-slider") as HTMLInputElement;
+      if (cloneProgress && originalProgress) {
+        cloneProgress.value = originalProgress.value;
+        cloneProgress.style.backgroundImage = originalProgress.style.backgroundImage;
+      }
+
+      // Update time displays
+      const cloneElapsed = clone.querySelector("#bpe-time-display span:first-child") as HTMLSpanElement;
+      const originalElapsed = original.querySelector("#bpe-time-display span:first-child") as HTMLSpanElement;
+      if (cloneElapsed && originalElapsed) {
+        cloneElapsed.textContent = originalElapsed.textContent;
+      }
+
+      const cloneDuration = clone.querySelector("#bpe-duration-display") as HTMLSpanElement;
+      const originalDuration = original.querySelector("#bpe-duration-display") as HTMLSpanElement;
+      if (cloneDuration && originalDuration) {
+        cloneDuration.textContent = originalDuration.textContent;
+      }
+
+      // Update title
+      const cloneTitle = clone.querySelector("#bpe-header-title") as HTMLSpanElement;
+      const originalTitle = original.querySelector("#bpe-header-title") as HTMLSpanElement;
+      if (cloneTitle && originalTitle) {
+        cloneTitle.textContent = originalTitle.textContent;
+        cloneTitle.title = originalTitle.title;
+      }
+
+      // Update pretext
+      const clonePretext = clone.querySelector("#bpe-header-title-pretext") as HTMLSpanElement;
+      const originalPretext = original.querySelector("#bpe-header-title-pretext") as HTMLSpanElement;
+      if (clonePretext && originalPretext) {
+        clonePretext.textContent = originalPretext.textContent;
+      }
+
+      // Update volume display
+      const cloneVolumeValue = clone.querySelector("#bpe-volume-value") as HTMLDivElement;
+      const originalVolumeValue = original.querySelector("#bpe-volume-value") as HTMLDivElement;
+      if (cloneVolumeValue && originalVolumeValue) {
+        cloneVolumeValue.textContent = originalVolumeValue.textContent;
+      }
+
+      // Update volume slider value
+      const cloneVolSlider = clone.querySelector("#bpe-volume-slider") as HTMLInputElement;
+      const originalVolSlider = original.querySelector("#bpe-volume-slider") as HTMLInputElement;
+      if (cloneVolSlider && originalVolSlider) {
+        cloneVolSlider.value = originalVolSlider.value;
+      }
+
+      requestAnimationFrame(updateClonedState);
+    };
+    requestAnimationFrame(updateClonedState);
+  };
+
+  const toggleFullscreenMode = () => {
+    const existingOverlay = document.getElementById("bpe-fullscreen-overlay");
+
+    if (existingOverlay) {
+      existingOverlay.remove();
+      document.body.style.overflow = "auto";
+
+      // Restore toggle icon
+      const fullscreenBtn = document.getElementById("bpe-fullscreen-btn");
+      if (fullscreenBtn) {
+        fullscreenBtn.innerHTML = `${PLUME_SVG.fullscreen}<span id="bpe-fullscreen-btn-label">Enter fullscreen mode</span>${PLUME_SVG.fullscreen}`;
+        fullscreenBtn.title = "Fullscreen Mode";
+      }
+
+      logger(CPL.INFO, "Exited fullscreen mode");
+      return;
+    }
+
+    // Enter fullscreen
+    const coverArt = document.querySelector("#tralbumArt img") as HTMLImageElement;
+    if (!coverArt) {
+      logger(CPL.WARN, "Cover art not found");
+      return;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "bpe-fullscreen-overlay";
+
+    // Create background with cover art (blurred and dimmed)
+    const background = document.createElement("div");
+    background.id = "bpe-fullscreen-background";
+    background.style.backgroundImage = `url(${coverArt.src})`;
+    overlay.appendChild(background);
+
+    // Create content container for horizontal layout
+    const contentContainer = document.createElement("div");
+    contentContainer.id = "bpe-fullscreen-content";
+
+    // Create cover art container (left side)
+    const coverArtContainer = document.createElement("div");
+    coverArtContainer.id = "bpe-fullscreen-coverart";
+    const coverArtImg = document.createElement("img");
+    coverArtImg.src = coverArt.src;
+    coverArtImg.alt = "album or single cover art";
+    coverArtContainer.appendChild(coverArtImg);
+    contentContainer.appendChild(coverArtContainer);
+
+    // Clone the plume module (right side)
+    const plumeContainer = document.querySelector("#bpe-plume") as HTMLDivElement;
+    if (!plumeContainer) {
+      logger(CPL.WARN, "Plume container not found");
+      return;
+    }
+
+    const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
+    plumeClone.id = "bpe-plume-fullscreen";
+
+    // Hide the fullscreen button section in the cloned module
+    const clonedFullscreenBtn = plumeClone.querySelector("#bpe-fullscreen-btn-container") as HTMLButtonElement;
+    if (clonedFullscreenBtn) {
+      clonedFullscreenBtn.style.display = "none";
+    }
+
+    contentContainer.appendChild(plumeClone);
+
+    overlay.appendChild(contentContainer);
+
+    // Create exit fullscreen button in top right corner
+    const exitBtn = document.createElement("button");
+    exitBtn.id = "bpe-fullscreen-exit-btn";
+    exitBtn.innerHTML = PLUME_SVG.fullscreenExit;
+    exitBtn.title = "Exit Fullscreen";
+    exitBtn.addEventListener("click", () => {
+      toggleFullscreenMode();
+    });
+    overlay.appendChild(exitBtn);
+
+    // Sync all controls with the original plume module
+    setupFullscreenControlSync(plumeContainer, plumeClone);
+
+    document.body.appendChild(overlay);
+    document.body.style.overflow = "hidden";
+
+    logger(CPL.INFO, "Entered fullscreen mode");
+  };
+
+  const createFullscreenBtnContainer = (): HTMLDivElement => {
+    const fullscreenBtn: HTMLButtonElement = document.createElement("button");
+    fullscreenBtn.id = "bpe-fullscreen-btn";
+    fullscreenBtn.innerHTML = `${PLUME_SVG.fullscreen}<span id="bpe-fullscreen-btn-label">Enter fullscreen mode</span>${PLUME_SVG.fullscreen}`;
+    fullscreenBtn.title = "Fullscreen Mode";
+    fullscreenBtn.addEventListener("click", () => {
+      toggleFullscreenMode();
+    });
+    const container: HTMLDivElement = document.createElement("div");
+    container.id = "bpe-fullscreen-btn-container";
+    container.appendChild(fullscreenBtn);
+    return container;
+  }
 
   // Function to save the new volume from the slider to browser cache
   const saveNewVolume = (newVolume: number) => {
@@ -730,7 +1026,7 @@ const browserCacheExists = browserCache !== undefined;
     }
   };
 
-  type TrackQuantifiers = {
+  interface TrackQuantifiers {
     current: number;
     total: number;
   };
@@ -875,6 +1171,9 @@ const browserCacheExists = browserCache !== undefined;
     if (volumeContainer) {
       plumeContainer.appendChild(volumeContainer);
     }
+
+    const fullscreenBtnContainer = createFullscreenBtnContainer();
+    plumeContainer.appendChild(fullscreenBtnContainer);
 
     bcPlayerContainer.appendChild(plumeContainer);
 
@@ -1078,7 +1377,7 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   // Observe DOM changes for players that load dynamically
-  const observer = new MutationObserver((mutations) => {
+  const domObserver = new MutationObserver((mutations) => {
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
@@ -1122,7 +1421,7 @@ const browserCacheExists = browserCache !== undefined;
   });
 
   // Start observing
-  observer.observe(document.body, {
+  domObserver.observe(document.body, {
     childList: true,
     subtree: true,
   });
