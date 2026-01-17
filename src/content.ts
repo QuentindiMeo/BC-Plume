@@ -1,6 +1,6 @@
 // Plume - TypeScript for song page and album page display
 const APP_NAME = "Plume - Bandcamp Player Enhancer";
-const APP_VERSION = "v1.2.6.0";
+const APP_VERSION = "v1.2.6";
 const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
 
 interface BrowserAPI {
@@ -218,7 +218,21 @@ enum PLUME_ELEM_IDENTIFIERS {
   plumeContainer = "div#bpe-plume",
   headerTitlePretext = "span#bpe-header-title-pretext",
   headerTitle = "span#bpe-header-title",
+  progressContainer = "div#bpe-progress-container",
+  progressSlider = "input#bpe-progress-slider",
+  trackBwdBtn = "button#bpe-track-bwd-btn",
+  timeBwdBtn = "button#bpe-time-bwd-btn",
+  playPauseBtn = "button#bpe-play-pause-btn",
+  timeFwdBtn = "button#bpe-time-fwd-btn",
+  trackFwdBtn = "button#bpe-track-fwd-btn",
+  fullscreenBtn = "button#bpe-fullscreen-btn",
+  volumeSlider = "input#bpe-volume-slider",
   volumeValue = "div#bpe-volume-value",
+  fullscreenOverlay = "div#bpe-fullscreen-overlay",
+  fullscreenBackground = "div#bpe-fullscreen-background",
+  fullscreenContent = "div#bpe-fullscreen-content",
+  fullscreenCoverArtContainer = "div#bpe-fullscreen-cover-art",
+  fullscreenClone = "div#bpe-fullscreen-clone",
 }
 
 enum BC_ELEM_IDENTIFIERS {
@@ -383,183 +397,69 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const setupFullscreenControlSync = (original: HTMLDivElement, clone: HTMLDivElement) => {
-    console.log("hello")
-    // Sync play/pause button - directly control the audio element
-    const clonePlayPauseBtn = clone.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
-    if (clonePlayPauseBtn) {
-      clonePlayPauseBtn.addEventListener("click", () => {
-        if (plume.audioElement!.paused) {
-          plume.audioElement!.play();
-          clonePlayPauseBtn.innerHTML = PLUME_SVG.playPause;
-        } else {
-          plume.audioElement!.pause();
-          clonePlayPauseBtn.innerHTML = PLUME_SVG.playPlay;
-        }
-      });
-    }
+    const cloneProgressSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
+    cloneProgressSlider.addEventListener("input", function(this: HTMLInputElement) {
+      const originalSlider = original.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
+      originalSlider.value = this.value;
+      originalSlider.dispatchEvent(new Event("input"));
 
-    // Sync track backward button - directly trigger the action
-    const cloneTrackBackwardBtn = clone.querySelector("#bpe-track-bwd-btn") as HTMLButtonElement;
-    if (cloneTrackBackwardBtn) {
-      cloneTrackBackwardBtn.addEventListener("click", () => {
-        logger(CPL.DEBUG, "Fullscreen: Previous track clicked");
-        clickPreviousTrackButton();
-      });
-    }
+      const elapsed = plume.audioElement!.currentTime;
+      const duration = plume.audioElement!.duration;
 
-
-    // Sync track forward button - directly trigger the action
-    const cloneTrackForwardBtn = clone.querySelector("#bpe-track-fwd-btn") as HTMLButtonElement;
-    if (cloneTrackForwardBtn) {
-      cloneTrackForwardBtn.addEventListener("click", () => {
-        logger(CPL.DEBUG, "Fullscreen: Next track clicked");
-        clickNextTrackButton();
-      });
-    }
-
-    // Sync time backward button - directly control the audio element
-    const cloneTimeBackwardBtn = clone.querySelector("#bpe-time-bwd-btn") as HTMLButtonElement;
-    if (cloneTimeBackwardBtn) {
-      cloneTimeBackwardBtn.addEventListener("click", () => {
-        logger(CPL.DEBUG, "Fullscreen: Rewind time clicked");
-        if (plume.audioElement) {
-          const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
-          plume.audioElement.currentTime = newTime;
-        }
-      });
-    }
-
-    // Sync time forward button - directly control the audio element
-    const cloneTimeForwardBtn = clone.querySelector("#bpe-time-fwd-btn") as HTMLButtonElement;
-    if (cloneTimeForwardBtn) {
-      cloneTimeForwardBtn.addEventListener("click", () => {
-        logger(CPL.DEBUG, "Fullscreen: Forward time clicked");
-        if (plume.audioElement) {
-          const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
-          plume.audioElement.currentTime = newTime;
-        }
-      });
-    }
-
-    // Sync progress slider
-    const cloneProgressSlider = clone.querySelector("#bpe-progress-slider") as HTMLInputElement;
-    if (cloneProgressSlider) {
-      cloneProgressSlider.addEventListener("input", function(this: HTMLInputElement) {
-        const originalSlider = original.querySelector("#bpe-progress-slider") as HTMLInputElement;
-        if (originalSlider) {
-          originalSlider.value = this.value;
-          originalSlider.dispatchEvent(new Event("input"));
-        }
-      });
-    }
-
-    // Sync volume slider
-    const cloneVolumeSlider = clone.querySelector("#bpe-volume-slider") as HTMLInputElement;
-    if (cloneVolumeSlider) {
-      cloneVolumeSlider.addEventListener("input", function(this: HTMLInputElement) {
-        const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-        if (plume.audioElement) {
-          plume.audioElement.volume = volume;
-          saveNewVolume(volume);
-
-          // Update the volume display in fullscreen
-          const cloneVolumeDisplay = clone.querySelector("#bpe-volume-value") as HTMLDivElement;
-          if (cloneVolumeDisplay) {
-            cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
-          }
-        }
-      });
-    }
-
-    // Sync duration display click
-    const cloneDurationDisplay = clone.querySelector("#bpe-duration-display") as HTMLSpanElement;
-    if (cloneDurationDisplay) {
-      cloneDurationDisplay.addEventListener("click", () => {
-        const originalDisplay = original.querySelector("#bpe-duration-display") as HTMLSpanElement;
-        originalDisplay?.click();
-      });
-    }
-
-    // Listen to audio element play/pause events to update the fullscreen play button
-    if (plume.audioElement) {
-      const updatePlayPauseIcon = () => {
-        const clonePlayBtn = clone.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
-        if (clonePlayBtn && plume.audioElement) {
-          clonePlayBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
-        }
-      };
-
-      plume.audioElement.addEventListener("play", updatePlayPauseIcon);
-      plume.audioElement.addEventListener("pause", updatePlayPauseIcon);
-
-      // Set initial state
-      updatePlayPauseIcon();
-    }
-
-    // Keep the cloned module updated with audio state
-    const updateClonedState = () => {
-      if (!document.getElementById("bpe-fullscreen-overlay")) return;
-
-      // Update play/pause icon
-      const clonePlayBtn = clone.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
-      const originalPlayBtn = original.querySelector("#bpe-play-pause-btn") as HTMLButtonElement;
-      if (clonePlayBtn && originalPlayBtn) {
-        clonePlayBtn.innerHTML = originalPlayBtn.innerHTML;
+      if (!Number.isNaN(duration) && duration > 0) {
+        const percent = (elapsed / duration) * 100;
+        const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
+        const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+        cloneProgressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+        cloneProgressSlider.style.backgroundImage = bgImg;
       }
+    });
 
-      // Update progress slider
-      const cloneProgress = clone.querySelector("#bpe-progress-slider") as HTMLInputElement;
-      const originalProgress = original.querySelector("#bpe-progress-slider") as HTMLInputElement;
-      if (cloneProgress && originalProgress) {
-        cloneProgress.value = originalProgress.value;
-        cloneProgress.style.backgroundImage = originalProgress.style.backgroundImage;
-      }
+    const cloneElapsedDisplay = clone.querySelector("#bpe-elapsed-display") as HTMLDivElement;
+    const elapsedObserver = new MutationObserver((mutations: MutationRecord[]) => {
+      mutations.forEach((_) => {
+        cloneElapsedDisplay.textContent = plume.elapsedDisplay!.textContent;
+      });
+    });
+    elapsedObserver.observe(plume.elapsedDisplay!, { childList: true, subtree: true });
 
-      // Update time displays
-      const cloneElapsed = clone.querySelector("#bpe-time-display span:first-child") as HTMLSpanElement;
-      const originalElapsed = original.querySelector("#bpe-time-display span:first-child") as HTMLSpanElement;
-      if (cloneElapsed && originalElapsed) {
-        cloneElapsed.textContent = originalElapsed.textContent;
-      }
+    const cloneDurationDisplay = clone.querySelector("#bpe-duration-display") as HTMLDivElement;
+    const durationObserver = new MutationObserver((mutations: MutationRecord[]) => {
+      mutations.forEach((_) => {
+        cloneDurationDisplay.textContent = plume.durationDisplay!.textContent;
+      });
+    });
+    durationObserver.observe(plume.durationDisplay!, { childList: true, subtree: true });
+    cloneDurationDisplay.addEventListener("click", handleDurationChange);
 
-      const cloneDuration = clone.querySelector("#bpe-duration-display") as HTMLSpanElement;
-      const originalDuration = original.querySelector("#bpe-duration-display") as HTMLSpanElement;
-      if (cloneDuration && originalDuration) {
-        cloneDuration.textContent = originalDuration.textContent;
-      }
+    const cloneTrackBackwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackBwdBtn) as HTMLButtonElement;
+    cloneTrackBackwardBtn.addEventListener("click", handleTrackBackward);
 
-      // Update title
-      const cloneTitle = clone.querySelector("#bpe-header-title") as HTMLSpanElement;
-      const originalTitle = original.querySelector("#bpe-header-title") as HTMLSpanElement;
-      if (cloneTitle && originalTitle) {
-        cloneTitle.textContent = originalTitle.textContent;
-        cloneTitle.title = originalTitle.title;
-      }
+    const cloneTimeBackwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeBwdBtn) as HTMLButtonElement;
+    cloneTimeBackwardBtn.addEventListener("click", handleTimeBackward);
 
-      // Update pretext
-      const clonePretext = clone.querySelector("#bpe-header-title-pretext") as HTMLSpanElement;
-      const originalPretext = original.querySelector("#bpe-header-title-pretext") as HTMLSpanElement;
-      if (clonePretext && originalPretext) {
-        clonePretext.textContent = originalPretext.textContent;
-      }
+    const originalPlayPauseBtn = original.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement;
+    const clonePlayPauseBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement;
+    clonePlayPauseBtn.addEventListener("click", () => {
+      handlePlayPause([clonePlayPauseBtn, originalPlayPauseBtn]);
+    });
 
-      // Update volume display
-      const cloneVolumeValue = clone.querySelector("#bpe-volume-value") as HTMLDivElement;
-      const originalVolumeValue = original.querySelector("#bpe-volume-value") as HTMLDivElement;
-      if (cloneVolumeValue && originalVolumeValue) {
-        cloneVolumeValue.textContent = originalVolumeValue.textContent;
-      }
+    const cloneTimeForwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement;
+    cloneTimeForwardBtn.addEventListener("click", handleTimeForward);
 
-      // Update volume slider value
-      const cloneVolSlider = clone.querySelector("#bpe-volume-slider") as HTMLInputElement;
-      const originalVolSlider = original.querySelector("#bpe-volume-slider") as HTMLInputElement;
-      if (cloneVolSlider && originalVolSlider) {
-        cloneVolSlider.value = originalVolSlider.value;
-      }
+    const cloneTrackForwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement;
+    cloneTrackForwardBtn.addEventListener("click", handleTrackForward);
 
-      requestAnimationFrame(updateClonedState);
-    };
-    requestAnimationFrame(updateClonedState);
+    const cloneVolumeSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeSlider) as HTMLInputElement;
+    cloneVolumeSlider.addEventListener("input", function(this: HTMLInputElement) {
+      const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
+      plume.audioElement!.volume = newVolume;
+      saveNewVolume(newVolume);
+
+      // Update the volume display in fullscreen
+      const cloneVolumeDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
+      cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
+    });
   };
 
   const toggleFullscreenMode = () => {
@@ -588,21 +488,19 @@ const browserCacheExists = browserCache !== undefined;
     }
 
     const overlay = document.createElement("div");
-    overlay.id = "bpe-fullscreen-overlay";
+    overlay.id = PLUME_ELEM_IDENTIFIERS.fullscreenOverlay.slice(4); // remove "div#" prefix
 
     // Create background with cover art (blurred and dimmed)
     const background = document.createElement("div");
-    background.id = "bpe-fullscreen-background";
+    background.id = PLUME_ELEM_IDENTIFIERS.fullscreenBackground.slice(4); // remove "div#" prefix
     background.style.backgroundImage = `url(${coverArt.src})`;
     overlay.appendChild(background);
 
-    // Create content container for horizontal layout
     const contentContainer = document.createElement("div");
-    contentContainer.id = "bpe-fullscreen-content";
+    contentContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenContent.slice(4); // remove "div#" prefix
 
-    // Create cover art container (left side)
     const coverArtContainer = document.createElement("div");
-    coverArtContainer.id = "bpe-fullscreen-coverart";
+    coverArtContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArtContainer.slice(4); // remove "div#" prefix
     const coverArtImg = document.createElement("img");
     coverArtImg.src = coverArt.src;
     coverArtImg.alt = "album or single cover art";
@@ -617,7 +515,7 @@ const browserCacheExists = browserCache !== undefined;
     }
 
     const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
-    plumeClone.id = "bpe-plume-fullscreen";
+    plumeClone.id = PLUME_ELEM_IDENTIFIERS.fullscreenClone.slice(4); // remove "div#" prefix
 
     // Hide the fullscreen button section in the cloned module
     const clonedFullscreenBtn = plumeClone.querySelector("#bpe-fullscreen-btn-container") as HTMLButtonElement;
@@ -690,23 +588,23 @@ const browserCacheExists = browserCache !== undefined;
     label.id = "bpe-volume-label";
     label.textContent = getString("LABEL__VOLUME");
 
-    const slider = document.createElement("input");
-    slider.id = "bpe-volume-slider";
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = VOLUME_SLIDER_GRANULARITY.toString();
-    slider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
-    slider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
+    const volumeSlider = document.createElement("input");
+    volumeSlider.id = PLUME_ELEM_IDENTIFIERS.volumeSlider.slice(6); // remove "input#" prefix
+    volumeSlider.type = "range";
+    volumeSlider.min = "0";
+    volumeSlider.max = VOLUME_SLIDER_GRANULARITY.toString();
+    volumeSlider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
+    volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
     // Apply saved volume to audio element
     plume.audioElement!.volume = plume.savedVolume;
 
     const valueDisplay = document.createElement("div");
-    valueDisplay.id = "bpe-volume-value";
-    valueDisplay.textContent = `${slider.value}${getString("META__PERCENTAGE")}`;
+    valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.slice(4); // remove "div#" prefix
+    valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
 
     // Event listener for volume change
-    slider.addEventListener("input", function (this: HTMLInputElement) {
+    volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
       const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
       if (plume.audioElement) {
         plume.audioElement.volume = volume;
@@ -717,10 +615,10 @@ const browserCacheExists = browserCache !== undefined;
     });
 
     container.appendChild(label);
-    container.appendChild(slider);
+    container.appendChild(volumeSlider);
     container.appendChild(valueDisplay);
 
-    plume.volumeSlider = slider;
+    plume.volumeSlider = volumeSlider;
     return container;
   };
 
@@ -759,92 +657,34 @@ const browserCacheExists = browserCache !== undefined;
     container.id = "bpe-playback-controls";
 
     const trackBackwardBtn = document.createElement("button");
-    trackBackwardBtn.id = "bpe-track-bwd-btn";
+    trackBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackBwdBtn.slice(7); // remove "button#" prefix
     trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
     trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
+    trackBackwardBtn.addEventListener("click", handleTrackBackward);
 
     const timeBackwardBtn = document.createElement("button");
-    timeBackwardBtn.id = "bpe-time-bwd-btn";
+    timeBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeBwdBtn.slice(7); // remove "button#" prefix
     timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
     timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
+    timeBackwardBtn.addEventListener("click", handleTimeBackward);
 
     const playPauseBtn = document.createElement("button");
-    playPauseBtn.id = "bpe-play-pause-btn";
-    playPauseBtn.innerHTML = PLUME_SVG.playPlay;
+    playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.slice(7); // remove "button#" prefix
+    playPauseBtn.innerHTML = plume.audioElement?.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
+    playPauseBtn.addEventListener("click", () => { handlePlayPause([playPauseBtn]); });
 
     const timeForwardBtn = document.createElement("button");
-    timeForwardBtn.id = "bpe-time-fwd-btn";
+    timeForwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeFwdBtn.slice(7); // remove "button#" prefix
     timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
     timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
+    timeForwardBtn.addEventListener("click", handleTimeForward);
 
     const trackForwardBtn = document.createElement("button");
-    trackForwardBtn.id = "bpe-track-fwd-btn";
+    trackForwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackFwdBtn.slice(7); // remove "button#" prefix
     trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
     trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
-
-    // === Event listeners for buttons ===
-    trackBackwardBtn.addEventListener("click", () => {
-      logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
-
-      const rv = clickPreviousTrackButton();
-      if (rv === null) return; // previous track button not found
-      logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
-    });
-
-    timeBackwardBtn.addEventListener("click", () => {
-      logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
-
-      const newTime = Math.max(0, plume.audioElement!.currentTime - TIME_STEP_DURATION);
-      plume.audioElement!.currentTime = newTime;
-      logger(
-        CPL.DEBUG,
-        `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
-          "DEBUG__REWIND_TIME__DISPATCHED2"
-        )}`
-      );
-    });
-
-    playPauseBtn.addEventListener("click", () => {
-      if (plume.audioElement!.paused) {
-        plume.audioElement!.play();
-        playPauseBtn.innerHTML = PLUME_SVG.playPause;
-      } else {
-        plume.audioElement!.pause();
-        playPauseBtn.innerHTML = PLUME_SVG.playPlay;
-      }
-    });
-
-    timeForwardBtn.addEventListener("click", () => {
-      logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
-
-      const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + TIME_STEP_DURATION);
-      plume.audioElement!.currentTime = newTime;
-      logger(
-        CPL.DEBUG,
-        `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
-          "DEBUG__FORWARD_TIME__DISPATCHED2"
-        )}`
-      );
-    });
-
-    trackForwardBtn.addEventListener("click", () => {
-      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-
-      clickNextTrackButton();
-      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
-    });
-
-    plume.audioElement?.addEventListener("play", () => {
-      playPauseBtn.innerHTML = PLUME_SVG.playPause;
-    });
-
-    plume.audioElement?.addEventListener("pause", () => {
-      playPauseBtn.innerHTML = PLUME_SVG.playPlay;
-    });
-
-    // Initial state
-    playPauseBtn.innerHTML = plume.audioElement?.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+    trackForwardBtn.addEventListener("click", handleTrackForward);
 
     container.appendChild(trackBackwardBtn);
     container.appendChild(timeBackwardBtn);
@@ -854,6 +694,57 @@ const browserCacheExists = browserCache !== undefined;
 
     return container;
   };
+
+  const handleTrackBackward = () => {
+    logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
+
+    const rv = clickPreviousTrackButton();
+    if (rv === null) return; // previous track button not found
+    logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
+  };
+
+  const handleTimeBackward = () => {
+    logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
+
+    const newTime = Math.max(0, plume.audioElement!.currentTime - TIME_STEP_DURATION);
+    plume.audioElement!.currentTime = newTime;
+    logger(
+      CPL.DEBUG,
+      `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
+        "DEBUG__REWIND_TIME__DISPATCHED2"
+      )}`
+    );
+  }
+
+  const handlePlayPause = (playPauseBtns: HTMLButtonElement[]) => {
+    if (plume.audioElement!.paused) {
+      plume.audioElement!.play();
+      playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPause);
+    } else {
+      plume.audioElement!.pause();
+      playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPlay);
+    }
+  }
+
+  const handleTimeForward = () => {
+    logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
+
+    const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + TIME_STEP_DURATION);
+    plume.audioElement!.currentTime = newTime;
+    logger(
+      CPL.DEBUG,
+      `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
+        "DEBUG__FORWARD_TIME__DISPATCHED2"
+      )}`
+    );
+  }
+
+  const handleTrackForward = () => {
+    logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+
+    clickNextTrackButton();
+    logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
+  }
 
   // Function to format time as MM:SS
   const formatTime = (seconds: number): string => {
@@ -892,18 +783,19 @@ const browserCacheExists = browserCache !== undefined;
 
     const container = document.createElement("div");
     container.id = "bpe-progress-container";
-    const slider = document.createElement("input");
-    slider.id = "bpe-progress-slider";
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = PROGRESS_SLIDER_GRANULARITY.toString();
-    slider.value = "0";
-    slider.ariaLabel = getString("ARIA__PROGRESS_SLIDER");
+    const progressSlider = document.createElement("input");
+    progressSlider.id = PLUME_ELEM_IDENTIFIERS.progressSlider.slice(6); // remove "input#" prefix
+    progressSlider.type = "range";
+    progressSlider.min = "0";
+    progressSlider.max = PROGRESS_SLIDER_GRANULARITY.toString();
+    progressSlider.value = "0";
+    progressSlider.ariaLabel = getString("ARIA__PROGRESS_SLIDER");
 
     const timeDisplay = document.createElement("div");
     timeDisplay.id = "bpe-time-display";
 
     const elapsed = document.createElement("span");
+    elapsed.id = "bpe-elapsed-display";
     elapsed.textContent = "0:00";
 
     const duration = document.createElement("span");
@@ -914,32 +806,31 @@ const browserCacheExists = browserCache !== undefined;
     timeDisplay.appendChild(elapsed);
     timeDisplay.appendChild(duration);
 
-    container.appendChild(slider);
+    container.appendChild(progressSlider);
     container.appendChild(timeDisplay);
 
-    // Event listener to invert duration display method on click
-    duration.addEventListener("click", () => {
-      if (plume.durationDisplay && plume.audioElement) {
-        saveDurationDisplayMethod(plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION
-          ? TIME_DISPLAY_METHOD.REMAINING
-          : TIME_DISPLAY_METHOD.DURATION
-        );
-      }
-    });
-
-    // Event listener for progress change
-    slider.addEventListener("input", function (this: HTMLInputElement) {
+    duration.addEventListener("click", handleDurationChange);
+    progressSlider.addEventListener("input", function (this: HTMLInputElement) {
       const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
       if (plume.audioElement) {
         plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       }
     });
 
-    plume.progressSlider = slider;
+    plume.progressSlider = progressSlider;
     plume.elapsedDisplay = elapsed;
     plume.durationDisplay = duration;
 
     return container;
+  };
+
+  const handleDurationChange = () => {
+    if (plume.durationDisplay && plume.audioElement) {
+      saveDurationDisplayMethod(plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION
+        ? TIME_DISPLAY_METHOD.REMAINING
+        : TIME_DISPLAY_METHOD.DURATION
+      );
+    }
   };
 
   const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
