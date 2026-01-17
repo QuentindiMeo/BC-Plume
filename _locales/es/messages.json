@@ -76,8 +76,17 @@
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
+  "ARIA__TRACK": {
+    "message": "La pista $TITULO_PISTA$ se está reproduciendo",
+    "placeholders": {
+      "titulo_pista": {
+        "content": "$1",
+        "example": "Título de la pista"
+      }
+    }
+  },
   "ARIA__TRACK_CURRENT": {
-    "message": "La pista $TITULO_PISTA$ se está reproduciendo actualmente (pista $NUMERO_PISTA$ de $TOTAL_PISTAS$)",
+    "message": "La pista $TITULO_PISTA$ se está reproduciendo (pista $NUMERO_PISTA$ de $TOTAL_PISTAS$)",
     "placeholders": {
       "numero_pista": {
         "content": "$1",
@@ -89,7 +98,7 @@
       },
       "titulo_pista": {
         "content": "$3",
-        "example": "Título de la Pista"
+        "example": "Título de la pista"
       }
     }
   },

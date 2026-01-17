@@ -78,6 +78,15 @@
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
+  "ARIA__TRACK": {
+    "message": "Le morceau $TITRE_PISTE$ est en cours de lecture",
+    "placeholders": {
+      "titre_piste": {
+        "content": "$1",
+        "example": "Titre de la piste"
+      }
+    }
+  },
   "ARIA__TRACK_CURRENT": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture (piste $NUMERO_PISTE$ sur $TOTAL_PISTES$)",
     "placeholders": {
