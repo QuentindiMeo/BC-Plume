@@ -697,6 +697,16 @@ const browserCacheExists = browserCache !== undefined;
     return container;
   };
 
+  const isFirstTrackOfAlbumPlaying = () => {
+    const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    const firstTrackRow = trackList?.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
+    const firstTrackTitleElem = firstTrackRow?.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
+    const currentTrackTitleElem = document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLAnchorElement;
+    if (!currentTrackTitleElem) return false;
+
+    return firstTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
+  };
+
   // Function to click on the previous track button
   const clickPreviousTrackButton = () => {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
@@ -705,7 +715,8 @@ const browserCacheExists = browserCache !== undefined;
       return null;
     }
 
-    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART) {
+    const firstTrackIsPlaying = !isAlbumPage || isFirstTrackOfAlbumPlaying();
+    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART && !firstTrackIsPlaying) {
       prevButton.click();
     } else {
       // Restart current track instead, if more than X seconds have elapsed
