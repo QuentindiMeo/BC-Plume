@@ -35,11 +35,11 @@
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Botón de retroceso presionado" },
   "DEBUG__REWIND_TIME__DISPATCHED1": { "message": "Tiempo retrocedido a:" },
-  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": " s" },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Botón Play/Pausa presionado" },
   "DEBUG__FORWARD_TIME__CLICKED": { "message": "Botón de avance presionado" },
   "DEBUG__FORWARD_TIME__DISPATCHED1": { "message": "Tiempo avanzado a:" },
-  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": " s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Botón de pista siguiente presionado" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Evento de pista siguiente enviado" },
   "DEBUG__TRACK__QUANTIFIERS": {
@@ -55,6 +55,7 @@
       }
     }
   },
+  "LABEL__TRACK": { "message": "reproduciendo ahora:" },
   "LABEL__TRACK_CURRENT": {
     "message": "reproduciendo ahora ($NUMERACION$):",
     "placeholders": {

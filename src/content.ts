@@ -312,6 +312,8 @@ const browserCacheExists = browserCache !== undefined;
 (() => {
   "use strict";
 
+  const isAlbumPage = globalThis.location.pathname.includes("/album/");
+
   // Function to initialize playback (necessary to make Plume buttons effective)
   const initPlayback = () => {
     const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
@@ -1009,7 +1011,7 @@ const browserCacheExists = browserCache !== undefined;
 
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    const titleElement = globalThis.location.pathname.includes("/album/")
+    const titleElement = isAlbumPage
       ? (document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLSpanElement)
       : (document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement);
     if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
@@ -1100,7 +1102,9 @@ const browserCacheExists = browserCache !== undefined;
     currentTitleSection.ariaLabel = getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle]);
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.id = PLUME_ELEM_IDENTIFIERS.headerTitlePretext.split("#")[1];
-    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`);
+    currentTitlePretext.textContent = isAlbumPage
+      ? getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`)
+      : getString("LABEL__TRACK");
     currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitlePretext);
@@ -1149,7 +1153,9 @@ const browserCacheExists = browserCache !== undefined;
 
       const newTrackTitle = getCurrentTrackTitle();
       const newTq = getTrackQuantifiers(newTrackTitle);
-      preText.textContent = getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`);
+      preText.textContent = isAlbumPage
+        ? getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`)
+        : getString("LABEL__TRACK");
       preText.ariaLabel = getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle]);
     }
   };
