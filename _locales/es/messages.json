@@ -1,0 +1,99 @@
+{
+  "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "No se puede encontrar un contenedor adecuado" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento padre del reproductor no encontrado" },
+  "WARN__BROWSER_API__NOT_DETECTED": { "message": "No se detectó API del navegador, usando localStorage como alternativa" },
+  "WARN__AUDIO__NOT_FOUND": { "message": "No se encontró elemento de audio" },
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando en 2s..." },
+  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Contenedor del reproductor no encontrado, buscando una alternativa..." },
+  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "No se pudo cargar el método de visualización de tiempo:" },
+  "WARN__PREV_TRACK__NOT_FOUND": { "message": "Botón de pista anterior no encontrado" },
+  "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Botón de pista siguiente no encontrado" },
+  "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Botón Play/Pausa no encontrado" },
+  "WARN__VOLUME__NOT_LOADED": { "message": "No se pudo cargar el volumen:" },
+  "WARN__VOLUME__NOT_SAVED": { "message": "No se pudo guardar el volumen:" },
+  "WARN__COVER_ART__NOT_FOUND": { "message": "Portada no encontrada" },
+  "LOG__MOUNT__COMPLETE": { "message": "BC-Plume montado exitosamente" },
+  "LOG__INITIALIZATION__START": { "message": "Inicializando BC-Plume..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume inicializado exitosamente" },
+  "LOG__NAVIGATION_DETECTED": { "message": "Navegación detectada, reiniciando..." },
+  "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
+  "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
+  "INFO__BROWSER__DETECTED": { "message": "Navegador detectado:" },
+  "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
+  "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Método de visualización de tiempo aplicado:" },
+  "INFO__VOLUME__APPLIED": { "message": "Volumen aplicado al nuevo audio:" },
+  "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Oyentes de eventos de audio configurados" },
+  "INFO__AUDIO__FOUND": { "message": "Elemento de audio encontrado" },
+  "INFO__VOLUME__FOUND": { "message": "Volumen restaurado:" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Pasar a pantalla completa" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Salir de pantalla completa" },
+  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Elementos de control detectados ===" },
+  "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controles potenciales encontrados:" },
+  "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
+  "DEBUG__PREV_TRACK__CLICKED": { "message": "Botón de pista anterior presionado" },
+  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Evento de pista anterior enviado" },
+  "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
+  "DEBUG__REWIND_TIME__CLICKED": { "message": "Botón de retroceso presionado" },
+  "DEBUG__REWIND_TIME__DISPATCHED1": { "message": "Tiempo retrocedido a:" },
+  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Botón Play/Pausa presionado" },
+  "DEBUG__FORWARD_TIME__CLICKED": { "message": "Botón de avance presionado" },
+  "DEBUG__FORWARD_TIME__DISPATCHED1": { "message": "Tiempo avanzado a:" },
+  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__NEXT_TRACK__CLICKED": { "message": "Botón de pista siguiente presionado" },
+  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Evento de pista siguiente enviado" },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Número de pista actual: $NUMERO_PISTA$, Total de pistas: $TOTAL_PISTAS$",
+    "placeholders": {
+      "numero_pista": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_pistas": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
+  "LABEL__TRACK_CURRENT": {
+    "message": "reproduciendo ahora ($NUMERACION$):",
+    "placeholders": {
+      "numeracion": {
+        "content": "$1",
+        "example": "1/4"
+      }
+    }
+  },
+  "LABEL__TRACK_UNKNOWN": { "message": "pista desconocida" },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Cambiar a visualización restante/duración" },
+  "LABEL__TRACK_BACKWARD": { "message": "Reiniciar pista/Ir a pista anterior" },
+  "LABEL__TIME_BACKWARD": { "message": "Retroceder 10 segundos" },
+  "LABEL__PLAY_PAUSE": { "message": "Reproducir/Pausar" },
+  "LABEL__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
+  "LABEL__TRACK_FORWARD": { "message": "Ir a pista siguiente" },
+  "LABEL__VOLUME": { "message": "Volumen" },
+  "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
+  "META__PERCENTAGE": { "message": "%" },
+  "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
+  "ARIA__TRACK_CURRENT": {
+    "message": "La pista $TITULO_PISTA$ se está reproduciendo actualmente (pista $NUMERO_PISTA$ de $TOTAL_PISTAS$)",
+    "placeholders": {
+      "numero_pista": {
+        "content": "$1",
+        "example": "1"
+      },
+      "total_pistas": {
+        "content": "$2",
+        "example": "4"
+      },
+      "titulo_pista": {
+        "content": "$3",
+        "example": "Título de la Pista"
+      }
+    }
+  },
+  "ARIA__PROGRESS_SLIDER": { "message": "Control deslizante de progreso del audio" },
+  "ARIA__VOLUME_SLIDER": { "message": "Control deslizante de volumen" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
+  "ARIA__COVER_ART": { "message": "Imagen de carátula" }
+}
