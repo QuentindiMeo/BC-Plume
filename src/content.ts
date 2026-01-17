@@ -216,7 +216,7 @@ interface DebugControl {
 enum PLUME_ELEM_IDENTIFIERS {
   bcElements = "div.bpe-hidden-original",
   plumeContainer = "div#bpe-plume",
-  headerDisplay = "div#bpe-header-display",
+  headerContainer = "div#bpe-header-container",
   headerLogo = "a#bpe-header-logo",
   headerCurrent = "div#bpe-header-current",
   headerTitlePretext = "span#bpe-header-title-pretext",
@@ -411,7 +411,7 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const setupFullscreenControlSync = (original: HTMLDivElement, clone: HTMLDivElement) => {
-    const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerDisplay) as HTMLDivElement;
+    const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement;
     const headerContainerObserver = new MutationObserver((mutations: MutationRecord[]) => {
       mutations.forEach((_) => {
         cloneHeaderContainer.innerHTML = plume.titleDisplay!.innerHTML;
@@ -538,6 +538,16 @@ const browserCacheExists = browserCache !== undefined;
 
     const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
     plumeClone.id = PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1];
+
+    const fullscreenLogo = document.createElement("a");
+    fullscreenLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
+    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}--version">${APP_VERSION}</p>`;
+    fullscreenLogo.href = PLUME_KO_FI_URL;
+    fullscreenLogo.target = "_blank";
+    fullscreenLogo.rel = "noopener noreferrer";
+    fullscreenLogo.ariaLabel = APP_NAME;
+    fullscreenLogo.title = getString("ARIA__LOGO_LINK");
+    plumeClone.insertBefore(fullscreenLogo, plumeClone.firstChild);
 
     // Hide the fullscreen button section in the cloned module
     const clonedFullscreenBtn = plumeClone.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer) as HTMLButtonElement;
@@ -1070,7 +1080,7 @@ const browserCacheExists = browserCache !== undefined;
     plumeContainer.id = PLUME_ELEM_IDENTIFIERS.plumeContainer.split("#")[1];
 
     const headerContainer = document.createElement("div");
-    headerContainer.id = PLUME_ELEM_IDENTIFIERS.headerDisplay.split("#")[1];
+    headerContainer.id = PLUME_ELEM_IDENTIFIERS.headerContainer.split("#")[1];
 
     const headerLogo = document.createElement("a");
     headerLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
