@@ -412,13 +412,16 @@ const browserCacheExists = browserCache !== undefined;
 
   const setupFullscreenControlSync = (original: HTMLDivElement, clone: HTMLDivElement) => {
     const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement;
-    const headerContainerObserver = new MutationObserver((mutations: MutationRecord[]) => {
-      mutations.forEach((_) => {
-        cloneHeaderContainer.innerHTML = plume.titleDisplay!.innerHTML;
-      });
+    const headerContainerObserver = new MutationObserver(() => {
+      cloneHeaderContainer.innerHTML = plume.titleDisplay!.innerHTML;
     });
     headerContainerObserver.observe(plume.titleDisplay!, { childList: true, subtree: true });
 
+    const progressSliderObserver = new MutationObserver(() => {
+      cloneProgressSlider.value = plume.progressSlider!.value;
+      cloneProgressSlider.style.backgroundImage = plume.progressSlider!.style.backgroundImage;
+    });
+    progressSliderObserver.observe(plume.progressSlider!, { attributes: true, attributeFilter: ['value', 'style'] });
     const cloneProgressSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
     cloneProgressSlider.addEventListener("input", function(this: HTMLInputElement) {
       const originalSlider = original.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
@@ -438,18 +441,14 @@ const browserCacheExists = browserCache !== undefined;
     });
 
     const cloneElapsedDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement;
-    const elapsedObserver = new MutationObserver((mutations: MutationRecord[]) => {
-      mutations.forEach((_) => {
-        cloneElapsedDisplay.textContent = plume.elapsedDisplay!.textContent;
-      });
+    const elapsedObserver = new MutationObserver(() => {
+      cloneElapsedDisplay.textContent = plume.elapsedDisplay!.textContent;
     });
     elapsedObserver.observe(plume.elapsedDisplay!, { childList: true, subtree: true });
 
     const cloneDurationDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.durationDisplay) as HTMLSpanElement;
-    const durationObserver = new MutationObserver((mutations: MutationRecord[]) => {
-      mutations.forEach((_) => {
-        cloneDurationDisplay.textContent = plume.durationDisplay!.textContent;
-      });
+    const durationObserver = new MutationObserver(() => {
+      cloneDurationDisplay.textContent = plume.durationDisplay!.textContent;
     });
     durationObserver.observe(plume.durationDisplay!, { childList: true, subtree: true });
     cloneDurationDisplay.addEventListener("click", handleDurationChange);
