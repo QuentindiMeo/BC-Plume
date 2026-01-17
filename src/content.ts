@@ -485,7 +485,7 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const toggleFullscreenMode = () => {
-    const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay);
+    const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
 
     if (existingOverlay) {
       existingOverlay.remove();
@@ -559,11 +559,52 @@ const browserCacheExists = browserCache !== undefined;
     });
     overlay.appendChild(exitBtn);
 
+    const setupFullscreenFocusTrap = () => {
+      const getFocusableElements = () => {
+        return Array.from(overlay.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        ));
+      };
+
+      const handleTabKey = (event: KeyboardEvent) => {
+        if (event.key !== "Tab") return;
+
+        const focusableElements = getFocusableElements();
+        if (focusableElements.length === 0) return;
+
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+        const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
+
+        if (event.shiftKey) {
+          if (document.activeElement === firstFocusable || currentIndex === -1) {
+            event.preventDefault();
+            lastFocusable.focus();
+          }
+        } else if (document.activeElement === lastFocusable || currentIndex === -1) {
+          event.preventDefault();
+          firstFocusable.focus();
+        }
+      };
+
+      overlay.addEventListener("keydown", handleTabKey);
+
+      setTimeout(() => {
+        const initialFocusable = getFocusableElements()[0];
+        initialFocusable?.focus();
+      }, 0); // Somehow needs timeout to function right
+    };
+
+    overlay.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key === "Escape") toggleFullscreenMode();
+    });
+
     // Sync all controls with the original plume module
     setupFullscreenControlSync(plumeContainer, plumeClone);
 
     document.body.appendChild(overlay);
     document.body.style.overflow = "hidden";
+    setupFullscreenFocusTrap();
 
     logger(CPL.INFO, "Entered fullscreen mode");
   };
@@ -948,7 +989,7 @@ const browserCacheExists = browserCache !== undefined;
     const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
     if (!trackTable) return { current: 0, total: 0 };
 
-    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow)
     const trackCount = trackRows.length;
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;

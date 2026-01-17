@@ -331,12 +331,12 @@
   z-index: 10;
 }
 #bpe-fullscreen-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.025);
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
 }
 #bpe-fullscreen-btn:active {
-  transform: scale(0.95);
+  transform: scale(1);
 }
 
 #bpe-fullscreen-btn svg {
@@ -426,7 +426,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
 
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 #bpe-fullscreen-exit-btn:hover {
   transform: scale(1.1);
@@ -456,7 +456,7 @@
   background-color: #000;
 
   /* Heavy blur and dimming */
-  filter: blur(2rem) brightness(0.3);
+  filter: blur(1.5rem) brightness(0.5);
 
   /* Make background inert */
   pointer-events: none;
@@ -479,10 +479,9 @@
   pointer-events: all;
 }
 
-#bpe-fullscreen-coverart {
-  flex: 0 0 auto;
-  max-width: 45%;
-  max-height: 100%;
+#bpe-fullscreen-cover-art {
+  max-width: 40vw;
+  max-height: 60vh;
 
   display: flex;
   align-items: center;
@@ -501,11 +500,10 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-
-#bpe-fullscreen-coverart img {
-  width: 100%;
+#bpe-fullscreen-cover-art img {
+  width: 100vw;
   height: auto;
-  max-height: 100%;
+  max-height: 100vh;
   object-fit: contain;
 
   border-radius: 0.5rem;
@@ -518,15 +516,12 @@
   flex: 1 1 auto;
   max-width: 25vw;
 
-  /* Make the plume module interactable */
   pointer-events: all;
 
   /* Add some shadow for better visibility */
   box-shadow: 0 0.625rem 3.125rem rgba(0, 0, 0, 0.8);
 
-  /* Smooth transition */
   transition: transform 0.3s ease;
-
   animation: slideInRight 0.5s ease-out;
 }
 #bpe-plume-fullscreen:hover {
@@ -552,7 +547,7 @@
     padding: 2rem 0;
   }
 
-  #bpe-fullscreen-coverart {
+  #bpe-fullscreen-cover-art {
     max-width: 70%;
     max-height: 40vh;
   }
