@@ -20,7 +20,7 @@
 &#xa0;
 
 <div align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.6-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.2.7-blue?logo=semver" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
 </div>
 <div align="center">
@@ -58,8 +58,9 @@ A cross-browser web extension that improves the listening experience on Bandcamp
   - **Time display mode**: Switch between track duration and remaining time (remembered across pages)
 - **Custom playback controls**: Play/Pause buttons, skip back/forward 10 seconds with a modern design
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
-- **Plume follows you!**: The player sticks to the top of the viewport when scrolling down
+- **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
+- **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more to come on demand!)
 
 ## :rocket: Installation
 
@@ -79,7 +80,7 @@ This extension uses:
 - **Manifest V3**: For modern browser compatibility
 - **Cross-Browser API**: Automatic Chromium/Firefox detection
 - **Content Scripts**: To interact with Bandcamp pages
-- **Storage API + localStorage**: Saves preferences with fallback
+- **Storage API & localStorage**: Saves preferences in browser cache
 - **Vanilla TypeScript**: No external dependencies
 
 The code is fully commented and structured for understanding, easy contribution and modification.
@@ -104,9 +105,9 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
-- _**[1.3.0]** if you want it..._: **Pedal To The Metal** — New features are added to Plume. [#???](#card_file_box-project-roadmap)
+- _**[1.3.0]** Jan 18 2026_: **Pedal To The Metal** — Fullscreen mode, playback bugfixes and Spanish language support. [#67](https://github.com/QuentindiMeo/BC-Plume/pull/67)
 - _**[1.2.5]** Sep 08 2025_: official release — Word is spread on Reddit, Plume is ready for use. [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48)
-- _**[1.2.0]** Jul 30 2025_: **Pretty boy** — Plume gets a logo & UI rework. [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
+- _**[1.2.0]** Jul 30 2025_: **Pretty Boy** — Plume gets a logo & UI rework. [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
 - _**[1.1.0]** Jul 28 2025_: **First Release** — The original Bandcamp player is fully replaced by Plume. [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18)
 - _**[1.0.0]** Jul 28 2025_: **Hello World!** — The project is drafted, under the name _MBAPPE_.
 
