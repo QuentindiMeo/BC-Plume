@@ -773,7 +773,7 @@ const browserCacheExists = browserCache !== undefined;
 
     const playPauseBtn = document.createElement("button");
     playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
-    playPauseBtn.innerHTML = plume.audioElement?.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+    playPauseBtn.innerHTML = plume.audioElement!.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
     playPauseBtn.addEventListener("click", () => { handlePlayPause([playPauseBtn]); });
 
@@ -811,6 +811,11 @@ const browserCacheExists = browserCache !== undefined;
 
     const newTime = Math.max(0, plume.audioElement!.currentTime - TIME_STEP_DURATION);
     plume.audioElement!.currentTime = newTime;
+    if (plume.audioElement!.paused)
+      setTimeout(() => {
+        plume.audioElement!.pause(); // prevent auto-play when forwarding on paused track
+      }, 10);
+
     logger(
       CPL.DEBUG,
       `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
@@ -834,6 +839,11 @@ const browserCacheExists = browserCache !== undefined;
 
     const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + TIME_STEP_DURATION);
     plume.audioElement!.currentTime = newTime;
+    if (plume.audioElement!.paused)
+      setTimeout(() => {
+        plume.audioElement!.pause(); // prevent auto-play when forwarding on paused track
+      }, 10);
+
     logger(
       CPL.DEBUG,
       `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
