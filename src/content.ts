@@ -735,6 +735,7 @@ const browserCacheExists = browserCache !== undefined;
       // Restart current track instead, if more than X seconds have elapsed
       plume.audioElement!.currentTime = 0;
       logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
+      updatePlayPauseBtnIcon();
     }
     return true;
   };
@@ -749,6 +750,7 @@ const browserCacheExists = browserCache !== undefined;
 
     nextButton.click();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+    updatePlayPauseBtnIcon();
     return true;
   };
 
@@ -1173,6 +1175,11 @@ const browserCacheExists = browserCache !== undefined;
 
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
   };
+
+  const updatePlayPauseBtnIcon = () => {
+    const playPauseBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+    playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPause);
+  }
 
   const updateTrackForwardBtnState = () => {
     const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.trackFwdBtn);
