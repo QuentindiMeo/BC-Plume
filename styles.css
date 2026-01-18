@@ -223,14 +223,7 @@
 }
 #bpe-playback-controls button:disabled {
   opacity: 0.4;
-  cursor: not-allowed;
   pointer-events: none;
-}
-#bpe-playback-controls button:disabled:hover {
-  transform: none;
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: none;
 }
 
 #bpe-play-pause-btn {

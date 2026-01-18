@@ -699,8 +699,8 @@ const browserCacheExists = browserCache !== undefined;
 
   const isFirstTrackOfAlbumPlaying = () => {
     const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
-    const firstTrackRow = trackList?.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
-    const firstTrackTitleElem = firstTrackRow?.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
+    const firstTrackRow = trackList.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
+    const firstTrackTitleElem = firstTrackRow.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
     const currentTrackTitleElem = document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLAnchorElement;
     if (!currentTrackTitleElem) return false;
 
@@ -735,7 +735,7 @@ const browserCacheExists = browserCache !== undefined;
       // Restart current track instead, if more than X seconds have elapsed
       plume.audioElement!.currentTime = 0;
       logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
-      updatePlayPauseBtnIcon();
+      setPauseBtnIcon();
     }
     return true;
   };
@@ -750,7 +750,7 @@ const browserCacheExists = browserCache !== undefined;
 
     nextButton.click();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-    updatePlayPauseBtnIcon();
+    setPauseBtnIcon();
     return true;
   };
 
@@ -813,7 +813,7 @@ const browserCacheExists = browserCache !== undefined;
     plume.audioElement!.currentTime = newTime;
     if (plume.audioElement!.paused)
       setTimeout(() => {
-        plume.audioElement!.pause(); // prevent auto-play when forwarding on paused track
+        plume.audioElement!.pause(); // prevent auto-play when rewinding on paused track
       }, 10);
 
     logger(
@@ -1186,10 +1186,10 @@ const browserCacheExists = browserCache !== undefined;
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
   };
 
-  const updatePlayPauseBtnIcon = () => {
+  const setPauseBtnIcon = () => {
     const playPauseBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
     playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPause);
-  }
+  };
 
   const updateTrackForwardBtnState = () => {
     const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.trackFwdBtn);
