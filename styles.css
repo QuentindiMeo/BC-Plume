@@ -350,39 +350,6 @@
   margin-left: 0.25rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  /* Global adjustment for mobile */
-  #bpe-progress-container {
-    padding: 0.5rem 0.75rem;
-  }
-
-  #bpe-playback-controls {
-    padding: 1rem;
-    gap: 0.625rem;
-  }
-
-  #bpe-playback-controls button {
-    width: 4.25rem;
-    height: 4.25rem;
-    font-size: 0.875rem;
-  }
-
-  #bpe-play-pause-btn {
-    width: 3.25rem !important;
-    height: 3.25rem !important;
-    font-size: 1.125rem !important;
-  }
-
-  #bpe-volume-container {
-    padding: 0.5rem 0.75rem;
-  }
-
-  #bpe-volume-slider {
-    height: 0.5rem;
-  }
-}
-
 /* Fullscreen Mode Styles */
 
 @keyframes fadeIn {
@@ -447,7 +414,6 @@
 }
 
 #bpe-fullscreen-clone {
-  max-width: 25vw;
   background: #ffffff07;
   border-radius: .5rem;
 
@@ -473,6 +439,10 @@
   font-size: 1rem;
 }
 
+#bpe-fullscreen-clone #bpe-header-container {
+  max-width: 25em;
+}
+
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-logo {
   display: none;
 }
@@ -481,7 +451,7 @@
   width: 100%;
 }
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-title {
-  max-width: 100%;
+  white-space: nowrap;
 }
 
 #bpe-fullscreen-exit-btn {
@@ -535,7 +505,7 @@
   animation: slideInLeft 0.5s ease-out;
 }
 
-/* Responsive adjustments for smaller screens */
+/* Responsive adjustments for fullscreen */
 @media (max-width: 768px) {
   #bpe-fullscreen-content {
     height: auto;

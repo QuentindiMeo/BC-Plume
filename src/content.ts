@@ -1,6 +1,6 @@
 // Plume - TypeScript for song page and album page display
 const APP_NAME = "Plume - Bandcamp Player Enhancer";
-const APP_VERSION = "v1.2.6";
+const APP_VERSION = "v1.3.0";
 const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
 
 interface BrowserAPI {
