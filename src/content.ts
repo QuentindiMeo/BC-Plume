@@ -926,9 +926,12 @@ const browserCacheExists = browserCache !== undefined;
     duration.addEventListener("click", handleDurationChange);
     progressSlider.addEventListener("input", function (this: HTMLInputElement) {
       const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-      if (plume.audioElement) {
+      if (plume.audioElement)
         plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-      }
+      if (plume.audioElement!.paused)
+        setTimeout(() => {
+          plume.audioElement!.pause(); // prevent auto-play when seeking on paused track
+        }, 10);
     });
 
     plume.progressSlider = progressSlider;
