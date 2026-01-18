@@ -55,6 +55,7 @@
       }
     }
   },
+  "LABEL__TRACK": { "message": "currently playing:" },
   "LABEL__TRACK_CURRENT": {
     "message": "currently playing ($NUMBERING$):",
     "placeholders": {
@@ -64,7 +65,7 @@
       }
     }
   },
-  "LABEL__TRACK_UNKNOWN": { "message": "Unknown Track" },
+  "LABEL__TRACK_UNKNOWN": { "message": "unknown track" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "LABEL__TRACK_BACKWARD": { "message": "Restart track / Go to previous track" },
   "LABEL__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
@@ -75,6 +76,15 @@
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
+  "ARIA__TRACK": {
+    "message": "The track $TRACK_TITLE$ is currently playing",
+    "placeholders": {
+      "track_title": {
+        "content": "$1",
+        "example": "Song Title"
+      }
+    }
+  },
   "ARIA__TRACK_CURRENT": {
     "message": "The track $TRACK_TITLE$ is currently playing (track $TRACK_NUMBER$ out of $TOTAL_TRACKS$)",
     "placeholders": {

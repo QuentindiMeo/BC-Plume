@@ -312,6 +312,8 @@ const browserCacheExists = browserCache !== undefined;
 (() => {
   "use strict";
 
+  const isAlbumPage = globalThis.location.pathname.includes("/album/");
+
   // Function to initialize playback (necessary to make Plume buttons effective)
   const initPlayback = () => {
     const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
@@ -695,33 +697,61 @@ const browserCacheExists = browserCache !== undefined;
     return container;
   };
 
+  const isFirstTrackOfAlbumPlaying = () => {
+    const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    const firstTrackRow = trackList.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
+    const firstTrackTitleElem = firstTrackRow.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
+    const currentTrackTitleElem = document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLAnchorElement;
+    if (!currentTrackTitleElem) return false;
+
+    return firstTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
+  };
+
+  const isLastTrackOfAlbumPlaying = () => {
+    const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    if (!trackList) return false;
+
+    const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+    const lastTrackRow = trackRows[trackRows.length - 1] as HTMLTableRowElement;
+    const lastTrackTitleElem = lastTrackRow?.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
+    const currentTrackTitleElem = document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLAnchorElement;
+    if (!currentTrackTitleElem) return false;
+
+    return lastTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
+  };
+
   // Function to click on the previous track button
-  const clickPreviousTrackButton = () => {
+  const clickPreviousTrackButton = (): true | null => {
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
     if (!prevButton) {
       logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
       return null;
     }
 
-    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART) {
+    const firstTrackIsPlaying = !isAlbumPage || isFirstTrackOfAlbumPlaying();
+    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART && !firstTrackIsPlaying) {
       prevButton.click();
     } else {
       // Restart current track instead, if more than X seconds have elapsed
       plume.audioElement!.currentTime = 0;
       logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
+      setPauseBtnIcon();
     }
     return true;
   };
 
   // Function to click on the next track button
-  const clickNextTrackButton = () => {
+  const clickNextTrackButton = (): true | null => {
     const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
-    if (nextButton) {
-      nextButton.click();
-      logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-    } else {
+    if (!nextButton) {
       logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
+      return null;
     }
+
+    nextButton.click();
+    logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+    setPauseBtnIcon();
+    return true;
   };
 
   const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
@@ -743,7 +773,7 @@ const browserCacheExists = browserCache !== undefined;
 
     const playPauseBtn = document.createElement("button");
     playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
-    playPauseBtn.innerHTML = plume.audioElement?.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+    playPauseBtn.innerHTML = plume.audioElement!.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
     playPauseBtn.addEventListener("click", () => { handlePlayPause([playPauseBtn]); });
 
@@ -781,6 +811,11 @@ const browserCacheExists = browserCache !== undefined;
 
     const newTime = Math.max(0, plume.audioElement!.currentTime - TIME_STEP_DURATION);
     plume.audioElement!.currentTime = newTime;
+    if (plume.audioElement!.paused)
+      setTimeout(() => {
+        plume.audioElement!.pause(); // prevent auto-play when rewinding on paused track
+      }, 10);
+
     logger(
       CPL.DEBUG,
       `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
@@ -804,6 +839,11 @@ const browserCacheExists = browserCache !== undefined;
 
     const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + TIME_STEP_DURATION);
     plume.audioElement!.currentTime = newTime;
+    if (plume.audioElement!.paused)
+      setTimeout(() => {
+        plume.audioElement!.pause(); // prevent auto-play when forwarding on paused track
+      }, 10);
+
     logger(
       CPL.DEBUG,
       `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
@@ -815,7 +855,8 @@ const browserCacheExists = browserCache !== undefined;
   const handleTrackForward = () => {
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
-    clickNextTrackButton();
+    const rv = clickNextTrackButton();
+    if (rv === null) return; // next track button not found
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   };
 
@@ -1009,7 +1050,7 @@ const browserCacheExists = browserCache !== undefined;
 
   // Function to get the current track title from Bandcamp
   const getCurrentTrackTitle = (): string => {
-    const titleElement = globalThis.location.pathname.includes("/album/")
+    const titleElement = isAlbumPage
       ? (document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLSpanElement)
       : (document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement);
     if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
@@ -1097,10 +1138,14 @@ const browserCacheExists = browserCache !== undefined;
     const currentTitleSection = document.createElement("div");
     currentTitleSection.id = PLUME_ELEM_IDENTIFIERS.headerCurrent.split("#")[1];
     currentTitleSection.tabIndex = 0; // make it focusable for screen readers
-    currentTitleSection.ariaLabel = getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle]);
+    currentTitleSection.ariaLabel = isAlbumPage
+      ? getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle])
+      : getString("ARIA__TRACK", initialTrackTitle);
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.id = PLUME_ELEM_IDENTIFIERS.headerTitlePretext.split("#")[1];
-    currentTitlePretext.textContent = getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`);
+    currentTitlePretext.textContent = isAlbumPage
+      ? getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`)
+      : getString("LABEL__TRACK");
     currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitlePretext);
@@ -1141,31 +1186,46 @@ const browserCacheExists = browserCache !== undefined;
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
   };
 
+  const setPauseBtnIcon = () => {
+    const playPauseBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+    playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPause);
+  };
+
+  const updateTrackForwardBtnState = () => {
+    const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.trackFwdBtn);
+    if (trackFwdBtns.length === 0) return;
+
+    const shouldDisable = !isAlbumPage || isLastTrackOfAlbumPlaying();
+    trackFwdBtns.forEach(btn => btn.disabled = shouldDisable);
+  };
+
   // Function to update the pretext display (track numbering)
   const updatePretextDisplay = () => {
-    if (plume.titleDisplay) {
-      const preText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
-      if (!preText) return;
+    const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
+    if (!preText) return;
 
-      const newTrackTitle = getCurrentTrackTitle();
-      const newTq = getTrackQuantifiers(newTrackTitle);
-      preText.textContent = getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`);
-      preText.ariaLabel = getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle]);
-    }
+    const newTrackTitle = getCurrentTrackTitle();
+    const newTq = getTrackQuantifiers(newTrackTitle);
+    preText.textContent = isAlbumPage
+      ? getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`)
+      : getString("LABEL__TRACK");
+
+    const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerCurrent) as HTMLDivElement;
+    headerCurrent.ariaLabel = isAlbumPage
+      ? getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle])
+      : getString("ARIA__TRACK", newTrackTitle);
   };
 
   const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
   const LATIN_CHAR_HEIGHT = 19; // in px, for calculation
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
-    if (!plume.titleDisplay) return;
-
-    const titleText = plume.titleDisplay.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
+    const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
     if (!titleText) return;
 
-    const currentTrackTitle = getCurrentTrackTitle();
-    titleText.textContent = currentTrackTitle;
-    titleText.title = currentTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
+    const newTrackTitle = getCurrentTrackTitle();
+    titleText.textContent = newTrackTitle;
+    titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
     if (titleText.offsetHeight !== LATIN_CHAR_HEIGHT) {
       const logo = document.querySelector(PLUME_ELEM_IDENTIFIERS.headerLogo) as HTMLAnchorElement;
@@ -1215,8 +1275,10 @@ const browserCacheExists = browserCache !== undefined;
     // Update title when metadata loads (new track)
     plume.audioElement!.addEventListener("loadedmetadata", updateTitleDisplay);
     plume.audioElement!.addEventListener("loadedmetadata", updatePretextDisplay);
+    plume.audioElement!.addEventListener("loadedmetadata", updateTrackForwardBtnState);
     plume.audioElement!.addEventListener("loadstart", updateTitleDisplay);
     plume.audioElement!.addEventListener("loadstart", updatePretextDisplay);
+    plume.audioElement!.addEventListener("loadstart", updateTrackForwardBtnState);
 
     // Sync volume with Plume's slider
     plume.audioElement!.addEventListener("volumechange", () => {

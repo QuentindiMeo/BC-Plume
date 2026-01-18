@@ -35,11 +35,11 @@
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Botón de retroceso presionado" },
   "DEBUG__REWIND_TIME__DISPATCHED1": { "message": "Tiempo retrocedido a:" },
-  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": " s" },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Botón Play/Pausa presionado" },
   "DEBUG__FORWARD_TIME__CLICKED": { "message": "Botón de avance presionado" },
   "DEBUG__FORWARD_TIME__DISPATCHED1": { "message": "Tiempo avanzado a:" },
-  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": " s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Botón de pista siguiente presionado" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Evento de pista siguiente enviado" },
   "DEBUG__TRACK__QUANTIFIERS": {
@@ -55,6 +55,7 @@
       }
     }
   },
+  "LABEL__TRACK": { "message": "reproduciendo ahora:" },
   "LABEL__TRACK_CURRENT": {
     "message": "reproduciendo ahora ($NUMERACION$):",
     "placeholders": {
@@ -75,8 +76,17 @@
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
+  "ARIA__TRACK": {
+    "message": "La pista $TITULO_PISTA$ se está reproduciendo",
+    "placeholders": {
+      "titulo_pista": {
+        "content": "$1",
+        "example": "Título de la pista"
+      }
+    }
+  },
   "ARIA__TRACK_CURRENT": {
-    "message": "La pista $TITULO_PISTA$ se está reproduciendo actualmente (pista $NUMERO_PISTA$ de $TOTAL_PISTAS$)",
+    "message": "La pista $TITULO_PISTA$ se está reproduciendo (pista $NUMERO_PISTA$ de $TOTAL_PISTAS$)",
     "placeholders": {
       "numero_pista": {
         "content": "$1",
@@ -88,7 +98,7 @@
       },
       "titulo_pista": {
         "content": "$3",
-        "example": "Título de la Pista"
+        "example": "Título de la pista"
       }
     }
   },

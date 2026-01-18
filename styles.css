@@ -221,6 +221,10 @@
 #bpe-playback-controls button:active {
   transform: scale(0.95);
 }
+#bpe-playback-controls button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
 
 #bpe-play-pause-btn {
   width: 3.75rem !important;
@@ -443,22 +447,25 @@
 }
 
 #bpe-fullscreen-clone {
+  max-width: 20vw;
+  background: #ffffff07;
+  border-radius: .5rem;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: #ffffff07;
-  border-radius: .5rem;
 }
 
 #bpe-fullscreen-clone > #bpe-header-logo {
-  transform: unset;
-  transform-origin: unset;
-  scale: 1;
-  padding: 0;
   position: relative;
   height: 6rem;
-  font-size: 1rem;
+  padding: 0;
   margin-bottom: 1rem;
+
+  scale: 1;
+  transform: unset;
+  transform-origin: unset;
+
   align-items: center;
 }
 #bpe-fullscreen-clone > #bpe-header-logo p {
@@ -470,11 +477,18 @@
   display: none;
 }
 
+#bpe-fullscreen-clone #bpe-header-container #bpe-header-current {
+  width: 100%;
+}
+#bpe-fullscreen-clone #bpe-header-container #bpe-header-title {
+  max-width: 100%;
+}
+
 #bpe-fullscreen-exit-btn {
+  z-index: 10001;
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;
-  z-index: 10001;
 
   width: 3rem;
   height: 3rem;
@@ -490,7 +504,6 @@
 
   cursor: pointer;
   transition: all 0.3s ease;
-
   animation: fadeIn 0.3s ease-out;
 }
 #bpe-fullscreen-exit-btn:hover {
@@ -525,10 +538,11 @@
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
   #bpe-fullscreen-content {
-    flex-direction: column;
-    gap: 2rem;
     height: auto;
     padding: 2rem 0;
+
+    flex-direction: column;
+    gap: 2rem;
   }
 
   #bpe-fullscreen-cover-art img {

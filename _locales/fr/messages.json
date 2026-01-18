@@ -37,11 +37,11 @@
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Bouton de rembobinage cliqué" },
   "DEBUG__REWIND_TIME__DISPATCHED1": { "message": "Temps rembobiné à :" },
-  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": " s" },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Bouton Play/Pause cliqué" },
   "DEBUG__FORWARD_TIME__CLICKED": { "message": "Bouton d'avance cliqué" },
   "DEBUG__FORWARD_TIME__DISPATCHED1": { "message": "Temps avancé à :" },
-  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": "s" },
+  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": " s" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
   "DEBUG__TRACK__QUANTIFIERS": {
@@ -57,6 +57,7 @@
       }
     }
   },
+  "LABEL__TRACK": { "message": "en cours de lecture :" },
   "LABEL__TRACK_CURRENT": {
     "message": "en cours de lecture ($PISTE$) :",
     "placeholders": {
@@ -66,7 +67,7 @@
       }
     }
   },
-  "LABEL__TRACK_UNKNOWN": { "message": "Titre de la piste inconnu" },
+  "LABEL__TRACK_UNKNOWN": { "message": "titre inconnu" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "LABEL__TRACK_BACKWARD": { "message": "Recommencer / Aller à la piste précédente" },
   "LABEL__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
@@ -77,6 +78,15 @@
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
+  "ARIA__TRACK": {
+    "message": "Le morceau $TITRE_PISTE$ est en cours de lecture",
+    "placeholders": {
+      "titre_piste": {
+        "content": "$1",
+        "example": "Titre de la piste"
+      }
+    }
+  },
   "ARIA__TRACK_CURRENT": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture (piste $NUMERO_PISTE$ sur $TOTAL_PISTES$)",
     "placeholders": {
