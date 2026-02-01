@@ -1456,14 +1456,6 @@ const browserCacheExists = browserCache !== undefined;
       handlePlayPause(playPauseBtns as HTMLButtonElement[]);
     };
 
-    const handleTimeNavigation = (direction: "backward" | "forward") => {
-      const btnId = direction === "backward"
-        ? PLUME_ELEM_IDENTIFIERS.timeBwdBtn
-        : PLUME_ELEM_IDENTIFIERS.timeFwdBtn;
-      const btn = document.querySelector(btnId) as HTMLButtonElement;
-      btn.click();
-    };
-
     const handleAdjustVolume = (delta: number) => {
       if (!plume.volumeSlider || !plume.audioElement) return;
 
@@ -1497,8 +1489,8 @@ const browserCacheExists = browserCache !== undefined;
       e.preventDefault();
       switch (e.code) {
         case "Space": handlePlayPauseShortcut(); break;
-        case "ArrowLeft": handleTimeNavigation("backward"); break;
-        case "ArrowRight": handleTimeNavigation("forward"); break;
+        case "ArrowLeft": handleTimeBackward(); break;
+        case "ArrowRight": handleTimeForward(); break;
         case "ArrowUp": handleAdjustVolume(5); break;
         case "ArrowDown": handleAdjustVolume(-5); break;
         case "PageUp": handleTrackBackward(); break;
