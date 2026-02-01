@@ -10,6 +10,12 @@
 
 /*********** Native elements styling ***********/
 
+span.project-runtime {
+  font-size: 50%;
+  line-height: 50%;
+  color: #0000007f;
+}
+
 .inline_player { /* parent component */
   position: sticky !important;
   top: 0;
@@ -437,6 +443,16 @@
   margin: 0;
   color: #ffffff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+#bpe-fullscreen-titling__project {
+  font-style: italic;
+}
+#bpe-fullscreen-titling__project span.project-runtime {
+  font-size: 60%;
+  line-height: 60%;
+  font-weight: 500;
+  font-style: normal;
+  color: #ffffffaf;
 }
 #bpe-fullscreen-titling__artist {
   color: #ffffff7f;

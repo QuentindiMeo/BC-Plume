@@ -214,6 +214,7 @@ interface DebugControl {
 }
 
 enum PLUME_ELEM_IDENTIFIERS {
+  runtime = "span#project-runtime",
   bcElements = "div.bpe-hidden-original",
   plumeContainer = "div#bpe-plume",
   headerContainer = "div#bpe-header-container",
@@ -265,6 +266,7 @@ enum BC_ELEM_IDENTIFIERS {
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
+  trackDuration = "span.time",
   coverArt = "div#tralbumArt img"
 }
 
@@ -369,6 +371,57 @@ const browserCacheExists = browserCache !== undefined;
     );
 
     return audio;
+  };
+
+  const runtimeInfo = {
+    totalRuntime: 0,
+    formattedTotalRuntime: "",
+    ariaString: ""
+  };
+  const getRuntimeSpan = (): HTMLSpanElement => {
+    if (!runtimeInfo.totalRuntime) {
+      const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+      const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+      trackRows.forEach((row) => {
+        const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
+        if (durationCell) {
+          const durationText = durationCell.textContent.trim();
+          const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
+          let seconds = 0;
+          if (parts.length === 2) {
+            // MM:SS
+            seconds = parts[0] * 60 + parts[1];
+          } else if (parts.length === 3) {
+            // HH:MM:SS
+            seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+          }
+          runtimeInfo.totalRuntime += seconds;
+        }
+      });
+      const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
+      const seconds = runtimeInfo.totalRuntime % 60;
+      runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
+        minutes,
+        seconds < 10 ? "0" + seconds : seconds.toString()
+      ]);
+      runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [Math.floor(runtimeInfo.totalRuntime / 60), runtimeInfo.totalRuntime % 60]);
+      logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
+    }
+
+    const runtimeSpan = document.createElement("span");
+    runtimeSpan.className = PLUME_ELEM_IDENTIFIERS.runtime.split("#")[1];
+    runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
+    runtimeSpan.ariaLabel = runtimeInfo.ariaString;
+
+    return runtimeSpan;
+  };
+  const addRuntimeFullscreen = (parent: HTMLHeadingElement) => {
+    parent.appendChild(getRuntimeSpan());
+  };
+  const addRuntime = () => {
+    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+    const titleElement = infoSection.querySelector("h2");
+    titleElement!.appendChild(getRuntimeSpan());
   };
 
   // Debug function to identify Bandcamp controls
@@ -548,11 +601,15 @@ const browserCacheExists = browserCache !== undefined;
     titling.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
     const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
 
-    const albumTitle = infoSection.querySelector("h2") as HTMLHeadingElement;
+    const albumHeading = infoSection.querySelector("h2")!.cloneNode(true) as HTMLHeadingElement;
+    albumHeading.querySelector("span")?.remove();
     const projectTitle = document.createElement("h2");
     projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
-    projectTitle.textContent = albumTitle.textContent || "";
-    projectTitle.style.fontStyle = isAlbumPage ? "italic" : "unset";
+    projectTitle.textContent = albumHeading.textContent || "";
+    if (!isAlbumPage)
+      projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
+    if (isAlbumPage)
+      addRuntimeFullscreen(projectTitle);
     titling.appendChild(projectTitle);
 
     const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
@@ -1213,6 +1270,9 @@ const browserCacheExists = browserCache !== undefined;
     bcPlayerContainer.appendChild(plumeContainer);
 
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
+
+    if (isAlbumPage)
+      addRuntime();
   };
 
   const setPauseBtnIcon = () => {
