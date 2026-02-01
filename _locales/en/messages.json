@@ -74,6 +74,7 @@
   "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
   "LABEL__VOLUME": { "message": "Volume" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
+  "LABEL__BY": { "message": "by" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
   "ARIA__TRACK": {

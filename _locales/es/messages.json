@@ -74,6 +74,7 @@
   "LABEL__TRACK_FORWARD": { "message": "Ir a pista siguiente" },
   "LABEL__VOLUME": { "message": "Volumen" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
+  "LABEL__BY": { "message": "de" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
   "ARIA__TRACK": {
@@ -102,8 +103,8 @@
       }
     }
   },
-  "ARIA__PROGRESS_SLIDER": { "message": "Control deslizante de progreso del audio" },
-  "ARIA__VOLUME_SLIDER": { "message": "Control deslizante de volumen" },
+  "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
+  "ARIA__VOLUME_SLIDER": { "message": "Deslizador de volumen" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" }
 }

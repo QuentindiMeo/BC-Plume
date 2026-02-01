@@ -244,7 +244,11 @@ enum PLUME_ELEM_IDENTIFIERS {
   fullscreenBackground = "div#bpe-fullscreen-background",
   fullscreenContent = "div#bpe-fullscreen-content",
   fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
-  fullscreenCoverArtContainer = "div#bpe-fullscreen-cover-art",
+  fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
+  fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
+  fullscreenTitlingContainer = "div#bpe-fullscreen-titling",
+  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
+  fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
 }
 
@@ -257,7 +261,7 @@ enum BC_ELEM_IDENTIFIERS {
   albumPageCurrentTrackTitle = "a.title_link",
   previousTrack = "div.prevbutton",
   nextTrack = "div.nextbutton",
-  nameSection = "div#name-section",
+  infoSection = "div#name-section",
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
@@ -531,13 +535,34 @@ const browserCacheExists = browserCache !== undefined;
     const contentContainer = document.createElement("div");
     contentContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenContent.split("#")[1];
 
-    const coverArtContainer = document.createElement("div");
-    coverArtContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArtContainer.split("#")[1];
+    const presentationContainer = document.createElement("div");
+    presentationContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenPresentationContainer.split("#")[1];
+
     const coverArtImg = document.createElement("img");
+    coverArtImg.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArt.split("#")[1];
     coverArtImg.src = coverArt.src;
     coverArtImg.alt = getString("ARIA__COVER_ART");
-    coverArtContainer.appendChild(coverArtImg);
-    contentContainer.appendChild(coverArtContainer);
+    presentationContainer.appendChild(coverArtImg);
+
+    const titling = document.createElement("div");
+    titling.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
+    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+
+    const albumTitle = infoSection.querySelector("h2") as HTMLHeadingElement;
+    const projectTitle = document.createElement("h2");
+    projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
+    projectTitle.textContent = albumTitle.textContent || "";
+    projectTitle.style.fontStyle = isAlbumPage ? "italic" : "unset";
+    titling.appendChild(projectTitle);
+
+    const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
+    const artistTitle = document.createElement("h3");
+    artistTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingArtist.split("#")[1];
+    artistTitle.textContent = getString("LABEL__BY") + " " + (artistName.textContent || "");
+    titling.appendChild(artistTitle);
+
+    presentationContainer.appendChild(titling);
+    contentContainer.appendChild(presentationContainer);
 
     // Clone the plume module (right side)
     const plumeContainer = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer) as HTMLDivElement;
@@ -546,12 +571,13 @@ const browserCacheExists = browserCache !== undefined;
 
     const fullscreenLogo = document.createElement("a");
     fullscreenLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
-    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}--version">${APP_VERSION}</p>`;
+    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}__version">${APP_VERSION}</p>`;
     fullscreenLogo.href = PLUME_KO_FI_URL;
     fullscreenLogo.target = "_blank";
     fullscreenLogo.rel = "noopener noreferrer";
     fullscreenLogo.ariaLabel = APP_NAME;
     fullscreenLogo.title = getString("ARIA__LOGO_LINK");
+    fullscreenLogo.tabIndex = 0;
     plumeClone.insertBefore(fullscreenLogo, plumeClone.firstChild);
 
     // Hide the fullscreen button section in the cloned module
@@ -1000,7 +1026,7 @@ const browserCacheExists = browserCache !== undefined;
   }
 
   const getArtistNameElement = (): HTMLSpanElement => {
-    const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.nameSection) as HTMLElement;
+    const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLElement;
     const nameSectionLinks = nameSection.querySelectorAll("span");
     const artistElementIdx = nameSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
     return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
@@ -1128,7 +1154,7 @@ const browserCacheExists = browserCache !== undefined;
 
     const headerLogo = document.createElement("a");
     headerLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
-    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}--version">${APP_VERSION}</p>`;
+    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}__version">${APP_VERSION}</p>`;
     headerLogo.href = PLUME_KO_FI_URL;
     headerLogo.target = "_blank";
     headerLogo.rel = "noopener noreferrer";
