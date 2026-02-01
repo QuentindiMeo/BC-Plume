@@ -214,8 +214,7 @@ interface DebugControl {
 }
 
 enum PLUME_ELEM_IDENTIFIERS {
-  runtime = "span#project-runtime",
-  bcElements = "div.bpe-hidden-original",
+  bcElements = "div#bpe-hidden-original",
   plumeContainer = "div#bpe-plume",
   headerContainer = "div#bpe-header-container",
   headerLogo = "a#bpe-header-logo",
@@ -380,10 +379,11 @@ const browserCacheExists = browserCache !== undefined;
   const runtimeInfo = {
     totalRuntime: 0,
     formattedTotalRuntime: "",
-    ariaString: ""
+    ariaString: "",
+    calculated: false
   };
   const getRuntimeSpan = (): HTMLSpanElement => {
-    if (!runtimeInfo.totalRuntime) {
+    if (!runtimeInfo.calculated) {
       const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
       const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
       trackRows.forEach((row) => {
@@ -410,10 +410,12 @@ const browserCacheExists = browserCache !== undefined;
       ]);
       runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [Math.floor(runtimeInfo.totalRuntime / 60), runtimeInfo.totalRuntime % 60]);
       logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
+
+      runtimeInfo.calculated = true;
     }
 
     const runtimeSpan = document.createElement("span");
-    runtimeSpan.className = PLUME_ELEM_IDENTIFIERS.runtime.split("#")[1];
+    runtimeSpan.className = "project-runtime";
     runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
     runtimeSpan.ariaLabel = runtimeInfo.ariaString;
 
@@ -1131,7 +1133,7 @@ const browserCacheExists = browserCache !== undefined;
     if (!trackTable) return { current: 0, total: 0 };
 
     const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
-    if (!trackRows)
+    if (trackRows.length === 0)
       return { current: 0, total: 0 };
 
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
@@ -1155,7 +1157,7 @@ const browserCacheExists = browserCache !== undefined;
     const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
     if (bcAudioTable) {
       bcAudioTable.style.display = "none";
-      bcAudioTable.classList.add("bpe-hidden-original");
+      bcAudioTable.classList.add(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
     }
 
     logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
@@ -1167,7 +1169,7 @@ const browserCacheExists = browserCache !== undefined;
     if (!bcAudioTable) return; // eliminate onInit function call
 
     bcAudioTable.style.display = "unset";
-    bcAudioTable.classList.remove("bpe-hidden-original");
+    bcAudioTable.classList.remove(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
 
     logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__RESTORED"));
   };
@@ -1472,7 +1474,7 @@ const browserCacheExists = browserCache !== undefined;
       volumeSliders.forEach((slider) => {
         (slider as HTMLInputElement).value = newValue.toString();
 
-        const valueDisplay = slider.parentElement!.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLSpanElement;
+        const valueDisplay = slider.parentElement!.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
         valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
       });
 
