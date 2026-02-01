@@ -265,6 +265,7 @@ enum BC_ELEM_IDENTIFIERS {
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
+  trackDuration = "span.time",
   coverArt = "div#tralbumArt img"
 }
 
@@ -369,6 +370,47 @@ const browserCacheExists = browserCache !== undefined;
     );
 
     return audio;
+  };
+
+  let formattedTotalRuntime = "";
+  const getRuntimeSpan = (forFullscreen = false): HTMLSpanElement => {
+    if (!forFullscreen) {
+      let totalRuntime = 0;
+      const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+      const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+      trackRows.forEach((row) => {
+        const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
+        if (durationCell) {
+          const durationText = durationCell.textContent.trim();
+          const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
+          let seconds = 0;
+          if (parts.length === 2) {
+            // MM:SS
+            seconds = parts[0] * 60 + parts[1];
+          } else if (parts.length === 3) {
+            // HH:MM:SS
+            seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+          }
+          totalRuntime += seconds;
+        }
+      });
+      formattedTotalRuntime = formatTime(totalRuntime);
+    }
+
+    const runtimeSpan = document.createElement("span");
+    runtimeSpan.className = "project-runtime";
+    runtimeSpan.textContent = "(" + formattedTotalRuntime + ")";
+
+    console.log(forFullscreen, runtimeSpan)
+    return runtimeSpan;
+  }
+  const addRuntimeFullscreen = (parent: HTMLHeadingElement) => {
+    parent.appendChild(getRuntimeSpan(true));
+  }
+  const addRuntime = () => {
+    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+    const titleElement = infoSection.querySelector("h2");
+    titleElement!.appendChild(getRuntimeSpan());
   };
 
   // Debug function to identify Bandcamp controls
@@ -548,12 +590,17 @@ const browserCacheExists = browserCache !== undefined;
     titling.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
     const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
 
-    const albumTitle = infoSection.querySelector("h2") as HTMLHeadingElement;
+    const albumHeading = infoSection.querySelector("h2")!.cloneNode(true) as HTMLHeadingElement;
+    albumHeading.querySelector("span")?.remove();
     const projectTitle = document.createElement("h2");
     projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
-    projectTitle.textContent = albumTitle.textContent || "";
+    projectTitle.textContent = albumHeading.textContent || "";
+    if (!isAlbumPage)
+      projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
     projectTitle.style.fontStyle = isAlbumPage ? "italic" : "unset";
     titling.appendChild(projectTitle);
+    if (isAlbumPage)
+      addRuntimeFullscreen(projectTitle);
 
     const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
     const artistTitle = document.createElement("h3");
@@ -1213,6 +1260,9 @@ const browserCacheExists = browserCache !== undefined;
     bcPlayerContainer.appendChild(plumeContainer);
 
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
+
+    if (isAlbumPage)
+      addRuntime();
   };
 
   const setPauseBtnIcon = () => {

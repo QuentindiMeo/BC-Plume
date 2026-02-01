@@ -10,6 +10,13 @@
 
 /*********** Native elements styling ***********/
 
+span.project-runtime {
+  font-size: 50%;
+  line-height: 50%;
+  font-style: italic;
+  color: #0000007f;
+}
+
 .inline_player { /* parent component */
   position: sticky !important;
   top: 0;
@@ -438,6 +445,12 @@
   color: #ffffff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
+<<<<<<< Updated upstream
+=======
+#bpe-fullscreen-titling__project span.project-runtime {
+  color: #ffffffaf;
+}
+>>>>>>> Stashed changes
 #bpe-fullscreen-titling__artist {
   color: #ffffff7f;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
