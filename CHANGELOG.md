@@ -1,7 +1,11 @@
 <div align="center" id="top">
   <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
-  <h2>:card_file_box: Plume's Changelog :card_file_box:</h2>
+  <h2>:card_file_box: Full-Fleshed Changelog :card_file_box:</h2>
 </div>
+
+- later releases to come.
+
+  - _**[1.3.1]** Feb 01 2026_: Fullscreen mode is improved, album runtime is displayed, keyboard shortcuts are added. [#76](https://github.com/QuentindiMeo/BC-Plume/pull/76)
 
 - _**[1.3.0]** Jan 18 2026_: **Pedal To The Metal** — Fullscreen mode, playback bugfixes and Spanish language support. [#67](https://github.com/QuentindiMeo/BC-Plume/pull/67)
 

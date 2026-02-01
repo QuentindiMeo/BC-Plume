@@ -10,6 +10,12 @@
 
 /*********** Native elements styling ***********/
 
+span.project-runtime {
+  font-size: 50%;
+  line-height: 50%;
+  color: #0000007f;
+}
+
 .inline_player { /* parent component */
   position: sticky !important;
   top: 0;
@@ -43,7 +49,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.bpe-hidden-original {
+#bpe-hidden-original {
   display: none !important;
   visibility: hidden !important;
 }
@@ -76,7 +82,7 @@
 
   scale: 0.25;
 }
-#bpe-header-logo--version {
+#bpe-header-logo__version {
   margin: 0;
   margin-top: 0.5rem;
 
@@ -404,13 +410,53 @@
   pointer-events: all;
 }
 
-#bpe-fullscreen-cover-art {
+#bpe-fullscreen-presentation {
+  position: relative;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+#bpe-fullscreen-cover-art {
+  max-width: 30vw;
+  max-height: 60vh;
 
-  pointer-events: none;
-  user-select: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
+
+  animation: slideInLeft 0.5s ease-out;
+}
+#bpe-fullscreen-titling {
+  position: absolute;
+  bottom: -6vh;
+  margin-top: 0.5rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+
+  animation: slideInRight 0.5s ease-out;
+}
+#bpe-fullscreen-titling * {
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+#bpe-fullscreen-titling__project {
+  font-style: italic;
+}
+#bpe-fullscreen-titling__project span.project-runtime {
+  font-size: 60%;
+  line-height: 60%;
+  font-weight: 500;
+  font-style: normal;
+  color: #ffffffaf;
+}
+#bpe-fullscreen-titling__artist {
+  color: #ffffff7f;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 #bpe-fullscreen-clone {
@@ -495,16 +541,6 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-#bpe-fullscreen-cover-art img {
-  max-width: 30vw;
-  max-height: 60vh;
-
-  border-radius: 0.5rem;
-  box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
-
-  animation: slideInLeft 0.5s ease-out;
-}
-
 /* Responsive adjustments for fullscreen */
 @media (max-width: 768px) {
   #bpe-fullscreen-content {
@@ -515,8 +551,12 @@
     gap: 2rem;
   }
 
-  #bpe-fullscreen-cover-art img {
+  #bpe-fullscreen-cover-art {
     max-width: 70vw;
     max-height: 40vh;
+  }
+
+  #bpe-fullscreen-titling {
+    position: unset;
   }
 }

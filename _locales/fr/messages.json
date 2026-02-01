@@ -21,6 +21,8 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Éléments du lecteur original cachés" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Éléments du lecteur original restaurés" },
   "INFO__BROWSER__DETECTED": { "message": "Navigateur détecté :" },
+  "INFO__SHORTCUTS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
+  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Méthode d'affichage de la durée appliquée :" },
   "INFO__VOLUME__APPLIED": { "message": "Volume appliqué à nouvel audio :" },
@@ -57,6 +59,19 @@
       }
     }
   },
+  "LABEL__RUNTIME": {
+    "message": "$MINUTES$ min $SECONDES$ s",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "secondes": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
   "LABEL__TRACK": { "message": "en cours de lecture :" },
   "LABEL__TRACK_CURRENT": {
     "message": "en cours de lecture ($PISTE$) :",
@@ -76,7 +91,21 @@
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__VOLUME": { "message": "Volume" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
+  "LABEL__BY": { "message": "de" },
   "META__PERCENTAGE": { "message": " %" },
+  "ARIA__RUNTIME__LABEL": {
+    "message": "Durée totale du projet : $MINUTES$ minutes et $SECONDES$ secondes",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "secondes": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
   "ARIA__TRACK": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture",

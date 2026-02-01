@@ -19,6 +19,8 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
   "INFO__BROWSER__DETECTED": { "message": "Navegador detectado:" },
+  "INFO__SHORTCUTS__REGISTERED": { "message": "Atajos de teclado registrados" },
+  "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Método de visualización de tiempo aplicado:" },
   "INFO__VOLUME__APPLIED": { "message": "Volumen aplicado al nuevo audio:" },
@@ -55,6 +57,19 @@
       }
     }
   },
+  "LABEL__RUNTIME": {
+    "message": "$MINUTOS$ min $SEGUNDOS$ s",
+    "placeholders": {
+      "minutos": {
+        "content": "$1",
+        "example": "5"
+      },
+      "segundos": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
   "LABEL__TRACK": { "message": "reproduciendo ahora:" },
   "LABEL__TRACK_CURRENT": {
     "message": "reproduciendo ahora ($NUMERACION$):",
@@ -74,7 +89,21 @@
   "LABEL__TRACK_FORWARD": { "message": "Ir a pista siguiente" },
   "LABEL__VOLUME": { "message": "Volumen" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
+  "LABEL__BY": { "message": "de" },
   "META__PERCENTAGE": { "message": "%" },
+  "ARIA__RUNTIME__LABEL": {
+    "message": "El tiempo total es de $MINUTOS$ minutos y $SEGUNDOS$ segundos" ,
+    "placeholders": {
+      "minutos": {
+        "content": "$1",
+        "example": "5"
+      },
+      "segundos": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
   "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
   "ARIA__TRACK": {
     "message": "La pista $TITULO_PISTA$ se está reproduciendo",
@@ -102,8 +131,8 @@
       }
     }
   },
-  "ARIA__PROGRESS_SLIDER": { "message": "Control deslizante de progreso del audio" },
-  "ARIA__VOLUME_SLIDER": { "message": "Control deslizante de volumen" },
+  "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
+  "ARIA__VOLUME_SLIDER": { "message": "Deslizador de volumen" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" }
 }

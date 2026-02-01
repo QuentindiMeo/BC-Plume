@@ -1,6 +1,6 @@
 // Plume - TypeScript for song page and album page display
 const APP_NAME = "Plume - Bandcamp Player Enhancer";
-const APP_VERSION = "v1.3.0";
+const APP_VERSION = "v1.3.1";
 const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
 
 interface BrowserAPI {
@@ -214,7 +214,7 @@ interface DebugControl {
 }
 
 enum PLUME_ELEM_IDENTIFIERS {
-  bcElements = "div.bpe-hidden-original",
+  bcElements = "div#bpe-hidden-original",
   plumeContainer = "div#bpe-plume",
   headerContainer = "div#bpe-header-container",
   headerLogo = "a#bpe-header-logo",
@@ -244,7 +244,11 @@ enum PLUME_ELEM_IDENTIFIERS {
   fullscreenBackground = "div#bpe-fullscreen-background",
   fullscreenContent = "div#bpe-fullscreen-content",
   fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
-  fullscreenCoverArtContainer = "div#bpe-fullscreen-cover-art",
+  fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
+  fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
+  fullscreenTitlingContainer = "div#bpe-fullscreen-titling",
+  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
+  fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
 }
 
@@ -257,12 +261,17 @@ enum BC_ELEM_IDENTIFIERS {
   albumPageCurrentTrackTitle = "a.title_link",
   previousTrack = "div.prevbutton",
   nextTrack = "div.nextbutton",
-  nameSection = "div#name-section",
+  infoSection = "div#name-section",
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
+  trackDuration = "span.time",
   coverArt = "div#tralbumArt img"
 }
+
+const AVAILABLE_SHORTCUT_CODES = new Set([
+  "Space", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "KeyF"
+]);
 
 // Customized console logger with timestamp and level
 enum CPL { // Console Printing Level
@@ -365,6 +374,60 @@ const browserCacheExists = browserCache !== undefined;
     );
 
     return audio;
+  };
+
+  const runtimeInfo = {
+    totalRuntime: 0,
+    formattedTotalRuntime: "",
+    ariaString: "",
+    calculated: false
+  };
+  const getRuntimeSpan = (): HTMLSpanElement => {
+    if (!runtimeInfo.calculated) {
+      const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+      const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+      trackRows.forEach((row) => {
+        const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
+        if (durationCell) {
+          const durationText = durationCell.textContent.trim();
+          const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
+          let seconds = 0;
+          if (parts.length === 2) {
+            // MM:SS
+            seconds = parts[0] * 60 + parts[1];
+          } else if (parts.length === 3) {
+            // HH:MM:SS
+            seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+          }
+          runtimeInfo.totalRuntime += seconds;
+        }
+      });
+      const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
+      const seconds = runtimeInfo.totalRuntime % 60;
+      runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
+        minutes,
+        seconds < 10 ? "0" + seconds : seconds.toString()
+      ]);
+      runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [Math.floor(runtimeInfo.totalRuntime / 60), runtimeInfo.totalRuntime % 60]);
+      logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
+
+      runtimeInfo.calculated = true;
+    }
+
+    const runtimeSpan = document.createElement("span");
+    runtimeSpan.className = "project-runtime";
+    runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
+    runtimeSpan.ariaLabel = runtimeInfo.ariaString;
+
+    return runtimeSpan;
+  };
+  const addRuntimeFullscreen = (parent: HTMLHeadingElement) => {
+    parent.appendChild(getRuntimeSpan());
+  };
+  const addRuntime = () => {
+    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+    const titleElement = infoSection.querySelector("h2");
+    titleElement!.appendChild(getRuntimeSpan());
   };
 
   // Debug function to identify Bandcamp controls
@@ -531,13 +594,38 @@ const browserCacheExists = browserCache !== undefined;
     const contentContainer = document.createElement("div");
     contentContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenContent.split("#")[1];
 
-    const coverArtContainer = document.createElement("div");
-    coverArtContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArtContainer.split("#")[1];
+    const presentationContainer = document.createElement("div");
+    presentationContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenPresentationContainer.split("#")[1];
+
     const coverArtImg = document.createElement("img");
+    coverArtImg.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArt.split("#")[1];
     coverArtImg.src = coverArt.src;
     coverArtImg.alt = getString("ARIA__COVER_ART");
-    coverArtContainer.appendChild(coverArtImg);
-    contentContainer.appendChild(coverArtContainer);
+    presentationContainer.appendChild(coverArtImg);
+
+    const titling = document.createElement("div");
+    titling.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
+    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+
+    const albumHeading = infoSection.querySelector("h2")!.cloneNode(true) as HTMLHeadingElement;
+    albumHeading.querySelector("span")?.remove();
+    const projectTitle = document.createElement("h2");
+    projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
+    projectTitle.textContent = albumHeading.textContent || "";
+    if (!isAlbumPage)
+      projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
+    if (isAlbumPage)
+      addRuntimeFullscreen(projectTitle);
+    titling.appendChild(projectTitle);
+
+    const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
+    const artistTitle = document.createElement("h3");
+    artistTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingArtist.split("#")[1];
+    artistTitle.textContent = getString("LABEL__BY") + " " + (artistName.textContent || "");
+    titling.appendChild(artistTitle);
+
+    presentationContainer.appendChild(titling);
+    contentContainer.appendChild(presentationContainer);
 
     // Clone the plume module (right side)
     const plumeContainer = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer) as HTMLDivElement;
@@ -546,12 +634,13 @@ const browserCacheExists = browserCache !== undefined;
 
     const fullscreenLogo = document.createElement("a");
     fullscreenLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
-    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}--version">${APP_VERSION}</p>`;
+    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}__version">${APP_VERSION}</p>`;
     fullscreenLogo.href = PLUME_KO_FI_URL;
     fullscreenLogo.target = "_blank";
     fullscreenLogo.rel = "noopener noreferrer";
     fullscreenLogo.ariaLabel = APP_NAME;
     fullscreenLogo.title = getString("ARIA__LOGO_LINK");
+    fullscreenLogo.tabIndex = 0;
     plumeClone.insertBefore(fullscreenLogo, plumeClone.firstChild);
 
     // Hide the fullscreen button section in the cloned module
@@ -1000,7 +1089,7 @@ const browserCacheExists = browserCache !== undefined;
   }
 
   const getArtistNameElement = (): HTMLSpanElement => {
-    const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.nameSection) as HTMLElement;
+    const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLElement;
     const nameSectionLinks = nameSection.querySelectorAll("span");
     const artistElementIdx = nameSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
     return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
@@ -1044,11 +1133,13 @@ const browserCacheExists = browserCache !== undefined;
     if (!trackTable) return { current: 0, total: 0 };
 
     const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
-    const trackCount = trackRows.length;
+    if (trackRows.length === 0)
+      return { current: 0, total: 0 };
+
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
-    logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackCount]));
-    return { current: currentTrackNumber, total: trackCount };
+    logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackRows.length]));
+    return { current: currentTrackNumber, total: trackRows.length };
   };
 
   // Function to get the current track title from Bandcamp
@@ -1066,7 +1157,7 @@ const browserCacheExists = browserCache !== undefined;
     const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
     if (bcAudioTable) {
       bcAudioTable.style.display = "none";
-      bcAudioTable.classList.add("bpe-hidden-original");
+      bcAudioTable.classList.add(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
     }
 
     logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
@@ -1078,7 +1169,7 @@ const browserCacheExists = browserCache !== undefined;
     if (!bcAudioTable) return; // eliminate onInit function call
 
     bcAudioTable.style.display = "unset";
-    bcAudioTable.classList.remove("bpe-hidden-original");
+    bcAudioTable.classList.remove(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
 
     logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__RESTORED"));
   };
@@ -1128,7 +1219,7 @@ const browserCacheExists = browserCache !== undefined;
 
     const headerLogo = document.createElement("a");
     headerLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
-    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}--version">${APP_VERSION}</p>`;
+    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}__version">${APP_VERSION}</p>`;
     headerLogo.href = PLUME_KO_FI_URL;
     headerLogo.target = "_blank";
     headerLogo.rel = "noopener noreferrer";
@@ -1187,6 +1278,9 @@ const browserCacheExists = browserCache !== undefined;
     bcPlayerContainer.appendChild(plumeContainer);
 
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
+
+    if (isAlbumPage)
+      addRuntime();
   };
 
   const setPauseBtnIcon = () => {
@@ -1356,6 +1450,62 @@ const browserCacheExists = browserCache !== undefined;
     });
   };
 
+  const setupKeyboardShortcuts = () => {
+    const isTypingInInput = (target: HTMLElement): boolean => {
+      return target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+    };
+
+    const handlePlayPauseShortcut = () => {
+      const playPauseBtns = Array.from(document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn));
+      handlePlayPause(playPauseBtns as HTMLButtonElement[]);
+    };
+
+    const handleAdjustVolume = (delta: number) => {
+      if (!plume.volumeSlider || !plume.audioElement) return;
+
+      const currentValue = Number.parseInt(plume.volumeSlider.value);
+      const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
+      plume.volumeSlider.value = newValue.toString();
+
+      const volume = newValue / VOLUME_SLIDER_GRANULARITY;
+      plume.audioElement.volume = volume;
+
+      const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
+      volumeSliders.forEach((slider) => {
+        (slider as HTMLInputElement).value = newValue.toString();
+
+        const valueDisplay = slider.parentElement!.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
+        valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
+      });
+
+      saveNewVolume(volume);
+    };
+
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
+      const isValidShortcut = AVAILABLE_SHORTCUT_CODES.has(e.code);
+      if (!isValidShortcut) return;
+
+      // Skip if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (isTypingInInput(target)) return;
+
+      e.preventDefault();
+      switch (e.code) {
+        case "Space": handlePlayPauseShortcut(); break;
+        case "ArrowLeft": handleTimeBackward(); break;
+        case "ArrowRight": handleTimeForward(); break;
+        case "ArrowUp": handleAdjustVolume(5); break;
+        case "ArrowDown": handleAdjustVolume(-5); break;
+        case "PageUp": handleTrackBackward(); break;
+        case "PageDown": handleTrackForward(); break;
+        case "KeyF": toggleFullscreenMode(); break;
+      }
+    });
+
+    logger(CPL.INFO, getString("INFO__SHORTCUTS__REGISTERED"));
+  };
+
   // Main initialization function
   const init = async () => {
     logger(CPL.INFO, getString("LOG__INITIALIZATION__START"));
@@ -1383,6 +1533,7 @@ const browserCacheExists = browserCache !== undefined;
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
+    setupKeyboardShortcuts();
     initPlayback();
 
     // Debug: show detected controls
