@@ -19,6 +19,7 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Original player elements hidden" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },
   "INFO__BROWSER__DETECTED": { "message": "Detected browser:" },
+  "INFO__SHORTCUTS__REGISTERED": { "message": "Keyboard shortcuts registered" },
   "INFO__RUNTIME__CALCULATED": { "message": "Total runtime calculated:" },
   "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Time display method applied:" },

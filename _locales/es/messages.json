@@ -19,6 +19,7 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
   "INFO__BROWSER__DETECTED": { "message": "Navegador detectado:" },
+  "INFO__SHORTCUTS__REGISTERED": { "message": "Atajos de teclado registrados" },
   "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Método de visualización de tiempo aplicado:" },

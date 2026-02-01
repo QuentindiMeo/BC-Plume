@@ -21,6 +21,7 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Éléments du lecteur original cachés" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Éléments du lecteur original restaurés" },
   "INFO__BROWSER__DETECTED": { "message": "Navigateur détecté :" },
+  "INFO__SHORTCUTS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
   "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Méthode d'affichage de la durée appliquée :" },
