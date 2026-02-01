@@ -405,12 +405,14 @@
 }
 
 #bpe-fullscreen-presentation {
+  position: relative;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-#bpe-fullscreen-presentation img {
+#bpe-fullscreen-cover-art {
   max-width: 30vw;
   max-height: 60vh;
 
@@ -533,7 +535,7 @@
     gap: 2rem;
   }
 
-  #bpe-fullscreen-presentation img {
+  #bpe-fullscreen-cover-art {
     max-width: 70vw;
     max-height: 40vh;
   }

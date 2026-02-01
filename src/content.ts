@@ -245,6 +245,7 @@ enum PLUME_ELEM_IDENTIFIERS {
   fullscreenContent = "div#bpe-fullscreen-content",
   fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
   fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
+  fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
   fullscreenTitlingContainer = "div#bpe-fullscreen-titling",
   fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
   fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
@@ -538,6 +539,7 @@ const browserCacheExists = browserCache !== undefined;
     presentationContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenPresentationContainer.split("#")[1];
 
     const coverArtImg = document.createElement("img");
+    coverArtImg.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArt.split("#")[1];
     coverArtImg.src = coverArt.src;
     coverArtImg.alt = getString("ARIA__COVER_ART");
     presentationContainer.appendChild(coverArtImg);
