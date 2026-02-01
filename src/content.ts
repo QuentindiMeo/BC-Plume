@@ -270,6 +270,10 @@ enum BC_ELEM_IDENTIFIERS {
   coverArt = "div#tralbumArt img"
 }
 
+const AVAILABLE_SHORTCUT_CODES = new Set([
+  "Space", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "KeyF"
+]);
+
 // Customized console logger with timestamp and level
 enum CPL { // Console Printing Level
   DEBUG = "debug",
@@ -1442,6 +1446,62 @@ const browserCacheExists = browserCache !== undefined;
     });
   };
 
+  const setupKeyboardShortcuts = () => {
+    const isTypingInInput = (target: HTMLElement): boolean => {
+      return target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+    };
+
+    const handlePlayPauseShortcut = () => {
+      const playPauseBtns = Array.from(document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn));
+      handlePlayPause(playPauseBtns as HTMLButtonElement[]);
+    };
+
+    const handleAdjustVolume = (delta: number) => {
+      if (!plume.volumeSlider || !plume.audioElement) return;
+
+      const currentValue = Number.parseInt(plume.volumeSlider.value);
+      const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
+      plume.volumeSlider.value = newValue.toString();
+
+      const volume = newValue / VOLUME_SLIDER_GRANULARITY;
+      plume.audioElement.volume = volume;
+
+      const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
+      volumeSliders.forEach((slider) => {
+        (slider as HTMLInputElement).value = newValue.toString();
+
+        const valueDisplay = slider.parentElement!.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLSpanElement;
+        valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
+      });
+
+      saveNewVolume(volume);
+    };
+
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
+      const isValidShortcut = AVAILABLE_SHORTCUT_CODES.has(e.code);
+      if (!isValidShortcut) return;
+
+      // Skip if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (isTypingInInput(target)) return;
+
+      e.preventDefault();
+      switch (e.code) {
+        case "Space": handlePlayPauseShortcut(); break;
+        case "ArrowLeft": handleTimeBackward(); break;
+        case "ArrowRight": handleTimeForward(); break;
+        case "ArrowUp": handleAdjustVolume(5); break;
+        case "ArrowDown": handleAdjustVolume(-5); break;
+        case "PageUp": handleTrackBackward(); break;
+        case "PageDown": handleTrackForward(); break;
+        case "KeyF": toggleFullscreenMode(); break;
+      }
+    });
+
+    logger(CPL.INFO, getString("INFO__SHORTCUTS__REGISTERED"));
+  };
+
   // Main initialization function
   const init = async () => {
     logger(CPL.INFO, getString("LOG__INITIALIZATION__START"));
@@ -1469,6 +1529,7 @@ const browserCacheExists = browserCache !== undefined;
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
+    setupKeyboardShortcuts();
     initPlayback();
 
     // Debug: show detected controls
