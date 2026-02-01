@@ -246,8 +246,8 @@ enum PLUME_ELEM_IDENTIFIERS {
   fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
   fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
   fullscreenTitlingContainer = "div#bpe-fullscreen-titling",
-  fullscreenTitlingProject = "h2#bpe-fullscreen-titling--project",
-  fullscreenTitlingArtist = "h3#bpe-fullscreen-titling--artist",
+  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
+  fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
 }
 
@@ -550,6 +550,7 @@ const browserCacheExists = browserCache !== undefined;
     const projectTitle = document.createElement("h2");
     projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
     projectTitle.textContent = albumTitle.textContent || "";
+    projectTitle.style.fontStyle = isAlbumPage ? "italic" : "unset";
     titling.appendChild(projectTitle);
 
     const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
@@ -568,12 +569,13 @@ const browserCacheExists = browserCache !== undefined;
 
     const fullscreenLogo = document.createElement("a");
     fullscreenLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
-    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}--version">${APP_VERSION}</p>`;
+    fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}__version">${APP_VERSION}</p>`;
     fullscreenLogo.href = PLUME_KO_FI_URL;
     fullscreenLogo.target = "_blank";
     fullscreenLogo.rel = "noopener noreferrer";
     fullscreenLogo.ariaLabel = APP_NAME;
     fullscreenLogo.title = getString("ARIA__LOGO_LINK");
+    fullscreenLogo.tabIndex = 0;
     plumeClone.insertBefore(fullscreenLogo, plumeClone.firstChild);
 
     // Hide the fullscreen button section in the cloned module
@@ -1150,7 +1152,7 @@ const browserCacheExists = browserCache !== undefined;
 
     const headerLogo = document.createElement("a");
     headerLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
-    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}--version">${APP_VERSION}</p>`;
+    headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}__version">${APP_VERSION}</p>`;
     headerLogo.href = PLUME_KO_FI_URL;
     headerLogo.target = "_blank";
     headerLogo.rel = "noopener noreferrer";
