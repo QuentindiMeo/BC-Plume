@@ -76,6 +76,7 @@
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__VOLUME": { "message": "Volume" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
+  "LABEL__BY": { "message": "de" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
   "ARIA__TRACK": {
