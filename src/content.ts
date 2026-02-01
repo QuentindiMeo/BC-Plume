@@ -1,6 +1,6 @@
 // Plume - TypeScript for song page and album page display
 const APP_NAME = "Plume - Bandcamp Player Enhancer";
-const APP_VERSION = "v1.3.0";
+const APP_VERSION = "v1.3.1";
 const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
 
 interface BrowserAPI {
@@ -1131,11 +1131,13 @@ const browserCacheExists = browserCache !== undefined;
     if (!trackTable) return { current: 0, total: 0 };
 
     const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
-    const trackCount = trackRows.length;
+    if (!trackRows)
+      return { current: 0, total: 0 };
+
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
-    logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackCount]));
-    return { current: currentTrackNumber, total: trackCount };
+    logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackRows.length]));
+    return { current: currentTrackNumber, total: trackRows.length };
   };
 
   // Function to get the current track title from Bandcamp
