@@ -372,10 +372,13 @@ const browserCacheExists = browserCache !== undefined;
     return audio;
   };
 
-  let formattedTotalRuntime = "";
-  const getRuntimeSpan = (forFullscreen = false): HTMLSpanElement => {
-    if (!forFullscreen) {
-      let totalRuntime = 0;
+  const runtimeInfo = {
+    totalRuntime: 0,
+    formattedTotalRuntime: "",
+    ariaString: ""
+  }
+  const getRuntimeSpan = (): HTMLSpanElement => {
+    if (!runtimeInfo.totalRuntime) {
       const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
       const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
       trackRows.forEach((row) => {
@@ -391,21 +394,34 @@ const browserCacheExists = browserCache !== undefined;
             // HH:MM:SS
             seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
           }
-          totalRuntime += seconds;
+          runtimeInfo.totalRuntime += seconds;
         }
       });
-      formattedTotalRuntime = formatTime(totalRuntime);
+      const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
+      const seconds = runtimeInfo.totalRuntime % 60;
+      runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
+        minutes,
+        seconds < 10 ? "0" + seconds : seconds.toString()
+      ]);
+      runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [Math.floor(runtimeInfo.totalRuntime / 60), runtimeInfo.totalRuntime % 60]);
+      logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
     }
 
     const runtimeSpan = document.createElement("span");
     runtimeSpan.className = "project-runtime";
-    runtimeSpan.textContent = "(" + formattedTotalRuntime + ")";
+    runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
+    runtimeSpan.title = runtimeInfo.ariaString;
+    const ariaSpan = document.createElement("span");
+    ariaSpan.id = "project-runtime__aria";
+    ariaSpan.className = "sr-only";
+    ariaSpan.textContent = runtimeInfo.ariaString;
+    runtimeSpan.setAttribute("aria-describedby", ariaSpan.id);
+    runtimeSpan.appendChild(ariaSpan);
 
-    console.log(forFullscreen, runtimeSpan)
     return runtimeSpan;
   }
   const addRuntimeFullscreen = (parent: HTMLHeadingElement) => {
-    parent.appendChild(getRuntimeSpan(true));
+    parent.appendChild(getRuntimeSpan());
   }
   const addRuntime = () => {
     const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
@@ -597,7 +613,6 @@ const browserCacheExists = browserCache !== undefined;
     projectTitle.textContent = albumHeading.textContent || "";
     if (!isAlbumPage)
       projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
-    projectTitle.style.fontStyle = isAlbumPage ? "italic" : "unset";
     titling.appendChild(projectTitle);
     if (isAlbumPage)
       addRuntimeFullscreen(projectTitle);

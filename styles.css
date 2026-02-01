@@ -10,10 +10,20 @@
 
 /*********** Native elements styling ***********/
 
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+}
+
 span.project-runtime {
   font-size: 50%;
   line-height: 50%;
-  font-style: italic;
   color: #0000007f;
 }
 
@@ -445,12 +455,16 @@ span.project-runtime {
   color: #ffffff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
-<<<<<<< Updated upstream
-=======
+#bpe-fullscreen-titling__project {
+  font-style: italic;
+}
 #bpe-fullscreen-titling__project span.project-runtime {
+  font-size: 60%;
+  line-height: 60%;
+  font-weight: 500;
+  font-style: normal;
   color: #ffffffaf;
 }
->>>>>>> Stashed changes
 #bpe-fullscreen-titling__artist {
   color: #ffffff7f;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
