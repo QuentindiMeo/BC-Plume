@@ -214,6 +214,7 @@ interface DebugControl {
 }
 
 enum PLUME_ELEM_IDENTIFIERS {
+  runtime = "span#project-runtime",
   bcElements = "div.bpe-hidden-original",
   plumeContainer = "div#bpe-plume",
   headerContainer = "div#bpe-header-container",
@@ -376,7 +377,7 @@ const browserCacheExists = browserCache !== undefined;
     totalRuntime: 0,
     formattedTotalRuntime: "",
     ariaString: ""
-  }
+  };
   const getRuntimeSpan = (): HTMLSpanElement => {
     if (!runtimeInfo.totalRuntime) {
       const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
@@ -408,21 +409,15 @@ const browserCacheExists = browserCache !== undefined;
     }
 
     const runtimeSpan = document.createElement("span");
-    runtimeSpan.className = "project-runtime";
+    runtimeSpan.className = PLUME_ELEM_IDENTIFIERS.runtime.split("#")[1];
     runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
-    runtimeSpan.title = runtimeInfo.ariaString;
-    const ariaSpan = document.createElement("span");
-    ariaSpan.id = "project-runtime__aria";
-    ariaSpan.className = "sr-only";
-    ariaSpan.textContent = runtimeInfo.ariaString;
-    runtimeSpan.setAttribute("aria-describedby", ariaSpan.id);
-    runtimeSpan.appendChild(ariaSpan);
+    runtimeSpan.ariaLabel = runtimeInfo.ariaString;
 
     return runtimeSpan;
-  }
+  };
   const addRuntimeFullscreen = (parent: HTMLHeadingElement) => {
     parent.appendChild(getRuntimeSpan());
-  }
+  };
   const addRuntime = () => {
     const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
     const titleElement = infoSection.querySelector("h2");
@@ -613,9 +608,9 @@ const browserCacheExists = browserCache !== undefined;
     projectTitle.textContent = albumHeading.textContent || "";
     if (!isAlbumPage)
       projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
-    titling.appendChild(projectTitle);
     if (isAlbumPage)
       addRuntimeFullscreen(projectTitle);
+    titling.appendChild(projectTitle);
 
     const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
     const artistTitle = document.createElement("h3");
