@@ -253,6 +253,8 @@ enum PLUME_ELEM_IDENTIFIERS {
 }
 
 enum BC_ELEM_IDENTIFIERS {
+  trackView = "div.trackView",
+  infoSection = "div#name-section",
   playerParent = "div.inline_player",
   inlinePlayerTable = "div.inline_player>table",
   audioPlayer = "audio",
@@ -261,7 +263,6 @@ enum BC_ELEM_IDENTIFIERS {
   albumPageCurrentTrackTitle = "a.title_link",
   previousTrack = "div.prevbutton",
   nextTrack = "div.nextbutton",
-  infoSection = "div#name-section",
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
@@ -382,7 +383,7 @@ const browserCacheExists = browserCache !== undefined;
     ariaString: "",
     calculated: false
   };
-  const getRuntimeSpan = (): HTMLSpanElement => {
+  const getInfoSectionWithRuntime = (): HTMLSpanElement => {
     if (!runtimeInfo.calculated) {
       const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
       const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
@@ -414,20 +415,47 @@ const browserCacheExists = browserCache !== undefined;
       runtimeInfo.calculated = true;
     }
 
+    const infoSectionId = BC_ELEM_IDENTIFIERS.infoSection.split("#")[1];
+    const infoSection = document.getElementById(infoSectionId) as HTMLDivElement;
+    const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true) as HTMLDivElement;
+    const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true) as HTMLDivElement;
+
+    const newNameSection = document.createElement("div");
+    newNameSection.id = infoSectionId;
+
+    const newTitleHeading = document.createElement("div");
+    newTitleHeading.className = infoSectionId + "__titling";
+    newTitleHeading.appendChild(titleHeadingClone);
+
+    const mainSectionBackground = document.getElementById("pgBd")!;
+    const bgColor = globalThis.getComputedStyle(mainSectionBackground).getPropertyValue("background");
+    const bgColorAsRGB = [...bgColor.matchAll(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/g)].map(match => {
+      return {
+        r: Number.parseInt(match[1], 10),
+        g: Number.parseInt(match[2], 10),
+        b: Number.parseInt(match[3], 10),
+      };
+    })[0];
+    const runtimeTextColor = measureContrastRatioWCAG([bgColorAsRGB.r, bgColorAsRGB.g, bgColorAsRGB.b]) >= 3
+      ? "#0000007f"
+      : "#ffffff7f";
+
     const runtimeSpan = document.createElement("span");
     runtimeSpan.className = "project-runtime";
     runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
+    runtimeSpan.style.color = runtimeTextColor;
     runtimeSpan.ariaLabel = runtimeInfo.ariaString;
+    newTitleHeading.appendChild(runtimeSpan);
 
-    return runtimeSpan;
-  };
-  const addRuntimeFullscreen = (parent: HTMLHeadingElement) => {
-    parent.appendChild(getRuntimeSpan());
+    newNameSection.appendChild(newTitleHeading);
+    newNameSection.appendChild(artistHeadingClone);
+    infoSection.remove();
+
+    return newNameSection;
   };
   const addRuntime = () => {
-    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
-    const titleElement = infoSection.querySelector("h2");
-    titleElement!.appendChild(getRuntimeSpan());
+    const trackView = document.querySelector(BC_ELEM_IDENTIFIERS.trackView) as HTMLDivElement;
+    trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
   };
 
   // Debug function to identify Bandcamp controls
@@ -603,28 +631,15 @@ const browserCacheExists = browserCache !== undefined;
     coverArtImg.alt = getString("ARIA__COVER_ART");
     presentationContainer.appendChild(coverArtImg);
 
-    const titling = document.createElement("div");
-    titling.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
-    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
-
-    const albumHeading = infoSection.querySelector("h2")!.cloneNode(true) as HTMLHeadingElement;
-    albumHeading.querySelector("span")?.remove();
-    const projectTitle = document.createElement("h2");
+    const newNameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+    const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
+    adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
+    const projectTitle = adjustedNameSection.querySelector("h2")!;
     projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
-    projectTitle.textContent = albumHeading.textContent || "";
     if (!isAlbumPage)
       projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
-    if (isAlbumPage)
-      addRuntimeFullscreen(projectTitle);
-    titling.appendChild(projectTitle);
 
-    const artistName = Array.from(infoSection.querySelectorAll("span")).slice(-1)[0];
-    const artistTitle = document.createElement("h3");
-    artistTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingArtist.split("#")[1];
-    artistTitle.textContent = getString("LABEL__BY") + " " + (artistName.textContent || "");
-    titling.appendChild(artistTitle);
-
-    presentationContainer.appendChild(titling);
+    presentationContainer.appendChild(adjustedNameSection);
     contentContainer.appendChild(presentationContainer);
 
     // Clone the plume module (right side)
@@ -1089,10 +1104,10 @@ const browserCacheExists = browserCache !== undefined;
   }
 
   const getArtistNameElement = (): HTMLSpanElement => {
-    const nameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLElement;
-    const nameSectionLinks = nameSection.querySelectorAll("span");
-    const artistElementIdx = nameSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
-    return nameSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
+    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+    const infoSectionLinks = infoSection.querySelectorAll("span");
+    const artistElementIdx = infoSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
+    return infoSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
   };
 
   const getTrackTitleElement = (): HTMLSpanElement => {
@@ -1451,10 +1466,6 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const setupKeyboardShortcuts = () => {
-    const isTypingInInput = (target: HTMLElement): boolean => {
-      return target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
-    };
-
     const handlePlayPauseShortcut = () => {
       const playPauseBtns = Array.from(document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn));
       handlePlayPause(playPauseBtns as HTMLButtonElement[]);
@@ -1485,10 +1496,6 @@ const browserCacheExists = browserCache !== undefined;
       if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
       const isValidShortcut = AVAILABLE_SHORTCUT_CODES.has(e.code);
       if (!isValidShortcut) return;
-
-      // Skip if user is typing in an input field
-      const target = e.target as HTMLElement;
-      if (isTypingInInput(target)) return;
 
       e.preventDefault();
       switch (e.code) {
