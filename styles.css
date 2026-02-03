@@ -22,9 +22,6 @@ div.name-section__titling {
 div.name-section__titling h2 {
   margin-right: 0 !important;
 }
-div.name-section__titling > span.project-runtime {
-  color: #0000007f;
-}
 
 .inline_player { /* parent component */
   position: sticky !important;
@@ -442,7 +439,7 @@ div.name-section__titling > span.project-runtime {
 }
 .bpe-fullscreen-titling {
   position: absolute;
-  bottom: -6vh;
+  bottom: -8vh;
 
   display: flex;
   flex-direction: column;
@@ -453,7 +450,7 @@ div.name-section__titling > span.project-runtime {
 }
 .bpe-fullscreen-titling h2, .bpe-fullscreen-titling h3 {
   margin: 0;
-  color: #ffffff;
+  text-align: justify;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 .bpe-fullscreen-titling .name-section__titling {
@@ -463,10 +460,6 @@ div.name-section__titling > span.project-runtime {
   font-weight: 500;
   font-style: normal;
   color: #ffffff7f !important;
-}
-.bpe-fullscreen-titling #bpe-fullscreen-titling__artist {
-  color: #ffffff7f;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 #bpe-fullscreen-clone {
@@ -555,10 +548,8 @@ div.name-section__titling > span.project-runtime {
 @media (max-width: 768px) {
   #bpe-fullscreen-content {
     height: auto;
-    padding: 2rem 0;
-
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
   }
 
   #bpe-fullscreen-cover-art {
@@ -566,7 +557,11 @@ div.name-section__titling > span.project-runtime {
     max-height: 40vh;
   }
 
-  #bpe-fullscreen-titling {
+  .bpe-fullscreen-titling {
     position: unset;
+  }
+
+  #bpe-fullscreen-presentation {
+    gap: 0.25rem;
   }
 }

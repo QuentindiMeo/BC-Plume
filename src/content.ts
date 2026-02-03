@@ -254,6 +254,7 @@ enum PLUME_ELEM_IDENTIFIERS {
 
 enum BC_ELEM_IDENTIFIERS {
   trackView = "div.trackView",
+  fromAlbum = "span.fromAlbum",
   infoSection = "div#name-section",
   playerParent = "div.inline_player",
   inlinePlayerTable = "div.inline_player>table",
@@ -634,10 +635,13 @@ const browserCacheExists = browserCache !== undefined;
     const newNameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
     const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
     adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
-    const projectTitle = adjustedNameSection.querySelector("h2")!;
-    projectTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
-    if (!isAlbumPage)
-      projectTitle.textContent = "\"" + projectTitle.textContent.trim() + "\"";
+    const headTitle = adjustedNameSection.querySelector("h2")!;
+    headTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
+    if (!isAlbumPage) {
+      headTitle.textContent = "\"" + headTitle.textContent.trim() + "\"";
+      const albumTitle = adjustedNameSection.querySelector(BC_ELEM_IDENTIFIERS.fromAlbum) as HTMLSpanElement;
+      albumTitle.style.fontStyle = "italic";
+    }
 
     presentationContainer.appendChild(adjustedNameSection);
     contentContainer.appendChild(presentationContainer);
@@ -682,8 +686,8 @@ const browserCacheExists = browserCache !== undefined;
         ));
       };
 
-      const handleTabKey = (event: KeyboardEvent) => {
-        if (event.key !== "Tab") return;
+      const handleTabKey = (e: KeyboardEvent) => {
+        if (e.code !== "Tab") return;
 
         const focusableElements = getFocusableElements();
         if (focusableElements.length === 0) return;
@@ -692,13 +696,13 @@ const browserCacheExists = browserCache !== undefined;
         const lastFocusable = focusableElements[focusableElements.length - 1];
         const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
 
-        if (event.shiftKey) {
+        if (e.shiftKey) {
           if (document.activeElement === firstFocusable || currentIndex === -1) {
-            event.preventDefault();
+            e.preventDefault();
             lastFocusable.focus();
           }
         } else if (document.activeElement === lastFocusable || currentIndex === -1) {
-          event.preventDefault();
+          e.preventDefault();
           firstFocusable.focus();
         }
       };
@@ -711,8 +715,8 @@ const browserCacheExists = browserCache !== undefined;
       }, 0); // Somehow needs timeout to function right
     };
 
-    overlay.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key === "Escape") toggleFullscreenMode();
+    overlay.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.code === "Escape") toggleFullscreenMode();
     });
 
     // Sync all controls with the original plume module
@@ -1498,6 +1502,7 @@ const browserCacheExists = browserCache !== undefined;
       if (!isValidShortcut) return;
 
       e.preventDefault();
+      e.stopPropagation();
       switch (e.code) {
         case "Space": handlePlayPauseShortcut(); break;
         case "ArrowLeft": handleTimeBackward(); break;
