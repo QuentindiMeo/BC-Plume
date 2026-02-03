@@ -246,16 +246,16 @@ enum PLUME_ELEM_IDENTIFIERS {
   fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
   fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
   fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
-  fullscreenTitlingContainer = "div#bpe-fullscreen-titling",
+  fullscreenTitlingContainer = "div.bpe-fullscreen-titling",
   fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
   fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
 }
 
 enum BC_ELEM_IDENTIFIERS {
+  infoSection = "div#name-section",
   trackView = "div.trackView",
   fromAlbum = "span.fromAlbum",
-  infoSection = "div#name-section",
   playerParent = "div.inline_player",
   inlinePlayerTable = "div.inline_player>table",
   audioPlayer = "audio",
@@ -384,7 +384,7 @@ const browserCacheExists = browserCache !== undefined;
     ariaString: "",
     calculated: false
   };
-  const getInfoSectionWithRuntime = (): HTMLSpanElement => {
+  const getInfoSectionWithRuntime = (): HTMLDivElement => {
     if (!runtimeInfo.calculated) {
       const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
       const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
@@ -430,19 +430,17 @@ const browserCacheExists = browserCache !== undefined;
 
     const mainSectionBackground = document.getElementById("pgBd")!;
     const bgColor = globalThis.getComputedStyle(mainSectionBackground).getPropertyValue("background");
-    const bgColorAsRGB = [...bgColor.matchAll(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/g)].map(match => {
-      return {
-        r: Number.parseInt(match[1], 10),
-        g: Number.parseInt(match[2], 10),
-        b: Number.parseInt(match[3], 10),
-      };
-    })[0];
-    const runtimeTextColor = measureContrastRatioWCAG([bgColorAsRGB.r, bgColorAsRGB.g, bgColorAsRGB.b]) >= 3
+    const bgColorAsRGB = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bgColor);
+    const r = Number.parseInt(bgColorAsRGB![1], 10);
+    const g = Number.parseInt(bgColorAsRGB![2], 10);
+    const b = Number.parseInt(bgColorAsRGB![3], 10);
+    const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= 3
       ? "#0000007f"
       : "#ffffff7f";
+    alert(`${[r,g,b]}, ${measureContrastRatioWCAG([r, g, b])} => ${runtimeTextColor}`);
 
     const runtimeSpan = document.createElement("span");
-    runtimeSpan.className = "project-runtime";
+    runtimeSpan.className = "runtime";
     runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
     runtimeSpan.style.color = runtimeTextColor;
     runtimeSpan.ariaLabel = runtimeInfo.ariaString;
@@ -634,14 +632,11 @@ const browserCacheExists = browserCache !== undefined;
 
     const newNameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
     const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
-    adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split("#")[1];
+    adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1]; // as class because id is already used by BC
     const headTitle = adjustedNameSection.querySelector("h2")!;
     headTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
-    if (!isAlbumPage) {
+    if (!isAlbumPage)
       headTitle.textContent = "\"" + headTitle.textContent.trim() + "\"";
-      const albumTitle = adjustedNameSection.querySelector(BC_ELEM_IDENTIFIERS.fromAlbum) as HTMLSpanElement;
-      albumTitle.style.fontStyle = "italic";
-    }
 
     presentationContainer.appendChild(adjustedNameSection);
     contentContainer.appendChild(presentationContainer);
