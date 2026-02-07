@@ -340,11 +340,17 @@ const browserCacheExists = browserCache !== undefined;
   const loadSavedVolume = (): Promise<number> => {
     return new Promise((resolve) => {
       if (browserCacheExists) {
-        browserCache.get([PLUME_CACHE_KEYS.VOLUME]).then((ls: LocalStorage) => {
-          const volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
-          plume.savedVolume = volume;
-          resolve(volume);
-        });
+        browserCache.get([PLUME_CACHE_KEYS.VOLUME])
+          .then((ls: LocalStorage) => {
+            const volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
+            plume.savedVolume = volume;
+            resolve(volume);
+          })
+          .catch((e) => {
+            logger(CPL.WARN, getString("WARN__VOLUME__NOT_LOADED"), e);
+            plume.savedVolume = PLUME_DEF.savedVolume;
+            resolve(PLUME_DEF.savedVolume);
+          });
       } else {
         // Fallback with localStorage
         try {
@@ -387,7 +393,14 @@ const browserCacheExists = browserCache !== undefined;
   const getInfoSectionWithRuntime = (): HTMLDivElement => {
     if (!runtimeInfo.calculated) {
       const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
-      const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+      if (!trackList) {
+        logger(CPL.WARN, getString("WARN__TRACK_LIST__NOT_FOUND"));
+        const errorDiv = document.createElement("div");
+        errorDiv.textContent = getString("WARN__RUNTIME__NOT_CALCULATED");
+        return errorDiv;
+      }
+
+      const trackRows = trackList?.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow) ?? [];
       trackRows.forEach((row) => {
         const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
         if (durationCell) {
@@ -437,7 +450,6 @@ const browserCacheExists = browserCache !== undefined;
     const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= 3
       ? "#0000007f"
       : "#ffffff7f";
-    alert(`${[r,g,b]}, ${measureContrastRatioWCAG([r, g, b])} => ${runtimeTextColor}`);
 
     const runtimeSpan = document.createElement("span");
     runtimeSpan.className = "runtime";
@@ -1118,8 +1130,16 @@ const browserCacheExists = browserCache !== undefined;
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
-    const trackColorRGB = trackColor.match(/\d+/g)!.map(Number) as [number, number, number];
-    const artistColorRGB = artistColor.match(/\d+/g)!.map(Number) as [number, number, number];
+    const trackColorMatch = trackColor.match(/\d+/g);
+    const artistColorMatch = artistColor.match(/\d+/g);
+
+    // Fallback to gray if color regex matching fails
+    if (!trackColorMatch || !artistColorMatch) {
+      return FALLBACK_GRAY;
+    }
+
+    const trackColorRGB = trackColorMatch.map(Number) as [number, number, number];
+    const artistColorRGB = artistColorMatch.map(Number) as [number, number, number];
     const trackColorContrast = measureContrastRatioWCAG(trackColorRGB);
     const artistColorContrast = measureContrastRatioWCAG(artistColorRGB);
     if (trackColorContrast > WCAG_CONTRAST && artistColorContrast > WCAG_CONTRAST) {
@@ -1130,7 +1150,11 @@ const browserCacheExists = browserCache !== undefined;
       return trackColorContrast > WCAG_CONTRAST ? trackColor : artistColor;
     } else {
       const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
-      const preferredColorRgb = preferredColor.match(/\d+/g)!.map(Number) as [number, number, number];
+      const preferredColorMatch = preferredColor.match(/\d+/g);
+      if (!preferredColorMatch) {
+        return FALLBACK_GRAY;
+      }
+      const preferredColorRgb = preferredColorMatch.map(Number) as [number, number, number];
       if (isGrayscale(preferredColorRgb))
         return FALLBACK_GRAY;
       return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST);
@@ -1440,12 +1464,18 @@ const browserCacheExists = browserCache !== undefined;
   const loadDurationDisplayMethod = (): Promise<TimeDisplayMethodType> => {
     return new Promise((resolve) => {
       if (browserCacheExists) {
-        browserCache.get([PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]).then((ls: LocalStorage) => {
-          const durationDisplayMethod =
-            ls[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] || PLUME_DEF.durationDisplayMethod;
-          plume.durationDisplayMethod = durationDisplayMethod;
-          resolve(durationDisplayMethod);
-        });
+        browserCache.get([PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD])
+          .then((ls: LocalStorage) => {
+            const durationDisplayMethod =
+              ls[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] || PLUME_DEF.durationDisplayMethod;
+            plume.durationDisplayMethod = durationDisplayMethod;
+            resolve(durationDisplayMethod);
+          })
+          .catch((e) => {
+            logger(CPL.WARN, getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
+            plume.durationDisplayMethod = PLUME_DEF.durationDisplayMethod;
+            resolve(PLUME_DEF.durationDisplayMethod);
+          });
       } else {
         // Fallback with localStorage
         try {
@@ -1514,24 +1544,39 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   // Main initialization function
+  let isInitializing = false;
+  let isInitialized = false;
+
   const init = async () => {
+    // Prevent concurrent initialization
+    if (isInitializing || isInitialized) {
+      return;
+    }
+    isInitializing = true;
+
     logger(CPL.INFO, getString("LOG__INITIALIZATION__START"));
 
     // Wait for the page to be fully loaded
     if (document.readyState !== "complete") {
-      window.addEventListener("load", init);
+      isInitializing = false;
+      window.addEventListener("load", init, { once: true });
       return;
     }
 
     plume.audioElement = await findAudioElement();
     if (!plume.audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
+      isInitializing = false;
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
-    if (plumeIsAlreadyInjected) return;
+    if (plumeIsAlreadyInjected) {
+      isInitializing = false;
+      isInitialized = true;
+      return;
+    }
 
     // Ensure duration display method is applied
     await loadDurationDisplayMethod();
@@ -1547,6 +1592,8 @@ const browserCacheExists = browserCache !== undefined;
     debugBandcampControls();
 
     logger(CPL.LOG, getString("LOG__INITIALIZATION__COMPLETE"));
+    isInitializing = false;
+    isInitialized = true;
   };
 
   const plume: PlumeCore = {
@@ -1621,6 +1668,18 @@ const browserCacheExists = browserCache !== undefined;
 
     lastUrl = currentPageUrl;
     logger(CPL.LOG, getString("LOG__NAVIGATION_DETECTED"));
+
+    // Clean up fullscreen if active before navigation
+    const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
+    if (existingOverlay) {
+      existingOverlay.remove();
+      document.body.style.overflow = "auto";
+      fullscreenCleanupCallback?.();
+      fullscreenCleanupCallback = null;
+    }
+
+    // Reset initialization flag to allow re-initialization on navigation
+    isInitialized = false;
     setTimeout(() => {
       init();
       setTimeout(updateTitleDisplay, 500);
