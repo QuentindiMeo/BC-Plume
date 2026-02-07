@@ -1,7 +1,9 @@
 {
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
+  "ERROR__NO_BROWSER_API": { "message": "No browser extension API detected" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Invalid volume value, using default" },
   "WARN__AUDIO__NOT_FOUND": { "message": "No audio element found" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },

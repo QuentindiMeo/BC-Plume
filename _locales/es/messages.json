@@ -1,7 +1,9 @@
 {
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "No se puede encontrar un contenedor adecuado" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento padre del reproductor no encontrado" },
+  "ERROR__NO_BROWSER_API": { "message": "No se detectó API de extensión del navegador" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No se detectó API del navegador, usando localStorage como alternativa" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Valor de volumen inválido, usando valor predeterminado" },
   "WARN__AUDIO__NOT_FOUND": { "message": "No se encontró elemento de audio" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando en 2s..." },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Contenedor del reproductor no encontrado, buscando una alternativa..." },

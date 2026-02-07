@@ -348,7 +348,12 @@ const browserCacheExists = browserCache !== undefined;
       if (browserCacheExists) {
         browserCache.get([PLUME_CACHE_KEYS.VOLUME])
           .then((ls: LocalStorage) => {
-            const volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
+            let volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
+            // Validate volume is a valid number within 0-1 range
+            if (typeof volume !== 'number' || Number.isNaN(volume) || volume < 0 || volume > 1) {
+              logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), volume);
+              volume = PLUME_DEF.savedVolume;
+            }
             plume.savedVolume = volume;
             resolve(volume);
           })
@@ -361,7 +366,12 @@ const browserCacheExists = browserCache !== undefined;
         // Fallback to localStorage
         try {
           const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.VOLUME);
-          const volume = storedVolume ? Number.parseFloat(storedVolume) : 1;
+          let volume = storedVolume ? Number.parseFloat(storedVolume) : PLUME_DEF.savedVolume;
+          // Validate volume is a valid number within 0-1 range
+          if (Number.isNaN(volume) || volume < 0 || volume > 1) {
+            logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), volume);
+            volume = PLUME_DEF.savedVolume;
+          }
           plume.savedVolume = volume;
           resolve(volume);
         } catch (e) {
@@ -440,8 +450,8 @@ const browserCacheExists = browserCache !== undefined;
 
     const infoSectionId = BC_ELEM_IDENTIFIERS.infoSection.split("#")[1];
     const infoSection = document.getElementById(infoSectionId) as HTMLDivElement;
-    const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true) as HTMLHeadingElement;
-    const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true) as HTMLHeadingElement;
+    const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true);
+    const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true);
 
     const newNameSection = document.createElement("div");
     newNameSection.id = infoSectionId;
@@ -523,7 +533,7 @@ const browserCacheExists = browserCache !== undefined;
     return relevantControls;
   };
 
-  const setupFullscreenControlSync = (original: HTMLDivElement, clone: HTMLDivElement) => {
+  const setupFullscreenControlSync = (original: HTMLElement, clone: HTMLElement) => {
     const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement;
     const headerContainerObserver = new MutationObserver(() => {
       // Safe use of innerHTML to clone DOM content from controlled element
@@ -637,7 +647,7 @@ const browserCacheExists = browserCache !== undefined;
     // Create background with cover art (blurred and dimmed)
     const background = document.createElement("div");
     background.id = PLUME_ELEM_IDENTIFIERS.fullscreenBackground.split("#")[1];
-    const coverArtUrl = encodeURI(coverArt.src);
+    const coverArtUrl = encodeURIComponent(coverArt.src);
     background.style.backgroundImage = `url("${coverArtUrl}")`;
     overlay.appendChild(background);
 
@@ -659,6 +669,7 @@ const browserCacheExists = browserCache !== undefined;
       return;
     }
 
+    // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
     const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
     adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1]; // as class because id is already used by BC
     const headTitle = adjustedNameSection.querySelector("h2")!;
@@ -676,6 +687,7 @@ const browserCacheExists = browserCache !== undefined;
       return;
     }
 
+    // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
     const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
     plumeClone.id = PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1];
 
@@ -1373,7 +1385,8 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
-  const LATIN_CHAR_HEIGHT = 19; // in px, for calculation
+  // Expected single-line height for Latin characters in px. Used as baseline to calculate additional padding needed when title wraps to multiple lines or uses taller character sets.
+  const LATIN_CHAR_HEIGHT = 19;
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
     const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
@@ -1470,6 +1483,8 @@ const browserCacheExists = browserCache !== undefined;
     const triggerHeight = (plumeParentDiv as HTMLDivElement).offsetTop;
     window.addEventListener("scroll", () => { // Check if plume is in viewport height for sticky styling
       if (scrollIsTicking) return;
+      scrollIsTicking = true;
+
       globalThis.requestAnimationFrame(() => {
         const plumeIsInViewport = window.scrollY < triggerHeight;
         if (plumeIsInViewport) {
@@ -1479,7 +1494,6 @@ const browserCacheExists = browserCache !== undefined;
         }
         scrollIsTicking = false;
       });
-      scrollIsTicking = true;
     });
   };
 
