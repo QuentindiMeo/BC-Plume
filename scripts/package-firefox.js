@@ -20,7 +20,7 @@ srcFiles.forEach((file) => {
   if (fs.existsSync(srcPath)) {
     let content = fs.readFileSync(srcPath, "utf8");
     // Replace chrome.storage with browser.storage for Firefox compatibility
-    content = content.replace(/chrome\.storage/g, "browser.storage");
+    content = content.replaceAll('chrome.storage', "browser.storage");
     fs.writeFileSync(destPath, content);
     console.log(`✅ Copied and adapted ${file} for Firefox`);
   } else {
@@ -31,7 +31,7 @@ srcFiles.forEach((file) => {
 
 // Copy static files
 const staticFiles = ["styles.css", "README.md"];
-const staticDirs = ["icons"];
+const staticDirs = ["icons", "_locales"];
 
 staticFiles.forEach((file) => {
   const srcPath = path.join(__dirname, "..", file);
@@ -51,14 +51,15 @@ staticDirs.forEach((dir) => {
   }
 });
 
-// Create Firefox manifest (Manifest V2)
+// Create Firefox manifest (Manifest V3)
 const manifest = {
-  manifest_version: 2,
+  manifest_version: 3,
   name: "BC-Plume - Bandcamp Player Enhancer",
   version: "1.3.1",
   description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
   default_locale: "en",
-  permissions: ["storage", "*://*.bandcamp.com/*"],
+  permissions: ["storage"],
+  host_permissions: ["*://*.bandcamp.com/*"],
   content_scripts: [
     {
       matches: ["*://*.bandcamp.com/album/*", "*://*.bandcamp.com/track/*"],
@@ -67,12 +68,15 @@ const manifest = {
       run_at: "document_end",
     },
   ],
+  content_security_policy: {
+    extension_pages: "script-src 'self'; object-src 'none'",
+  },
   icons: {
     16: "icons/icon16.svg",
     48: "icons/icon48.svg",
     128: "icons/icon128.svg",
   },
-  applications: {
+  browser_specific_settings: {
     gecko: {
       id: "bandcamp-player-enhancer@extension.local",
       strict_min_version: "109.0",
@@ -82,5 +86,5 @@ const manifest = {
 
 fs.writeFileSync(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
-console.log("✅ Created Firefox manifest.json (Manifest V2)");
+console.log("✅ Created Firefox manifest.json (Manifest V3)");
 console.log("🎉 Firefox extension package ready in build/firefox/");

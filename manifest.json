@@ -14,6 +14,9 @@
       "run_at": "document_end"
     }
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
   "icons": {
     "16": "icons/icon16.svg",
     "48": "icons/icon48.svg",

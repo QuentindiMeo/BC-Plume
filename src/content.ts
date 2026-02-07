@@ -48,6 +48,12 @@ const PLUME_CONSTANTS = {
   TIME_BEFORE_RESTART: 5, // seconds before track restarts on backward button click
 };
 
+// SECURITY NOTE: PLUME_SVG contains hardcoded SVG markup that is safely used with innerHTML. All values are static constants defined at compile time with no user input or dynamic content.
+// While innerHTML is generally discouraged, it's acceptable here because:
+//    1. Content is 100% controlled (no user input, no external data)
+//    2. SVG is verbose to create via DOM methods (createElementNS for each element)
+//    3. Content scripts run in isolated context
+// Note to developers: do not introduce any dynamic content or user input into PLUME_SVG, as that would create security risks. Always sanitize any new content if you must add it.
 enum PLUME_SVG {
   logo = `
     <svg
@@ -352,7 +358,7 @@ const browserCacheExists = browserCache !== undefined;
             resolve(PLUME_DEF.savedVolume);
           });
       } else {
-        // Fallback with localStorage
+        // Fallback to localStorage
         try {
           const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.VOLUME);
           const volume = storedVolume ? Number.parseFloat(storedVolume) : 1;
@@ -401,21 +407,24 @@ const browserCacheExists = browserCache !== undefined;
       }
 
       const trackRows = trackList?.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow) ?? [];
-      trackRows.forEach((row) => {
+      trackRows.forEach((row, idx) => {
         const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
-        if (durationCell) {
-          const durationText = durationCell.textContent.trim();
-          const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
-          let seconds = 0;
-          if (parts.length === 2) {
-            // MM:SS
-            seconds = parts[0] * 60 + parts[1];
-          } else if (parts.length === 3) {
-            // HH:MM:SS
-            seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
-          }
-          runtimeInfo.totalRuntime += seconds;
+        if (!durationCell) {
+          logger(CPL.WARN, getString("WARN__DURATION_CELL__NOT_FOUND"), [row, idx]);
+          return;
         }
+
+        const durationText = durationCell.textContent.trim();
+        const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
+        let seconds = 0;
+        if (parts.length === 2) {
+          // MM:SS
+          seconds = parts[0] * 60 + parts[1];
+        } else if (parts.length === 3) {
+          // HH:MM:SS
+          seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+        }
+        runtimeInfo.totalRuntime += seconds;
       });
       const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
       const seconds = runtimeInfo.totalRuntime % 60;
@@ -431,8 +440,8 @@ const browserCacheExists = browserCache !== undefined;
 
     const infoSectionId = BC_ELEM_IDENTIFIERS.infoSection.split("#")[1];
     const infoSection = document.getElementById(infoSectionId) as HTMLDivElement;
-    const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true) as HTMLDivElement;
-    const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true) as HTMLDivElement;
+    const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true) as HTMLHeadingElement;
+    const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true) as HTMLHeadingElement;
 
     const newNameSection = document.createElement("div");
     newNameSection.id = infoSectionId;
@@ -517,6 +526,7 @@ const browserCacheExists = browserCache !== undefined;
   const setupFullscreenControlSync = (original: HTMLDivElement, clone: HTMLDivElement) => {
     const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement;
     const headerContainerObserver = new MutationObserver(() => {
+      // Safe use of innerHTML to clone DOM content from controlled element
       cloneHeaderContainer.innerHTML = plume.titleDisplay!.innerHTML;
     });
     headerContainerObserver.observe(plume.titleDisplay!, { childList: true, subtree: true });
@@ -600,8 +610,9 @@ const browserCacheExists = browserCache !== undefined;
   let fullscreenCleanupCallback: (() => void) | null = null;
   const toggleFullscreenMode = () => {
     const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
+    const alreadyHasFullscreenOverlay = !!existingOverlay;
 
-    if (existingOverlay) {
+    if (alreadyHasFullscreenOverlay) {
       existingOverlay.remove();
       document.body.style.overflow = "auto";
 
@@ -643,6 +654,11 @@ const browserCacheExists = browserCache !== undefined;
     presentationContainer.appendChild(coverArtImg);
 
     const newNameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+    if (!newNameSection) {
+      logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
+      return;
+    }
+
     const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
     adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1]; // as class because id is already used by BC
     const headTitle = adjustedNameSection.querySelector("h2")!;
@@ -655,6 +671,11 @@ const browserCacheExists = browserCache !== undefined;
 
     // Clone the plume module (right side)
     const plumeContainer = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer) as HTMLDivElement;
+    if (!plumeContainer) {
+      logger(CPL.WARN, getString("WARN__PLUME_CONTAINER__NOT_FOUND"));
+      return;
+    }
+
     const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
     plumeClone.id = PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1];
 
@@ -757,7 +778,7 @@ const browserCacheExists = browserCache !== undefined;
     if (browserCacheExists) {
       browserCache.set({ [PLUME_CACHE_KEYS.VOLUME]: newVolume });
     } else {
-      // Fallback with localStorage
+      // Fallback to localStorage
       try {
         localStorage.setItem(PLUME_CACHE_KEYS.VOLUME, newVolume.toString());
       } catch (e) {
@@ -997,7 +1018,7 @@ const browserCacheExists = browserCache !== undefined;
     if (browserCacheExists) {
       browserCache.set({ [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: newMethod });
     } else {
-      // Fallback with localStorage
+      // Fallback to localStorage
       try {
         localStorage.setItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, newMethod);
       } catch (e) {
@@ -1362,11 +1383,13 @@ const browserCacheExists = browserCache !== undefined;
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
-    if (titleText.offsetHeight !== LATIN_CHAR_HEIGHT) {
+    // Cache offsetHeight to avoid multiple layout recalculations
+    const titleHeight = titleText.offsetHeight;
+    if (titleHeight !== LATIN_CHAR_HEIGHT) {
       const logo = document.querySelector(PLUME_ELEM_IDENTIFIERS.headerLogo) as HTMLAnchorElement;
       if (!logo) return;
 
-      const deltaPaddingPx = titleText.offsetHeight - LATIN_CHAR_HEIGHT; // calculate difference in px
+      const deltaPaddingPx = titleHeight - LATIN_CHAR_HEIGHT; // calculate difference in px
       const deltaPaddingRem = deltaPaddingPx / 16; // 16px = 1rem
       logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingRem}rem`;
     }
@@ -1477,7 +1500,7 @@ const browserCacheExists = browserCache !== undefined;
             resolve(PLUME_DEF.durationDisplayMethod);
           });
       } else {
-        // Fallback with localStorage
+        // Fallback to localStorage
         try {
           const storedDurationDisplayMethod = localStorage.getItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD);
           const durationDisplayMethod: TimeDisplayMethodType = storedDurationDisplayMethod
@@ -1650,19 +1673,14 @@ const browserCacheExists = browserCache !== undefined;
       }
     });
   });
-
-  // Start observing
-  domObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  domObserver.observe(document.body, { childList: true, subtree: true });
 
   init();
   createPlumeStickinessListener();
 
   // Support for SPA navigation
   let lastUrl = location.href;
-  new MutationObserver(() => {
+  const spaNavigationObserver = new MutationObserver(() => {
     const currentPageUrl = location.href;
     if (currentPageUrl === lastUrl) return;
 
@@ -1685,5 +1703,13 @@ const browserCacheExists = browserCache !== undefined;
       setTimeout(updateTitleDisplay, 500);
       setTimeout(updatePretextDisplay, 600); // slight delay to ensure track display is updated
     }, 1000);
-  }).observe(document, { subtree: true, childList: true });
+  });
+  spaNavigationObserver.observe(document, { subtree: true, childList: true });
+
+  // Cleanup observers on page unload
+  window.addEventListener('unload', () => {
+    domObserver.disconnect();
+    spaNavigationObserver.disconnect();
+    fullscreenCleanupCallback?.();
+  });
 })();

@@ -28,7 +28,7 @@ srcFiles.forEach((file) => {
 
 // Copy static files
 const staticFiles = ["styles.css", "README.md"];
-const staticDirs = ["icons"];
+const staticDirs = ["icons", "_locales"];
 
 staticFiles.forEach((file) => {
   const srcPath = path.join(__dirname, "..", file);
@@ -65,6 +65,9 @@ const manifest = {
       run_at: "document_end",
     },
   ],
+  content_security_policy: {
+    extension_pages: "script-src 'self'; object-src 'none'",
+  },
   icons: {
     16: "icons/icon16.png",
     48: "icons/icon48.png",
