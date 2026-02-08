@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 console.log("🦊 Building Firefox extension package...");
 
@@ -18,11 +18,8 @@ srcFiles.forEach((file) => {
   const srcPath = path.join(distDir, file);
   const destPath = path.join(buildDir, file);
   if (fs.existsSync(srcPath)) {
-    let content = fs.readFileSync(srcPath, "utf8");
-    // Replace chrome.storage with browser.storage for Firefox compatibility
-    content = content.replaceAll('chrome.storage', "browser.storage");
-    fs.writeFileSync(destPath, content);
-    console.log(`✅ Copied and adapted ${file} for Firefox`);
+    fs.copyFileSync(srcPath, destPath);
+    console.log(`✅ Copied ${file}`);
   } else {
     console.error(`❌ Missing ${file} - run 'pnpm run build' first`);
     process.exit(1);
@@ -87,4 +84,13 @@ const manifest = {
 fs.writeFileSync(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
 console.log("✅ Created Firefox manifest.json (Manifest V3)");
+
+// Copy locales
+const localesDir = path.join(__dirname, "..", "_locales");
+const localesDestDir = path.join(buildDir, "_locales");
+if (fs.existsSync(localesDir)) {
+  fs.cpSync(localesDir, localesDestDir, { recursive: true });
+  console.log("✅ Copied _locales/");
+}
+
 console.log("🎉 Firefox extension package ready in build/firefox/");

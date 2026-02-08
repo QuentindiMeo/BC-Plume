@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 console.log("📦 Building Chrome extension package...");
 
@@ -78,4 +78,13 @@ const manifest = {
 fs.writeFileSync(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
 console.log("✅ Created Chrome manifest.json");
+
+// Copy locales
+const localesDir = path.join(__dirname, "..", "_locales");
+const localesDestDir = path.join(buildDir, "_locales");
+if (fs.existsSync(localesDir)) {
+  fs.cpSync(localesDir, localesDestDir, { recursive: true });
+  console.log("✅ Copied _locales/");
+}
+
 console.log("🎉 Chrome extension package ready in build/chrome/");
