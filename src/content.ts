@@ -840,8 +840,9 @@ const browserCacheExists = browserCache !== undefined;
   const syncMuteBtn = (isMuted: boolean) => {
     if (!plume.muteBtn) return;
     plume.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-    plume.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
     plume.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+    plume.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+    plume.muteBtn.ariaPressed = isMuted.toString();
     plume.muteBtn.classList.toggle("muted", isMuted);
   };
 
@@ -857,6 +858,7 @@ const browserCacheExists = browserCache !== undefined;
     muteBtn.type = "button";
     muteBtn.title = getString("ARIA__MUTE");
     muteBtn.ariaLabel = getString("ARIA__MUTE");
+    muteBtn.ariaPressed = "false";
     muteBtn.innerHTML = PLUME_SVG.volumeOn;
 
     const volumeSlider = document.createElement("input");
