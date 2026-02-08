@@ -1,106 +1,19 @@
 // Plume - TypeScript for song page and album page display
-import {
-  APP_NAME,
-  APP_VERSION,
-  PLUME_CONSTANTS,
-  PLUME_DEF,
-  PLUME_KO_FI_URL,
-  TIME_DISPLAY_METHOD,
-  type PlumeCore,
-  type TimeDisplayMethodType,
-} from "./constants";
+import { APP_NAME, APP_VERSION, PLUME_CONSTANTS, PLUME_DEF, PLUME_KO_FI_URL } from "./constants";
 import { PLUME_SVG } from "./svg/icons";
+import {
+  BC_ELEM_IDENTIFIERS,
+  DebugControl,
+  LocalStorage,
+  PLUME_CACHE_KEYS,
+  PLUME_ELEM_IDENTIFIERS,
+  PlumeCore,
+  TIME_DISPLAY_METHOD,
+  TimeDisplayMethodType,
+} from "./types";
 import { getBrowserAPI } from "./utils/browser";
 import { getString } from "./utils/i18n";
 import { CPL, logger } from "./utils/logger";
-
-enum PLUME_CACHE_KEYS {
-  DURATION_DISPLAY_METHOD = "plume_duration_display_method",
-  VOLUME = "plume_volume",
-}
-interface LocalStorage {
-  [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: TimeDisplayMethodType | undefined;
-  [PLUME_CACHE_KEYS.VOLUME]: number | undefined;
-}
-
-interface DebugControl {
-  index: number;
-  tagName: string;
-  classes: string;
-  title: string;
-  text: string;
-  onclick: string;
-}
-
-enum PLUME_ELEM_IDENTIFIERS {
-  bcElements = "div#bpe-hidden-original",
-  plumeContainer = "div#bpe-plume",
-  headerContainer = "div#bpe-header-container",
-  headerLogo = "a#bpe-header-logo",
-  headerCurrent = "div#bpe-header-current",
-  headerTitlePretext = "span#bpe-header-title-pretext",
-  headerTitle = "span#bpe-header-title",
-  playbackManager = "div#bpe-playback-manager",
-  playbackControls = "div#bpe-playback-controls",
-  progressContainer = "div#bpe-progress-container",
-  progressSlider = "input#bpe-progress-slider",
-  timeDisplay = "div#bpe-time-display",
-  elapsedDisplay = "span#bpe-elapsed-display",
-  durationDisplay = "span#bpe-duration-display",
-  trackBwdBtn = "button#bpe-track-bwd-btn",
-  timeBwdBtn = "button#bpe-time-bwd-btn",
-  playPauseBtn = "button#bpe-play-pause-btn",
-  timeFwdBtn = "button#bpe-time-fwd-btn",
-  trackFwdBtn = "button#bpe-track-fwd-btn",
-  fullscreenBtn = "button#bpe-fullscreen-btn",
-  fullscreenBtnLabel = "span#bpe-fullscreen-btn-label",
-  volumeContainer = "div#bpe-volume-container",
-  muteBtn = "button#bpe-mute-btn",
-  volumeSlider = "input#bpe-volume-slider",
-  volumeValue = "div#bpe-volume-value",
-  fullscreenBtnContainer = "div#bpe-fullscreen-btn-container",
-  fullscreenOverlay = "div#bpe-fullscreen-overlay",
-  fullscreenBackground = "div#bpe-fullscreen-background",
-  fullscreenContent = "div#bpe-fullscreen-content",
-  fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
-  fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
-  fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
-  fullscreenTitlingContainer = "div.bpe-fullscreen-titling",
-  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
-  fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
-  fullscreenClone = "div#bpe-fullscreen-clone",
-}
-
-enum BC_ELEM_IDENTIFIERS {
-  infoSection = "div#name-section",
-  trackView = "div.trackView",
-  fromAlbum = "span.fromAlbum",
-  playerParent = "div.inline_player",
-  inlinePlayerTable = "div.inline_player>table",
-  audioPlayer = "audio",
-  playPause = "div.playbutton",
-  songPageCurrentTrackTitle = "h2.trackTitle",
-  albumPageCurrentTrackTitle = "a.title_link",
-  previousTrack = "div.prevbutton",
-  nextTrack = "div.nextbutton",
-  trackList = "table#track_table",
-  trackRow = "tr.track_row_view",
-  trackTitle = "span.track-title",
-  trackDuration = "span.time",
-  coverArt = "div#tralbumArt img",
-}
-
-const AVAILABLE_SHORTCUT_CODES = new Set([
-  "Space",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "ArrowDown",
-  "PageUp",
-  "PageDown",
-  "KeyF",
-  "KeyM",
-]);
 
 const browserApi = getBrowserAPI();
 const browserCache = browserApi.storage.local;
@@ -589,9 +502,11 @@ logger(
     fullscreenBtn.addEventListener("click", () => {
       toggleFullscreenMode();
     });
+
     const container: HTMLDivElement = document.createElement("div");
     container.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer.split("#")[1];
     container.appendChild(fullscreenBtn);
+
     return container;
   };
 
@@ -878,6 +793,7 @@ logger(
   // Function to format time as MM:SS
   const formatTime = (seconds: number): string => {
     if (Number.isNaN(seconds) || !Number.isFinite(seconds)) return "0:00";
+
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
@@ -1032,7 +948,7 @@ logger(
   };
 
   const WCAG_CONTRAST = 4.5; // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
-  const FALLBACK_GRAY = "rgb(127, 127, 127)"; // fallback gray if the best color is grayscale, to ensure visibility on Plume's dark background
+  const FALLBACK_GRAY_RGB_STR = "rgb(127, 127, 127)"; // fallback gray if the best color is grayscale, to ensure visibility on Plume's dark background
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
@@ -1041,7 +957,7 @@ logger(
 
     // Fallback to gray if color regex matching fails
     if (!trackColorMatch || !artistColorMatch) {
-      return FALLBACK_GRAY;
+      return FALLBACK_GRAY_RGB_STR;
     }
 
     const trackColorRGB = trackColorMatch.map(Number) as [number, number, number];
@@ -1058,10 +974,10 @@ logger(
       const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
       const preferredColorMatch = preferredColor.match(/\d+/g);
       if (!preferredColorMatch) {
-        return FALLBACK_GRAY;
+        return FALLBACK_GRAY_RGB_STR;
       }
       const preferredColorRgb = preferredColorMatch.map(Number) as [number, number, number];
-      if (isGrayscale(preferredColorRgb)) return FALLBACK_GRAY;
+      if (isGrayscale(preferredColorRgb)) return FALLBACK_GRAY_RGB_STR;
       return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST);
     }
   };
@@ -1335,8 +1251,7 @@ logger(
       }
 
       syncMuteBtn(currentVolume === 0);
-      if (currentVolume !== 0)
-        saveNewVolume(currentVolume);
+      if (currentVolume !== 0) saveNewVolume(currentVolume);
     });
 
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
@@ -1439,7 +1354,7 @@ logger(
 
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
-      const isValidShortcut = AVAILABLE_SHORTCUT_CODES.has(e.code);
+      const isValidShortcut = PLUME_CONSTANTS.AVAILABLE_SHORTCUT_CODES.has(e.code);
       if (!isValidShortcut) return;
 
       e.preventDefault();

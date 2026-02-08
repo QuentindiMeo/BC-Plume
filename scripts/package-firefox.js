@@ -53,7 +53,7 @@ const manifest = {
   manifest_version: 3,
   name: "BC-Plume - Bandcamp Player Enhancer",
   version: "1.3.1",
-  description: "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
+  description: "Improves the Bandcamp player interface with a volume slider and enhanced playback controls.",
   default_locale: "en",
   permissions: ["storage"],
   host_permissions: ["*://*.bandcamp.com/*"],
