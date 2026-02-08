@@ -96,7 +96,6 @@
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
   "LABEL__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
-  "LABEL__VOLUME": { "message": "Volume" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__RUNTIME__LABEL": {
@@ -141,6 +140,8 @@
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
   "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" },
+  "ARIA__MUTE": { "message": "Couper le son" },
+  "ARIA__UNMUTE": { "message": "Rétablir le son" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" }
 }

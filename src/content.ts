@@ -38,11 +38,14 @@ interface PlumeCore {
   durationDisplay: HTMLSpanElement | null;
   durationDisplayMethod: TimeDisplayMethodType;
   volumeSlider: HTMLInputElement | null;
+  muteBtn: HTMLButtonElement | null;
   savedVolume: number;
+  playerVolume: number;
 }
-const PLUME_DEF: Pick<PlumeCore, "durationDisplayMethod" | "savedVolume"> = {
+const PLUME_DEF: Pick<PlumeCore, "durationDisplayMethod" | "savedVolume" | "playerVolume"> = {
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
   savedVolume: 0.5, // Default volume, 0..1
+  playerVolume: 0.5,
 };
 const PLUME_CONSTANTS = {
   TIME_BEFORE_RESTART: 5, // seconds before track restarts on backward button click
@@ -193,6 +196,21 @@ enum PLUME_SVG {
       <path d="M16 8V5H14V10H19V8H16Z" fill="currentColor" />
     </svg>
   `,
+  volumeOn = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor" />
+      <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12Z" fill="currentColor" />
+      <path d="M14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z" fill="currentColor" />
+    </svg>
+  `,
+  volumeMuted = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V10.18L16.45 12.63C16.48 12.43 16.5 12.22 16.5 12Z" fill="currentColor" />
+      <path d="M19 12C19 12.94 18.8 13.82 18.46 14.64L19.97 16.15C20.63 14.91 21 13.5 21 12C21 7.72 18.01 4.14 14 3.23V5.29C16.89 6.15 19 8.83 19 12Z" fill="currentColor" />
+      <path d="M4.27 3L3 4.27L7.73 9H3V15H7L12 20V13.27L16.25 17.52C15.58 18.04 14.83 18.45 14 18.7V20.76C15.38 20.45 16.63 19.81 17.69 18.95L19.73 21L21 19.73L12 10.73L4.27 3Z" fill="currentColor" />
+      <path d="M12 4L9.91 6.09L12 8.18V4Z" fill="currentColor" />
+    </svg>
+  `,
 }
 
 /**
@@ -242,7 +260,7 @@ enum PLUME_ELEM_IDENTIFIERS {
   fullscreenBtn = "button#bpe-fullscreen-btn",
   fullscreenBtnLabel = "span#bpe-fullscreen-btn-label",
   volumeContainer = "div#bpe-volume-container",
-  volumeLabel = "label#bpe-volume-label",
+  muteBtn = "button#bpe-mute-btn",
   volumeSlider = "input#bpe-volume-slider",
   volumeValue = "div#bpe-volume-value",
   fullscreenBtnContainer = "div#bpe-fullscreen-btn-container",
@@ -278,7 +296,7 @@ enum BC_ELEM_IDENTIFIERS {
 }
 
 const AVAILABLE_SHORTCUT_CODES = new Set([
-  "Space", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "KeyF"
+  "Space", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "KeyF", "KeyM"
 ]);
 
 // Customized console logger with timestamp and level
@@ -606,12 +624,27 @@ const browserCacheExists = browserCache !== undefined;
       cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
     });
 
+    const cloneMuteBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement;
+    cloneMuteBtn.addEventListener("click", () => plume.muteBtn?.click());
+
+    // Sync mute button visual state from original to clone
+    const muteBtnObserver = new MutationObserver(() => {
+      if (!plume.muteBtn) return;
+      // Safe use of innerHTML to clone SVG icon from controlled element
+      cloneMuteBtn.innerHTML = plume.muteBtn.innerHTML;
+      cloneMuteBtn.ariaLabel = plume.muteBtn.ariaLabel;
+      cloneMuteBtn.title = plume.muteBtn.title;
+      cloneMuteBtn.className = plume.muteBtn.className;
+    });
+    muteBtnObserver.observe(plume.muteBtn!, { childList: true, attributes: true, attributeFilter: ['aria-label', 'title', 'class'] });
+
     // Return cleanup function to disconnect all observers
     return () => {
       headerContainerObserver.disconnect();
       progressSliderObserver.disconnect();
       elapsedObserver.disconnect();
       durationObserver.disconnect();
+      muteBtnObserver.disconnect();
     };
   };
 
@@ -647,7 +680,7 @@ const browserCacheExists = browserCache !== undefined;
     // Create background with cover art (blurred and dimmed)
     const background = document.createElement("div");
     background.id = PLUME_ELEM_IDENTIFIERS.fullscreenBackground.split("#")[1];
-    const coverArtUrl = encodeURIComponent(coverArt.src);
+    const coverArtUrl = encodeURI(coverArt.src);
     background.style.backgroundImage = `url("${coverArtUrl}")`;
     overlay.appendChild(background);
 
@@ -712,6 +745,7 @@ const browserCacheExists = browserCache !== undefined;
     // Create exit fullscreen button in top right corner
     const exitBtn = document.createElement("button");
     exitBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenExitBtn.split("#")[1];
+    exitBtn.type = "button";
     exitBtn.innerHTML = PLUME_SVG.fullscreenExit;
     exitBtn.title = getString("ARIA__EXIT_FULLSCREEN_BTN");
     exitBtn.addEventListener("click", () => {
@@ -772,6 +806,7 @@ const browserCacheExists = browserCache !== undefined;
   const createFullscreenBtnContainer = (): HTMLDivElement => {
     const fullscreenBtn: HTMLButtonElement = document.createElement("button");
     fullscreenBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtn.split("#")[1];
+    fullscreenBtn.type = "button";
     fullscreenBtn.innerHTML = `<span id="${fullscreenBtnId}">${fullscreenBtnLabel}</span>${PLUME_SVG.fullscreen}`;
     fullscreenBtn.ariaLabel = fullscreenBtnLabel;
     fullscreenBtn.addEventListener("click", () => {
@@ -800,6 +835,17 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const VOLUME_SLIDER_GRANULARITY = 100;
+
+  // Sync mute button icon and aria-label to reflect the current audio volume state
+  const syncMuteBtn = (isMuted: boolean) => {
+    if (!plume.muteBtn) return;
+    plume.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+    plume.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+    plume.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+    plume.muteBtn.ariaPressed = isMuted.toString();
+    plume.muteBtn.classList.toggle("muted", isMuted);
+  };
+
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
     if (plume.volumeSlider) return null;
@@ -807,9 +853,13 @@ const browserCacheExists = browserCache !== undefined;
     const container = document.createElement("div");
     container.id = PLUME_ELEM_IDENTIFIERS.volumeContainer.split("#")[1];
 
-    const label = document.createElement("label");
-    label.id = PLUME_ELEM_IDENTIFIERS.volumeLabel.split("#")[1];
-    label.textContent = getString("LABEL__VOLUME");
+    const muteBtn = document.createElement("button");
+    muteBtn.id = PLUME_ELEM_IDENTIFIERS.muteBtn.split("#")[1];
+    muteBtn.type = "button";
+    muteBtn.title = getString("ARIA__MUTE");
+    muteBtn.ariaLabel = getString("ARIA__MUTE");
+    muteBtn.ariaPressed = "false";
+    muteBtn.innerHTML = PLUME_SVG.volumeOn;
 
     const volumeSlider = document.createElement("input");
     volumeSlider.id = PLUME_ELEM_IDENTIFIERS.volumeSlider.split("#")[1];
@@ -826,22 +876,52 @@ const browserCacheExists = browserCache !== undefined;
     valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
     valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
 
-    // Event listener for volume change
-    volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
-      const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-      if (plume.audioElement) {
-        plume.audioElement.volume = volume;
-        valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
+    muteBtn.addEventListener("click", () => {
+      if (!plume.audioElement) {
+        logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
+        return;
+      }
 
-        saveNewVolume(volume);
+      const currentlyMuted = plume.audioElement.volume === 0;
+      if (currentlyMuted) {
+        const restoredVolume = plume.playerVolume > 0 ? plume.playerVolume : PLUME_DEF.savedVolume;
+        plume.audioElement.volume = restoredVolume;
+        volumeSlider.value = Math.round(restoredVolume * VOLUME_SLIDER_GRANULARITY).toString();
+        valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
+        syncMuteBtn(false);
+      } else {
+        plume.playerVolume = plume.audioElement.volume;
+        plume.audioElement.volume = 0;
+        volumeSlider.value = "0";
+        valueDisplay.textContent = `0${getString("META__PERCENTAGE")}`;
+        syncMuteBtn(true);
       }
     });
 
-    container.appendChild(label);
+    // Event listener for volume change via slider
+    volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
+      const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
+
+      if (!plume.audioElement) {
+        logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
+        return;
+      }
+
+      plume.audioElement.volume = volume;
+      valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
+
+      // Moving slider off zero counts as an intentional unmute
+      if (volume > 0) syncMuteBtn(false);
+
+      saveNewVolume(volume);
+    });
+
+    container.appendChild(muteBtn);
     container.appendChild(volumeSlider);
     container.appendChild(valueDisplay);
 
     plume.volumeSlider = volumeSlider;
+    plume.muteBtn = muteBtn;
     return container;
   };
 
@@ -909,30 +989,35 @@ const browserCacheExists = browserCache !== undefined;
 
     const trackBackwardBtn = document.createElement("button");
     trackBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackBwdBtn.split("#")[1];
+    trackBackwardBtn.type = "button";
     trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
     trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
     trackBackwardBtn.addEventListener("click", handleTrackBackward);
 
     const timeBackwardBtn = document.createElement("button");
     timeBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeBwdBtn.split("#")[1];
+    timeBackwardBtn.type = "button";
     timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
     timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
     timeBackwardBtn.addEventListener("click", handleTimeBackward);
 
     const playPauseBtn = document.createElement("button");
     playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
+    playPauseBtn.type = "button";
     playPauseBtn.innerHTML = plume.audioElement!.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
     playPauseBtn.addEventListener("click", () => { handlePlayPause([playPauseBtn]); });
 
     const timeForwardBtn = document.createElement("button");
     timeForwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeFwdBtn.split("#")[1];
+    timeForwardBtn.type = "button";
     timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
     timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
     timeForwardBtn.addEventListener("click", handleTimeForward);
 
     const trackForwardBtn = document.createElement("button");
     trackForwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackFwdBtn.split("#")[1];
+    trackForwardBtn.type = "button";
     trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
     trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
     trackForwardBtn.addEventListener("click", handleTrackForward);
@@ -1451,11 +1536,12 @@ const browserCacheExists = browserCache !== undefined;
     plume.audioElement!.addEventListener("loadstart", updatePretextDisplay);
     plume.audioElement!.addEventListener("loadstart", updateTrackForwardBtnState);
 
-    // Sync volume with Plume's slider
+    // Sync volume slider and mute button with external volume changes
     plume.audioElement!.addEventListener("volumechange", () => {
       if (!plume.volumeSlider) return;
 
-      plume.volumeSlider.value = `${Math.round(plume.audioElement!.volume * VOLUME_SLIDER_GRANULARITY)}`;
+      const currentVolume = plume.audioElement!.volume;
+      plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
       const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
         PLUME_ELEM_IDENTIFIERS.volumeValue
       ) as HTMLSpanElement;
@@ -1463,7 +1549,8 @@ const browserCacheExists = browserCache !== undefined;
         valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
-      saveNewVolume(plume.audioElement!.volume);
+      syncMuteBtn(currentVolume === 0);
+      saveNewVolume(currentVolume);
     });
 
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
@@ -1558,6 +1645,10 @@ const browserCacheExists = browserCache !== undefined;
       saveNewVolume(volume);
     };
 
+    const handleToggleMute = () => {
+      if (plume.muteBtn) plume.muteBtn.click();
+    };
+
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
       const isValidShortcut = AVAILABLE_SHORTCUT_CODES.has(e.code);
@@ -1574,6 +1665,7 @@ const browserCacheExists = browserCache !== undefined;
         case "PageUp": handleTrackBackward(); break;
         case "PageDown": handleTrackForward(); break;
         case "KeyF": toggleFullscreenMode(); break;
+        case "KeyM": handleToggleMute(); break;
       }
     });
 
@@ -1641,7 +1733,9 @@ const browserCacheExists = browserCache !== undefined;
     durationDisplay: null,
     durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
     volumeSlider: null,
+    muteBtn: null,
     savedVolume: PLUME_DEF.savedVolume,
+    playerVolume: PLUME_DEF.playerVolume,
   };
 
   // Observe DOM changes for players that load dynamically

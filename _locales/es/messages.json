@@ -94,7 +94,6 @@
   "LABEL__PLAY_PAUSE": { "message": "Reproducir/Pausar" },
   "LABEL__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
   "LABEL__TRACK_FORWARD": { "message": "Ir a pista siguiente" },
-  "LABEL__VOLUME": { "message": "Volumen" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__RUNTIME__LABEL": {
@@ -139,6 +138,8 @@
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
   "ARIA__VOLUME_SLIDER": { "message": "Deslizador de volumen" },
+  "ARIA__MUTE": { "message": "Silenciar" },
+  "ARIA__UNMUTE": { "message": "Activar sonido" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" }
 }
