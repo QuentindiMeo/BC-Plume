@@ -624,12 +624,27 @@ const browserCacheExists = browserCache !== undefined;
       cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
     });
 
+    const cloneMuteBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement;
+    cloneMuteBtn.addEventListener("click", () => plume.muteBtn?.click());
+
+    // Sync mute button visual state from original to clone
+    const muteBtnObserver = new MutationObserver(() => {
+      if (!plume.muteBtn) return;
+      // Safe use of innerHTML to clone SVG icon from controlled element
+      cloneMuteBtn.innerHTML = plume.muteBtn.innerHTML;
+      cloneMuteBtn.ariaLabel = plume.muteBtn.ariaLabel;
+      cloneMuteBtn.title = plume.muteBtn.title;
+      cloneMuteBtn.className = plume.muteBtn.className;
+    });
+    muteBtnObserver.observe(plume.muteBtn!, { childList: true, attributes: true, attributeFilter: ['aria-label', 'title', 'class'] });
+
     // Return cleanup function to disconnect all observers
     return () => {
       headerContainerObserver.disconnect();
       progressSliderObserver.disconnect();
       elapsedObserver.disconnect();
       durationObserver.disconnect();
+      muteBtnObserver.disconnect();
     };
   };
 
