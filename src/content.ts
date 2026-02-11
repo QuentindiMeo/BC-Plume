@@ -1,5 +1,5 @@
 // Plume - TypeScript for song page and album page display
-import { APP_NAME, APP_VERSION, PLUME_CONSTANTS, PLUME_DEF, PLUME_KO_FI_URL } from "./constants";
+import { APP_NAME, APP_VERSION, PLUME_CONSTANTS, PLUME_KO_FI_URL } from "./constants";
 import { createStore, loadPersistedState, selectors } from "./store";
 import { ACTION_TYPES } from "./store/store";
 import { PLUME_SVG } from "./svg/icons";
@@ -302,6 +302,7 @@ import { CPL, logger } from "./utils/logger";
       fullscreenCleanupCallback?.();
       fullscreenCleanupCallback = null;
 
+      store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
       logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
       return;
     }
@@ -442,6 +443,7 @@ import { CPL, logger } from "./utils/logger";
     document.body.style.overflow = "hidden";
     setupFullscreenFocusTrap();
 
+    store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
     logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
   };
 
@@ -515,20 +517,7 @@ import { CPL, logger } from "./utils/logger";
         return;
       }
 
-      const currentlyMuted = plume.audioElement.volume === 0;
-      if (currentlyMuted) {
-        const restoredVolume = plume.playerVolume > 0 ? plume.playerVolume : PLUME_DEF.savedVolume;
-        plume.audioElement.volume = restoredVolume;
-        volumeSlider.value = Math.round(restoredVolume * VOLUME_SLIDER_GRANULARITY).toString();
-        valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
-        syncMuteBtn(false);
-      } else {
-        plume.playerVolume = plume.audioElement.volume;
-        plume.audioElement.volume = 0;
-        volumeSlider.value = "0";
-        valueDisplay.textContent = `0${getString("META__PERCENTAGE")}`;
-        syncMuteBtn(true);
-      }
+      store.dispatch({ type: ACTION_TYPES.TOGGLE_MUTE });
     });
 
     // Event listener for volume change via slider
@@ -544,7 +533,9 @@ import { CPL, logger } from "./utils/logger";
       valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
       // Moving slider off zero counts as an intentional unmute
-      if (volume > 0) syncMuteBtn(false);
+      if (volume > 0 && store.getState().isMuted) {
+        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
+      }
 
       saveNewVolume(volume);
     });
@@ -699,9 +690,11 @@ import { CPL, logger } from "./utils/logger";
   const handlePlayPause = (playPauseBtns: HTMLButtonElement[]) => {
     if (plume.audioElement!.paused) {
       plume.audioElement!.play();
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: true });
       playPauseBtns.forEach((btn) => (btn.innerHTML = PLUME_SVG.playPause));
     } else {
       plume.audioElement!.pause();
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: false });
       playPauseBtns.forEach((btn) => (btn.innerHTML = PLUME_SVG.playPlay));
     }
   };
@@ -1174,8 +1167,20 @@ import { CPL, logger } from "./utils/logger";
         valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
-      syncMuteBtn(currentVolume === 0);
+      const isMuted = currentVolume === 0;
+      if (store.getState().isMuted !== isMuted) {
+        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
+      }
       if (currentVolume !== 0) saveNewVolume(currentVolume);
+    });
+
+    // Track play/pause state changes from audio element
+    plume.audioElement!.addEventListener("play", () => {
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: true });
+    });
+
+    plume.audioElement!.addEventListener("pause", () => {
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: false });
     });
 
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
@@ -1230,6 +1235,35 @@ import { CPL, logger } from "./utils/logger";
       // Subscribe to duration display method changes to update display
       store.subscribe("durationDisplayMethod", () => {
         updateProgressBar();
+      }),
+      // Subscribe to mute state changes
+      store.subscribe("isMuted", (isMuted) => {
+        syncMuteBtn(isMuted);
+
+        // Update volume slider and display
+        if (plume.volumeSlider) {
+          const currentVolume = store.getState().volume;
+          plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
+
+          const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
+            PLUME_ELEM_IDENTIFIERS.volumeValue
+          ) as HTMLDivElement | null;
+          if (valueDisplay) {
+            valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+          }
+        }
+
+        // Update audio element volume
+        if (plume.audioElement) {
+          plume.audioElement.volume = store.getState().volume;
+        }
+      }),
+      // Subscribe to playing state changes
+      store.subscribe("isPlaying", (isPlaying) => {
+        const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+        playPauseBtns.forEach((btn) => {
+          btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+        });
       })
     );
 
@@ -1369,11 +1403,8 @@ import { CPL, logger } from "./utils/logger";
     progressSlider: null,
     elapsedDisplay: null,
     durationDisplay: null,
-    durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
     volumeSlider: null,
     muteBtn: null,
-    savedVolume: PLUME_DEF.savedVolume,
-    playerVolume: PLUME_DEF.playerVolume,
   };
 
   // Observe DOM changes for players that load dynamically
@@ -1438,6 +1469,7 @@ import { CPL, logger } from "./utils/logger";
       document.body.style.overflow = "auto";
       fullscreenCleanupCallback?.();
       fullscreenCleanupCallback = null;
+      store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
     }
 
     // Reset initialization flag to allow re-initialization on navigation

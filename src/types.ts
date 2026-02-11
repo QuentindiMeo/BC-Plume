@@ -16,11 +16,8 @@ export interface PlumeCore {
   progressSlider: HTMLInputElement | null;
   elapsedDisplay: HTMLSpanElement | null;
   durationDisplay: HTMLSpanElement | null;
-  durationDisplayMethod: TimeDisplayMethodType;
   volumeSlider: HTMLInputElement | null;
   muteBtn: HTMLButtonElement | null;
-  savedVolume: number;
-  playerVolume: number;
 }
 
 export enum PLUME_CACHE_KEYS {

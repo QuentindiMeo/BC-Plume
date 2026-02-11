@@ -11,25 +11,37 @@ export interface PersistedState {
 }
 
 export interface TransientState {
-  currentTime: number;
   duration: number;
+  currentTime: number;
+  isPlaying: boolean;
+  isMuted: boolean;
+  volumeBeforeMute: number;
+  isFullscreen: boolean;
 }
 
 export interface AppState extends PersistedState, TransientState {}
 
 export enum ACTION_TYPES {
-  SET_VOLUME,
-  SET_DURATION_DISPLAY_METHOD,
-  SET_CURRENT_TIME,
   SET_DURATION,
+  SET_CURRENT_TIME,
+  SET_IS_PLAYING,
+  SET_DURATION_DISPLAY_METHOD,
+  SET_VOLUME,
+  SET_IS_MUTED,
+  TOGGLE_MUTE,
+  SET_IS_FULLSCREEN,
   RESET_TRANSIENT_STATE,
 }
 
 export type Action =
-  | { type: ACTION_TYPES.SET_VOLUME; payload: number }
-  | { type: ACTION_TYPES.SET_DURATION_DISPLAY_METHOD; payload: TimeDisplayMethodType }
-  | { type: ACTION_TYPES.SET_CURRENT_TIME; payload: number }
   | { type: ACTION_TYPES.SET_DURATION; payload: number }
+  | { type: ACTION_TYPES.SET_CURRENT_TIME; payload: number }
+  | { type: ACTION_TYPES.SET_IS_PLAYING; payload: boolean }
+  | { type: ACTION_TYPES.SET_DURATION_DISPLAY_METHOD; payload: TimeDisplayMethodType }
+  | { type: ACTION_TYPES.SET_VOLUME; payload: number }
+  | { type: ACTION_TYPES.SET_IS_MUTED; payload: boolean }
+  | { type: ACTION_TYPES.TOGGLE_MUTE }
+  | { type: ACTION_TYPES.SET_IS_FULLSCREEN; payload: boolean }
   | { type: ACTION_TYPES.RESET_TRANSIENT_STATE };
 
 export type StateListener<K extends keyof AppState> = (value: AppState[K], prevValue: AppState[K]) => void;
@@ -42,10 +54,14 @@ export interface Store {
 }
 
 const INITIAL_STATE: AppState = {
-  volume: PLUME_DEF.savedVolume,
-  durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
-  currentTime: 0,
   duration: 0,
+  currentTime: 0,
+  isPlaying: false,
+  durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+  volume: PLUME_DEF.savedVolume,
+  isMuted: false,
+  volumeBeforeMute: PLUME_DEF.savedVolume,
+  isFullscreen: false,
 };
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
@@ -148,9 +164,40 @@ export function createStore(): Store {
         updateState("duration", action.payload);
         break;
 
+      case ACTION_TYPES.SET_IS_PLAYING:
+        updateState("isPlaying", action.payload);
+        break;
+
+      case ACTION_TYPES.SET_IS_MUTED:
+        updateState("isMuted", action.payload);
+        break;
+
+      case ACTION_TYPES.TOGGLE_MUTE: {
+        if (state.isMuted) {
+          // Unmute: restore previous volume
+          const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEF.savedVolume;
+          updateState("volume", restoredVolume);
+          updateState("isMuted", false);
+        } else {
+          // Mute: save current volume and set to 0
+          updateState("volumeBeforeMute", state.volume);
+          updateState("volume", 0);
+          updateState("isMuted", true);
+        }
+        break;
+      }
+
+      case ACTION_TYPES.SET_IS_FULLSCREEN:
+        updateState("isFullscreen", action.payload);
+        break;
+
       case ACTION_TYPES.RESET_TRANSIENT_STATE:
-        updateState("currentTime", INITIAL_STATE.currentTime);
         updateState("duration", INITIAL_STATE.duration);
+        updateState("currentTime", INITIAL_STATE.currentTime);
+        updateState("isPlaying", INITIAL_STATE.isPlaying);
+        updateState("isMuted", INITIAL_STATE.isMuted);
+        updateState("volumeBeforeMute", INITIAL_STATE.volumeBeforeMute);
+        updateState("isFullscreen", INITIAL_STATE.isFullscreen);
         break;
 
       default:
@@ -169,9 +216,8 @@ export function createStore(): Store {
     },
 
     subscribe<K extends keyof AppState>(key: K, listener: StateListener<K>): () => void {
-      if (!listeners.has(key)) {
-        listeners.set(key, new Set());
-      }
+      if (!listeners.has(key)) listeners.set(key, new Set());
+
       listeners.get(key)!.add(listener);
 
       return () => {
