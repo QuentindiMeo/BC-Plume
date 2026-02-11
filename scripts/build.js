@@ -34,10 +34,11 @@ async function build() {
       await esbuild.build(buildOptions);
       console.log("✅ Build complete!");
     }
+    console.log(); // newline for readability
   } catch (error) {
     console.error("❌ Build failed:", error);
     process.exit(1);
   }
 }
 
-(await build())();
+build();
