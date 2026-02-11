@@ -1,25 +1,23 @@
 // Plume - TypeScript for song page and album page display
 import { APP_NAME, APP_VERSION, PLUME_CONSTANTS, PLUME_DEF, PLUME_KO_FI_URL } from "./constants";
+import { createStore, loadPersistedState, selectors } from "./store";
+import { ACTION_TYPES } from "./store/store";
 import { PLUME_SVG } from "./svg/icons";
 import {
   BC_ELEM_IDENTIFIERS,
   DebugControl,
-  LocalStorage,
-  PLUME_CACHE_KEYS,
   PLUME_ELEM_IDENTIFIERS,
   PlumeCore,
   TIME_DISPLAY_METHOD,
   TimeDisplayMethodType,
 } from "./types";
-import { browserCache } from "./utils/browser";
 import { getString } from "./utils/i18n";
 import { CPL, logger } from "./utils/logger";
-
-const browserCacheExists = browserCache !== undefined;
 
 (() => {
   "use strict";
 
+  const store = createStore();
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
 
   // Function to initialize playback (necessary to make Plume buttons effective)
@@ -34,45 +32,10 @@ const browserCacheExists = browserCache !== undefined;
     }
   };
 
-  const loadSavedVolume = (): Promise<number> => {
-    return new Promise((resolve) => {
-      if (browserCacheExists) {
-        browserCache
-          .get([PLUME_CACHE_KEYS.VOLUME])
-          .then((ls: LocalStorage) => {
-            let volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
-            // Validate volume is a valid number within 0-1 range
-            if (typeof volume !== "number" || Number.isNaN(volume) || volume < 0 || volume > 1) {
-              logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), volume);
-              volume = PLUME_DEF.savedVolume;
-            }
-            plume.savedVolume = volume;
-            resolve(volume);
-          })
-          .catch((e) => {
-            logger(CPL.WARN, getString("WARN__VOLUME__NOT_LOADED"), e);
-            plume.savedVolume = PLUME_DEF.savedVolume;
-            resolve(PLUME_DEF.savedVolume);
-          });
-      } else {
-        // Fallback to localStorage
-        try {
-          const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.VOLUME);
-          let volume = storedVolume ? Number.parseFloat(storedVolume) : PLUME_DEF.savedVolume;
-          // Validate volume is a valid number within 0-1 range
-          if (Number.isNaN(volume) || volume < 0 || volume > 1) {
-            logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), volume);
-            volume = PLUME_DEF.savedVolume;
-          }
-          plume.savedVolume = volume;
-          resolve(volume);
-        } catch (e) {
-          logger(CPL.WARN, getString("WARN__VOLUME__NOT_LOADED"), e);
-          plume.savedVolume = 1;
-          resolve(1);
-        }
-      }
-    });
+  // Load persisted state from storage into store
+  const loadSavedVolume = async (): Promise<number> => {
+    await loadPersistedState(store);
+    return store.getState().volume;
   };
 
   // Function to find the audio element
@@ -81,13 +44,10 @@ const browserCacheExists = browserCache !== undefined;
     if (!audio) return null;
     logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 
-    // Load and immediately apply saved volume
-    await loadSavedVolume();
-    audio.volume = plume.savedVolume;
-    logger(
-      CPL.INFO,
-      `${getString("INFO__VOLUME__FOUND")} ${Math.round(plume.savedVolume * 100)}${getString("META__PERCENTAGE")}`
-    );
+    // Load and immediately apply saved volume from store
+    const volume = await loadSavedVolume();
+    audio.volume = volume;
+    logger(CPL.INFO, `${getString("INFO__VOLUME__FOUND")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`);
 
     return audio;
   };
@@ -502,20 +462,9 @@ const browserCacheExists = browserCache !== undefined;
     return container;
   };
 
-  // Function to save the new volume from the slider to browser cache
+  // Save volume to store (which auto-persists)
   const saveNewVolume = (newVolume: number) => {
-    plume.savedVolume = newVolume;
-
-    if (browserCacheExists) {
-      browserCache.set({ [PLUME_CACHE_KEYS.VOLUME]: newVolume });
-    } else {
-      // Fallback to localStorage
-      try {
-        localStorage.setItem(PLUME_CACHE_KEYS.VOLUME, newVolume.toString());
-      } catch (e) {
-        logger(CPL.WARN, getString("WARN__VOLUME__NOT_SAVED"), e);
-      }
-    }
+    store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: newVolume });
   };
 
   // Sync mute button icon and aria-label to reflect the current audio volume state
@@ -549,11 +498,12 @@ const browserCacheExists = browserCache !== undefined;
     volumeSlider.type = "range";
     volumeSlider.min = "0";
     volumeSlider.max = VOLUME_SLIDER_GRANULARITY.toString();
-    volumeSlider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
+    const currentVolume = store.getState().volume;
+    volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
     volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
     // Apply saved volume to audio element
-    plume.audioElement!.volume = plume.savedVolume;
+    plume.audioElement!.volume = currentVolume;
 
     const valueDisplay = document.createElement("div");
     valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
@@ -782,36 +732,18 @@ const browserCacheExists = browserCache !== undefined;
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   };
 
-  // Function to format time as MM:SS
-  const formatTime = (seconds: number): string => {
-    if (Number.isNaN(seconds) || !Number.isFinite(seconds)) return "0:00";
-
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  };
-
   const saveDurationDisplayMethod = (newMethod: TimeDisplayMethodType) => {
-    plume.durationDisplayMethod = newMethod;
+    store.dispatch({ type: ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: newMethod });
 
     const player = plume.audioElement;
     if (!player || !plume.durationDisplay || !plume.elapsedDisplay) return;
-    if (plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION) {
-      plume.durationDisplay.textContent = formatTime(player.duration);
-    } else {
-      plume.durationDisplay.textContent = "-" + formatTime(player.duration - player.currentTime);
-    }
 
-    if (browserCacheExists) {
-      browserCache.set({ [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: newMethod });
-    } else {
-      // Fallback to localStorage
-      try {
-        localStorage.setItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, newMethod);
-      } catch (e) {
-        logger(CPL.WARN, getString("WARN__VOLUME__NOT_SAVED"), e);
-      }
-    }
+    // Update current time in store for accurate remaining time calculation
+    store.dispatch({ type: ACTION_TYPES.SET_CURRENT_TIME, payload: player.currentTime });
+    store.dispatch({ type: ACTION_TYPES.SET_DURATION, payload: player.duration });
+
+    const state = store.getState();
+    plume.durationDisplay.textContent = selectors.getFormattedDuration(state);
   };
 
   const PROGRESS_SLIDER_GRANULARITY = 1000; // use 1000 for better granularity: 1000s = 16m40s
@@ -865,10 +797,9 @@ const browserCacheExists = browserCache !== undefined;
 
   const handleDurationChange = () => {
     if (plume.durationDisplay && plume.audioElement) {
+      const currentMethod = store.getState().durationDisplayMethod;
       saveDurationDisplayMethod(
-        plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION
-          ? TIME_DISPLAY_METHOD.REMAINING
-          : TIME_DISPLAY_METHOD.DURATION
+        currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION
       );
     }
   };
@@ -1193,24 +1124,25 @@ const browserCacheExists = browserCache !== undefined;
     const elapsed = plume.audioElement!.currentTime;
     const duration = plume.audioElement!.duration;
 
-    if (!Number.isNaN(duration) && duration > 0) {
-      const percent = (elapsed / duration) * 100;
-      const bgPercent = percent < 50 ? percent + 1 : percent - 1; // or else it under/overflows
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-      plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-      plume.progressSlider.style.backgroundImage = bgImg;
+    // Update store with current playback state
+    store.dispatch({ type: ACTION_TYPES.SET_CURRENT_TIME, payload: elapsed });
+    store.dispatch({ type: ACTION_TYPES.SET_DURATION, payload: duration });
 
-      if (plume.elapsedDisplay) {
-        plume.elapsedDisplay.textContent = formatTime(elapsed);
-      }
+    if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
 
-      if (plume.durationDisplay) {
-        if (plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION) {
-          plume.durationDisplay.textContent = formatTime(duration);
-        } else {
-          plume.durationDisplay.textContent = "-" + formatTime(duration - elapsed);
-        }
-      }
+    const state = store.getState();
+    const percent = selectors.getProgressPercentage(state);
+    const bgPercent = percent < 50 ? percent + 1 : percent - 1; // or else it under/overflows
+    const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+    plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+    plume.progressSlider.style.backgroundImage = bgImg;
+
+    if (plume.elapsedDisplay) {
+      plume.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+    }
+
+    if (plume.durationDisplay) {
+      plume.durationDisplay.textContent = selectors.getFormattedDuration(state);
     }
   };
 
@@ -1278,39 +1210,30 @@ const browserCacheExists = browserCache !== undefined;
     });
   };
 
-  // Function to load the duration display method from browser cache (duration or remaining)
-  const loadDurationDisplayMethod = (): Promise<TimeDisplayMethodType> => {
-    return new Promise((resolve) => {
-      if (browserCacheExists) {
-        browserCache
-          .get([PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD])
-          .then((ls: LocalStorage) => {
-            const durationDisplayMethod =
-              ls[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] || PLUME_DEF.durationDisplayMethod;
-            plume.durationDisplayMethod = durationDisplayMethod;
-            resolve(durationDisplayMethod);
-          })
-          .catch((e) => {
-            logger(CPL.WARN, getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
-            plume.durationDisplayMethod = PLUME_DEF.durationDisplayMethod;
-            resolve(PLUME_DEF.durationDisplayMethod);
-          });
-      } else {
-        // Fallback to localStorage
-        try {
-          const storedDurationDisplayMethod = localStorage.getItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD);
-          const durationDisplayMethod: TimeDisplayMethodType = storedDurationDisplayMethod
-            ? (storedDurationDisplayMethod as TimeDisplayMethodType)
-            : TIME_DISPLAY_METHOD.DURATION;
-          plume.durationDisplayMethod = durationDisplayMethod;
-          resolve(durationDisplayMethod);
-        } catch (e) {
-          logger(CPL.WARN, getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
-          plume.durationDisplayMethod = TIME_DISPLAY_METHOD.DURATION;
-          resolve(TIME_DISPLAY_METHOD.DURATION);
+  // Load duration display method from store (already loaded during init)
+  const loadDurationDisplayMethod = async (): Promise<TimeDisplayMethodType> => {
+    return store.getState().durationDisplayMethod;
+  };
+
+  // Store unsubscribe functions for cleanup
+  const storeSubscriptions: Array<() => void> = [];
+
+  // Setup store subscriptions for reactive UI updates
+  const setupStoreSubscriptions = () => {
+    storeSubscriptions.push(
+      // Subscribe to volume changes to update audio element
+      store.subscribe("volume", (volume) => {
+        if (plume.audioElement && !plume.audioElement.paused) {
+          plume.audioElement.volume = volume;
         }
-      }
-    });
+      }),
+      // Subscribe to duration display method changes to update display
+      store.subscribe("durationDisplayMethod", () => {
+        updateProgressBar();
+      })
+    );
+
+    logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
   };
 
   const setupKeyboardShortcuts = () => {
@@ -1403,6 +1326,9 @@ const browserCacheExists = browserCache !== undefined;
       return;
     }
 
+    // Load persisted state into store
+    await loadPersistedState(store);
+
     plume.audioElement = await findAudioElement();
     if (!plume.audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
@@ -1419,12 +1345,13 @@ const browserCacheExists = browserCache !== undefined;
     }
 
     // Ensure duration display method is applied
-    await loadDurationDisplayMethod();
-    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
+    const durationDisplayMethod = await loadDurationDisplayMethod();
+    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
+    setupStoreSubscriptions();
     setupKeyboardShortcuts();
     initPlayback();
 
@@ -1459,17 +1386,15 @@ const browserCacheExists = browserCache !== undefined;
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
           // Ensure duration display method is applied
-          await loadDurationDisplayMethod();
-          logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
+          const durationDisplayMethod = await loadDurationDisplayMethod();
+          logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
           // Load and apply saved volume to the new element
-          await loadSavedVolume();
-          newAudio.volume = plume.savedVolume;
+          const volume = await loadSavedVolume();
+          newAudio.volume = volume;
           logger(
             CPL.INFO,
-            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(plume.savedVolume * 100)}${getString(
-              "META__PERCENTAGE"
-            )}`
+            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
           );
 
           plume.audioElement = newAudio;
@@ -1530,5 +1455,8 @@ const browserCacheExists = browserCache !== undefined;
     domObserver.disconnect();
     spaNavigationObserver.disconnect();
     fullscreenCleanupCallback?.();
+
+    // Unsubscribe all store listeners
+    storeSubscriptions.forEach((unsubscribe) => unsubscribe());
   });
 })();

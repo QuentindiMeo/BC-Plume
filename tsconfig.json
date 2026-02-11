@@ -25,6 +25,6 @@
     "allowUnusedLabels": false,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "build"]
 }
