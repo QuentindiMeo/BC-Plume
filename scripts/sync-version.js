@@ -47,4 +47,40 @@ if (fs.existsSync(firefoxManifestPath)) {
   }
 }
 
+const readmePath = path.join(__dirname, "..", "README.md");
+if (fs.existsSync(readmePath)) {
+  let readmeContent = fs.readFileSync(readmePath, "utf8");
+  const versionRegex = /release-v(\d+\.\d+\.\d+)/;
+  const readmeVersionMatch = readmeContent.match(versionRegex);
+  if (readmeVersionMatch && readmeVersionMatch[1] === packageVersion) {
+    console.log("✓ README.md version already up to date");
+  } else if (versionRegex.test(readmeContent)) {
+    readmeContent = readmeContent.replace(versionRegex, `release-v${packageVersion}`);
+    fs.writeFileSync(readmePath, readmeContent);
+    console.log(`✅ Updated README.md version to ${packageVersion}`);
+  } else {
+    console.warn("⚠️ Version string not found in README.md, skipping update");
+  }
+} else {
+  console.warn("⚠️ README.md not found, skipping update");
+}
+
+const logoVersionConstantPath = path.join(__dirname, "..", "src", "constants.ts");
+if (fs.existsSync(logoVersionConstantPath)) {
+  let constantsContent = fs.readFileSync(logoVersionConstantPath, "utf8");
+  const versionConstRegex = /APP_VERSION = ['"]v(\d+\.\d+\.\d+)['"]/;
+  const versionConstMatch = constantsContent.match(versionConstRegex);
+  if (versionConstMatch && versionConstMatch[1] === packageVersion) {
+    console.log("✓ APP_VERSION constant already up to date");
+  } else if (versionConstRegex.test(constantsContent)) {
+    constantsContent = constantsContent.replace(versionConstRegex, `APP_VERSION = 'v${packageVersion}'`);
+    fs.writeFileSync(logoVersionConstantPath, constantsContent);
+    console.log(`✅ Updated APP_VERSION constant to ${packageVersion}`);
+  } else {
+    console.warn("⚠️ APP_VERSION constant not found in constants.ts, skipping update");
+  }
+} else {
+  console.warn("⚠️ src/constants.ts not found, skipping APP_VERSION constant update");
+}
+
 console.log("✅ Version synchronization complete!");

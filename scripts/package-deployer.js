@@ -8,7 +8,7 @@ const toTitleCase = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const deployPackage = (browser) => {
+const deployPackage = (browser, withNewline) => {
   if (!VALID_BROWSERS.includes(browser)) {
     console.error(`❌ Invalid browser specified. Use one of: ${VALID_BROWSERS.join(", ")}`);
     process.exit(1);
@@ -87,10 +87,10 @@ const deployPackage = (browser) => {
 
   fs.writeFileSync(path.join(deployDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
-  console.log(`✅ Built ${toTitleCase(browser)} extension (Manifest V3)`);
-  console.log(`🎉 ${toTitleCase(browser)} extension package ready in build/${browser}/`);
-  console.log(); // newline for readability
+  console.log(`🎉 Deployed ${toTitleCase(browser)} package version ${packageVersion} to build/${browser}/`);
+  if (withNewline)
+    console.log(); // newline for readability
 };
 
-deployPackage("chrome");
+deployPackage("chrome", true);
 deployPackage("firefox");

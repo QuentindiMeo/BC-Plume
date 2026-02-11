@@ -190,82 +190,91 @@ import { CPL, logger } from "./utils/logger";
   const setupFullscreen = (clone: HTMLElement) => {
     const subscriptions: Array<() => void> = [];
 
-    const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement;
+    const cloneEl = {
+      headerContainer: clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement,
+      progressSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement,
+      elapsedDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement,
+      durationDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.durationDisplay) as HTMLSpanElement,
+      playPauseBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement,
+      volumeSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeSlider) as HTMLInputElement,
+      volumeDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement,
+      muteBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement,
+      trackBackwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackBwdBtn) as HTMLButtonElement,
+      timeBackwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeBwdBtn) as HTMLButtonElement,
+      timeForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement,
+      trackForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement,
+    };
 
-    // Subscribe to progress updates
-    const cloneProgressSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
+    const updateFullscreenDuration = () => {
+      if (!cloneEl.durationDisplay) return;
+      const state = store.getState();
+      cloneEl.durationDisplay.textContent = selectors.getFormattedDuration(state);
+    };
     subscriptions.push(
+      // Subscribe to progress updates
       store.subscribe("currentTime", () => {
         const state = store.getState();
-        if (!cloneProgressSlider) return;
+        if (!cloneEl.progressSlider) return;
 
         const percent = selectors.getProgressPercentage(state);
         const bgPercent = percent < 50 ? percent + 1 : percent - 1;
         const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-        cloneProgressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-        cloneProgressSlider.style.backgroundImage = bgImg;
-      })
-    );
-
-    // Subscribe to elapsed time display
-    const cloneElapsedDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement;
-    subscriptions.push(
+        cloneEl.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+        cloneEl.progressSlider.style.backgroundImage = bgImg;
+      }),
+      // Subscribe to elapsed time display
       store.subscribe("currentTime", () => {
-        if (!cloneElapsedDisplay) return;
+        if (!cloneEl.elapsedDisplay) return;
         const state = store.getState();
-        cloneElapsedDisplay.textContent = selectors.getFormattedElapsed(state);
-      })
-    );
-
-    // Subscribe to duration display (updates on both duration and display method changes)
-    const cloneDurationDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.durationDisplay) as HTMLSpanElement;
-    const updateFullscreenDuration = () => {
-      if (!cloneDurationDisplay) return;
-      const state = store.getState();
-      cloneDurationDisplay.textContent = selectors.getFormattedDuration(state);
-    };
-    subscriptions.push(
+        cloneEl.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+      }),
+      // Subscribe to duration display (updates on both duration and display method changes)
       store.subscribe("duration", updateFullscreenDuration),
       store.subscribe("durationDisplayMethod", updateFullscreenDuration),
-      store.subscribe("currentTime", updateFullscreenDuration)
-    );
-
-    // Subscribe to play/pause state
-    const clonePlayPauseBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement;
-    subscriptions.push(
+      store.subscribe("currentTime", updateFullscreenDuration),
+      // Subscribe to play/pause state
       store.subscribe("isPlaying", (isPlaying) => {
-        if (!clonePlayPauseBtn) return;
-        clonePlayPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
-      })
-    );
-
-    // Subscribe to volume changes
-    const cloneVolumeSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeSlider) as HTMLInputElement;
-    const cloneVolumeDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
-    subscriptions.push(
+        if (!cloneEl.playPauseBtn) return;
+        cloneEl.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+      }),
+      // Subscribe to volume changes
       store.subscribe("volume", (volume) => {
-        if (!cloneVolumeSlider || !cloneVolumeDisplay) return;
-        cloneVolumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
-        cloneVolumeDisplay.textContent = `${cloneVolumeSlider.value}${getString("META__PERCENTAGE")}`;
-      })
-    );
-
-    // Subscribe to mute state
-    const cloneMuteBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement;
-    subscriptions.push(
+        if (!cloneEl.volumeSlider || !cloneEl.volumeDisplay) return;
+        cloneEl.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+        cloneEl.volumeDisplay.textContent = `${cloneEl.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+      }),
+      // Subscribe to mute state
       store.subscribe("isMuted", (isMuted) => {
-        if (!cloneMuteBtn) return;
-        cloneMuteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-        cloneMuteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-        cloneMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-        cloneMuteBtn.ariaPressed = isMuted.toString();
-        cloneMuteBtn.classList.toggle("muted", isMuted);
+        if (!cloneEl.muteBtn) return;
+        cloneEl.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+        cloneEl.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+        cloneEl.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+        cloneEl.muteBtn.ariaPressed = isMuted.toString();
+        cloneEl.muteBtn.classList.toggle("muted", isMuted);
+      }),
+      // Subscribe to track title changes
+      store.subscribe("trackTitle", (trackTitle) => {
+        if (!cloneEl.headerContainer || !trackTitle) return;
+        const cloneHeaderTitle = cloneEl.headerContainer.querySelector(
+          PLUME_ELEM_IDENTIFIERS.headerTitle
+        ) as HTMLSpanElement;
+        if (cloneHeaderTitle) {
+          cloneHeaderTitle.textContent = trackTitle;
+          cloneHeaderTitle.title = trackTitle;
+        }
+      }),
+      // Subscribe to track number changes
+      store.subscribe("trackNumber", (trackNumber) => {
+        if (!cloneEl.headerContainer || !trackNumber) return;
+        const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
+          PLUME_ELEM_IDENTIFIERS.headerTitlePretext
+        ) as HTMLSpanElement;
+        if (cloneHeaderPretext) {
+          cloneHeaderPretext.textContent = trackNumber;
+        }
       })
     );
 
-    // Setup event listeners for fullscreen controls
-    // Note: These listeners are attached to cloned elements in the fullscreen overlay.
-    // They are automatically cleaned up when the overlay DOM is removed on exit.
     const handleProgressInput = function (this: HTMLInputElement) {
       const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
       if (plume.audioElement) {
@@ -292,52 +301,50 @@ import { CPL, logger } from "./utils/logger";
       saveNewVolume(newVolume);
     };
 
-    cloneProgressSlider.addEventListener("input", handleProgressInput);
-    cloneDurationDisplay.addEventListener("click", handleDurationChange);
-
-    const cloneTrackBackwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackBwdBtn) as HTMLButtonElement;
-    cloneTrackBackwardBtn.addEventListener("click", handleTrackBackward);
-
-    const cloneTimeBackwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeBwdBtn) as HTMLButtonElement;
-    cloneTimeBackwardBtn.addEventListener("click", handleTimeBackward);
-
-    clonePlayPauseBtn.addEventListener("click", handlePlayPause);
-
-    const cloneTimeForwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement;
-    cloneTimeForwardBtn.addEventListener("click", handleTimeForward);
-
-    const cloneTrackForwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement;
-    cloneTrackForwardBtn.addEventListener("click", handleTrackForward);
-
-    cloneVolumeSlider.addEventListener("input", handleVolumeInput);
-
-    cloneMuteBtn.addEventListener("click", () => {
-      store.dispatch({ type: ACTION_TYPES.TOGGLE_MUTE });
-    });
+    // Setup event listeners for fullscreen controls
+    // The listeners are automatically cleaned up when the overlay DOM is removed on exit.
+    cloneEl.progressSlider.addEventListener("input", handleProgressInput);
+    cloneEl.durationDisplay.addEventListener("click", handleDurationChange);
+    cloneEl.trackBackwardBtn.addEventListener("click", handleTrackBackward);
+    cloneEl.timeBackwardBtn.addEventListener("click", handleTimeBackward);
+    cloneEl.playPauseBtn.addEventListener("click", handlePlayPause);
+    cloneEl.timeForwardBtn.addEventListener("click", handleTimeForward);
+    cloneEl.trackForwardBtn.addEventListener("click", handleTrackForward);
+    cloneEl.volumeSlider.addEventListener("input", handleVolumeInput);
+    cloneEl.muteBtn.addEventListener("click", handleMuteToggle);
 
     // Initialize fullscreen UI with current state
     const state = store.getState();
-    if (plume.titleDisplay && cloneHeaderContainer) {
+    if (plume.titleDisplay && cloneEl.headerContainer) {
       // Safe use of innerHTML to clone DOM content from controlled element
-      cloneHeaderContainer.innerHTML = plume.titleDisplay.innerHTML;
+      cloneEl.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
+    }
+    // Initialize track number in fullscreen
+    if (state.trackNumber && cloneEl.headerContainer) {
+      const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
+        PLUME_ELEM_IDENTIFIERS.headerTitlePretext
+      ) as HTMLSpanElement;
+      if (cloneHeaderPretext) {
+        cloneHeaderPretext.textContent = state.trackNumber;
+      }
     }
     updateFullscreenDuration();
-    if (cloneElapsedDisplay) {
-      cloneElapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+    if (cloneEl.elapsedDisplay) {
+      cloneEl.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
     }
-    if (cloneVolumeSlider && cloneVolumeDisplay) {
-      cloneVolumeSlider.value = Math.round(state.volume * VOLUME_SLIDER_GRANULARITY).toString();
-      cloneVolumeDisplay.textContent = `${cloneVolumeSlider.value}${getString("META__PERCENTAGE")}`;
+    if (cloneEl.volumeSlider && cloneEl.volumeDisplay) {
+      cloneEl.volumeSlider.value = Math.round(state.volume * VOLUME_SLIDER_GRANULARITY).toString();
+      cloneEl.volumeDisplay.textContent = `${cloneEl.volumeSlider.value}${getString("META__PERCENTAGE")}`;
     }
-    if (cloneMuteBtn) {
-      cloneMuteBtn.innerHTML = state.isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-      cloneMuteBtn.title = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-      cloneMuteBtn.ariaLabel = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-      cloneMuteBtn.ariaPressed = state.isMuted.toString();
-      cloneMuteBtn.classList.toggle("muted", state.isMuted);
+    if (cloneEl.muteBtn) {
+      cloneEl.muteBtn.innerHTML = state.isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+      cloneEl.muteBtn.title = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+      cloneEl.muteBtn.ariaLabel = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+      cloneEl.muteBtn.ariaPressed = state.isMuted.toString();
+      cloneEl.muteBtn.classList.toggle("muted", state.isMuted);
     }
-    if (clonePlayPauseBtn) {
-      clonePlayPauseBtn.innerHTML = state.isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+    if (cloneEl.playPauseBtn) {
+      cloneEl.playPauseBtn.innerHTML = state.isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
     }
 
     // Return cleanup function to unsubscribe all listeners
@@ -543,6 +550,15 @@ import { CPL, logger } from "./utils/logger";
     plume.muteBtn.classList.toggle("muted", isMuted);
   };
 
+  const handleMuteToggle = () => {
+    if (!plume.audioElement) {
+      logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
+      return;
+    }
+
+    store.dispatch({ type: ACTION_TYPES.TOGGLE_MUTE });
+  };
+
   const VOLUME_SLIDER_GRANULARITY = 100;
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
@@ -575,14 +591,7 @@ import { CPL, logger } from "./utils/logger";
     valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
     valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
 
-    muteBtn.addEventListener("click", () => {
-      if (!plume.audioElement) {
-        logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
-
-      store.dispatch({ type: ACTION_TYPES.TOGGLE_MUTE });
-    });
+    muteBtn.addEventListener("click", handleMuteToggle);
 
     // Event listener for volume change via slider
     volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
@@ -1071,9 +1080,10 @@ import { CPL, logger } from "./utils/logger";
       : getString("ARIA__TRACK", initialTrackTitle);
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.id = PLUME_ELEM_IDENTIFIERS.headerTitlePretext.split("#")[1];
-    currentTitlePretext.textContent = isAlbumPage
+    const initialTrackNumberText = isAlbumPage
       ? getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`)
       : getString("LABEL__TRACK");
+    currentTitlePretext.textContent = initialTrackNumberText;
     currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitlePretext);
@@ -1084,6 +1094,10 @@ import { CPL, logger } from "./utils/logger";
     currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitleText);
     headerContainer.appendChild(currentTitleSection);
+
+    // Initialize store with current track title and track number
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_TITLE, payload: initialTrackTitle });
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_NUMBER, payload: initialTrackNumberText });
 
     plume.titleDisplay = headerContainer;
     plumeContainer.appendChild(headerContainer);
@@ -1136,9 +1150,14 @@ import { CPL, logger } from "./utils/logger";
 
     const newTrackTitle = getCurrentTrackTitle();
     const newTq = getTrackQuantifiers(newTrackTitle);
-    preText.textContent = isAlbumPage
+    const trackNumberText = isAlbumPage
       ? getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`)
       : getString("LABEL__TRACK");
+
+    // Dispatch track number change to store for fullscreen sync
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_NUMBER, payload: trackNumberText });
+
+    preText.textContent = trackNumberText;
 
     const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerCurrent) as HTMLDivElement;
     headerCurrent.ariaLabel = isAlbumPage
@@ -1157,6 +1176,9 @@ import { CPL, logger } from "./utils/logger";
     const newTrackTitle = getCurrentTrackTitle();
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
+
+    // Dispatch title change to store for fullscreen sync
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_TITLE, payload: newTrackTitle });
 
     // Cache offsetHeight to avoid multiple layout recalculations
     const titleHeight = titleText.offsetHeight;

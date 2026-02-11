@@ -11,6 +11,8 @@ export interface PersistedState {
 }
 
 export interface TransientState {
+  trackTitle: string | null;
+  trackNumber: string | null;
   duration: number;
   currentTime: number;
   isPlaying: boolean;
@@ -22,6 +24,8 @@ export interface TransientState {
 export interface AppState extends PersistedState, TransientState {}
 
 export enum ACTION_TYPES {
+  SET_TRACK_TITLE,
+  SET_TRACK_NUMBER,
   SET_DURATION,
   SET_CURRENT_TIME,
   SET_IS_PLAYING,
@@ -34,6 +38,8 @@ export enum ACTION_TYPES {
 }
 
 export type Action =
+  | { type: ACTION_TYPES.SET_TRACK_TITLE; payload: string | null }
+  | { type: ACTION_TYPES.SET_TRACK_NUMBER; payload: string | null }
   | { type: ACTION_TYPES.SET_DURATION; payload: number }
   | { type: ACTION_TYPES.SET_CURRENT_TIME; payload: number }
   | { type: ACTION_TYPES.SET_IS_PLAYING; payload: boolean }
@@ -54,6 +60,8 @@ export interface Store {
 }
 
 const INITIAL_STATE: AppState = {
+  trackTitle: null,
+  trackNumber: null,
   duration: 0,
   currentTime: 0,
   isPlaying: false,
@@ -144,6 +152,14 @@ export function createStore(): Store {
 
   function reducer(action: Action): void {
     switch (action.type) {
+      case ACTION_TYPES.SET_TRACK_TITLE:
+        updateState("trackTitle", action.payload);
+        break;
+
+      case ACTION_TYPES.SET_TRACK_NUMBER:
+        updateState("trackNumber", action.payload);
+        break;
+
       case ACTION_TYPES.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
           logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), action.payload);
@@ -192,6 +208,8 @@ export function createStore(): Store {
         break;
 
       case ACTION_TYPES.RESET_TRANSIENT_STATE:
+        updateState("trackTitle", INITIAL_STATE.trackTitle);
+        updateState("trackNumber", INITIAL_STATE.trackNumber);
         updateState("duration", INITIAL_STATE.duration);
         updateState("currentTime", INITIAL_STATE.currentTime);
         updateState("isPlaying", INITIAL_STATE.isPlaying);
