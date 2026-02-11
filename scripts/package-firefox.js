@@ -4,6 +4,10 @@ const path = require("node:path");
 
 console.log("🦊 Building Firefox extension package...");
 
+// Read version from package.json (single source of truth)
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+const packageVersion = packageJson.version;
+
 // Ensure build directory exists
 const buildDir = path.join(__dirname, "..", "build", "firefox");
 if (!fs.existsSync(buildDir)) {
@@ -19,7 +23,6 @@ srcFiles.forEach((file) => {
   const destPath = path.join(buildDir, file);
   if (fs.existsSync(srcPath)) {
     fs.copyFileSync(srcPath, destPath);
-    console.log(`✅ Copied ${file}`);
   } else {
     console.error(`❌ Missing ${file} - run 'pnpm run build' first`);
     process.exit(1);
@@ -35,7 +38,6 @@ staticFiles.forEach((file) => {
   const destPath = path.join(buildDir, file);
   if (fs.existsSync(srcPath)) {
     fs.copyFileSync(srcPath, destPath);
-    console.log(`✅ Copied ${file}`);
   }
 });
 
@@ -44,46 +46,32 @@ staticDirs.forEach((dir) => {
   const destPath = path.join(buildDir, dir);
   if (fs.existsSync(srcPath)) {
     fs.cpSync(srcPath, destPath, { recursive: true });
-    console.log(`✅ Copied ${dir}/`);
   }
 });
 
-// Create Firefox manifest (Manifest V3)
+const rootManifestPath = path.join(__dirname, "..", "manifest.json");
+const rootManifest = JSON.parse(fs.readFileSync(rootManifestPath, "utf8"));
 const manifest = {
-  manifest_version: 3,
-  name: "BC-Plume - Bandcamp Player Enhancer",
-  version: "1.3.1",
-  description: "Improves the Bandcamp player interface with a volume slider and enhanced playback controls.",
-  default_locale: "en",
-  permissions: ["storage"],
-  host_permissions: ["*://*.bandcamp.com/*"],
+  ...rootManifest,
+  version: packageVersion,
   content_scripts: [
     {
-      matches: ["*://*.bandcamp.com/album/*", "*://*.bandcamp.com/track/*"],
+      matches: rootManifest.content_scripts[0].matches,
       js: ["content.js"],
-      css: ["styles.css"],
-      run_at: "document_end",
+      css: rootManifest.content_scripts[0].css,
+      run_at: rootManifest.content_scripts[0].run_at,
     },
   ],
-  content_security_policy: {
-    extension_pages: "script-src 'self'; object-src 'none'",
-  },
   icons: {
-    16: "icons/icon16.svg",
-    48: "icons/icon48.svg",
-    128: "icons/icon128.svg",
-  },
-  browser_specific_settings: {
-    gecko: {
-      id: "bandcamp-player-enhancer@extension.local",
-      strict_min_version: "109.0",
-    },
+    16: "icons/icon16.png",
+    48: "icons/icon48.png",
+    128: "icons/icon128.png",
   },
 };
 
 fs.writeFileSync(path.join(buildDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
-console.log("✅ Created Firefox manifest.json (Manifest V3)");
+console.log("✅ Built Firefox extension (Manifest V3)");
 
 // Copy locales
 const localesDir = path.join(__dirname, "..", "_locales");

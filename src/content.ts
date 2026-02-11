@@ -11,19 +11,11 @@ import {
   TIME_DISPLAY_METHOD,
   TimeDisplayMethodType,
 } from "./types";
-import { getBrowserAPI } from "./utils/browser";
+import { browserCache } from "./utils/browser";
 import { getString } from "./utils/i18n";
 import { CPL, logger } from "./utils/logger";
 
-const browserApi = getBrowserAPI();
-const browserCache = browserApi.storage.local;
 const browserCacheExists = browserCache !== undefined;
-const chromeApi = (globalThis as any).chrome;
-logger(
-  CPL.INFO,
-  getString("INFO__BROWSER__DETECTED"),
-  chromeApi === undefined || (globalThis as any).browser !== undefined ? "Firefox-based" : "Chromium-based"
-);
 
 (() => {
   "use strict";
@@ -1399,9 +1391,7 @@ logger(
 
   const init = async () => {
     // Prevent concurrent initialization
-    if (isInitializing || isInitialized) {
-      return;
-    }
+    if (isInitializing || isInitialized) return;
     isInitializing = true;
 
     logger(CPL.INFO, getString("LOG__INITIALIZATION__START"));

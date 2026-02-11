@@ -40,4 +40,4 @@ async function build() {
   }
 }
 
-build();
+(await build())();
