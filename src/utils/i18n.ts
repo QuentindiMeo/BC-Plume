@@ -1,11 +1,15 @@
-import { getBrowserAPI } from "./browser";
+import { browserApi } from "./browser";
+import { CPL, logger } from "./logger";
 
-const browserApi = getBrowserAPI();
-
-if (!browserApi.i18n?.getMessage) {
-  browserApi.i18n = {
-    getMessage: (key: string) => key,
-  };
+export function logDetectedBrowser(): void {
+  const chromeApi = (globalThis as any).chrome;
+  logger(
+    CPL.INFO,
+    getString("INFO__BROWSER__DETECTED"),
+    chromeApi === undefined || (globalThis as any).browser !== undefined ? "Firefox-based" : "Chromium-based"
+  );
 }
 
-export const getString = browserApi.i18n.getMessage;
+const getLocalizedMessage = browserApi.i18n?.getMessage?.bind(browserApi.i18n) ?? ((key: string) => key);
+
+export const getString = getLocalizedMessage;

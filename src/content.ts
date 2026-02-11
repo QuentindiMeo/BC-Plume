@@ -11,12 +11,13 @@ import {
   TIME_DISPLAY_METHOD,
   TimeDisplayMethodType,
 } from "./types";
-import { getString } from "./utils/i18n";
+import { getString, logDetectedBrowser } from "./utils/i18n";
 import { CPL, logger } from "./utils/logger";
 
 (() => {
   "use strict";
 
+  logDetectedBrowser();
   const store = createStore();
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
 
@@ -32,12 +33,6 @@ import { CPL, logger } from "./utils/logger";
     }
   };
 
-  // Load persisted state from storage into store
-  const loadSavedVolume = async (): Promise<number> => {
-    await loadPersistedState(store);
-    return store.getState().volume;
-  };
-
   // Function to find the audio element
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
     const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
@@ -45,7 +40,7 @@ import { CPL, logger } from "./utils/logger";
     logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 
     // Load and immediately apply saved volume from store
-    const volume = await loadSavedVolume();
+    const volume = store.getState().volume;
     audio.volume = volume;
     logger(CPL.INFO, `${getString("INFO__VOLUME__FOUND")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`);
 
@@ -298,7 +293,7 @@ import { CPL, logger } from "./utils/logger";
         store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
       }
 
-      saveNewVolume(newVolume);
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: newVolume });
     };
 
     // Setup event listeners for fullscreen controls
@@ -535,11 +530,6 @@ import { CPL, logger } from "./utils/logger";
     return container;
   };
 
-  // Save volume to store (which auto-persists)
-  const saveNewVolume = (newVolume: number) => {
-    store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: newVolume });
-  };
-
   // Sync mute button icon and aria-label to reflect the current audio volume state
   const syncMuteBtn = (isMuted: boolean) => {
     if (!plume.muteBtn) return;
@@ -610,7 +600,7 @@ import { CPL, logger } from "./utils/logger";
         store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
       }
 
-      saveNewVolume(volume);
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
     });
 
     container.appendChild(muteBtn);
@@ -1199,9 +1189,11 @@ import { CPL, logger } from "./utils/logger";
     const elapsed = plume.audioElement!.currentTime;
     const duration = plume.audioElement!.duration;
 
-    // Update store with current playback state
-    store.dispatch({ type: ACTION_TYPES.SET_CURRENT_TIME, payload: elapsed });
-    store.dispatch({ type: ACTION_TYPES.SET_DURATION, payload: duration });
+    // Update store with current playback state (batched for performance)
+    store.dispatch({
+      type: ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS,
+      payload: { currentTime: elapsed, duration },
+    });
 
     if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
 
@@ -1253,7 +1245,7 @@ import { CPL, logger } from "./utils/logger";
       if (store.getState().isMuted !== isMuted) {
         store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
       }
-      if (currentVolume !== 0) saveNewVolume(currentVolume);
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: currentVolume });
     });
 
     // Track play/pause state changes from audio element
@@ -1310,7 +1302,7 @@ import { CPL, logger } from "./utils/logger";
     storeSubscriptions.push(
       // Subscribe to volume changes to update audio element
       store.subscribe("volume", (volume) => {
-        if (plume.audioElement && !plume.audioElement.paused) {
+        if (plume.audioElement) {
           plume.audioElement.volume = volume;
         }
       }),
@@ -1375,7 +1367,7 @@ import { CPL, logger } from "./utils/logger";
         valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
       });
 
-      saveNewVolume(volume);
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
     };
 
     const handleToggleMute = () => {
@@ -1502,7 +1494,7 @@ import { CPL, logger } from "./utils/logger";
           logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
           // Load and apply saved volume to the new element
-          const volume = await loadSavedVolume();
+          const volume = store.getState().volume;
           newAudio.volume = volume;
           logger(
             CPL.INFO,

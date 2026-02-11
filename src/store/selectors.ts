@@ -1,3 +1,4 @@
+import { TIME_DISPLAY_METHOD } from "../types";
 import type { AppState } from "./store";
 
 // Function to format time as MM:SS
@@ -15,7 +16,7 @@ export const selectors = {
   },
 
   getFormattedDuration: (state: AppState): string => {
-    if (state.durationDisplayMethod === "remaining") {
+    if (state.durationDisplayMethod === TIME_DISPLAY_METHOD.REMAINING) {
       const remaining = state.duration - state.currentTime;
       return "-" + formatTime(remaining);
     }

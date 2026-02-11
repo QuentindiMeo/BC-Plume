@@ -11,9 +11,14 @@ export async function loadPersistedState(store: Store): Promise<void> {
 
     if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
       const volume = result[PLUME_CACHE_KEYS.VOLUME];
-      if (typeof volume === "number" && volume >= 0 && volume <= 1) {
-        store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
-        logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), `${Math.round(volume * 100)}%`);
+      if (typeof volume === "number") {
+        const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
+        store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volumeClamped });
+
+        if (volumeClamped === 0) {
+          store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: true });
+        }
+        logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), `${Math.round(volumeClamped * 100)}%`);
       }
     }
 

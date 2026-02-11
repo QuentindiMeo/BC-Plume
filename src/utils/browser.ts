@@ -1,6 +1,3 @@
-import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
-
 export interface BrowserAPI {
   storage: {
     local: {
@@ -13,19 +10,33 @@ export interface BrowserAPI {
   };
 }
 
-export function getBrowserAPI(): BrowserAPI {
-  const chromeApi = (globalThis as any).chrome;
-  const firefoxApi = (globalThis as any).browser;
+function getBrowserAPI(): BrowserAPI {
+  if (!(globalThis as any).browser && !(globalThis as any).chrome)
+    throw new Error(
+      "No compatible browser API found. This extension requires a Chromium-based or Firefox-based browser."
+    );
 
-  if (firefoxApi !== undefined && firefoxApi?.storage) return firefoxApi;
-  else return chromeApi;
+  return (globalThis as any).browser ?? (globalThis as any).chrome;
 }
 
-const browserApi = getBrowserAPI();
-export const browserCache = browserApi.storage.local;
-const chromeApi = (globalThis as any).chrome;
-logger(
-  CPL.INFO,
-  getString("INFO__BROWSER__DETECTED"),
-  chromeApi === undefined || (globalThis as any).browser !== undefined ? "Firefox-based" : "Chromium-based"
-);
+let cachedBrowserApi: BrowserAPI | null = null;
+export function getBrowserApi(): BrowserAPI {
+  if (cachedBrowserApi) return cachedBrowserApi;
+
+  cachedBrowserApi = getBrowserAPI();
+  return cachedBrowserApi;
+}
+export const browserApi: BrowserAPI = new Proxy({} as BrowserAPI, {
+  get(_target, prop, _receiver) {
+    const api = getBrowserApi() as any;
+    const value = api[prop];
+    return typeof value === "function" ? value.bind(api) : value;
+  },
+});
+export const browserCache = new Proxy({} as BrowserAPI["storage"]["local"], {
+  get(_target, prop, _receiver) {
+    const cache = getBrowserApi().storage.local as any;
+    const value = cache[prop];
+    return typeof value === "function" ? value.bind(cache) : value;
+  },
+});

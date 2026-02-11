@@ -32,6 +32,7 @@ export enum ACTION_TYPES {
   SET_DURATION_DISPLAY_METHOD,
   SET_VOLUME,
   SET_IS_MUTED,
+  UPDATE_PLAYBACK_PROGRESS,
   TOGGLE_MUTE,
   SET_IS_FULLSCREEN,
   RESET_TRANSIENT_STATE,
@@ -46,6 +47,7 @@ export type Action =
   | { type: ACTION_TYPES.SET_DURATION_DISPLAY_METHOD; payload: TimeDisplayMethodType }
   | { type: ACTION_TYPES.SET_VOLUME; payload: number }
   | { type: ACTION_TYPES.SET_IS_MUTED; payload: boolean }
+  | { type: ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS; payload: { currentTime: number; duration: number } }
   | { type: ACTION_TYPES.TOGGLE_MUTE }
   | { type: ACTION_TYPES.SET_IS_FULLSCREEN; payload: boolean }
   | { type: ACTION_TYPES.RESET_TRANSIENT_STATE };
@@ -83,22 +85,24 @@ export function createStore(): Store {
   const globalListeners = new Set<(state: AppState) => void>();
 
   let persistenceTimer: ReturnType<typeof setTimeout> | null = null;
+  let pendingPersistedKeys = new Set<keyof AppState>();
 
   function persistState(keys: Array<keyof AppState>): void {
-    if (persistenceTimer) {
-      clearTimeout(persistenceTimer);
-    }
+    // Accumulate all keys that need to be persisted during the debounce window
+    keys.forEach((key) => {
+      if (PERSISTED_KEYS.has(key)) pendingPersistedKeys.add(key);
+    });
 
+    if (persistenceTimer) clearTimeout(persistenceTimer);
     persistenceTimer = setTimeout(() => {
       const toSave: Record<string, any> = {};
 
-      for (const key of keys) {
-        if (PERSISTED_KEYS.has(key)) {
-          if (key === "volume") {
-            toSave[PLUME_CACHE_KEYS.VOLUME] = state.volume;
-          } else if (key === "durationDisplayMethod") {
-            toSave[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] = state.durationDisplayMethod;
-          }
+      // Persist all pending keys that accumulated during debounce window
+      for (const key of pendingPersistedKeys) {
+        if (key === "volume") {
+          toSave[PLUME_CACHE_KEYS.VOLUME] = state.volume;
+        } else if (key === "durationDisplayMethod") {
+          toSave[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] = state.durationDisplayMethod;
         }
       }
 
@@ -112,6 +116,9 @@ export function createStore(): Store {
             logger(CPL.ERROR, getString("ERROR__STATE__PERSIST_FAILED"), error);
           });
       }
+
+      pendingPersistedKeys.clear();
+      persistenceTimer = null;
     }, PERSISTENCE_DELAY_MS);
   }
 
@@ -205,6 +212,11 @@ export function createStore(): Store {
 
       case ACTION_TYPES.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
+        break;
+
+      case ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS:
+        updateState("currentTime", action.payload.currentTime);
+        updateState("duration", action.payload.duration);
         break;
 
       case ACTION_TYPES.RESET_TRANSIENT_STATE:

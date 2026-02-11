@@ -18,7 +18,7 @@ const buildOptions = {
   bundle: true,
   outfile: path.join(distDir, "content.js"),
   platform: "browser",
-  target: "es2020",
+  target: "es2022",
   sourcemap: isDev,
   minify: !isDev,
   logLevel: "info",
