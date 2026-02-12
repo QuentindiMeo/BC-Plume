@@ -1,352 +1,24 @@
 // Plume - TypeScript for song page and album page display
-const APP_NAME = "Plume - Bandcamp Player Enhancer";
-const APP_VERSION = "v1.3.1";
-const PLUME_KO_FI_URL = "https://ko-fi.com/quentindimeo";
-
-interface BrowserAPI {
-  storage: {
-    local: {
-      get: (keys: Array<string>) => Promise<any>;
-      set: (items: any) => Promise<void>;
-    };
-  };
-  i18n: {
-    getMessage: (key: string, substitutions?: any, options?: object) => string;
-  };
-}
-
-enum BROWSER_TYPE {
-  CHROMIUM = "Chromium",
-  FIREFOX = "Firefox",
-}
-type BrowserType = `${BROWSER_TYPE}`; // Type alias for string literal types
-
-enum TIME_DISPLAY_METHOD {
-  DURATION = "duration",
-  REMAINING = "remaining",
-}
-type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`; // Type alias for string literal types
-
-/**
- * Audio player enhancement handles
- */
-interface PlumeCore {
-  audioElement: HTMLAudioElement | null;
-  titleDisplay: HTMLDivElement | null;
-  progressSlider: HTMLInputElement | null;
-  elapsedDisplay: HTMLSpanElement | null;
-  durationDisplay: HTMLSpanElement | null;
-  durationDisplayMethod: TimeDisplayMethodType;
-  volumeSlider: HTMLInputElement | null;
-  muteBtn: HTMLButtonElement | null;
-  savedVolume: number;
-  playerVolume: number;
-}
-const PLUME_DEF: Pick<PlumeCore, "durationDisplayMethod" | "savedVolume" | "playerVolume"> = {
-  durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
-  savedVolume: 0.5, // Default volume, 0..1
-  playerVolume: 0.5,
-};
-const PLUME_CONSTANTS = {
-  TIME_BEFORE_RESTART: 5, // seconds before track restarts on backward button click
-};
-
-// SECURITY NOTE: PLUME_SVG contains hardcoded SVG markup that is safely used with innerHTML. All values are static constants defined at compile time with no user input or dynamic content.
-// While innerHTML is generally discouraged, it's acceptable here because:
-//    1. Content is 100% controlled (no user input, no external data)
-//    2. SVG is verbose to create via DOM methods (createElementNS for each element)
-//    3. Content scripts run in isolated context
-// Note to developers: do not introduce any dynamic content or user input into PLUME_SVG, as that would create security risks. Always sanitize any new content if you must add it.
-enum PLUME_SVG {
-  logo = `
-    <svg
-      version="1.1"
-      id="logo_plume"
-      width="100%"
-      height="100%"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 557.6 299.3"
-      author="Rebecca ȘES"
-    >
-      <style type="text/css">
-        .st0 { fill-rule: evenodd; clip-rule: evenodd; fill: #20A0C3; }
-        .st1 { fill: #20A0C3; }
-        .st2 { fill: #20A0C3; stroke: #1FA0C3; stroke-width: 3; stroke-miterlimit: 7.2021; }
-        .st3 { fill: #20A0C3; stroke: #1FA0C3; stroke-width: 0.5; stroke-miterlimit: 7.2021; }
-      </style>
-      <g>
-        <g id="plume_p">
-          <g id="plume_p_">
-            <path
-              vector-effect="non-scaling-stroke"
-              class="st0"
-              d="M31.4,178.7l5.8-12.6c12.5,0,18.7,5.4,18.7,16.2v3.8 c3.5-6.5,8-11.8,13.5-15.9s11.9-6.2,19.3-6.2c6.5,0,12.1,1.7,16.9,5c4.8,3.3,8.5,7.9,11.1,13.7c2.6,5.8,3.9,12.6,3.9,20.3 c0,8.9-1.3,17-3.9,24.2c-2.6,7.3-6.1,13.5-10.5,18.7c-4.4,5.2-9.4,9.2-14.9,12s-11.2,4.1-17.1,4.1c-5.8,0-11.1-1.4-16.1-4.3 c-5-2.9-8.9-6.4-11.6-10.6l-9.2,52.4H21l18.7-107.1c0.4-2,0.5-3.7,0.5-5C40.3,181.5,37.3,178.7,31.4,178.7z M52.1,214.1 l-3.2,18.2c2.6,4.8,6.1,8.5,10.3,11.2c4.2,2.6,8.7,4,13.5,4c5.6,0,10.8-1.8,15.6-5.5c4.7-3.7,8.6-8.7,11.4-15.2 c2.9-6.5,4.3-13.9,4.3-22.3c0-8.2-1.9-14.6-5.6-19.4c-3.7-4.7-8.6-7.1-14.6-7.1c-4.8,0-9.4,1.5-13.8,4.5s-8.1,7.2-11.3,12.6 C55.7,200.5,53.5,206.8,52.1,214.1z"
-            />
-          </g>
-        </g>
-        <g id="plume_feather">
-          <g>
-            <rect x="75.1" y="174.7" transform="matrix(0.1809 -0.9835 0.9835 0.1809 -41.9654 305.8548)" class="st2" width="175.1" height="6.8"/>
-          </g>
-          <g>
-            <path
-              class="st2"
-              d="M184.8,199.9c-0.8,0-1.6-0.3-2.3-0.9c-1.4-1.3-1.5-3.4-0.2-4.8c6.3-6.9,7.8-15.8,8-22 c0.2-8.3-1.7-16.7-3.5-24.8l-7.4-33.1c-1.6-7.3-3.1-15.2-1.9-22.6c-16.8,17.6-25.1,42.6-21.9,67c0.2,1.9-1.1,3.6-2.9,3.8 c-1.9,0.2-3.6-1.1-3.8-2.9c-3.9-29,7.4-58.9,29.3-77.9c0.2-0.2,0.4-0.4,0.7-0.6c1.5-1.4,3.3-2.9,6.5-3.4c1.4-0.2,2.7,0.5,3.4,1.7 c0.7,1.2,0.5,2.7-0.4,3.8c-6.5,7.6-4.7,18.7-2.3,29.5l7.4,33.1c1.9,8.6,3.9,17.4,3.7,26.5c-0.2,7.4-2,17.9-9.7,26.4 C186.6,199.5,185.7,199.9,184.8,199.9z"
-            />
-          </g>
-          <g>
-            <path
-              class="st3"
-              d="M154,228.4c-0.1,0-0.2,0-0.3,0c-1.2-0.1-2.3-0.9-2.8-2L140,200.9c-0.7-1.7,0.1-3.7,1.8-4.4 c1.7-0.7,3.7,0.1,4.4,1.8l8.5,20c3.9-5.1,8.2-9.8,12.8-14.2c1.4-1.3,3.5-1.2,4.8,0.1c1.3,1.4,1.2,3.5-0.1,4.8 c-5.7,5.5-10.9,11.5-15.5,18C156.1,227.8,155.1,228.4,154,228.4z"
-            />
-          </g>
-          <g>
-            <path
-              class="st3"
-              d="M151.6,246.4c-0.1,0-0.2,0-0.3,0c-1.2-0.1-2.3-0.9-2.8-2l-10.9-25.4c-0.7-1.7,0.1-3.7,1.8-4.4 c1.7-0.7,3.7,0.1,4.4,1.8l8.5,20c3.9-5.1,8.2-9.8,12.8-14.2c1.4-1.3,3.5-1.2,4.8,0.1c1.3,1.4,1.2,3.5-0.1,4.8 c-5.7,5.5-10.9,11.5-15.5,18C153.8,245.9,152.7,246.4,151.6,246.4z"
-            />
-          </g>
-        </g>
-        <g id="plume_ume">
-          <g id="plume_u">
-            <path
-              vector-effect="non-scaling-stroke"
-              class="st0"
-              d="M207.9,225.7l10.3-59.6h16.2l-10.4,59.2c-0.1,1.2-0.2,2.3-0.4,3.2 c-0.1,0.9-0.2,1.9-0.2,3c0,5.4,1.6,9.4,4.7,12.1c3.1,2.6,6.8,4,11,4c4.6,0,9-1.4,13.4-4.2c4.4-2.8,8.3-6.9,11.6-12.2 c3.4-5.3,5.7-11.6,7-19.1l8.1-45.9h16.2l-11.9,68.2c-0.1,0.6-0.2,1.3-0.3,2.1c-0.1,0.8-0.1,1.6-0.1,2.4c0,3.4,1,5.7,2.9,7.1 c1.9,1.4,4.4,2.1,7.6,2.1l-5.6,12.6c-6.5,0-11.4-1.6-14.9-4.8c-3.4-3.2-5.1-8.1-5.1-14.9v-1.6c-8.8,15-20.2,22.5-34.4,22.5 c-4.8,0-9.2-1.1-13.2-3.2c-4-2.2-7.2-5.2-9.6-9.1s-3.6-8.6-3.6-14c0-1.6,0.1-3.2,0.2-4.8C207.5,229.2,207.6,227.5,207.9,225.7z"
-            />
-            <path
-              class="st1"
-              d="M233.6,261.9c-4.8,0-9.2-1.1-13.2-3.2c-4-2.2-7.3-5.2-9.6-9.1c-2.4-3.9-3.6-8.6-3.6-14 c0-1.6,0.1-3.2,0.2-4.8c0.1-1.6,0.3-3.3,0.5-5.1v0l10.3-59.6h16.3l0,0l-10.4,59.2c-0.1,1.2-0.2,2.3-0.4,3.1 c-0.1,0.9-0.2,1.9-0.2,3c0,5.4,1.6,9.4,4.7,12c3.1,2.6,6.8,4,11,4c4.5,0,9-1.4,13.4-4.2c4.4-2.8,8.3-6.9,11.6-12.1 c3.3-5.3,5.7-11.7,7-19.1l8.1-45.9h16.3l0,0l-11.9,68.2c-0.1,0.6-0.2,1.3-0.3,2.1c-0.1,0.8-0.1,1.6-0.1,2.4c0,3.3,1,5.7,2.9,7.1 c1.9,1.4,4.4,2.1,7.5,2.1h0l0,0l-5.6,12.6h0c-3.2,0-6.1-0.4-8.6-1.2c-2.5-0.8-4.6-2-6.3-3.6c-1.7-1.6-3-3.6-3.9-6.1 c-0.9-2.5-1.3-5.4-1.3-8.8v-1.5c-4.4,7.4-9.4,13.1-15.1,16.8c-2.9,1.9-5.9,3.3-9.1,4.2S237.2,261.9,233.6,261.9z M207.9,225.7 c-0.2,1.8-0.4,3.5-0.5,5.1c-0.1,1.6-0.2,3.2-0.2,4.8c0,5.4,1.2,10.1,3.6,13.9c2.4,3.9,5.6,6.9,9.6,9.1s8.4,3.2,13.2,3.2 c14.1,0,25.7-7.6,34.4-22.5l0-0.1v1.7c0,6.7,1.7,11.7,5.1,14.8c3.4,3.2,8.4,4.8,14.8,4.8l5.6-12.6c-3.1,0-5.6-0.7-7.5-2.1 c-1.9-1.4-2.9-3.8-2.9-7.1c0-0.8,0-1.7,0.1-2.4c0.1-0.8,0.2-1.5,0.3-2.1l11.9-68.2h-16.2l-8.1,45.9c-1.3,7.4-3.7,13.8-7,19.1 c-3.3,5.3-7.3,9.4-11.6,12.2c-4.4,2.8-8.9,4.2-13.4,4.2c-4.2,0-7.9-1.3-11-4c-1.6-1.3-2.7-3-3.5-5c-0.8-2-1.2-4.4-1.2-7.1 c0-1.1,0.1-2.1,0.2-3c0.1-0.9,0.2-2,0.4-3.1l10.4-59.2h-16.2L207.9,225.7L207.9,225.7z"
-            />
-          </g>
-          <g id="plume_m">
-            <path
-              vector-effect="non-scaling-stroke"
-              class="st0"
-              d="M393,221l-6.8,38.7h-16.2l10.3-56c0.6-2.9,1-5,1.1-6.4s0.2-2.7,0.2-3.9 c0-4.7-1.4-8.4-4.1-11.2c-2.7-2.8-6.2-4.1-10.5-4.1c-4.2,0-8.6,1.6-13.3,4.7s-8.9,8-12.8,14.5c-3.8,6.5-6.7,14.9-8.5,25.1 l-6.5,37.3h-16.2l16.4-93.6h15.7l-4,21.6c3.6-7.2,8.5-13,14.7-17.3s12.6-6.5,19.2-6.5c7.4,0,13.4,2.3,18,6.8s7.1,10.2,7.7,17 c4.1-7.4,9.1-13.3,15-17.5s12.4-6.3,19.4-6.3c8,0,14.4,2.5,19.2,7.5c4.7,5,7.1,11.1,7.1,18.3c0,3-0.4,6.8-1.1,11.3l-10.4,58.7 h-16.2l10.3-56c0.6-2.9,1-5,1.1-6.4c0.1-1.4,0.2-2.7,0.2-3.9c0-4.7-1.4-8.4-4.1-11.2s-6.2-4.1-10.5-4.1c-4,0-8.3,1.5-13,4.5 c-4.7,3-8.9,7.7-12.8,14C397.6,202.9,394.8,211.1,393,221z"
-            />
-            <path
-              class="st1"
-              d="M446.5,259.8h-16.3l0,0l10.3-56c0.6-2.9,1-5,1.1-6.4c0.1-1.4,0.2-2.7,0.2-3.9c0-4.7-1.4-8.4-4-11.1 s-6.2-4.1-10.5-4.1c-3.9,0-8.3,1.5-13,4.5c-4.7,3-9,7.7-12.8,13.9c-3.8,6.3-6.7,14.5-8.5,24.4l-6.8,38.7h-16.3l0,0l10.3-56 c0.6-2.9,1-5,1.1-6.4c0.1-1.4,0.2-2.7,0.2-3.9c0-4.7-1.4-8.4-4-11.1c-2.7-2.7-6.2-4.1-10.5-4.1c-4.2,0-8.7,1.6-13.3,4.7 c-4.7,3.1-9,8-12.8,14.5c-3.8,6.5-6.7,15-8.5,25.1l-6.5,37.3h-16.3l0,0l16.4-93.6h15.7l0,0l-3.9,21.4c1.8-3.5,3.9-6.7,6.3-9.6 c2.4-2.9,5.2-5.4,8.3-7.6c3.1-2.2,6.3-3.8,9.4-4.9s6.5-1.6,9.8-1.6c3.7,0,7.1,0.6,10.1,1.7c3,1.1,5.7,2.8,7.9,5.1 c2.3,2.2,4.1,4.8,5.4,7.6c1.3,2.8,2.1,5.9,2.4,9.3c4.1-7.4,9.1-13.2,15-17.4c3-2.1,6.1-3.7,9.3-4.7c3.2-1,6.6-1.6,10.1-1.6 c4,0,7.7,0.6,10.8,1.9c3.2,1.2,6,3.1,8.4,5.6c2.4,2.5,4.2,5.3,5.3,8.3c1.2,3,1.8,6.4,1.8,10c0,3-0.4,6.8-1.1,11.3L446.5,259.8z M430.3,259.7h16.2l10.4-58.7c0.7-4.5,1.1-8.4,1.1-11.3c0-7.2-2.4-13.3-7.1-18.3c-4.7-5-11.2-7.5-19.2-7.5 c-6.9,0-13.4,2.1-19.3,6.3c-5.9,4.2-11,10.1-15,17.5l0,0.1l0-0.1c-0.6-6.8-3.2-12.5-7.7-17c-4.5-4.5-10.6-6.7-18-6.7 c-6.6,0-13,2.2-19.2,6.5c-6.1,4.3-11.1,10.1-14.7,17.3l-0.1,0.2l0-0.2l4-21.6H326l-16.4,93.6h16.2l6.5-37.2 c1.8-10.2,4.6-18.6,8.5-25.1c3.8-6.5,8.1-11.4,12.8-14.5c4.7-3.1,9.2-4.7,13.3-4.7c4.3,0,7.9,1.4,10.6,4.1 c2.7,2.8,4.1,6.5,4.1,11.2c0,1.2-0.1,2.5-0.2,3.9c-0.1,1.4-0.5,3.5-1.1,6.4l-10.3,56h16.2L393,221c1.8-9.9,4.6-18.1,8.5-24.4 s8.1-11,12.8-14c4.7-3,9-4.5,13-4.5c4.3,0,7.9,1.4,10.6,4.1c2.7,2.8,4.1,6.5,4.1,11.2c0,1.2-0.1,2.5-0.2,3.9 c-0.1,1.4-0.5,3.5-1.1,6.4L430.3,259.7z"
-            />
-          </g>
-          <g id="plume_e">
-            <path
-              vector-effect="non-scaling-stroke"
-              class="st0"
-              d="M544.9,240.5l1.4,14.4c-3.6,1.7-8.2,3.3-13.7,4.8 c-5.5,1.5-11.6,2.3-18.4,2.3c-7.9,0-14.9-1.7-21-5.1s-10.8-8.3-14.2-14.8c-3.4-6.4-5.1-14-5.1-22.8c0-10,2.1-19.1,6.2-27.5 c4.1-8.4,10-15.1,17.6-20.2c7.6-5,16.5-7.6,26.7-7.6c7,0,12.9,1.3,17.7,4c4.9,2.6,8.6,6.1,11.3,10.3c2.6,4.2,4,8.7,4,13.5 c0,6.6-1.6,12.1-4.7,16.4c-3.1,4.3-7.1,7.7-12.1,10c-4.9,2.3-10.2,4-15.9,5c-5.7,1-11.1,1.4-16.3,1.4c-3.2,0-6.5-0.2-9.6-0.5 c-3.2-0.3-6-0.6-8.4-1c1,7.9,3.8,14,8.5,18.2c4.7,4.2,10.7,6.3,18,6.3c6,0,11.3-0.8,16-2.3S541.7,242,544.9,240.5z M523.3,177.6 c-5.6,0-10.7,1.4-15.3,4.2c-4.6,2.8-8.3,6.7-11.3,11.5s-4.9,10.4-5.9,16.7c2.8,0.5,5.6,0.9,8.4,1.2c2.8,0.3,5.9,0.5,9.3,0.5 c10.1,0,18.1-1.4,23.9-4.2c5.9-2.8,8.8-7.7,8.8-14.5c0-4.2-1.7-7.8-5-10.8C533.1,179.1,528.7,177.6,523.3,177.6z"
-            />
-            <path class="st1"
-              d="M514.3,261.9c-3.9,0-7.7-0.4-11.2-1.3c-3.5-0.9-6.8-2.1-9.8-3.9c-3-1.7-5.7-3.8-8.1-6.3 c-2.4-2.5-4.4-5.3-6.1-8.5c-1.7-3.2-3-6.7-3.9-10.5c-0.9-3.8-1.3-7.9-1.3-12.3c0-5,0.5-9.8,1.6-14.4c1-4.6,2.6-9,4.7-13.2 c2.1-4.2,4.6-8,7.5-11.3c2.9-3.3,6.3-6.3,10.1-8.8s8-4.4,12.4-5.7c4.4-1.3,9.3-1.9,14.3-1.9c6.9,0,12.9,1.3,17.7,4 c4.8,2.6,8.6,6.1,11.3,10.3c2.6,4.2,4,8.7,4,13.5c0,6.6-1.6,12.1-4.7,16.4c-3.1,4.3-7.2,7.7-12.1,10c-4.9,2.3-10.3,4-15.9,5 c-5.7,1-11.2,1.4-16.3,1.4c-3.2,0-6.5-0.2-9.6-0.5c-3.1-0.3-5.9-0.6-8.3-1c1,7.9,3.8,14,8.5,18.1c4.7,4.2,10.7,6.3,18,6.3 c6,0,11.4-0.8,16-2.3c4.7-1.6,8.7-3.1,11.9-4.7l0,0l0,0l1.4,14.4l0,0c-3.6,1.7-8.2,3.3-13.7,4.8 C527.2,261.2,521,261.9,514.3,261.9z M524.6,164c-10.2,0-19.1,2.5-26.7,7.6c-7.6,5-13.5,11.8-17.6,20.2s-6.2,17.6-6.2,27.5 c0,8.7,1.7,16.4,5.1,22.8c3.4,6.4,8.2,11.4,14.2,14.8c6,3.4,13.1,5.1,21,5.1c6.7,0,12.9-0.8,18.4-2.2c5.5-1.5,10.1-3.1,13.7-4.8 l-1.4-14.4c-3.2,1.5-7.2,3.1-11.9,4.7c-4.7,1.6-10.1,2.3-16,2.3c-3.6,0-7-0.5-10-1.6c-3-1-5.7-2.6-8-4.7 c-2.3-2.1-4.2-4.7-5.6-7.7c-1.4-3-2.4-6.5-2.8-10.5l0,0l0,0c2.4,0.4,5.2,0.7,8.4,1c3.2,0.3,6.4,0.5,9.6,0.5 c5.1,0,10.6-0.5,16.3-1.4s11-2.6,15.9-4.9c4.9-2.3,8.9-5.7,12.1-10c3.1-4.3,4.7-9.8,4.7-16.4c0-4.8-1.3-9.3-4-13.5 c-2.6-4.2-6.4-7.6-11.2-10.3C537.5,165.3,531.5,164,524.6,164z M508.6,211.7c-3.3,0-6.5-0.2-9.3-0.5c-2.8-0.3-5.6-0.7-8.4-1.2 l0,0l0,0c1-6.2,2.9-11.8,5.9-16.7s6.7-8.7,11.3-11.5c4.5-2.8,9.7-4.2,15.3-4.2c5.4,0,9.8,1.5,13.1,4.5c3.3,3,5,6.6,5,10.8 c0,3.4-0.7,6.4-2.2,8.8c-1.5,2.4-3.7,4.3-6.6,5.7C526.7,210.3,518.6,211.7,508.6,211.7z M491,210c2.7,0.5,5.5,0.9,8.3,1.2 c2.8,0.3,5.9,0.5,9.3,0.5c10,0,18.1-1.4,23.9-4.2c5.8-2.8,8.8-7.7,8.8-14.5c0-4.2-1.7-7.8-4.9-10.8c-3.3-3-7.7-4.5-13-4.5 c-5.6,0-10.8,1.4-15.3,4.2c-4.5,2.8-8.3,6.7-11.2,11.5C493.9,198.2,491.9,203.8,491,210z"
-            />
-          </g>
-        </g>
-      </g>
-    </svg>
-  `,
-  trackBackward = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2 7H5V17H2V7Z" fill="currentColor" />
-      <path d="M6 12L13.0023 7.00003V17L6 12Z" fill="currentColor" />
-      <path d="M21.0023 7.00003L14 12L21.0023 17V7.00003Z" fill="currentColor" />
-    </svg>
-  `,
-  timeBackward = `
-    <svg fill="currentColor" width="24" height="24" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg">
-      <path d="M136,80v43.38116l37.56934,21.69062a8,8,0,1,1-8,13.85644l-41.56934-24c-.064-.03692-.12109-.0805-.18359-.11889-.13575-.08362-.271-.16779-.40088-.2591-.10352-.07232-.20215-.14892-.30127-.22534-.10205-.0788-.20362-.15765-.30127-.24115-.11182-.09479-.21778-.19342-.32276-.29333-.0791-.07532-.15771-.15064-.23388-.22913-.10694-.11017-.2085-.22351-.30811-.339-.06933-.08026-.13769-.16083-.2041-.24377-.0918-.1156-.1792-.23352-.26416-.35352-.06738-.09473-.1333-.19019-.19629-.2879-.07226-.11194-.14062-.22547-.207-.34058-.06592-.11438-.12988-.22986-.19043-.34778-.05322-.10418-.10352-.20941-.15185-.31561-.061-.13287-.11915-.26685-.17334-.4035-.03907-.09986-.0752-.20063-.11036-.30194-.0498-.14252-.09668-.28589-.13818-.432-.03027-.10687-.05664-.21454-.083-.32257-.0332-.13928-.06543-.27881-.09131-.42084-.02392-.12842-.0415-.25757-.05908-.38714-.0166-.12226-.0332-.244-.04394-.368-.01416-.16015-.01953-.3208-.02442-.48187C120.00879,128.14313,120,128.07269,120,128V80a8,8,0,0,1,16,0Zm59.88184-19.88232a96.10782,96.10782,0,0,0-135.76416,0L51.833,68.4021l-14.34278-14.343A7.99981,7.99981,0,0,0,23.8335,59.71582v40a7.99977,7.99977,0,0,0,8,8h40a7.99981,7.99981,0,0,0,5.65673-13.65674L63.147,79.71576l8.28467-8.28461a80.00025,80.00025,0,1,1,0,113.13721,8.00035,8.00035,0,0,0-11.314,11.31445A96.0001,96.0001,0,0,0,195.88184,60.11768Z"/>
-    </svg>
-  `,
-  playPlay = `
-    <svg width="100%" height="100%" viewBox="-1 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor" />
-    </svg>
-  `,
-  playPause = `
-    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11 7H8V17H11V7Z" fill="currentColor" />
-      <path d="M13 17H16V7H13V17Z" fill="currentColor" />
-    </svg>
-  `,
-  timeForward = `
-    <svg fill="currentColor" width="24" height="24" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg">
-      <path d="M136,80v43.38116l37.56934,21.69062a8,8,0,1,1-8,13.85644l-41.56934-24c-.064-.03692-.12109-.0805-.18359-.11889-.13575-.08362-.271-.16779-.40088-.2591-.10352-.07232-.20215-.14892-.30127-.22534-.10205-.0788-.20362-.15765-.30127-.24115-.11182-.09479-.21778-.19342-.32276-.29333-.0791-.07532-.15771-.15064-.23388-.22913-.10694-.11017-.2085-.22351-.30811-.339-.06933-.08026-.13769-.16083-.2041-.24377-.0918-.1156-.1792-.23352-.26416-.35352-.06738-.09473-.1333-.19019-.19629-.2879-.07226-.11194-.14062-.22547-.207-.34058-.06592-.11438-.12988-.22986-.19043-.34778-.05322-.10418-.10352-.20941-.15186-.31561-.061-.13287-.11914-.26685-.17333-.4035-.03907-.09986-.0752-.20063-.11036-.30194-.0498-.14252-.09668-.28589-.13818-.432-.03027-.10687-.05664-.21454-.083-.32257-.0332-.13928-.06543-.27881-.09131-.42084-.02392-.12842-.0415-.25757-.05908-.38714-.0166-.12226-.0332-.244-.04394-.368-.01416-.16015-.01954-.3208-.02442-.48187C120.00879,128.14313,120,128.07269,120,128V80a8,8,0,0,1,16,0Zm91.228-27.67529a7.99962,7.99962,0,0,0-8.71826,1.73437L204.1665,68.40222l-8.28466-8.28454a95.9551,95.9551,0,1,0,0,135.76464,7.99983,7.99983,0,1,0-11.31348-11.31347,80.00009,80.00009,0,1,1,0-113.1377l8.28467,8.28467L178.50977,94.05908a7.99981,7.99981,0,0,0,5.65673,13.65674h40a7.99977,7.99977,0,0,0,8-8v-40A8.00014,8.00014,0,0,0,227.228,52.32471Z"/>
-    </svg>
-  `,
-  trackForward = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M21.0023 17H18.0023V7H21.0023V17Z" fill="currentColor" />
-      <path d="M17.0023 12L10 17V7L17.0023 12Z" fill="currentColor" />
-      <path d="M2 17L9.00232 12L2 7V17Z" fill="currentColor" />
-    </svg>
-  `,
-  fullscreen = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor" />
-      <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor" />
-      <path d="M17 17H14V19H19V14H17V17Z" fill="currentColor" />
-      <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor" />
-    </svg>
-  `,
-  fullscreenExit = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 16H8V19H10V14H5V16Z" fill="currentColor" />
-      <path d="M8 8H5V10H10V5H8V8Z" fill="currentColor" />
-      <path d="M14 19H16V16H19V14H14V19Z" fill="currentColor" />
-      <path d="M16 8V5H14V10H19V8H16Z" fill="currentColor" />
-    </svg>
-  `,
-  volumeOn = `
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor" />
-      <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12Z" fill="currentColor" />
-      <path d="M14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z" fill="currentColor" />
-    </svg>
-  `,
-  volumeMuted = `
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V10.18L16.45 12.63C16.48 12.43 16.5 12.22 16.5 12Z" fill="currentColor" />
-      <path d="M19 12C19 12.94 18.8 13.82 18.46 14.64L19.97 16.15C20.63 14.91 21 13.5 21 12C21 7.72 18.01 4.14 14 3.23V5.29C16.89 6.15 19 8.83 19 12Z" fill="currentColor" />
-      <path d="M4.27 3L3 4.27L7.73 9H3V15H7L12 20V13.27L16.25 17.52C15.58 18.04 14.83 18.45 14 18.7V20.76C15.38 20.45 16.63 19.81 17.69 18.95L19.73 21L21 19.73L12 10.73L4.27 3Z" fill="currentColor" />
-      <path d="M12 4L9.91 6.09L12 8.18V4Z" fill="currentColor" />
-    </svg>
-  `,
-}
-
-/**
- * Cache interface
- */
-enum PLUME_CACHE_KEYS {
-  DURATION_DISPLAY_METHOD = "plume_duration_display_method",
-  VOLUME = "plume_volume",
-}
-interface LocalStorage {
-  [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: TimeDisplayMethodType | undefined;
-  [PLUME_CACHE_KEYS.VOLUME]: number | undefined;
-}
-
-/**
- * Debug control information
- */
-interface DebugControl {
-  index: number;
-  tagName: string;
-  classes: string;
-  title: string;
-  text: string;
-  onclick: string;
-}
-
-enum PLUME_ELEM_IDENTIFIERS {
-  bcElements = "div#bpe-hidden-original",
-  plumeContainer = "div#bpe-plume",
-  headerContainer = "div#bpe-header-container",
-  headerLogo = "a#bpe-header-logo",
-  headerCurrent = "div#bpe-header-current",
-  headerTitlePretext = "span#bpe-header-title-pretext",
-  headerTitle = "span#bpe-header-title",
-  playbackManager = "div#bpe-playback-manager",
-  playbackControls = "div#bpe-playback-controls",
-  progressContainer = "div#bpe-progress-container",
-  progressSlider = "input#bpe-progress-slider",
-  timeDisplay = "div#bpe-time-display",
-  elapsedDisplay = "span#bpe-elapsed-display",
-  durationDisplay = "span#bpe-duration-display",
-  trackBwdBtn = "button#bpe-track-bwd-btn",
-  timeBwdBtn = "button#bpe-time-bwd-btn",
-  playPauseBtn = "button#bpe-play-pause-btn",
-  timeFwdBtn = "button#bpe-time-fwd-btn",
-  trackFwdBtn = "button#bpe-track-fwd-btn",
-  fullscreenBtn = "button#bpe-fullscreen-btn",
-  fullscreenBtnLabel = "span#bpe-fullscreen-btn-label",
-  volumeContainer = "div#bpe-volume-container",
-  muteBtn = "button#bpe-mute-btn",
-  volumeSlider = "input#bpe-volume-slider",
-  volumeValue = "div#bpe-volume-value",
-  fullscreenBtnContainer = "div#bpe-fullscreen-btn-container",
-  fullscreenOverlay = "div#bpe-fullscreen-overlay",
-  fullscreenBackground = "div#bpe-fullscreen-background",
-  fullscreenContent = "div#bpe-fullscreen-content",
-  fullscreenExitBtn = "button#bpe-fullscreen-exit-btn",
-  fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
-  fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
-  fullscreenTitlingContainer = "div.bpe-fullscreen-titling",
-  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
-  fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
-  fullscreenClone = "div#bpe-fullscreen-clone",
-}
-
-enum BC_ELEM_IDENTIFIERS {
-  infoSection = "div#name-section",
-  trackView = "div.trackView",
-  fromAlbum = "span.fromAlbum",
-  playerParent = "div.inline_player",
-  inlinePlayerTable = "div.inline_player>table",
-  audioPlayer = "audio",
-  playPause = "div.playbutton",
-  songPageCurrentTrackTitle = "h2.trackTitle",
-  albumPageCurrentTrackTitle = "a.title_link",
-  previousTrack = "div.prevbutton",
-  nextTrack = "div.nextbutton",
-  trackList = "table#track_table",
-  trackRow = "tr.track_row_view",
-  trackTitle = "span.track-title",
-  trackDuration = "span.time",
-  coverArt = "div#tralbumArt img"
-}
-
-const AVAILABLE_SHORTCUT_CODES = new Set([
-  "Space", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "KeyF", "KeyM"
-]);
-
-// Customized console logger with timestamp and level
-enum CPL { // Console Printing Level
-  DEBUG = "debug",
-  INFO = "info",
-  LOG = "log",
-  WARN = "warn",
-  ERROR = "error",
-}
-type CPLType = `${CPL}`;
-const ConsolePrintingPrefix: Record<CPLType, string> = {
-  [CPL.DEBUG]: "DEBUG",
-  [CPL.INFO]: "INFO.",
-  [CPL.LOG]: "LOG..",
-  [CPL.WARN]: "WARN?",
-  [CPL.ERROR]: "ERR?!",
-};
-const logger = (method: CPLType, ...toPrint: any[]) => {
-  const now = new Date();
-  const nowTime = now.toLocaleTimeString();
-  const nowMilliseconds = now.getMilliseconds().toString().padStart(3, "0");
-  console[method](`[Plume_${APP_VERSION} ${ConsolePrintingPrefix[method]} | ${nowTime}.${nowMilliseconds}]`, ...toPrint);
-};
-
-// Browser detection and compatible storage API
-const chromeApi = (globalThis as any).chrome;
-const firefoxApi = (globalThis as any).browser;
-const browserApi: BrowserAPI = (() => {
-  if (chromeApi !== undefined && chromeApi.storage) {
-    return chromeApi;
-  } else if (firefoxApi !== undefined && firefoxApi.storage) {
-    return firefoxApi;
-  } else {
-    logger(CPL.WARN, (globalThis as any).chrome.i18n.getMessage("WARN__BROWSER_API__NOT_DETECTED"));
-    return (globalThis as any).chrome; // Assume Chromium-based as fallback
-  }
-})();
-const browserCache = browserApi.storage.local;
-if (!browserApi.i18n.getMessage) {
-  // Fallback for browsers without i18n support (safety net for if browser detection failed)
-  browserApi.i18n.getMessage = (key: string, _?: any[]) => key;
-}
-const getString = browserApi.i18n.getMessage;
-logger(CPL.INFO, getString("INFO__BROWSER__DETECTED"), chromeApi === undefined ? "Firefox-based" : "Chromium-based");
-const browserCacheExists = browserCache !== undefined;
+import { APP_NAME, APP_VERSION, PLUME_CONSTANTS, PLUME_KO_FI_URL } from "./constants";
+import { createStore, loadPersistedState, selectors } from "./store";
+import { ACTION_TYPES } from "./store/store";
+import { PLUME_SVG } from "./svg/icons";
+import {
+  BC_ELEM_IDENTIFIERS,
+  DebugControl,
+  PLUME_ELEM_IDENTIFIERS,
+  PlumeCore,
+  TIME_DISPLAY_METHOD,
+  TimeDisplayMethodType,
+} from "./types";
+import { getString, logDetectedBrowser } from "./utils/i18n";
+import { CPL, logger } from "./utils/logger";
 
 (() => {
   "use strict";
 
+  logDetectedBrowser();
+  const store = createStore();
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
 
   // Function to initialize playback (necessary to make Plume buttons effective)
@@ -361,59 +33,16 @@ const browserCacheExists = browserCache !== undefined;
     }
   };
 
-  const loadSavedVolume = (): Promise<number> => {
-    return new Promise((resolve) => {
-      if (browserCacheExists) {
-        browserCache.get([PLUME_CACHE_KEYS.VOLUME])
-          .then((ls: LocalStorage) => {
-            let volume = ls[PLUME_CACHE_KEYS.VOLUME] || PLUME_DEF.savedVolume;
-            // Validate volume is a valid number within 0-1 range
-            if (typeof volume !== 'number' || Number.isNaN(volume) || volume < 0 || volume > 1) {
-              logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), volume);
-              volume = PLUME_DEF.savedVolume;
-            }
-            plume.savedVolume = volume;
-            resolve(volume);
-          })
-          .catch((e) => {
-            logger(CPL.WARN, getString("WARN__VOLUME__NOT_LOADED"), e);
-            plume.savedVolume = PLUME_DEF.savedVolume;
-            resolve(PLUME_DEF.savedVolume);
-          });
-      } else {
-        // Fallback to localStorage
-        try {
-          const storedVolume = localStorage.getItem(PLUME_CACHE_KEYS.VOLUME);
-          let volume = storedVolume ? Number.parseFloat(storedVolume) : PLUME_DEF.savedVolume;
-          // Validate volume is a valid number within 0-1 range
-          if (Number.isNaN(volume) || volume < 0 || volume > 1) {
-            logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), volume);
-            volume = PLUME_DEF.savedVolume;
-          }
-          plume.savedVolume = volume;
-          resolve(volume);
-        } catch (e) {
-          logger(CPL.WARN, getString("WARN__VOLUME__NOT_LOADED"), e);
-          plume.savedVolume = 1;
-          resolve(1);
-        }
-      }
-    });
-  };
-
   // Function to find the audio element
   const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
     const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
     if (!audio) return null;
     logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 
-    // Load and immediately apply saved volume
-    await loadSavedVolume();
-    audio.volume = plume.savedVolume;
-    logger(
-      CPL.INFO,
-      `${getString("INFO__VOLUME__FOUND")} ${Math.round(plume.savedVolume * 100)}${getString("META__PERCENTAGE")}`
-    );
+    // Load and immediately apply saved volume from store
+    const volume = store.getState().volume;
+    audio.volume = volume;
+    logger(CPL.INFO, `${getString("INFO__VOLUME__FOUND")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`);
 
     return audio;
   };
@@ -422,7 +51,7 @@ const browserCacheExists = browserCache !== undefined;
     totalRuntime: 0,
     formattedTotalRuntime: "",
     ariaString: "",
-    calculated: false
+    calculated: false,
   };
   const getInfoSectionWithRuntime = (): HTMLDivElement => {
     if (!runtimeInfo.calculated) {
@@ -458,9 +87,12 @@ const browserCacheExists = browserCache !== undefined;
       const seconds = runtimeInfo.totalRuntime % 60;
       runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
         minutes,
-        seconds < 10 ? "0" + seconds : seconds.toString()
+        seconds < 10 ? "0" + seconds : seconds.toString(),
       ]);
-      runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [Math.floor(runtimeInfo.totalRuntime / 60), runtimeInfo.totalRuntime % 60]);
+      runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [
+        Math.floor(runtimeInfo.totalRuntime / 60),
+        runtimeInfo.totalRuntime % 60,
+      ]);
       logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
 
       runtimeInfo.calculated = true;
@@ -484,9 +116,7 @@ const browserCacheExists = browserCache !== undefined;
     const r = Number.parseInt(bgColorAsRGB![1], 10);
     const g = Number.parseInt(bgColorAsRGB![2], 10);
     const b = Number.parseInt(bgColorAsRGB![3], 10);
-    const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= 3
-      ? "#0000007f"
-      : "#ffffff7f";
+    const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= 3 ? "#0000007f" : "#ffffff7f";
 
     const runtimeSpan = document.createElement("span");
     runtimeSpan.className = "runtime";
@@ -551,100 +181,170 @@ const browserCacheExists = browserCache !== undefined;
     return relevantControls;
   };
 
-  const setupFullscreenControlSync = (original: HTMLElement, clone: HTMLElement) => {
-    const cloneHeaderContainer = clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement;
-    const headerContainerObserver = new MutationObserver(() => {
-      // Safe use of innerHTML to clone DOM content from controlled element
-      cloneHeaderContainer.innerHTML = plume.titleDisplay!.innerHTML;
-    });
-    headerContainerObserver.observe(plume.titleDisplay!, { childList: true, subtree: true });
+  // Setup store subscriptions for fullscreen UI to keep it in sync with state
+  const setupFullscreen = (clone: HTMLElement) => {
+    const subscriptions: Array<() => void> = [];
 
-    const cloneProgressSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
-    const progressSliderObserver = new MutationObserver(() => {
-      cloneProgressSlider.value = plume.progressSlider!.value;
-      cloneProgressSlider.style.backgroundImage = plume.progressSlider!.style.backgroundImage;
-    });
-    progressSliderObserver.observe(plume.progressSlider!, { attributes: true, attributeFilter: ['value', 'style'] });
-    cloneProgressSlider.addEventListener("input", function(this: HTMLInputElement) {
-      const originalSlider = original.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement;
-      originalSlider.value = this.value;
-      originalSlider.dispatchEvent(new Event("input"));
+    const cloneEl = {
+      headerContainer: clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement,
+      progressSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement,
+      elapsedDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement,
+      durationDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.durationDisplay) as HTMLSpanElement,
+      playPauseBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement,
+      volumeSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeSlider) as HTMLInputElement,
+      volumeDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement,
+      muteBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement,
+      trackBackwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackBwdBtn) as HTMLButtonElement,
+      timeBackwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeBwdBtn) as HTMLButtonElement,
+      timeForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement,
+      trackForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement,
+    };
 
-      const elapsed = plume.audioElement!.currentTime;
-      const duration = plume.audioElement!.duration;
+    const updateFullscreenDuration = () => {
+      if (!cloneEl.durationDisplay) return;
+      const state = store.getState();
+      cloneEl.durationDisplay.textContent = selectors.getFormattedDuration(state);
+    };
+    subscriptions.push(
+      // Subscribe to progress updates
+      store.subscribe("currentTime", () => {
+        const state = store.getState();
+        if (!cloneEl.progressSlider) return;
 
-      if (!Number.isNaN(duration) && duration > 0) {
-        const percent = (elapsed / duration) * 100;
-        const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
+        const percent = selectors.getProgressPercentage(state);
+        const bgPercent = percent < 50 ? percent + 1 : percent - 1;
         const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-        cloneProgressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-        cloneProgressSlider.style.backgroundImage = bgImg;
+        cloneEl.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+        cloneEl.progressSlider.style.backgroundImage = bgImg;
+      }),
+      // Subscribe to elapsed time display
+      store.subscribe("currentTime", () => {
+        if (!cloneEl.elapsedDisplay) return;
+        const state = store.getState();
+        cloneEl.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+      }),
+      // Subscribe to duration display (updates on both duration and display method changes)
+      store.subscribe("duration", updateFullscreenDuration),
+      store.subscribe("durationDisplayMethod", updateFullscreenDuration),
+      store.subscribe("currentTime", updateFullscreenDuration),
+      // Subscribe to play/pause state
+      store.subscribe("isPlaying", (isPlaying) => {
+        if (!cloneEl.playPauseBtn) return;
+        cloneEl.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+      }),
+      // Subscribe to volume changes
+      store.subscribe("volume", (volume) => {
+        if (!cloneEl.volumeSlider || !cloneEl.volumeDisplay) return;
+        cloneEl.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+        cloneEl.volumeDisplay.textContent = `${cloneEl.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+      }),
+      // Subscribe to mute state
+      store.subscribe("isMuted", (isMuted) => {
+        if (!cloneEl.muteBtn) return;
+        cloneEl.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+        cloneEl.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+        cloneEl.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+        cloneEl.muteBtn.ariaPressed = isMuted.toString();
+        cloneEl.muteBtn.classList.toggle("muted", isMuted);
+      }),
+      // Subscribe to track title changes
+      store.subscribe("trackTitle", (trackTitle) => {
+        if (!cloneEl.headerContainer || !trackTitle) return;
+        const cloneHeaderTitle = cloneEl.headerContainer.querySelector(
+          PLUME_ELEM_IDENTIFIERS.headerTitle
+        ) as HTMLSpanElement;
+        if (cloneHeaderTitle) {
+          cloneHeaderTitle.textContent = trackTitle;
+          cloneHeaderTitle.title = trackTitle;
+        }
+      }),
+      // Subscribe to track number changes
+      store.subscribe("trackNumber", (trackNumber) => {
+        if (!cloneEl.headerContainer || !trackNumber) return;
+        const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
+          PLUME_ELEM_IDENTIFIERS.headerTitlePretext
+        ) as HTMLSpanElement;
+        if (cloneHeaderPretext) {
+          cloneHeaderPretext.textContent = trackNumber;
+        }
+      })
+    );
+
+    const handleProgressInput = function (this: HTMLInputElement) {
+      const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
+      if (plume.audioElement) {
+        plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
+        if (plume.audioElement.paused) {
+          setTimeout(() => {
+            plume.audioElement!.pause();
+          }, 10);
+        }
       }
-    });
+    };
 
-    const cloneElapsedDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement;
-    const elapsedObserver = new MutationObserver(() => {
-      cloneElapsedDisplay.textContent = plume.elapsedDisplay!.textContent;
-    });
-    elapsedObserver.observe(plume.elapsedDisplay!, { childList: true, subtree: true });
-
-    const cloneDurationDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.durationDisplay) as HTMLSpanElement;
-    const durationObserver = new MutationObserver(() => {
-      cloneDurationDisplay.textContent = plume.durationDisplay!.textContent;
-    });
-    durationObserver.observe(plume.durationDisplay!, { childList: true, subtree: true });
-    cloneDurationDisplay.addEventListener("click", handleDurationChange);
-
-    const cloneTrackBackwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackBwdBtn) as HTMLButtonElement;
-    cloneTrackBackwardBtn.addEventListener("click", handleTrackBackward);
-
-    const cloneTimeBackwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeBwdBtn) as HTMLButtonElement;
-    cloneTimeBackwardBtn.addEventListener("click", handleTimeBackward);
-
-    const originalPlayPauseBtn = original.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement;
-    const clonePlayPauseBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement;
-    clonePlayPauseBtn.addEventListener("click", () => {
-      handlePlayPause([clonePlayPauseBtn, originalPlayPauseBtn]);
-    });
-
-    const cloneTimeForwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement;
-    cloneTimeForwardBtn.addEventListener("click", handleTimeForward);
-
-    const cloneTrackForwardBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement;
-    cloneTrackForwardBtn.addEventListener("click", handleTrackForward);
-
-    const cloneVolumeSlider = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeSlider) as HTMLInputElement;
-    cloneVolumeSlider.addEventListener("input", function(this: HTMLInputElement) {
+    const handleVolumeInput = function (this: HTMLInputElement) {
       const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-      plume.audioElement!.volume = newVolume;
-      saveNewVolume(newVolume);
+      if (!plume.audioElement) return;
 
-      // Update the volume display in fullscreen
-      const cloneVolumeDisplay = clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
-      cloneVolumeDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
-    });
+      plume.audioElement.volume = newVolume;
 
-    const cloneMuteBtn = clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement;
-    cloneMuteBtn.addEventListener("click", () => plume.muteBtn?.click());
+      // Moving slider off zero counts as an intentional unmute
+      if (newVolume > 0 && store.getState().isMuted) {
+        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
+      }
 
-    // Sync mute button visual state from original to clone
-    const muteBtnObserver = new MutationObserver(() => {
-      if (!plume.muteBtn) return;
-      // Safe use of innerHTML to clone SVG icon from controlled element
-      cloneMuteBtn.innerHTML = plume.muteBtn.innerHTML;
-      cloneMuteBtn.ariaLabel = plume.muteBtn.ariaLabel;
-      cloneMuteBtn.title = plume.muteBtn.title;
-      cloneMuteBtn.className = plume.muteBtn.className;
-    });
-    muteBtnObserver.observe(plume.muteBtn!, { childList: true, attributes: true, attributeFilter: ['aria-label', 'title', 'class'] });
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: newVolume });
+    };
 
-    // Return cleanup function to disconnect all observers
+    // Setup event listeners for fullscreen controls
+    // The listeners are automatically cleaned up when the overlay DOM is removed on exit.
+    cloneEl.progressSlider.addEventListener("input", handleProgressInput);
+    cloneEl.durationDisplay.addEventListener("click", handleDurationChange);
+    cloneEl.trackBackwardBtn.addEventListener("click", handleTrackBackward);
+    cloneEl.timeBackwardBtn.addEventListener("click", handleTimeBackward);
+    cloneEl.playPauseBtn.addEventListener("click", handlePlayPause);
+    cloneEl.timeForwardBtn.addEventListener("click", handleTimeForward);
+    cloneEl.trackForwardBtn.addEventListener("click", handleTrackForward);
+    cloneEl.volumeSlider.addEventListener("input", handleVolumeInput);
+    cloneEl.muteBtn.addEventListener("click", handleMuteToggle);
+
+    // Initialize fullscreen UI with current state
+    const state = store.getState();
+    if (plume.titleDisplay && cloneEl.headerContainer) {
+      // Safe use of innerHTML to clone DOM content from controlled element
+      cloneEl.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
+    }
+    // Initialize track number in fullscreen
+    if (state.trackNumber && cloneEl.headerContainer) {
+      const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
+        PLUME_ELEM_IDENTIFIERS.headerTitlePretext
+      ) as HTMLSpanElement;
+      if (cloneHeaderPretext) {
+        cloneHeaderPretext.textContent = state.trackNumber;
+      }
+    }
+    updateFullscreenDuration();
+    if (cloneEl.elapsedDisplay) {
+      cloneEl.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+    }
+    if (cloneEl.volumeSlider && cloneEl.volumeDisplay) {
+      cloneEl.volumeSlider.value = Math.round(state.volume * VOLUME_SLIDER_GRANULARITY).toString();
+      cloneEl.volumeDisplay.textContent = `${cloneEl.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+    }
+    if (cloneEl.muteBtn) {
+      cloneEl.muteBtn.innerHTML = state.isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+      cloneEl.muteBtn.title = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+      cloneEl.muteBtn.ariaLabel = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+      cloneEl.muteBtn.ariaPressed = state.isMuted.toString();
+      cloneEl.muteBtn.classList.toggle("muted", state.isMuted);
+    }
+    if (cloneEl.playPauseBtn) {
+      cloneEl.playPauseBtn.innerHTML = state.isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+    }
+
+    // Return cleanup function to unsubscribe all listeners
     return () => {
-      headerContainerObserver.disconnect();
-      progressSliderObserver.disconnect();
-      elapsedObserver.disconnect();
-      durationObserver.disconnect();
-      muteBtnObserver.disconnect();
+      subscriptions.forEach((unsubscribe) => unsubscribe());
     };
   };
 
@@ -656,13 +356,16 @@ const browserCacheExists = browserCache !== undefined;
     const alreadyHasFullscreenOverlay = !!existingOverlay;
 
     if (alreadyHasFullscreenOverlay) {
+      // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
+      if (fullscreenCleanupCallback) {
+        fullscreenCleanupCallback();
+        fullscreenCleanupCallback = null;
+      }
+
       existingOverlay.remove();
       document.body.style.overflow = "auto";
 
-      // Cleanup observers
-      fullscreenCleanupCallback?.();
-      fullscreenCleanupCallback = null;
-
+      store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
       logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
       return;
     }
@@ -707,8 +410,7 @@ const browserCacheExists = browserCache !== undefined;
     adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1]; // as class because id is already used by BC
     const headTitle = adjustedNameSection.querySelector("h2")!;
     headTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
-    if (!isAlbumPage)
-      headTitle.textContent = "\"" + headTitle.textContent.trim() + "\"";
+    if (!isAlbumPage) headTitle.textContent = '"' + headTitle.textContent.trim() + '"';
 
     presentationContainer.appendChild(adjustedNameSection);
     contentContainer.appendChild(presentationContainer);
@@ -736,7 +438,9 @@ const browserCacheExists = browserCache !== undefined;
     plumeClone.insertBefore(fullscreenLogo, plumeClone.firstChild);
 
     // Hide the fullscreen button section in the cloned module
-    const clonedFullscreenBtn = plumeClone.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer) as HTMLButtonElement;
+    const clonedFullscreenBtn = plumeClone.querySelector(
+      PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer
+    ) as HTMLButtonElement;
     clonedFullscreenBtn.style.display = "none";
 
     contentContainer.appendChild(plumeClone);
@@ -748,16 +452,20 @@ const browserCacheExists = browserCache !== undefined;
     exitBtn.type = "button";
     exitBtn.innerHTML = PLUME_SVG.fullscreenExit;
     exitBtn.title = getString("ARIA__EXIT_FULLSCREEN_BTN");
-    exitBtn.addEventListener("click", () => {
-      toggleFullscreenMode();
-    });
+    exitBtn.ariaLabel = getString("ARIA__EXIT_FULLSCREEN_BTN");
+    exitBtn.addEventListener("click", toggleFullscreenMode);
     overlay.appendChild(exitBtn);
 
+    // Setup keyboard navigation for fullscreen overlay
+    // Note: These listeners are on the overlay element and are automatically
+    // cleaned up when the overlay is removed from DOM on exit
     const setupFullscreenFocusTrap = () => {
       const getFocusableElements = () => {
-        return Array.from(overlay.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        ));
+        return Array.from(
+          overlay.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        );
       };
 
       const handleTabKey = (e: KeyboardEvent) => {
@@ -786,20 +494,22 @@ const browserCacheExists = browserCache !== undefined;
       setTimeout(() => {
         const initialFocusable = getFocusableElements()[0];
         initialFocusable?.focus();
-      }, 0); // Somehow needs timeout to function right
+      }, 0);
     };
 
-    overlay.addEventListener("keydown", (e: KeyboardEvent) => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
       if (e.code === "Escape") toggleFullscreenMode();
-    });
+    };
+    overlay.addEventListener("keydown", handleEscapeKey);
 
-    // Sync all controls with the original plume module
-    fullscreenCleanupCallback = setupFullscreenControlSync(plumeContainer, plumeClone);
+    // Setup store subscriptions for fullscreen UI - cleanup function stored for later
+    fullscreenCleanupCallback = setupFullscreen(plumeClone);
 
     document.body.appendChild(overlay);
     document.body.style.overflow = "hidden";
     setupFullscreenFocusTrap();
 
+    store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
     logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
   };
 
@@ -812,29 +522,13 @@ const browserCacheExists = browserCache !== undefined;
     fullscreenBtn.addEventListener("click", () => {
       toggleFullscreenMode();
     });
+
     const container: HTMLDivElement = document.createElement("div");
     container.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer.split("#")[1];
     container.appendChild(fullscreenBtn);
+
     return container;
   };
-
-  // Function to save the new volume from the slider to browser cache
-  const saveNewVolume = (newVolume: number) => {
-    plume.savedVolume = newVolume;
-
-    if (browserCacheExists) {
-      browserCache.set({ [PLUME_CACHE_KEYS.VOLUME]: newVolume });
-    } else {
-      // Fallback to localStorage
-      try {
-        localStorage.setItem(PLUME_CACHE_KEYS.VOLUME, newVolume.toString());
-      } catch (e) {
-        logger(CPL.WARN, getString("WARN__VOLUME__NOT_SAVED"), e);
-      }
-    }
-  };
-
-  const VOLUME_SLIDER_GRANULARITY = 100;
 
   // Sync mute button icon and aria-label to reflect the current audio volume state
   const syncMuteBtn = (isMuted: boolean) => {
@@ -846,6 +540,16 @@ const browserCacheExists = browserCache !== undefined;
     plume.muteBtn.classList.toggle("muted", isMuted);
   };
 
+  const handleMuteToggle = () => {
+    if (!plume.audioElement) {
+      logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
+      return;
+    }
+
+    store.dispatch({ type: ACTION_TYPES.TOGGLE_MUTE });
+  };
+
+  const VOLUME_SLIDER_GRANULARITY = 100;
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
     if (plume.volumeSlider) return null;
@@ -866,37 +570,18 @@ const browserCacheExists = browserCache !== undefined;
     volumeSlider.type = "range";
     volumeSlider.min = "0";
     volumeSlider.max = VOLUME_SLIDER_GRANULARITY.toString();
-    volumeSlider.value = Math.round(plume.savedVolume * VOLUME_SLIDER_GRANULARITY).toString();
+    const currentVolume = store.getState().volume;
+    volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
     volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
     // Apply saved volume to audio element
-    plume.audioElement!.volume = plume.savedVolume;
+    plume.audioElement!.volume = currentVolume;
 
     const valueDisplay = document.createElement("div");
     valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
     valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
 
-    muteBtn.addEventListener("click", () => {
-      if (!plume.audioElement) {
-        logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
-
-      const currentlyMuted = plume.audioElement.volume === 0;
-      if (currentlyMuted) {
-        const restoredVolume = plume.playerVolume > 0 ? plume.playerVolume : PLUME_DEF.savedVolume;
-        plume.audioElement.volume = restoredVolume;
-        volumeSlider.value = Math.round(restoredVolume * VOLUME_SLIDER_GRANULARITY).toString();
-        valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
-        syncMuteBtn(false);
-      } else {
-        plume.playerVolume = plume.audioElement.volume;
-        plume.audioElement.volume = 0;
-        volumeSlider.value = "0";
-        valueDisplay.textContent = `0${getString("META__PERCENTAGE")}`;
-        syncMuteBtn(true);
-      }
-    });
+    muteBtn.addEventListener("click", handleMuteToggle);
 
     // Event listener for volume change via slider
     volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
@@ -911,9 +596,11 @@ const browserCacheExists = browserCache !== undefined;
       valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
       // Moving slider off zero counts as an intentional unmute
-      if (volume > 0) syncMuteBtn(false);
+      if (volume > 0 && store.getState().isMuted) {
+        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
+      }
 
-      saveNewVolume(volume);
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
     });
 
     container.appendChild(muteBtn);
@@ -929,7 +616,9 @@ const browserCacheExists = browserCache !== undefined;
     const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
     const firstTrackRow = trackList.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
     const firstTrackTitleElem = firstTrackRow.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
-    const currentTrackTitleElem = document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLAnchorElement;
+    const currentTrackTitleElem = document.querySelector(
+      BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle
+    ) as HTMLAnchorElement;
     if (!currentTrackTitleElem) return false;
 
     return firstTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
@@ -942,7 +631,9 @@ const browserCacheExists = browserCache !== undefined;
     const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
     const lastTrackRow = trackRows[trackRows.length - 1] as HTMLTableRowElement;
     const lastTrackTitleElem = lastTrackRow?.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
-    const currentTrackTitleElem = document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLAnchorElement;
+    const currentTrackTitleElem = document.querySelector(
+      BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle
+    ) as HTMLAnchorElement;
     if (!currentTrackTitleElem) return false;
 
     return lastTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
@@ -1006,7 +697,7 @@ const browserCacheExists = browserCache !== undefined;
     playPauseBtn.type = "button";
     playPauseBtn.innerHTML = plume.audioElement!.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
-    playPauseBtn.addEventListener("click", () => { handlePlayPause([playPauseBtn]); });
+    playPauseBtn.addEventListener("click", handlePlayPause);
 
     const timeForwardBtn = document.createElement("button");
     timeForwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeFwdBtn.split("#")[1];
@@ -1057,13 +748,13 @@ const browserCacheExists = browserCache !== undefined;
     );
   };
 
-  const handlePlayPause = (playPauseBtns: HTMLButtonElement[]) => {
+  const handlePlayPause = () => {
     if (plume.audioElement!.paused) {
       plume.audioElement!.play();
-      playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPause);
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: true });
     } else {
       plume.audioElement!.pause();
-      playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPlay);
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: false });
     }
   };
 
@@ -1093,35 +784,18 @@ const browserCacheExists = browserCache !== undefined;
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   };
 
-  // Function to format time as MM:SS
-  const formatTime = (seconds: number): string => {
-    if (Number.isNaN(seconds) || !Number.isFinite(seconds)) return "0:00";
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  };
-
   const saveDurationDisplayMethod = (newMethod: TimeDisplayMethodType) => {
-    plume.durationDisplayMethod = newMethod;
+    store.dispatch({ type: ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: newMethod });
 
     const player = plume.audioElement;
     if (!player || !plume.durationDisplay || !plume.elapsedDisplay) return;
-    if (plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION) {
-      plume.durationDisplay.textContent = formatTime(player.duration);
-    } else {
-      plume.durationDisplay.textContent = "-" + formatTime(player.duration - player.currentTime);
-    }
 
-    if (browserCacheExists) {
-      browserCache.set({ [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: newMethod });
-    } else {
-      // Fallback to localStorage
-      try {
-        localStorage.setItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, newMethod);
-      } catch (e) {
-        logger(CPL.WARN, getString("WARN__VOLUME__NOT_SAVED"), e);
-      }
-    }
+    // Update current time in store for accurate remaining time calculation
+    store.dispatch({ type: ACTION_TYPES.SET_CURRENT_TIME, payload: player.currentTime });
+    store.dispatch({ type: ACTION_TYPES.SET_DURATION, payload: player.duration });
+
+    const state = store.getState();
+    plume.durationDisplay.textContent = selectors.getFormattedDuration(state);
   };
 
   const PROGRESS_SLIDER_GRANULARITY = 1000; // use 1000 for better granularity: 1000s = 16m40s
@@ -1159,8 +833,7 @@ const browserCacheExists = browserCache !== undefined;
     duration.addEventListener("click", handleDurationChange);
     progressSlider.addEventListener("input", function (this: HTMLInputElement) {
       const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-      if (plume.audioElement)
-        plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
+      if (plume.audioElement) plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
       if (plume.audioElement!.paused)
         setTimeout(() => {
           plume.audioElement!.pause(); // prevent auto-play when seeking on paused track
@@ -1176,9 +849,9 @@ const browserCacheExists = browserCache !== undefined;
 
   const handleDurationChange = () => {
     if (plume.durationDisplay && plume.audioElement) {
-      saveDurationDisplayMethod(plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION
-        ? TIME_DISPLAY_METHOD.REMAINING
-        : TIME_DISPLAY_METHOD.DURATION
+      const currentMethod = store.getState().durationDisplayMethod;
+      saveDurationDisplayMethod(
+        currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION
       );
     }
   };
@@ -1189,20 +862,26 @@ const browserCacheExists = browserCache !== undefined;
     b /= 255;
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    let h: number = 0, s: number = 0, l: number = (max + min) / 2;
+    let [h, s, l] = [0, 0, (max + min) / 2];
 
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
       switch (max) {
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
       }
       h /= 6;
     }
     return [h * 360, s * 100, l * 100];
-  }
+  };
   const isGrayscale = (rgb: [number, number, number]): boolean => RGBToHSL(...rgb)[1] === 0;
   const getLuminance = (rgb: [number, number, number]): number => {
     const [r, g, b] = rgb.map((c) => {
@@ -1217,7 +896,7 @@ const browserCacheExists = browserCache !== undefined;
     const L1 = getLuminance(rgb);
     const L2 = getLuminance(bgRgb);
     return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
-  }
+  };
 
   const CONTRAST_ADJUSTMENT_STEP = 0.05;
   const adjustColorContrast = (rgb: [number, number, number], minContrast: number): string => {
@@ -1230,7 +909,7 @@ const browserCacheExists = browserCache !== undefined;
 
     // return as rgb(r, g, b)
     return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
-  }
+  };
 
   const getArtistNameElement = (): HTMLSpanElement => {
     const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
@@ -1244,7 +923,7 @@ const browserCacheExists = browserCache !== undefined;
   };
 
   const WCAG_CONTRAST = 4.5; // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
-  const FALLBACK_GRAY = "rgb(127, 127, 127)"; // fallback gray if the best color is grayscale, to ensure visibility on Plume's dark background
+  const FALLBACK_GRAY_RGB_STR = "rgb(127, 127, 127)"; // fallback gray if the best color is grayscale, to ensure visibility on Plume's dark background
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
@@ -1253,7 +932,7 @@ const browserCacheExists = browserCache !== undefined;
 
     // Fallback to gray if color regex matching fails
     if (!trackColorMatch || !artistColorMatch) {
-      return FALLBACK_GRAY;
+      return FALLBACK_GRAY_RGB_STR;
     }
 
     const trackColorRGB = trackColorMatch.map(Number) as [number, number, number];
@@ -1270,11 +949,10 @@ const browserCacheExists = browserCache !== undefined;
       const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
       const preferredColorMatch = preferredColor.match(/\d+/g);
       if (!preferredColorMatch) {
-        return FALLBACK_GRAY;
+        return FALLBACK_GRAY_RGB_STR;
       }
       const preferredColorRgb = preferredColorMatch.map(Number) as [number, number, number];
-      if (isGrayscale(preferredColorRgb))
-        return FALLBACK_GRAY;
+      if (isGrayscale(preferredColorRgb)) return FALLBACK_GRAY_RGB_STR;
       return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST);
     }
   };
@@ -1282,15 +960,14 @@ const browserCacheExists = browserCache !== undefined;
   interface TrackQuantifiers {
     current: number;
     total: number;
-  };
+  }
   // Function to get the current track quantifiers (e.g. 3rd out of 10)
   const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
     const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
     if (!trackTable) return { current: 0, total: 0 };
 
     const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
-    if (trackRows.length === 0)
-      return { current: 0, total: 0 };
+    if (trackRows.length === 0) return { current: 0, total: 0 };
 
     const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
     const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
@@ -1393,9 +1070,10 @@ const browserCacheExists = browserCache !== undefined;
       : getString("ARIA__TRACK", initialTrackTitle);
     const currentTitlePretext = document.createElement("span");
     currentTitlePretext.id = PLUME_ELEM_IDENTIFIERS.headerTitlePretext.split("#")[1];
-    currentTitlePretext.textContent = isAlbumPage
+    const initialTrackNumberText = isAlbumPage
       ? getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`)
       : getString("LABEL__TRACK");
+    currentTitlePretext.textContent = initialTrackNumberText;
     currentTitlePretext.style.color = getAppropriatePretextColor();
     currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitlePretext);
@@ -1406,6 +1084,10 @@ const browserCacheExists = browserCache !== undefined;
     currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
     currentTitleSection.appendChild(currentTitleText);
     headerContainer.appendChild(currentTitleSection);
+
+    // Initialize store with current track title and track number
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_TITLE, payload: initialTrackTitle });
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_NUMBER, payload: initialTrackNumberText });
 
     plume.titleDisplay = headerContainer;
     plumeContainer.appendChild(headerContainer);
@@ -1435,13 +1117,12 @@ const browserCacheExists = browserCache !== undefined;
 
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
-    if (isAlbumPage)
-      addRuntime();
+    if (isAlbumPage) addRuntime();
   };
 
   const setPauseBtnIcon = () => {
     const playPauseBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
-    playPauseBtns.forEach(btn => btn.innerHTML = PLUME_SVG.playPause);
+    playPauseBtns.forEach((btn) => (btn.innerHTML = PLUME_SVG.playPause));
   };
 
   const updateTrackForwardBtnState = () => {
@@ -1449,7 +1130,7 @@ const browserCacheExists = browserCache !== undefined;
     if (trackFwdBtns.length === 0) return;
 
     const shouldDisable = !isAlbumPage || isLastTrackOfAlbumPlaying();
-    trackFwdBtns.forEach(btn => btn.disabled = shouldDisable);
+    trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
   };
 
   // Function to update the pretext display (track numbering)
@@ -1459,9 +1140,14 @@ const browserCacheExists = browserCache !== undefined;
 
     const newTrackTitle = getCurrentTrackTitle();
     const newTq = getTrackQuantifiers(newTrackTitle);
-    preText.textContent = isAlbumPage
+    const trackNumberText = isAlbumPage
       ? getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`)
       : getString("LABEL__TRACK");
+
+    // Dispatch track number change to store for fullscreen sync
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_NUMBER, payload: trackNumberText });
+
+    preText.textContent = trackNumberText;
 
     const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerCurrent) as HTMLDivElement;
     headerCurrent.ariaLabel = isAlbumPage
@@ -1480,6 +1166,9 @@ const browserCacheExists = browserCache !== undefined;
     const newTrackTitle = getCurrentTrackTitle();
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
+
+    // Dispatch title change to store for fullscreen sync
+    store.dispatch({ type: ACTION_TYPES.SET_TRACK_TITLE, payload: newTrackTitle });
 
     // Cache offsetHeight to avoid multiple layout recalculations
     const titleHeight = titleText.offsetHeight;
@@ -1500,24 +1189,27 @@ const browserCacheExists = browserCache !== undefined;
     const elapsed = plume.audioElement!.currentTime;
     const duration = plume.audioElement!.duration;
 
-    if (!Number.isNaN(duration) && duration > 0) {
-      const percent = (elapsed / duration) * 100;
-      const bgPercent = percent < 50 ? (percent + 1) : (percent - 1); // or else it under/overflows
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-      plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-      plume.progressSlider.style.backgroundImage = bgImg;
+    // Update store with current playback state (batched for performance)
+    store.dispatch({
+      type: ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS,
+      payload: { currentTime: elapsed, duration },
+    });
 
-      if (plume.elapsedDisplay) {
-        plume.elapsedDisplay.textContent = formatTime(elapsed);
-      }
+    if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
 
-      if (plume.durationDisplay) {
-        if (plume.durationDisplayMethod === TIME_DISPLAY_METHOD.DURATION) {
-          plume.durationDisplay.textContent = formatTime(duration);
-        } else {
-          plume.durationDisplay.textContent = "-" + formatTime(duration - elapsed);
-        }
-      }
+    const state = store.getState();
+    const percent = selectors.getProgressPercentage(state);
+    const bgPercent = percent < 50 ? percent + 1 : percent - 1; // or else it under/overflows
+    const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+    plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+    plume.progressSlider.style.backgroundImage = bgImg;
+
+    if (plume.elapsedDisplay) {
+      plume.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+    }
+
+    if (plume.durationDisplay) {
+      plume.durationDisplay.textContent = selectors.getFormattedDuration(state);
     }
   };
 
@@ -1549,8 +1241,20 @@ const browserCacheExists = browserCache !== undefined;
         valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
-      syncMuteBtn(currentVolume === 0);
-      saveNewVolume(currentVolume);
+      const isMuted = currentVolume === 0;
+      if (store.getState().isMuted !== isMuted) {
+        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
+      }
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: currentVolume });
+    });
+
+    // Track play/pause state changes from audio element
+    plume.audioElement!.addEventListener("play", () => {
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: true });
+    });
+
+    plume.audioElement!.addEventListener("pause", () => {
+      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: false });
     });
 
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
@@ -1568,7 +1272,8 @@ const browserCacheExists = browserCache !== undefined;
     }
 
     const triggerHeight = (plumeParentDiv as HTMLDivElement).offsetTop;
-    window.addEventListener("scroll", () => { // Check if plume is in viewport height for sticky styling
+    window.addEventListener("scroll", () => {
+      // Check if plume is in viewport height for sticky styling
       if (scrollIsTicking) return;
       scrollIsTicking = true;
 
@@ -1584,44 +1289,64 @@ const browserCacheExists = browserCache !== undefined;
     });
   };
 
-  // Function to load the duration display method from browser cache (duration or remaining)
-  const loadDurationDisplayMethod = (): Promise<TimeDisplayMethodType> => {
-    return new Promise((resolve) => {
-      if (browserCacheExists) {
-        browserCache.get([PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD])
-          .then((ls: LocalStorage) => {
-            const durationDisplayMethod =
-              ls[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] || PLUME_DEF.durationDisplayMethod;
-            plume.durationDisplayMethod = durationDisplayMethod;
-            resolve(durationDisplayMethod);
-          })
-          .catch((e) => {
-            logger(CPL.WARN, getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
-            plume.durationDisplayMethod = PLUME_DEF.durationDisplayMethod;
-            resolve(PLUME_DEF.durationDisplayMethod);
-          });
-      } else {
-        // Fallback to localStorage
-        try {
-          const storedDurationDisplayMethod = localStorage.getItem(PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD);
-          const durationDisplayMethod: TimeDisplayMethodType = storedDurationDisplayMethod
-            ? (storedDurationDisplayMethod as TimeDisplayMethodType)
-            : TIME_DISPLAY_METHOD.DURATION;
-          plume.durationDisplayMethod = durationDisplayMethod;
-          resolve(durationDisplayMethod);
-        } catch (e) {
-          logger(CPL.WARN, getString("WARN__TIME_DISPLAY_METHOD__NOT_LOADED"), e);
-          plume.durationDisplayMethod = TIME_DISPLAY_METHOD.DURATION;
-          resolve(TIME_DISPLAY_METHOD.DURATION);
+  // Load duration display method from store (already loaded during init)
+  const loadDurationDisplayMethod = async (): Promise<TimeDisplayMethodType> => {
+    return store.getState().durationDisplayMethod;
+  };
+
+  // Store unsubscribe functions for cleanup
+  const storeSubscriptions: Array<() => void> = [];
+
+  // Setup store subscriptions for reactive UI updates
+  const setupStoreSubscriptions = () => {
+    storeSubscriptions.push(
+      // Subscribe to volume changes to update audio element
+      store.subscribe("volume", (volume) => {
+        if (plume.audioElement) {
+          plume.audioElement.volume = volume;
         }
-      }
-    });
+      }),
+      // Subscribe to duration display method changes to update display
+      store.subscribe("durationDisplayMethod", () => {
+        updateProgressBar();
+      }),
+      // Subscribe to mute state changes
+      store.subscribe("isMuted", (isMuted) => {
+        syncMuteBtn(isMuted);
+
+        // Update volume slider and display
+        if (plume.volumeSlider) {
+          const currentVolume = store.getState().volume;
+          plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
+
+          const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
+            PLUME_ELEM_IDENTIFIERS.volumeValue
+          ) as HTMLDivElement | null;
+          if (valueDisplay) {
+            valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+          }
+        }
+
+        // Update audio element volume
+        if (plume.audioElement) {
+          plume.audioElement.volume = store.getState().volume;
+        }
+      }),
+      // Subscribe to playing state changes
+      store.subscribe("isPlaying", (isPlaying) => {
+        const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+        playPauseBtns.forEach((btn) => {
+          btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+        });
+      })
+    );
+
+    logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
   };
 
   const setupKeyboardShortcuts = () => {
     const handlePlayPauseShortcut = () => {
-      const playPauseBtns = Array.from(document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn));
-      handlePlayPause(playPauseBtns as HTMLButtonElement[]);
+      handlePlayPause();
     };
 
     const handleAdjustVolume = (delta: number) => {
@@ -1642,7 +1367,7 @@ const browserCacheExists = browserCache !== undefined;
         valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
       });
 
-      saveNewVolume(volume);
+      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
     };
 
     const handleToggleMute = () => {
@@ -1651,21 +1376,39 @@ const browserCacheExists = browserCache !== undefined;
 
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
-      const isValidShortcut = AVAILABLE_SHORTCUT_CODES.has(e.code);
+      const isValidShortcut = PLUME_CONSTANTS.AVAILABLE_SHORTCUT_CODES.has(e.code);
       if (!isValidShortcut) return;
 
       e.preventDefault();
       e.stopPropagation();
       switch (e.code) {
-        case "Space": handlePlayPauseShortcut(); break;
-        case "ArrowLeft": handleTimeBackward(); break;
-        case "ArrowRight": handleTimeForward(); break;
-        case "ArrowUp": handleAdjustVolume(5); break;
-        case "ArrowDown": handleAdjustVolume(-5); break;
-        case "PageUp": handleTrackBackward(); break;
-        case "PageDown": handleTrackForward(); break;
-        case "KeyF": toggleFullscreenMode(); break;
-        case "KeyM": handleToggleMute(); break;
+        case "Space":
+          handlePlayPauseShortcut();
+          break;
+        case "ArrowLeft":
+          handleTimeBackward();
+          break;
+        case "ArrowRight":
+          handleTimeForward();
+          break;
+        case "ArrowUp":
+          handleAdjustVolume(5);
+          break;
+        case "ArrowDown":
+          handleAdjustVolume(-5);
+          break;
+        case "PageUp":
+          handleTrackBackward();
+          break;
+        case "PageDown":
+          handleTrackForward();
+          break;
+        case "KeyF":
+          toggleFullscreenMode();
+          break;
+        case "KeyM":
+          handleToggleMute();
+          break;
       }
     });
 
@@ -1678,9 +1421,7 @@ const browserCacheExists = browserCache !== undefined;
 
   const init = async () => {
     // Prevent concurrent initialization
-    if (isInitializing || isInitialized) {
-      return;
-    }
+    if (isInitializing || isInitialized) return;
     isInitializing = true;
 
     logger(CPL.INFO, getString("LOG__INITIALIZATION__START"));
@@ -1691,6 +1432,9 @@ const browserCacheExists = browserCache !== undefined;
       window.addEventListener("load", init, { once: true });
       return;
     }
+
+    // Load persisted state into store
+    await loadPersistedState(store);
 
     plume.audioElement = await findAudioElement();
     if (!plume.audioElement) {
@@ -1708,12 +1452,13 @@ const browserCacheExists = browserCache !== undefined;
     }
 
     // Ensure duration display method is applied
-    await loadDurationDisplayMethod();
-    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
+    const durationDisplayMethod = await loadDurationDisplayMethod();
+    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
+    setupStoreSubscriptions();
     setupKeyboardShortcuts();
     initPlayback();
 
@@ -1731,11 +1476,8 @@ const browserCacheExists = browserCache !== undefined;
     progressSlider: null,
     elapsedDisplay: null,
     durationDisplay: null,
-    durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
     volumeSlider: null,
     muteBtn: null,
-    savedVolume: PLUME_DEF.savedVolume,
-    playerVolume: PLUME_DEF.playerVolume,
   };
 
   // Observe DOM changes for players that load dynamically
@@ -1748,17 +1490,15 @@ const browserCacheExists = browserCache !== undefined;
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
           // Ensure duration display method is applied
-          await loadDurationDisplayMethod();
-          logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${plume.durationDisplayMethod}"`);
+          const durationDisplayMethod = await loadDurationDisplayMethod();
+          logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
           // Load and apply saved volume to the new element
-          await loadSavedVolume();
-          newAudio.volume = plume.savedVolume;
+          const volume = store.getState().volume;
+          newAudio.volume = volume;
           logger(
             CPL.INFO,
-            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(plume.savedVolume * 100)}${getString(
-              "META__PERCENTAGE"
-            )}`
+            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
           );
 
           plume.audioElement = newAudio;
@@ -1798,10 +1538,15 @@ const browserCacheExists = browserCache !== undefined;
     // Clean up fullscreen if active before navigation
     const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
     if (existingOverlay) {
+      // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
+      if (fullscreenCleanupCallback) {
+        fullscreenCleanupCallback();
+        fullscreenCleanupCallback = null;
+      }
+
       existingOverlay.remove();
       document.body.style.overflow = "auto";
-      fullscreenCleanupCallback?.();
-      fullscreenCleanupCallback = null;
+      store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
     }
 
     // Reset initialization flag to allow re-initialization on navigation
@@ -1815,9 +1560,17 @@ const browserCacheExists = browserCache !== undefined;
   spaNavigationObserver.observe(document, { subtree: true, childList: true });
 
   // Cleanup observers on page unload
-  window.addEventListener('unload', () => {
+  window.addEventListener("unload", () => {
     domObserver.disconnect();
     spaNavigationObserver.disconnect();
-    fullscreenCleanupCallback?.();
+
+    // Cleanup fullscreen subscriptions if active
+    if (fullscreenCleanupCallback) {
+      fullscreenCleanupCallback();
+      fullscreenCleanupCallback = null;
+    }
+
+    // Unsubscribe all store listeners
+    storeSubscriptions.forEach((unsubscribe) => unsubscribe());
   });
 })();

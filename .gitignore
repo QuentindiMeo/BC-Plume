@@ -7,5 +7,7 @@ build/
 # To prevent committing sensitive files
 .env*
 
-# Ignore Claude
+# Ignore IDEs
+.vscode/
+.idea/
 .claude/
