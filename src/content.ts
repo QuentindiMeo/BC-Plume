@@ -10,21 +10,21 @@ import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "./domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "./domain/plume";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./features/formatting";
 import { getString, logDetectedBrowser } from "./features/i18n";
+import { setupHotkeys } from "./features/keyboard";
 import { CPL, logger } from "./features/logger";
-import { getPlumeInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 
-const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULARITY } =
-  PLUME_CONSTANTS;
+const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 (() => {
   "use strict";
 
   logDetectedBrowser();
   const store = getStoreInstance();
-  const plumeInstance = getPlumeInstance();
+  const plumeUiInstance = getPlumeUiInstance();
 
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
 
@@ -190,7 +190,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Setup store subscriptions for fullscreen UI to keep it in sync with state
   const setupFullscreen = (clone: HTMLElement): CleanupCallback => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const subscriptions: Array<SubscriptionCallback> = [];
 
     const cloneEl = {
@@ -535,7 +535,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Sync mute button icon and aria-label to reflect the current audio volume state
   const syncMuteBtn = (isMuted: boolean) => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const newMuteBtn = plume.muteBtn;
 
     newMuteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
@@ -543,7 +543,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     newMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
     newMuteBtn.ariaPressed = isMuted.toString();
     newMuteBtn.classList.toggle("muted", isMuted);
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
   };
 
   const handleMuteToggle = () => {
@@ -552,7 +552,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     if (plume.volumeSlider) return null;
 
     const container = document.createElement("div");
@@ -603,8 +603,8 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     container.appendChild(volumeSlider);
     container.appendChild(valueDisplay);
 
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
     return container;
   };
 
@@ -637,7 +637,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Function to click on the previous track button
   const clickPreviousTrackButton = (): true | null => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
 
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
     if (!prevButton) {
@@ -673,7 +673,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
   const createPlaybackControls = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const container = document.createElement("div");
     container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
 
@@ -730,7 +730,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   };
 
   const handleTimeBackward = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
     const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
@@ -749,7 +749,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   };
 
   const handlePlayPause = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     if (plume.audioElement.paused) {
       plume.audioElement.play();
       store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
@@ -760,7 +760,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   };
 
   const handleTimeForward = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
     const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
@@ -787,7 +787,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   };
 
   const saveDurationDisplayMethod = (newMethod: TimeDisplayMethodType) => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: newMethod });
 
     const player = plume.audioElement;
@@ -801,7 +801,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   };
 
   const createProgressContainer = async () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     if (plume.progressSlider) return;
 
     const container = document.createElement("div");
@@ -843,9 +843,9 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
       }
     });
 
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
 
     return container;
   };
@@ -1017,7 +1017,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     }
 
     if (!playerContainer) {
-      const plume = plumeInstance.getState();
+      const plume = plumeUiInstance.getState();
       logger(CPL.WARN, getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
       // Search near audio elements
       playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
@@ -1081,7 +1081,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_TITLE, payload: initialTrackTitle });
     store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_NUMBER, payload: initialTrackNumberText });
 
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, payload: headerContainer });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, payload: headerContainer });
     plumeContainer.appendChild(headerContainer);
 
     const playbackManager = document.createElement("div");
@@ -1127,7 +1127,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Function to update the pretext display (track numbering)
   const updatePretextDisplay = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
     if (!preText) return;
 
@@ -1153,7 +1153,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   const LATIN_CHAR_HEIGHT = 19;
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
     if (!titleText) return;
 
@@ -1178,7 +1178,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Function to update the progress bar and time displays as audio plays or metadata change
   const updateProgressBar = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const elapsed = plume.audioElement.currentTime;
     const duration = plume.audioElement.duration;
 
@@ -1204,7 +1204,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Function to set up event listeners on the audio element: progress, metadata, volume
   const setupAudioListeners = () => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     // Update progress container
     plume.audioElement.addEventListener("timeupdate", updateProgressBar);
     plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
@@ -1287,7 +1287,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   // Setup store subscriptions for reactive UI updates
   // Returns cleanup function to unsubscribe all subscriptions
   const setupStoreSubscriptions = (): CleanupCallback => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
     const subscriptions: Array<SubscriptionCallback> = [];
 
     subscriptions.push(
@@ -1333,77 +1333,11 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     };
   };
 
-  const setupHotkeys = () => {
-    const plume = plumeInstance.getState();
-
-    const handleAdjustVolume = (delta: number) => {
-      const currentValue = Number.parseInt(plume.volumeSlider.value);
-      const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
-      plume.volumeSlider.value = newValue.toString();
-
-      const volume = newValue / VOLUME_SLIDER_GRANULARITY;
-      plume.audioElement.volume = volume;
-
-      const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
-      volumeSliders.forEach((slider) => {
-        (slider as HTMLInputElement).value = newValue.toString();
-
-        const valueDisplay = slider.parentElement!.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
-        valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
-      });
-
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
-    };
-
-    const handleToggleMute = () => {
-      plume.muteBtn.click();
-    };
-
-    document.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
-      const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.code);
-      if (!isValidHotkey) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-      switch (e.code) {
-        case "Space":
-          handlePlayPause();
-          break;
-        case "ArrowLeft":
-          handleTimeBackward();
-          break;
-        case "ArrowRight":
-          handleTimeForward();
-          break;
-        case "ArrowUp":
-          handleAdjustVolume(5);
-          break;
-        case "ArrowDown":
-          handleAdjustVolume(-5);
-          break;
-        case "PageUp":
-          handleTrackBackward();
-          break;
-        case "PageDown":
-          handleTrackForward();
-          break;
-        case "KeyF":
-          toggleFullscreenMode();
-          break;
-        case "KeyM":
-          handleToggleMute();
-          break;
-      }
-    });
-
-    logger(CPL.INFO, getString("INFO__HOTKEYS__REGISTERED"));
-  };
-
   // Main initialization function
   let isInitializing = false;
   let isInitialized = false;
   let storeCleanupCallback: (() => void) | null = null;
+  let keyboardCleanupCallback: (() => void) | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -1429,7 +1363,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: audioElement });
+    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: audioElement });
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -1446,7 +1380,14 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     await injectEnhancements();
     setupAudioListeners();
     storeCleanupCallback = setupStoreSubscriptions();
-    setupHotkeys();
+    keyboardCleanupCallback = setupHotkeys({
+      handlePlayPause,
+      handleTimeBackward,
+      handleTimeForward,
+      handleTrackBackward,
+      handleTrackForward,
+      toggleFullscreenMode,
+    });
     initPlayback();
 
     // Debug: show detected controls
@@ -1459,7 +1400,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
 
   // Observe DOM changes for players that load dynamically
   const domObserver = new MutationObserver((mutations) => {
-    const plume = plumeInstance.getState();
+    const plume = plumeUiInstance.getState();
 
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
@@ -1480,7 +1421,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
             `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
           );
 
-          plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: newAudio });
+          plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: newAudio });
 
           // Reset if needed
           if (!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer)) {
@@ -1553,6 +1494,12 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     if (storeCleanupCallback) {
       storeCleanupCallback();
       storeCleanupCallback = null;
+    }
+
+    // Cleanup keyboard hotkeys
+    if (keyboardCleanupCallback) {
+      keyboardCleanupCallback();
+      keyboardCleanupCallback = null;
     }
   });
 })();

@@ -1,3 +1,2 @@
-type Function = () => void;
-export type CleanupCallback = Function;
-export type SubscriptionCallback = Function;
+export type CleanupCallback = () => void;
+export type SubscriptionCallback = () => void;

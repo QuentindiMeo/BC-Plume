@@ -1,11 +1,3 @@
-/**
- * Plume Instance Management
- *
- * Manages the DOM element references for the Plume player UI.
- * This module provides a centralized instance that holds references to
- * all key DOM elements in the enhanced player interface.
- */
-
 import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
 import { getString } from "../features/i18n";
 import { CPL, logger } from "../features/logger";
@@ -35,7 +27,7 @@ export interface InitializedPlumeCore {
 }
 
 export enum PLUME_ACTION_TYPES {
-  RESET_PLUME_INSTANCE = "resetPlumeInstance",
+  RESET_PLUME_UI_INSTANCE = "resetPlumeUiInstance",
   SET_AUDIO_ELEMENT = "setAudioElement",
   SET_TITLE_DISPLAY = "setTitleDisplay",
   SET_PROGRESS_SLIDER = "setProgressSlider",
@@ -46,7 +38,7 @@ export enum PLUME_ACTION_TYPES {
 }
 
 export type PlumeAction =
-  | Action<PLUME_ACTION_TYPES.RESET_PLUME_INSTANCE, string | null>
+  | Action<PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE, string | null>
   | Action<PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, HTMLAudioElement | null>
   | Action<PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, HTMLDivElement | null>
   | Action<PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, HTMLInputElement | null>
@@ -72,9 +64,9 @@ const INITIAL_STATE: PlumeCore = {
   muteBtn: null,
 };
 
-let plumeInstance: AppInstance | null = null;
+let plumeUiInstance: AppInstance | null = null;
 
-function createPlumeInstance(): AppInstance {
+function createPlumeUiInstance(): AppInstance {
   let state = { ...INITIAL_STATE } as InitializedPlumeCore;
 
   const listeners = new Map<keyof PlumeCore, Set<PlumeStateListener<any>>>();
@@ -113,7 +105,7 @@ function createPlumeInstance(): AppInstance {
 
   function reducer(action: PlumeAction): void {
     switch (action.type) {
-      case PLUME_ACTION_TYPES.RESET_PLUME_INSTANCE:
+      case PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE:
         updateState("audioElement", null);
         updateState("titleDisplay", null);
         updateState("progressSlider", null);
@@ -184,7 +176,7 @@ function createPlumeInstance(): AppInstance {
   };
 }
 
-export function getPlumeInstance(): AppInstance {
-  plumeInstance ??= createPlumeInstance();
-  return plumeInstance;
+export function getPlumeUiInstance(): AppInstance {
+  plumeUiInstance ??= createPlumeUiInstance();
+  return plumeUiInstance;
 }
