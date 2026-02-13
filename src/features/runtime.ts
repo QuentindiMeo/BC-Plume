@@ -1,0 +1,97 @@
+import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
+import { getString } from "./i18n";
+import { CPL, logger } from "./logger";
+import { measureContrastRatioWCAG } from "./utils/colors";
+
+interface RuntimeInfo {
+  totalRuntime: number;
+  formattedTotalRuntime: string;
+  ariaString: string;
+  calculated: boolean;
+}
+
+const runtimeInfo: RuntimeInfo = {
+  totalRuntime: 0,
+  formattedTotalRuntime: "",
+  ariaString: "",
+  calculated: false,
+};
+
+export const getInfoSectionWithRuntime = (): HTMLDivElement => {
+  if (!runtimeInfo.calculated) {
+    const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    if (!trackList) {
+      logger(CPL.WARN, getString("WARN__TRACK_LIST__NOT_FOUND"));
+      const errorDiv = document.createElement("div");
+      errorDiv.textContent = getString("WARN__RUNTIME__NOT_CALCULATED");
+      return errorDiv;
+    }
+
+    const trackRows = trackList?.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow) ?? [];
+    trackRows.forEach((row, idx) => {
+      const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
+      if (!durationCell) {
+        logger(CPL.WARN, getString("WARN__DURATION_CELL__NOT_FOUND"), [row, idx]);
+        return;
+      }
+
+      const durationText = durationCell.textContent.trim();
+      const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
+      let seconds = 0;
+      if (parts.length === 2) {
+        // MM:SS
+        seconds = parts[0] * 60 + parts[1];
+      } else if (parts.length === 3) {
+        // HH:MM:SS
+        seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      runtimeInfo.totalRuntime += seconds;
+    });
+    const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
+    const seconds = runtimeInfo.totalRuntime % 60;
+    runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
+      minutes,
+      seconds < 10 ? "0" + seconds : seconds.toString(),
+    ]);
+    runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [
+      Math.floor(runtimeInfo.totalRuntime / 60),
+      runtimeInfo.totalRuntime % 60,
+    ]);
+    logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
+
+    runtimeInfo.calculated = true;
+  }
+
+  const infoSectionId = BC_ELEM_IDENTIFIERS.infoSection.split("#")[1];
+  const infoSection = document.getElementById(infoSectionId) as HTMLDivElement;
+  const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true);
+  const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true);
+
+  const newNameSection = document.createElement("div");
+  newNameSection.id = infoSectionId;
+
+  const newTitleHeading = document.createElement("div");
+  newTitleHeading.className = infoSectionId + "__titling";
+  newTitleHeading.appendChild(titleHeadingClone);
+
+  const mainSectionBackground = document.getElementById("pgBd")!;
+  const bgColor = globalThis.getComputedStyle(mainSectionBackground).getPropertyValue("background");
+  const bgColorAsRGB = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bgColor);
+  const r = Number.parseInt(bgColorAsRGB![1], 10);
+  const g = Number.parseInt(bgColorAsRGB![2], 10);
+  const b = Number.parseInt(bgColorAsRGB![3], 10);
+  const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= 3 ? "#0000007f" : "#ffffff7f";
+
+  const runtimeSpan = document.createElement("span");
+  runtimeSpan.className = "runtime";
+  runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
+  runtimeSpan.style.color = runtimeTextColor;
+  runtimeSpan.ariaLabel = runtimeInfo.ariaString;
+  newTitleHeading.appendChild(runtimeSpan);
+
+  newNameSection.appendChild(newTitleHeading);
+  newNameSection.appendChild(artistHeadingClone);
+  infoSection.remove();
+
+  return newNameSection;
+};
