@@ -1,4 +1,4 @@
-import { browserApi } from "./browser";
+import { getBrowserInstance } from "../infra/BrowserImpl";
 import { CPL, logger } from "./logger";
 
 export function logDetectedBrowser(): void {
@@ -10,6 +10,7 @@ export function logDetectedBrowser(): void {
   );
 }
 
+const browserApi = getBrowserInstance().getState().api;
 const getLocalizedMessage = browserApi.i18n?.getMessage?.bind(browserApi.i18n) ?? ((key: string) => key);
 
 export const getString = getLocalizedMessage;

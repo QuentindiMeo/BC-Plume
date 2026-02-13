@@ -65,7 +65,7 @@ if (fs.existsSync(readmePath)) {
   console.warn("⚠️ README.md not found, skipping update");
 }
 
-const logoVersionConstantPath = path.join(__dirname, "..", "src", "constants.ts");
+const logoVersionConstantPath = path.join(__dirname, "..", "src", "domain", "meta.ts");
 if (fs.existsSync(logoVersionConstantPath)) {
   let constantsContent = fs.readFileSync(logoVersionConstantPath, "utf8");
   const versionConstRegex = /APP_VERSION = ['"]v(\d+\.\d+\.\d+)['"]/;
@@ -77,10 +77,10 @@ if (fs.existsSync(logoVersionConstantPath)) {
     fs.writeFileSync(logoVersionConstantPath, constantsContent);
     console.log(`✅ Updated APP_VERSION constant to ${packageVersion}`);
   } else {
-    console.warn("⚠️ APP_VERSION constant not found in constants.ts, skipping update");
+    console.warn("⚠️ APP_VERSION constant not found in meta.ts, skipping update");
   }
 } else {
-  console.warn("⚠️ src/constants.ts not found, skipping APP_VERSION constant update");
+  console.warn("⚠️ src/domain/meta.ts not found, skipping APP_VERSION constant update");
 }
 
 console.log("✅ Version synchronization complete!");

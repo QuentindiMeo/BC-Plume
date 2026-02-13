@@ -33,7 +33,7 @@
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Éléments du lecteur original restaurés" },
   "INFO__BROWSER__DETECTED": { "message": "Navigateur détecté :" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
-  "INFO__SHORTCUTS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
+  "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
   "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "La durée totale n'a pas pu être calculée" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },

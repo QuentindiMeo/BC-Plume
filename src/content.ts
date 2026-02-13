@@ -1,24 +1,30 @@
 // Plume - TypeScript for song page and album page display
-import { APP_NAME, APP_VERSION, PLUME_CONSTANTS, PLUME_KO_FI_URL } from "./constants";
-import { createStore, loadPersistedState, selectors } from "./store";
-import { ACTION_TYPES } from "./store/store";
-import { PLUME_SVG } from "./svg/icons";
 import {
   BC_ELEM_IDENTIFIERS,
+  BC_PLAYER_SELECTORS,
   DebugControl,
-  PLUME_ELEM_IDENTIFIERS,
-  PlumeCore,
   TIME_DISPLAY_METHOD,
   TimeDisplayMethodType,
-} from "./types";
-import { getString, logDetectedBrowser } from "./utils/i18n";
-import { CPL, logger } from "./utils/logger";
+} from "./domain/bandcamp";
+import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "./domain/meta";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "./domain/plume";
+import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./features/formatting";
+import { getString, logDetectedBrowser } from "./features/i18n";
+import { CPL, logger } from "./features/logger";
+import { getPlumeInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
+import { getStore, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
+import { PLUME_SVG } from "./svg/icons";
+
+const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULARITY } =
+  PLUME_CONSTANTS;
 
 (() => {
   "use strict";
 
   logDetectedBrowser();
-  const store = createStore();
+  const store = getStore();
+  const plumeInstance = getPlumeInstance();
+
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
 
   // Function to initialize playback (necessary to make Plume buttons effective)
@@ -183,6 +189,7 @@ import { CPL, logger } from "./utils/logger";
 
   // Setup store subscriptions for fullscreen UI to keep it in sync with state
   const setupFullscreen = (clone: HTMLElement) => {
+    const plume = plumeInstance.getState();
     const subscriptions: Array<() => void> = [];
 
     const cloneEl = {
@@ -203,7 +210,7 @@ import { CPL, logger } from "./utils/logger";
     const updateFullscreenDuration = () => {
       if (!cloneEl.durationDisplay) return;
       const state = store.getState();
-      cloneEl.durationDisplay.textContent = selectors.getFormattedDuration(state);
+      cloneEl.durationDisplay.textContent = getFormattedDuration(state);
     };
     subscriptions.push(
       // Subscribe to progress updates
@@ -211,7 +218,7 @@ import { CPL, logger } from "./utils/logger";
         const state = store.getState();
         if (!cloneEl.progressSlider) return;
 
-        const percent = selectors.getProgressPercentage(state);
+        const percent = getProgressPercentage(state);
         const bgPercent = percent < 50 ? percent + 1 : percent - 1;
         const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
         cloneEl.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
@@ -221,7 +228,7 @@ import { CPL, logger } from "./utils/logger";
       store.subscribe("currentTime", () => {
         if (!cloneEl.elapsedDisplay) return;
         const state = store.getState();
-        cloneEl.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+        cloneEl.elapsedDisplay.textContent = getFormattedElapsed(state);
       }),
       // Subscribe to duration display (updates on both duration and display method changes)
       store.subscribe("duration", updateFullscreenDuration),
@@ -272,28 +279,25 @@ import { CPL, logger } from "./utils/logger";
 
     const handleProgressInput = function (this: HTMLInputElement) {
       const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-      if (plume.audioElement) {
-        plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-        if (plume.audioElement.paused) {
-          setTimeout(() => {
-            plume.audioElement!.pause();
-          }, 10);
-        }
+
+      plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
+      if (plume.audioElement.paused) {
+        setTimeout(() => {
+          plume.audioElement.pause();
+        }, 10);
       }
     };
 
     const handleVolumeInput = function (this: HTMLInputElement) {
       const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-      if (!plume.audioElement) return;
-
       plume.audioElement.volume = newVolume;
 
       // Moving slider off zero counts as an intentional unmute
       if (newVolume > 0 && store.getState().isMuted) {
-        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
+        store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
       }
 
-      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: newVolume });
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: newVolume });
     };
 
     // Setup event listeners for fullscreen controls
@@ -310,10 +314,8 @@ import { CPL, logger } from "./utils/logger";
 
     // Initialize fullscreen UI with current state
     const state = store.getState();
-    if (plume.titleDisplay && cloneEl.headerContainer) {
-      // Safe use of innerHTML to clone DOM content from controlled element
-      cloneEl.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
-    }
+    // Safe use of innerHTML to clone DOM content from controlled element
+    cloneEl.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
     // Initialize track number in fullscreen
     if (state.trackNumber && cloneEl.headerContainer) {
       const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
@@ -325,7 +327,7 @@ import { CPL, logger } from "./utils/logger";
     }
     updateFullscreenDuration();
     if (cloneEl.elapsedDisplay) {
-      cloneEl.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
+      cloneEl.elapsedDisplay.textContent = getFormattedElapsed(state);
     }
     if (cloneEl.volumeSlider && cloneEl.volumeDisplay) {
       cloneEl.volumeSlider.value = Math.round(state.volume * VOLUME_SLIDER_GRANULARITY).toString();
@@ -365,7 +367,7 @@ import { CPL, logger } from "./utils/logger";
       existingOverlay.remove();
       document.body.style.overflow = "auto";
 
-      store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
       logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
       return;
     }
@@ -475,13 +477,13 @@ import { CPL, logger } from "./utils/logger";
         if (focusableElements.length === 0) return;
 
         const firstFocusable = focusableElements[0];
-        const lastFocusable = focusableElements[focusableElements.length - 1];
+        const lastFocusable = focusableElements.at(-1);
         const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
 
         if (e.shiftKey) {
           if (document.activeElement === firstFocusable || currentIndex === -1) {
             e.preventDefault();
-            lastFocusable.focus();
+            lastFocusable?.focus();
           }
         } else if (document.activeElement === lastFocusable || currentIndex === -1) {
           e.preventDefault();
@@ -509,7 +511,7 @@ import { CPL, logger } from "./utils/logger";
     document.body.style.overflow = "hidden";
     setupFullscreenFocusTrap();
 
-    store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
     logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
   };
 
@@ -532,26 +534,24 @@ import { CPL, logger } from "./utils/logger";
 
   // Sync mute button icon and aria-label to reflect the current audio volume state
   const syncMuteBtn = (isMuted: boolean) => {
-    if (!plume.muteBtn) return;
-    plume.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-    plume.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-    plume.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-    plume.muteBtn.ariaPressed = isMuted.toString();
-    plume.muteBtn.classList.toggle("muted", isMuted);
+    const plume = plumeInstance.getState();
+    const newMuteBtn = plume.muteBtn;
+
+    newMuteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+    newMuteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+    newMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+    newMuteBtn.ariaPressed = isMuted.toString();
+    newMuteBtn.classList.toggle("muted", isMuted);
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
   };
 
   const handleMuteToggle = () => {
-    if (!plume.audioElement) {
-      logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
-      return;
-    }
-
-    store.dispatch({ type: ACTION_TYPES.TOGGLE_MUTE });
+    store.dispatch({ type: STORE_ACTION_TYPES.TOGGLE_MUTE });
   };
 
-  const VOLUME_SLIDER_GRANULARITY = 100;
   // Function to create the volume slider
   const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
+    const plume = plumeInstance.getState();
     if (plume.volumeSlider) return null;
 
     const container = document.createElement("div");
@@ -575,7 +575,7 @@ import { CPL, logger } from "./utils/logger";
     volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
     // Apply saved volume to audio element
-    plume.audioElement!.volume = currentVolume;
+    plume.audioElement.volume = currentVolume;
 
     const valueDisplay = document.createElement("div");
     valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
@@ -587,28 +587,23 @@ import { CPL, logger } from "./utils/logger";
     volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
       const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
 
-      if (!plume.audioElement) {
-        logger(CPL.WARN, getString("WARN__AUDIO__NOT_FOUND"));
-        return;
-      }
-
       plume.audioElement.volume = volume;
       valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
       // Moving slider off zero counts as an intentional unmute
       if (volume > 0 && store.getState().isMuted) {
-        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: false });
+        store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
       }
 
-      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
     });
 
     container.appendChild(muteBtn);
     container.appendChild(volumeSlider);
     container.appendChild(valueDisplay);
 
-    plume.volumeSlider = volumeSlider;
-    plume.muteBtn = muteBtn;
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
     return container;
   };
 
@@ -641,6 +636,8 @@ import { CPL, logger } from "./utils/logger";
 
   // Function to click on the previous track button
   const clickPreviousTrackButton = (): true | null => {
+    const plume = plumeInstance.getState();
+
     const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
     if (!prevButton) {
       logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
@@ -648,11 +645,11 @@ import { CPL, logger } from "./utils/logger";
     }
 
     const firstTrackIsPlaying = !isAlbumPage || isFirstTrackOfAlbumPlaying();
-    if (plume.audioElement!.currentTime < PLUME_CONSTANTS.TIME_BEFORE_RESTART && !firstTrackIsPlaying) {
+    if (plume.audioElement.currentTime < TIME_BEFORE_RESTART && !firstTrackIsPlaying) {
       prevButton.click();
     } else {
       // Restart current track instead, if more than X seconds have elapsed
-      plume.audioElement!.currentTime = 0;
+      plume.audioElement.currentTime = 0;
       logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
       setPauseBtnIcon();
     }
@@ -675,6 +672,7 @@ import { CPL, logger } from "./utils/logger";
 
   const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
   const createPlaybackControls = () => {
+    const plume = plumeInstance.getState();
     const container = document.createElement("div");
     container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
 
@@ -695,7 +693,7 @@ import { CPL, logger } from "./utils/logger";
     const playPauseBtn = document.createElement("button");
     playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
     playPauseBtn.type = "button";
-    playPauseBtn.innerHTML = plume.audioElement!.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+    playPauseBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
     playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
     playPauseBtn.addEventListener("click", handlePlayPause);
 
@@ -731,13 +729,14 @@ import { CPL, logger } from "./utils/logger";
   };
 
   const handleTimeBackward = () => {
+    const plume = plumeInstance.getState();
     logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
-    const newTime = Math.max(0, plume.audioElement!.currentTime - TIME_STEP_DURATION);
-    plume.audioElement!.currentTime = newTime;
-    if (plume.audioElement!.paused)
+    const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
+    plume.audioElement.currentTime = newTime;
+    if (plume.audioElement.paused)
       setTimeout(() => {
-        plume.audioElement!.pause(); // prevent auto-play when rewinding on paused track
+        plume.audioElement.pause(); // prevent auto-play when rewinding on paused track
       }, 10);
 
     logger(
@@ -749,23 +748,25 @@ import { CPL, logger } from "./utils/logger";
   };
 
   const handlePlayPause = () => {
-    if (plume.audioElement!.paused) {
-      plume.audioElement!.play();
-      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: true });
+    const plume = plumeInstance.getState();
+    if (plume.audioElement.paused) {
+      plume.audioElement.play();
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
     } else {
-      plume.audioElement!.pause();
-      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: false });
+      plume.audioElement.pause();
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
     }
   };
 
   const handleTimeForward = () => {
+    const plume = plumeInstance.getState();
     logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
-    const newTime = Math.min(plume.audioElement!.duration || 0, plume.audioElement!.currentTime + TIME_STEP_DURATION);
-    plume.audioElement!.currentTime = newTime;
-    if (plume.audioElement!.paused)
+    const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
+    plume.audioElement.currentTime = newTime;
+    if (plume.audioElement.paused)
       setTimeout(() => {
-        plume.audioElement!.pause(); // prevent auto-play when forwarding on paused track
+        plume.audioElement.pause(); // prevent auto-play when forwarding on paused track
       }, 10);
 
     logger(
@@ -785,21 +786,21 @@ import { CPL, logger } from "./utils/logger";
   };
 
   const saveDurationDisplayMethod = (newMethod: TimeDisplayMethodType) => {
-    store.dispatch({ type: ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: newMethod });
+    const plume = plumeInstance.getState();
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: newMethod });
 
     const player = plume.audioElement;
-    if (!player || !plume.durationDisplay || !plume.elapsedDisplay) return;
 
     // Update current time in store for accurate remaining time calculation
-    store.dispatch({ type: ACTION_TYPES.SET_CURRENT_TIME, payload: player.currentTime });
-    store.dispatch({ type: ACTION_TYPES.SET_DURATION, payload: player.duration });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: player.currentTime });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: player.duration });
 
     const state = store.getState();
-    plume.durationDisplay.textContent = selectors.getFormattedDuration(state);
+    plume.durationDisplay.textContent = getFormattedDuration(state);
   };
 
-  const PROGRESS_SLIDER_GRANULARITY = 1000; // use 1000 for better granularity: 1000s = 16m40s
   const createProgressContainer = async () => {
+    const plume = plumeInstance.getState();
     if (plume.progressSlider) return;
 
     const container = document.createElement("div");
@@ -833,27 +834,26 @@ import { CPL, logger } from "./utils/logger";
     duration.addEventListener("click", handleDurationChange);
     progressSlider.addEventListener("input", function (this: HTMLInputElement) {
       const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-      if (plume.audioElement) plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-      if (plume.audioElement!.paused)
+      plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
+      if (plume.audioElement.paused) {
         setTimeout(() => {
-          plume.audioElement!.pause(); // prevent auto-play when seeking on paused track
+          plume.audioElement.pause(); // prevent auto-play when seeking on paused track
         }, 10);
+      }
     });
 
-    plume.progressSlider = progressSlider;
-    plume.elapsedDisplay = elapsed;
-    plume.durationDisplay = duration;
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
 
     return container;
   };
 
   const handleDurationChange = () => {
-    if (plume.durationDisplay && plume.audioElement) {
-      const currentMethod = store.getState().durationDisplayMethod;
-      saveDurationDisplayMethod(
-        currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION
-      );
-    }
+    const currentMethod = store.getState().durationDisplayMethod;
+    saveDurationDisplayMethod(
+      currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION
+    );
   };
 
   const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
@@ -1009,14 +1009,6 @@ import { CPL, logger } from "./utils/logger";
 
   // Function to find the original Bandcamp player container
   const findOriginalPlayerContainer = (): HTMLDivElement | null => {
-    const BC_PLAYER_SELECTORS = [
-      ".inline_player",
-      "#trackInfoInner",
-      ".track_play_auxiliary",
-      ".track_play_hilite",
-      ".track_play_area",
-    ];
-
     let playerContainer = null;
     for (const selector of BC_PLAYER_SELECTORS) {
       playerContainer = document.querySelector(selector);
@@ -1024,11 +1016,10 @@ import { CPL, logger } from "./utils/logger";
     }
 
     if (!playerContainer) {
+      const plume = plumeInstance.getState();
       logger(CPL.WARN, getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
       // Search near audio elements
-      if (plume.audioElement) {
-        playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
-      }
+      playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
     }
 
     return playerContainer ? (playerContainer as HTMLDivElement) : null;
@@ -1086,10 +1077,10 @@ import { CPL, logger } from "./utils/logger";
     headerContainer.appendChild(currentTitleSection);
 
     // Initialize store with current track title and track number
-    store.dispatch({ type: ACTION_TYPES.SET_TRACK_TITLE, payload: initialTrackTitle });
-    store.dispatch({ type: ACTION_TYPES.SET_TRACK_NUMBER, payload: initialTrackNumberText });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_TITLE, payload: initialTrackTitle });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_NUMBER, payload: initialTrackNumberText });
 
-    plume.titleDisplay = headerContainer;
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, payload: headerContainer });
     plumeContainer.appendChild(headerContainer);
 
     const playbackManager = document.createElement("div");
@@ -1135,6 +1126,7 @@ import { CPL, logger } from "./utils/logger";
 
   // Function to update the pretext display (track numbering)
   const updatePretextDisplay = () => {
+    const plume = plumeInstance.getState();
     const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
     if (!preText) return;
 
@@ -1145,7 +1137,7 @@ import { CPL, logger } from "./utils/logger";
       : getString("LABEL__TRACK");
 
     // Dispatch track number change to store for fullscreen sync
-    store.dispatch({ type: ACTION_TYPES.SET_TRACK_NUMBER, payload: trackNumberText });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_NUMBER, payload: trackNumberText });
 
     preText.textContent = trackNumberText;
 
@@ -1160,6 +1152,7 @@ import { CPL, logger } from "./utils/logger";
   const LATIN_CHAR_HEIGHT = 19;
   // Function to update the title display when track changes
   const updateTitleDisplay = () => {
+    const plume = plumeInstance.getState();
     const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
     if (!titleText) return;
 
@@ -1168,7 +1161,7 @@ import { CPL, logger } from "./utils/logger";
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
     // Dispatch title change to store for fullscreen sync
-    store.dispatch({ type: ACTION_TYPES.SET_TRACK_TITLE, payload: newTrackTitle });
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_TITLE, payload: newTrackTitle });
 
     // Cache offsetHeight to avoid multiple layout recalculations
     const titleHeight = titleText.offsetHeight;
@@ -1184,55 +1177,51 @@ import { CPL, logger } from "./utils/logger";
 
   // Function to update the progress bar and time displays as audio plays or metadata change
   const updateProgressBar = () => {
-    if (!plume.progressSlider) return;
-
-    const elapsed = plume.audioElement!.currentTime;
-    const duration = plume.audioElement!.duration;
+    const plume = plumeInstance.getState();
+    const elapsed = plume.audioElement.currentTime;
+    const duration = plume.audioElement.duration;
 
     // Update store with current playback state (batched for performance)
     store.dispatch({
-      type: ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS,
+      type: STORE_ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS,
       payload: { currentTime: elapsed, duration },
     });
 
     if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
 
     const state = store.getState();
-    const percent = selectors.getProgressPercentage(state);
+    const percent = getProgressPercentage(state);
     const bgPercent = percent < 50 ? percent + 1 : percent - 1; // or else it under/overflows
     const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
     plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
     plume.progressSlider.style.backgroundImage = bgImg;
 
-    if (plume.elapsedDisplay) {
-      plume.elapsedDisplay.textContent = selectors.getFormattedElapsed(state);
-    }
+    plume.elapsedDisplay.textContent = getFormattedElapsed(state);
 
-    if (plume.durationDisplay) {
-      plume.durationDisplay.textContent = selectors.getFormattedDuration(state);
-    }
+    plume.durationDisplay.textContent = getFormattedDuration(state);
   };
 
   // Function to set up event listeners on the audio element: progress, metadata, volume
   const setupAudioListeners = () => {
+    const plume = plumeInstance.getState();
     // Update progress container
-    plume.audioElement!.addEventListener("timeupdate", updateProgressBar);
-    plume.audioElement!.addEventListener("loadedmetadata", updateProgressBar);
-    plume.audioElement!.addEventListener("durationchange", updateProgressBar);
+    plume.audioElement.addEventListener("timeupdate", updateProgressBar);
+    plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
+    plume.audioElement.addEventListener("durationchange", updateProgressBar);
 
     // Update title when metadata loads (new track)
-    plume.audioElement!.addEventListener("loadedmetadata", updateTitleDisplay);
-    plume.audioElement!.addEventListener("loadedmetadata", updatePretextDisplay);
-    plume.audioElement!.addEventListener("loadedmetadata", updateTrackForwardBtnState);
-    plume.audioElement!.addEventListener("loadstart", updateTitleDisplay);
-    plume.audioElement!.addEventListener("loadstart", updatePretextDisplay);
-    plume.audioElement!.addEventListener("loadstart", updateTrackForwardBtnState);
+    plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
+    plume.audioElement.addEventListener("loadedmetadata", updatePretextDisplay);
+    plume.audioElement.addEventListener("loadedmetadata", updateTrackForwardBtnState);
+    plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
+    plume.audioElement.addEventListener("loadstart", updatePretextDisplay);
+    plume.audioElement.addEventListener("loadstart", updateTrackForwardBtnState);
 
     // Sync volume slider and mute button with external volume changes
-    plume.audioElement!.addEventListener("volumechange", () => {
+    plume.audioElement.addEventListener("volumechange", () => {
       if (!plume.volumeSlider) return;
 
-      const currentVolume = plume.audioElement!.volume;
+      const currentVolume = plume.audioElement.volume;
       plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
       const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
         PLUME_ELEM_IDENTIFIERS.volumeValue
@@ -1243,18 +1232,18 @@ import { CPL, logger } from "./utils/logger";
 
       const isMuted = currentVolume === 0;
       if (store.getState().isMuted !== isMuted) {
-        store.dispatch({ type: ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
+        store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
       }
-      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: currentVolume });
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: currentVolume });
     });
 
     // Track play/pause state changes from audio element
-    plume.audioElement!.addEventListener("play", () => {
-      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: true });
+    plume.audioElement.addEventListener("play", () => {
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
     });
 
-    plume.audioElement!.addEventListener("pause", () => {
-      store.dispatch({ type: ACTION_TYPES.SET_IS_PLAYING, payload: false });
+    plume.audioElement.addEventListener("pause", () => {
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
     });
 
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
@@ -1299,12 +1288,11 @@ import { CPL, logger } from "./utils/logger";
 
   // Setup store subscriptions for reactive UI updates
   const setupStoreSubscriptions = () => {
+    const plume = plumeInstance.getState();
     storeSubscriptions.push(
       // Subscribe to volume changes to update audio element
       store.subscribe("volume", (volume) => {
-        if (plume.audioElement) {
-          plume.audioElement.volume = volume;
-        }
+        plume.audioElement.volume = volume;
       }),
       // Subscribe to duration display method changes to update display
       store.subscribe("durationDisplayMethod", () => {
@@ -1315,22 +1303,18 @@ import { CPL, logger } from "./utils/logger";
         syncMuteBtn(isMuted);
 
         // Update volume slider and display
-        if (plume.volumeSlider) {
-          const currentVolume = store.getState().volume;
-          plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
+        const currentVolume = store.getState().volume;
+        plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
 
-          const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
-            PLUME_ELEM_IDENTIFIERS.volumeValue
-          ) as HTMLDivElement | null;
-          if (valueDisplay) {
-            valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
-          }
+        const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
+          PLUME_ELEM_IDENTIFIERS.volumeValue
+        ) as HTMLDivElement | null;
+        if (valueDisplay) {
+          valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
         }
 
         // Update audio element volume
-        if (plume.audioElement) {
-          plume.audioElement.volume = store.getState().volume;
-        }
+        plume.audioElement.volume = store.getState().volume;
       }),
       // Subscribe to playing state changes
       store.subscribe("isPlaying", (isPlaying) => {
@@ -1344,14 +1328,10 @@ import { CPL, logger } from "./utils/logger";
     logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
   };
 
-  const setupKeyboardShortcuts = () => {
-    const handlePlayPauseShortcut = () => {
-      handlePlayPause();
-    };
+  const setupHotkeys = () => {
+    const plume = plumeInstance.getState();
 
     const handleAdjustVolume = (delta: number) => {
-      if (!plume.volumeSlider || !plume.audioElement) return;
-
       const currentValue = Number.parseInt(plume.volumeSlider.value);
       const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
       plume.volumeSlider.value = newValue.toString();
@@ -1367,23 +1347,23 @@ import { CPL, logger } from "./utils/logger";
         valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
       });
 
-      store.dispatch({ type: ACTION_TYPES.SET_VOLUME, payload: volume });
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
     };
 
     const handleToggleMute = () => {
-      if (plume.muteBtn) plume.muteBtn.click();
+      plume.muteBtn.click();
     };
 
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
-      const isValidShortcut = PLUME_CONSTANTS.AVAILABLE_SHORTCUT_CODES.has(e.code);
-      if (!isValidShortcut) return;
+      const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.code);
+      if (!isValidHotkey) return;
 
       e.preventDefault();
       e.stopPropagation();
       switch (e.code) {
         case "Space":
-          handlePlayPauseShortcut();
+          handlePlayPause();
           break;
         case "ArrowLeft":
           handleTimeBackward();
@@ -1412,7 +1392,7 @@ import { CPL, logger } from "./utils/logger";
       }
     });
 
-    logger(CPL.INFO, getString("INFO__SHORTCUTS__REGISTERED"));
+    logger(CPL.INFO, getString("INFO__HOTKEYS__REGISTERED"));
   };
 
   // Main initialization function
@@ -1434,15 +1414,16 @@ import { CPL, logger } from "./utils/logger";
     }
 
     // Load persisted state into store
-    await loadPersistedState(store);
+    store.loadPersistedState();
 
-    plume.audioElement = await findAudioElement();
-    if (!plume.audioElement) {
+    const audioElement = await findAudioElement();
+    if (!audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
       isInitializing = false;
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
+    plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: audioElement });
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -1459,7 +1440,7 @@ import { CPL, logger } from "./utils/logger";
     await injectEnhancements();
     setupAudioListeners();
     setupStoreSubscriptions();
-    setupKeyboardShortcuts();
+    setupHotkeys();
     initPlayback();
 
     // Debug: show detected controls
@@ -1470,18 +1451,10 @@ import { CPL, logger } from "./utils/logger";
     isInitialized = true;
   };
 
-  const plume: PlumeCore = {
-    audioElement: null,
-    titleDisplay: null,
-    progressSlider: null,
-    elapsedDisplay: null,
-    durationDisplay: null,
-    volumeSlider: null,
-    muteBtn: null,
-  };
-
   // Observe DOM changes for players that load dynamically
   const domObserver = new MutationObserver((mutations) => {
+    const plume = plumeInstance.getState();
+
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
@@ -1501,7 +1474,7 @@ import { CPL, logger } from "./utils/logger";
             `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
           );
 
-          plume.audioElement = newAudio;
+          plumeInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: newAudio });
 
           // Reset if needed
           if (!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer)) {
@@ -1546,7 +1519,7 @@ import { CPL, logger } from "./utils/logger";
 
       existingOverlay.remove();
       document.body.style.overflow = "auto";
-      store.dispatch({ type: ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
     }
 
     // Reset initialization flag to allow re-initialization on navigation

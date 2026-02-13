@@ -1,4 +1,4 @@
-import { APP_VERSION } from "../constants";
+import { APP_VERSION } from "../domain/meta";
 
 export enum CPL {
   DEBUG = "debug",
@@ -7,8 +7,7 @@ export enum CPL {
   WARN = "warn",
   ERROR = "error",
 }
-
-export type CPLType = `${CPL}`;
+type CPLType = `${CPL}`;
 
 const ConsolePrintingPrefix: Record<CPLType, string> = {
   [CPL.DEBUG]: "DEBUG",
