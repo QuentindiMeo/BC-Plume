@@ -12,8 +12,9 @@ import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from
 import { getString, logDetectedBrowser } from "./features/i18n";
 import { CPL, logger } from "./features/logger";
 import { getPlumeInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
-import { getStore, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
+import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
+import { CleanupCallback, SubscriptionCallback } from "./types";
 
 const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULARITY } =
   PLUME_CONSTANTS;
@@ -22,7 +23,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   "use strict";
 
   logDetectedBrowser();
-  const store = getStore();
+  const store = getStoreInstance();
   const plumeInstance = getPlumeInstance();
 
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
@@ -188,9 +189,9 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   };
 
   // Setup store subscriptions for fullscreen UI to keep it in sync with state
-  const setupFullscreen = (clone: HTMLElement) => {
+  const setupFullscreen = (clone: HTMLElement): CleanupCallback => {
     const plume = plumeInstance.getState();
-    const subscriptions: Array<() => void> = [];
+    const subscriptions: Array<SubscriptionCallback> = [];
 
     const cloneEl = {
       headerContainer: clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement,
@@ -1283,13 +1284,13 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     return store.getState().durationDisplayMethod;
   };
 
-  // Store unsubscribe functions for cleanup
-  const storeSubscriptions: Array<() => void> = [];
-
   // Setup store subscriptions for reactive UI updates
-  const setupStoreSubscriptions = () => {
+  // Returns cleanup function to unsubscribe all subscriptions
+  const setupStoreSubscriptions = (): CleanupCallback => {
     const plume = plumeInstance.getState();
-    storeSubscriptions.push(
+    const subscriptions: Array<SubscriptionCallback> = [];
+
+    subscriptions.push(
       // Subscribe to volume changes to update audio element
       store.subscribe("volume", (volume) => {
         plume.audioElement.volume = volume;
@@ -1326,6 +1327,10 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     );
 
     logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
+
+    return () => {
+      subscriptions.forEach((unsubscribe) => unsubscribe());
+    };
   };
 
   const setupHotkeys = () => {
@@ -1398,6 +1403,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
   // Main initialization function
   let isInitializing = false;
   let isInitialized = false;
+  let storeCleanupCallback: (() => void) | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -1439,7 +1445,7 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
     // Inject enhancements
     await injectEnhancements();
     setupAudioListeners();
-    setupStoreSubscriptions();
+    storeCleanupCallback = setupStoreSubscriptions();
     setupHotkeys();
     initPlayback();
 
@@ -1543,7 +1549,10 @@ const { AVAILABLE_HOTKEY_CODES, PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART
       fullscreenCleanupCallback = null;
     }
 
-    // Unsubscribe all store listeners
-    storeSubscriptions.forEach((unsubscribe) => unsubscribe());
+    // Cleanup main UI store subscriptions
+    if (storeCleanupCallback) {
+      storeCleanupCallback();
+      storeCleanupCallback = null;
+    }
   });
 })();

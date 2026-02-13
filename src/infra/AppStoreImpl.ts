@@ -5,12 +5,12 @@ import { getString } from "../features/i18n";
 import { CPL, logger } from "../features/logger";
 import { BROWSER_ACTION_TYPES, getBrowserInstance } from "./BrowserImpl";
 
-export interface StorePersistedState {
+export interface AppPersistedState {
   volume: number;
   durationDisplayMethod: TimeDisplayMethodType;
 }
 
-export interface StoreTransientState {
+export interface AppTransientState {
   trackTitle: string | null;
   trackNumber: string | null;
   duration: number;
@@ -21,7 +21,7 @@ export interface StoreTransientState {
   isFullscreen: boolean;
 }
 
-export interface AppState extends StorePersistedState, StoreTransientState {}
+export interface AppState extends AppPersistedState, AppTransientState {}
 
 export enum STORE_ACTION_TYPES {
   SET_TRACK_TITLE = "SET_TRACK_TITLE",
@@ -57,7 +57,7 @@ export type AppStateListener<K extends keyof AppState = keyof AppState> = Listen
 const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
 const PERSISTENCE_DELAY_MS = 200;
 
-interface AppStore extends Store<AppState, AppAction> {
+interface AppStateStore extends Store<AppState, AppAction> {
   loadPersistedState(): Promise<void>;
 }
 
@@ -74,9 +74,9 @@ const INITIAL_STATE: AppState = {
   isFullscreen: false,
 };
 
-let storeInstance: AppStore | null = null;
+let appStoreInstance: AppStateStore | null = null;
 
-function createStore(): AppStore {
+function createAppStateInstance(): AppStateStore {
   let state: AppState = { ...INITIAL_STATE };
 
   const listeners = new Map<keyof AppState, Set<AppStateListener<any>>>();
@@ -234,7 +234,7 @@ function createStore(): AppStore {
     }
   }
 
-  async function loadPersistedState(store: AppStore): Promise<void> {
+  async function loadPersistedState(store: AppStateStore): Promise<void> {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
@@ -304,7 +304,7 @@ function createStore(): AppStore {
   };
 }
 
-export function getStore(): AppStore {
-  storeInstance ??= createStore();
-  return storeInstance;
+export function getStoreInstance(): AppStateStore {
+  appStoreInstance ??= createAppStateInstance();
+  return appStoreInstance;
 }
