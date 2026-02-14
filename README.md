@@ -4,11 +4,11 @@
 </div>
 
 <div align="center">
-  <a href="#memo-description">Description</a> &#xa0; | &#xa0;
-  <a href="#rocket-installation">Installation</a> &#xa0; | &#xa0;
-  <a href="#open_book-usage--general-information">Usage & General Information</a> &#xa0; | &#xa0;
-  <a href="#bug-troubleshooting">Troubleshooting</a> &#xa0; | &#xa0;
-  <a href="#card_file_box-project-roadmap">Project Roadmap</a>
+  <a href="#description">Description</a> &#xa0; | &#xa0;
+  <a href="#installation">Installation</a> &#xa0; | &#xa0;
+  <a href="#usage--general-information">Usage & General Information</a> &#xa0; | &#xa0;
+  <a href="#troubleshooting">Troubleshooting</a> &#xa0; | &#xa0;
+  <a href="#project-roadmap">Project Roadmap</a>
 </div>
 
 &#xa0;
@@ -48,12 +48,12 @@
 
 &#xa0;
 
-## :memo: Description
+## 📝 Description
 
 A cross-browser web extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.  
 **Compatible with Chrome, Firefox, Edge, and all other Chromium web browsers!**
 
-### :musical_note: Features
+### 🎵 Features
 
 - **Unified player**: Completely replaces the Bandcamp player with an enhanced version
 - **Time navigation**: Click and drag to seek within the track seamlessly
@@ -62,14 +62,14 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
-- **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more to come on demand!)
+- **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more on demand!)
 
-## :rocket: Installation
+## 🚀 Installation
 
 Either install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm) or the [Mozilla Add-ons site](https://addons.mozilla.org/fr/firefox/addon/bc-plume).  
 If you want to install it manually (for local build or development), follow the instructions in [**the installation file**](./INSTALLATION.md).
 
-## :open_book: Usage & General Information
+## 📖 Usage & General Information
 
 1. Go to any Bandcamp **album or track page**
 2. The extension replaces the original player with the **Plume player**
@@ -87,7 +87,7 @@ This extension uses:
 
 The code is fully commented and structured for understanding, easy contribution and modification.
 
-## :bug: Troubleshooting
+## 🐛 Troubleshooting
 
 ### The extension doesn't load (developer mode)
 
@@ -103,7 +103,7 @@ The code is fully commented and structured for understanding, easy contribution 
 
 If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Plume/issues) with details about your web browser and the page URL.
 
-## :card_file_box: Project Roadmap
+## 🗃️ Project Roadmap
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
