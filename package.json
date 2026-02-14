@@ -28,7 +28,14 @@
     "chrome-extension",
     "firefox-addon",
     "typescript",
-    "audio-player"
+    "audio-player",
+    "volume-control",
+    "music-player",
+    "bandcamp-enhancer",
+    "seek-bar",
+    "fullscreen",
+    "web-extension",
+    "manifest-v3"
   ],
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

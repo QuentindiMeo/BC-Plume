@@ -1,6 +1,6 @@
 <div align="center" id="top">
   <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
-  <h2>:notes:Bandcamp Player Lightweight Ultimate Media Enhancer :feather:</h2>
+  <h2>Plume — Bandcamp Player Lightweight Ultimate Media Enhancer</h2>
 </div>
 
 <div align="center">
@@ -13,24 +13,26 @@
 
 &#xa0;
 
-<div align="center">
-  <a href="#memo-description"><img src="https://github.com/user-attachments/assets/751b88bd-15c1-4ce8-b185-2cdb990dbfcf" alt="Demo gif of v1.2.4" width="800px" /></a>
-</div>
-
-&#xa0;
-
-<div align="center">
+<div id="badges" align="center">
   <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.3.1-blue?logo=semver" /></a>
-  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
+  <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
+  <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
 </div>
 <div align="center">
-  <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
 </div>
-&nbsp;
-<div align="center">
+
+&#xa0;
+
+<div id="demo" align="center">
+  <a href="#memo-description"><img alt="BC-Plume Bandcamp player enhancer demo — volume slider, seek bar, fullscreen mode; demo gif of v1.2.4" src="https://github.com/user-attachments/assets/751b88bd-15c1-4ce8-b185-2cdb990dbfcf" width="800px" /></a>
+</div>
+
+<div id="details" align="center">
   <sup><b>The technical stack at play:</b>&nbsp;</sup>
   <img title="TypeScript" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/typeScript.svg" width="36px" alt="TypeScript" />
   <img title="CSS" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/css.svg" width="36px" alt="CSS" />
