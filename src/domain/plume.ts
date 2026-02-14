@@ -1,42 +1,28 @@
-export enum BROWSER_TYPE {
-  CHROMIUM = "Chromium",
-  FIREFOX = "Firefox",
-}
-export type BrowserType = `${BROWSER_TYPE}`;
-
-export enum TIME_DISPLAY_METHOD {
-  DURATION = "duration",
-  REMAINING = "remaining",
-}
-export type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`;
-
-export interface PlumeCore {
-  audioElement: HTMLAudioElement | null;
-  titleDisplay: HTMLDivElement | null;
-  progressSlider: HTMLInputElement | null;
-  elapsedDisplay: HTMLSpanElement | null;
-  durationDisplay: HTMLSpanElement | null;
-  volumeSlider: HTMLInputElement | null;
-  muteBtn: HTMLButtonElement | null;
-}
+export const PLUME_CONSTANTS = {
+  TIME_BEFORE_RESTART: 5,
+  PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
+  VOLUME_SLIDER_GRANULARITY: 100,
+  AVAILABLE_HOTKEY_CODES: new Set([
+    "Space",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowUp",
+    "ArrowDown",
+    "PageUp",
+    "PageDown",
+    "KeyF",
+    "KeyM",
+  ]),
+} as const;
 
 export enum PLUME_CACHE_KEYS {
   DURATION_DISPLAY_METHOD = "plume_duration_display_method",
   VOLUME = "plume_volume",
 }
-export interface LocalStorage {
-  [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: TimeDisplayMethodType | undefined;
-  [PLUME_CACHE_KEYS.VOLUME]: number | undefined;
-}
 
-export interface DebugControl {
-  index: number;
-  tagName: string;
-  classes: string;
-  title: string;
-  text: string;
-  onclick: string;
-}
+export const PLUME_DEFAULTS = {
+  savedVolume: 0.5,
+} as const;
 
 export enum PLUME_ELEM_IDENTIFIERS {
   bcElements = "div#bpe-hidden-original",
@@ -75,23 +61,4 @@ export enum PLUME_ELEM_IDENTIFIERS {
   fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
   fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
-}
-
-export enum BC_ELEM_IDENTIFIERS {
-  infoSection = "div#name-section",
-  trackView = "div.trackView",
-  fromAlbum = "span.fromAlbum",
-  playerParent = "div.inline_player",
-  inlinePlayerTable = "div.inline_player>table",
-  audioPlayer = "audio",
-  playPause = "div.playbutton",
-  songPageCurrentTrackTitle = "h2.trackTitle",
-  albumPageCurrentTrackTitle = "a.title_link",
-  previousTrack = "div.prevbutton",
-  nextTrack = "div.nextbutton",
-  trackList = "table#track_table",
-  trackRow = "tr.track_row_view",
-  trackTitle = "span.track-title",
-  trackDuration = "span.time",
-  coverArt = "div#tralbumArt img",
 }

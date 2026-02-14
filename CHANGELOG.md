@@ -5,7 +5,7 @@
 
 - later releases to come.
 
-  - _**[1.3.1]** Feb 01 2026_: Fullscreen mode is improved, album runtime is displayed, keyboard shortcuts are added. [#76](https://github.com/QuentindiMeo/BC-Plume/pull/76)
+  - _**[1.3.1]** Feb 01 2026_: Fullscreen mode is improved, album runtime is displayed, hotkeys are added. [#76](https://github.com/QuentindiMeo/BC-Plume/pull/76)
 
 - _**[1.3.0]** Jan 18 2026_: **Pedal To The Metal** — Fullscreen mode, playback bugfixes and Spanish language support. [#67](https://github.com/QuentindiMeo/BC-Plume/pull/67)
 

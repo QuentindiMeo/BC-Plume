@@ -1,0 +1,161 @@
+import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../../infra/AppInstanceImpl";
+import { getStoreInstance, STORE_ACTION_TYPES } from "../../infra/AppStoreImpl";
+import { PLUME_SVG } from "../../svg/icons";
+import { getString } from "../i18n";
+import { CPL, logger } from "../logger";
+
+const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
+const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
+
+export const createPlaybackControlPanel = (): HTMLDivElement => {
+  const plume = getPlumeUiInstance().getState();
+  const container = document.createElement("div");
+  container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
+
+  const trackBackwardBtn = document.createElement("button");
+  trackBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackBwdBtn.split("#")[1];
+  trackBackwardBtn.type = "button";
+  trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
+  trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
+  trackBackwardBtn.ariaLabel = getString("LABEL__TRACK_BACKWARD");
+  trackBackwardBtn.addEventListener("click", handleTrackBackward);
+
+  const timeBackwardBtn = document.createElement("button");
+  timeBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeBwdBtn.split("#")[1];
+  timeBackwardBtn.type = "button";
+  timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
+  timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
+  timeBackwardBtn.ariaLabel = getString("LABEL__TIME_BACKWARD");
+  timeBackwardBtn.addEventListener("click", handleTimeBackward);
+
+  const playPauseBtn = document.createElement("button");
+  playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
+  playPauseBtn.type = "button";
+  playPauseBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+  playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
+  playPauseBtn.ariaLabel = getString("LABEL__PLAY_PAUSE");
+  playPauseBtn.addEventListener("click", handlePlayPause);
+
+  const timeForwardBtn = document.createElement("button");
+  timeForwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeFwdBtn.split("#")[1];
+  timeForwardBtn.type = "button";
+  timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
+  timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
+  timeForwardBtn.ariaLabel = getString("LABEL__TIME_FORWARD");
+  timeForwardBtn.addEventListener("click", handleTimeForward);
+
+  const trackForwardBtn = document.createElement("button");
+  trackForwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackFwdBtn.split("#")[1];
+  trackForwardBtn.type = "button";
+  trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
+  trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
+  trackForwardBtn.ariaLabel = getString("LABEL__TRACK_FORWARD");
+  trackForwardBtn.addEventListener("click", handleTrackForward);
+
+  container.appendChild(trackBackwardBtn);
+  container.appendChild(timeBackwardBtn);
+  container.appendChild(playPauseBtn);
+  container.appendChild(timeForwardBtn);
+  container.appendChild(trackForwardBtn);
+
+  return container;
+};
+
+export const handlePlayPause = (): void => {
+  const plume = getPlumeUiInstance().getState();
+  const store = getStoreInstance();
+
+  if (plume.audioElement.paused) {
+    plume.audioElement.play();
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
+  } else {
+    plume.audioElement.pause();
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
+  }
+};
+
+export const handleTrackBackward = (): void => {
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
+
+  // If past TIME_BEFORE_RESTART, restart current track
+  if (plume.audioElement.currentTime > TIME_BEFORE_RESTART) {
+    plume.audioElement.currentTime = 0;
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+    logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
+    return;
+  }
+
+  // Otherwise, click BC's previous button
+  const bcPrevBtn = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
+  if (!bcPrevBtn) {
+    logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
+    return;
+  }
+
+  bcPrevBtn.click();
+  logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
+};
+
+export const handleTrackForward = (): void => {
+  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+
+  const bcNextBtn = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
+  if (!bcNextBtn) {
+    logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
+    return;
+  }
+
+  bcNextBtn.click();
+  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
+};
+
+export const handleTimeBackward = (): void => {
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
+
+  const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
+  plume.audioElement.currentTime = newTime;
+
+  // Prevent auto-play when rewinding on paused track
+  if (plume.audioElement.paused) {
+    setTimeout(() => {
+      plume.audioElement.pause();
+    }, 10);
+  }
+
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+  logger(
+    CPL.DEBUG,
+    `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__REWIND_TIME__DISPATCHED2")}`
+  );
+};
+
+export const handleTimeForward = (): void => {
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
+
+  const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
+  plume.audioElement.currentTime = newTime;
+
+  // Prevent auto-play when forwarding on paused track
+  if (plume.audioElement.paused) {
+    setTimeout(() => {
+      plume.audioElement.pause();
+    }, 10);
+  }
+
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+  logger(
+    CPL.DEBUG,
+    `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__FORWARD_TIME__DISPATCHED2")}`
+  );
+};

@@ -12,7 +12,7 @@
     "dev": "pnpm clean && pnpm build:watch",
     "sync-version": "node scripts/sync-version.js",
     "package": "pnpm build:prod && node scripts/package-deployer.js",
-    "deploy": "pnpm sync-version && pnpm clean && pnpm package",
+    "deploy": "pnpm clean && pnpm sync-version && pnpm package",
 
     "lint": "pnpm prettier && pnpm eslint",
     "eslint": "eslint src/**/*.ts",

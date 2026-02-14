@@ -14,7 +14,7 @@ if (!fs.existsSync(distDir)) {
 }
 
 const buildOptions = {
-  entryPoints: [path.join(__dirname, "..", "src", "content.ts")],
+  entryPoints: [path.join(__dirname, "..", "src", "main.ts")],
   bundle: true,
   outfile: path.join(distDir, "content.js"),
   platform: "browser",

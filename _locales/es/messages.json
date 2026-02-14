@@ -31,7 +31,7 @@
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
   "INFO__BROWSER__DETECTED": { "message": "Navegador detectado:" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Suscripciones de almacén inicializadas" },
-  "INFO__SHORTCUTS__REGISTERED": { "message": "Atajos de teclado registrados" },
+  "INFO__HOTKEYS__REGISTERED": { "message": "Atajos de teclado registrados" },
   "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "El tiempo total no se pudo calcular" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },

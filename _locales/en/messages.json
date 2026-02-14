@@ -31,7 +31,7 @@
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },
   "INFO__BROWSER__DETECTED": { "message": "Detected browser:" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Store subscriptions initialized" },
-  "INFO__SHORTCUTS__REGISTERED": { "message": "Keyboard shortcuts registered" },
+  "INFO__HOTKEYS__REGISTERED": { "message": "Hotkeys registered" },
   "INFO__RUNTIME__CALCULATED": { "message": "Total runtime calculated:" },
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "Runtime could not be calculated" },
   "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },

@@ -267,8 +267,8 @@ div.name-section__titling h2 {
 
 #bpe-mute-btn {
   flex-shrink: 0;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   margin: 0;
   background: transparent;
@@ -335,7 +335,7 @@ div.name-section__titling h2 {
 }
 
 #bpe-volume-value {
-  width: 1.75rem;
+  width: 2rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   text-align: right;
   font-size: 0.75rem;
@@ -469,7 +469,7 @@ div.name-section__titling h2 {
 }
 .bpe-fullscreen-titling h2, .bpe-fullscreen-titling h3 {
   margin: 0;
-  text-align: justify;
+  text-align: center;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 .bpe-fullscreen-titling .name-section__titling {
