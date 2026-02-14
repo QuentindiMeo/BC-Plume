@@ -1,5 +1,5 @@
 // Plume - TypeScript for song page and album page display
-import { BC_ELEM_IDENTIFIERS, DebugControl, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "./domain/bandcamp";
+import { BC_ELEM_IDENTIFIERS, DebugControl, TIME_DISPLAY_METHOD } from "./domain/bandcamp";
 import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "./domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "./domain/plume";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./features/formatting";
@@ -14,8 +14,15 @@ import {
 import { getInfoSectionWithRuntime } from "./features/runtime";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
 import { getAppropriatePretextColor, getCurrentTrackTitle } from "./features/track-title";
-import { createFullscreenButtonSection, setupPlayerStickiness } from "./features/ui";
-import { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "./features/ui/volume";
+import {
+  createFullscreenButtonSection,
+  createProgressBar,
+  createVolumeControlSection,
+  handleMuteToggle,
+  setupPlayerStickiness,
+  syncMuteBtn,
+  updateProgressBar,
+} from "./features/ui";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
@@ -221,10 +228,21 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
       store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: newVolume });
     };
 
+    const handleFullscreenDurationClick = () => {
+      const currentMethod = store.getState().durationDisplayMethod;
+      const newMethod =
+        currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
+
+      store.dispatch({
+        type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD,
+        payload: newMethod,
+      });
+    };
+
     // Setup event listeners for fullscreen controls
     // The listeners are automatically cleaned up when the overlay DOM is removed on exit.
     cloneEl.progressSlider.addEventListener("input", handleProgressInput);
-    cloneEl.durationDisplay.addEventListener("click", handleDurationChange);
+    cloneEl.durationDisplay.addEventListener("click", handleFullscreenDurationClick);
     cloneEl.trackBackwardBtn.addEventListener("click", handleTrackBackward);
     cloneEl.timeBackwardBtn.addEventListener("click", handleTimeBackward);
     cloneEl.playPauseBtn.addEventListener("click", handlePlayPause);
@@ -612,77 +630,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   };
 
-  const saveDurationDisplayMethod = (newMethod: TimeDisplayMethodType) => {
-    const plume = plumeUiInstance.getState();
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: newMethod });
-
-    const player = plume.audioElement;
-
-    // Update current time in store for accurate remaining time calculation
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: player.currentTime });
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: player.duration });
-
-    const state = store.getState();
-    plume.durationDisplay.textContent = getFormattedDuration(state);
-  };
-
-  const createProgressContainer = async () => {
-    const plume = plumeUiInstance.getState();
-    if (plume.progressSlider) return;
-
-    const container = document.createElement("div");
-    container.id = PLUME_ELEM_IDENTIFIERS.progressContainer.split("#")[1];
-    const progressSlider = document.createElement("input");
-    progressSlider.id = PLUME_ELEM_IDENTIFIERS.progressSlider.split("#")[1];
-    progressSlider.type = "range";
-    progressSlider.min = "0";
-    progressSlider.max = PROGRESS_SLIDER_GRANULARITY.toString();
-    progressSlider.value = "0";
-    progressSlider.ariaLabel = getString("ARIA__PROGRESS_SLIDER");
-
-    const timeDisplay = document.createElement("div");
-    timeDisplay.id = PLUME_ELEM_IDENTIFIERS.timeDisplay.split("#")[1];
-
-    const elapsed = document.createElement("span");
-    elapsed.id = PLUME_ELEM_IDENTIFIERS.elapsedDisplay.split("#")[1];
-    elapsed.textContent = "0:00";
-
-    const duration = document.createElement("span");
-    duration.textContent = "0:00";
-    duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
-    duration.id = PLUME_ELEM_IDENTIFIERS.durationDisplay.split("#")[1];
-
-    timeDisplay.appendChild(elapsed);
-    timeDisplay.appendChild(duration);
-
-    container.appendChild(progressSlider);
-    container.appendChild(timeDisplay);
-
-    duration.addEventListener("click", handleDurationChange);
-    progressSlider.addEventListener("input", function (this: HTMLInputElement) {
-      const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-      plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-      if (plume.audioElement.paused) {
-        setTimeout(() => {
-          plume.audioElement.pause(); // prevent auto-play when seeking on paused track
-        }, 10);
-      }
-    });
-
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
-
-    return container;
-  };
-
-  const handleDurationChange = () => {
-    const currentMethod = store.getState().durationDisplayMethod;
-    saveDurationDisplayMethod(
-      currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION
-    );
-  };
-
   const injectEnhancements = async () => {
     const bcPlayerContainer = findOriginalPlayerContainer();
     if (!bcPlayerContainer) {
@@ -744,10 +691,8 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     const playbackManager = document.createElement("div");
     playbackManager.id = PLUME_ELEM_IDENTIFIERS.playbackManager.split("#")[1];
 
-    const progressContainer = await createProgressContainer();
-    if (progressContainer) {
-      playbackManager.appendChild(progressContainer);
-    }
+    const progressContainer = createProgressBar();
+    playbackManager.appendChild(progressContainer);
     const playbackControls = createPlaybackControls();
     if (playbackControls) {
       playbackManager.appendChild(playbackControls);
@@ -833,32 +778,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     }
   };
 
-  // Function to update the progress bar and time displays as audio plays or metadata change
-  const updateProgressBar = () => {
-    const plume = plumeUiInstance.getState();
-    const elapsed = plume.audioElement.currentTime;
-    const duration = plume.audioElement.duration;
-
-    // Update store with current playback state (batched for performance)
-    store.dispatch({
-      type: STORE_ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS,
-      payload: { currentTime: elapsed, duration },
-    });
-
-    if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
-
-    const state = store.getState();
-    const percent = getProgressPercentage(state);
-    const bgPercent = percent < 50 ? percent + 1 : percent - 1; // or else it under/overflows
-    const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-    plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-    plume.progressSlider.style.backgroundImage = bgImg;
-
-    plume.elapsedDisplay.textContent = getFormattedElapsed(state);
-
-    plume.durationDisplay.textContent = getFormattedDuration(state);
-  };
-
   // Function to set up event listeners on the audio element: progress, metadata, volume
   const setupAudioListeners = () => {
     const plume = plumeUiInstance.getState();
@@ -905,11 +824,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     });
 
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
-  };
-
-  // Load duration display method from store (already loaded during init)
-  const loadDurationDisplayMethod = async (): Promise<TimeDisplayMethodType> => {
-    return store.getState().durationDisplayMethod;
   };
 
   // Setup store subscriptions for reactive UI updates
@@ -1001,8 +915,8 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
       return;
     }
 
-    // Ensure duration display method is applied
-    const durationDisplayMethod = await loadDurationDisplayMethod();
+    // Duration display method is already loaded from persisted state
+    const durationDisplayMethod = store.getState().durationDisplayMethod;
     logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
     // Inject enhancements
@@ -1037,10 +951,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
         const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
-
-          // Ensure duration display method is applied
-          const durationDisplayMethod = await loadDurationDisplayMethod();
-          logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
 
           // Load and apply saved volume to the new element
           const volume = store.getState().volume;
