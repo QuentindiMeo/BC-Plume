@@ -66,13 +66,13 @@ const INITIAL_STATE: PlumeCore = {
 
 let plumeUiInstance: AppInstance | null = null;
 
-function createPlumeUiInstance(): AppInstance {
+const createPlumeUiInstance = (): AppInstance => {
   let state = { ...INITIAL_STATE } as InitializedPlumeCore;
 
   const listeners = new Map<keyof PlumeCore, Set<PlumeStateListener<any>>>();
   const globalListeners = new Set<(state: InitializedPlumeCore) => void>();
 
-  function notify<K extends keyof InitializedPlumeCore>(key: K, prevValue: InitializedPlumeCore[K]): void {
+  const notify = <K extends keyof InitializedPlumeCore>(key: K, prevValue: InitializedPlumeCore[K]): void => {
     const keyListeners = listeners.get(key);
     if (keyListeners) {
       keyListeners.forEach((listener) => {
@@ -91,9 +91,9 @@ function createPlumeUiInstance(): AppInstance {
         logger(CPL.ERROR, getString("ERROR__STATE__GLOBAL_LISTENER_FAILED"), error);
       }
     });
-  }
+  };
 
-  function updateState<K extends keyof PlumeCore>(key: K, value: PlumeCore[K]): void {
+  const updateState = <K extends keyof PlumeCore>(key: K, value: PlumeCore[K]): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
@@ -101,9 +101,9 @@ function createPlumeUiInstance(): AppInstance {
     state = { ...state, [key]: value };
 
     notify(key, prevValue);
-  }
+  };
 
-  function reducer(action: PlumeAction): void {
+  const reducer = (action: PlumeAction): void => {
     switch (action.type) {
       case PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE:
         updateState("audioElement", null);
@@ -139,7 +139,7 @@ function createPlumeUiInstance(): AppInstance {
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);
     }
-  }
+  };
 
   return {
     getState(): Readonly<InitializedPlumeCore> {
@@ -174,9 +174,9 @@ function createPlumeUiInstance(): AppInstance {
       };
     },
   };
-}
+};
 
-export function getPlumeUiInstance(): AppInstance {
+export const getPlumeUiInstance = (): AppInstance => {
   plumeUiInstance ??= createPlumeUiInstance();
   return plumeUiInstance;
-}
+};

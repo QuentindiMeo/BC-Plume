@@ -21,7 +21,7 @@ const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTAN
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
 
-export function cleanupFullscreenMode(): void {
+export const cleanupFullscreenMode = (): void => {
   const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
   if (existingOverlay) {
     // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
@@ -34,10 +34,10 @@ export function cleanupFullscreenMode(): void {
     document.body.style.overflow = "auto";
     getStoreInstance().dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
   }
-}
+};
 
 // Setup store subscriptions for fullscreen UI to keep it in sync with state
-function setupFullscreenUi(clone: HTMLElement): CleanupCallback {
+const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const plume = getPlumeUiInstance().getState();
   const store = getStoreInstance();
   const subscriptions: Array<SubscriptionCallback> = [];
@@ -209,9 +209,9 @@ function setupFullscreenUi(clone: HTMLElement): CleanupCallback {
   return () => {
     subscriptions.forEach((unsubscribe) => unsubscribe());
   };
-}
+};
 
-export function toggleFullscreenMode(): void {
+export const toggleFullscreenMode = (): void => {
   const store = getStoreInstance();
   const isAlbumPage = store.getState().pageType === "album";
   const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
@@ -373,4 +373,4 @@ export function toggleFullscreenMode(): void {
 
   store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
-}
+};

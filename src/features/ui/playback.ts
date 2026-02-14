@@ -9,7 +9,7 @@ import { CPL, logger } from "../logger";
 const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
 const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
 
-export function createPlaybackControlPanel(): HTMLDivElement {
+export const createPlaybackControlPanel = (): HTMLDivElement => {
   const plume = getPlumeUiInstance().getState();
   const container = document.createElement("div");
   container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
@@ -61,9 +61,9 @@ export function createPlaybackControlPanel(): HTMLDivElement {
   container.appendChild(trackForwardBtn);
 
   return container;
-}
+};
 
-export function handlePlayPause(): void {
+export const handlePlayPause = (): void => {
   const plume = getPlumeUiInstance().getState();
   const store = getStoreInstance();
 
@@ -74,9 +74,9 @@ export function handlePlayPause(): void {
     plume.audioElement.pause();
     store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
   }
-}
+};
 
-export function handleTrackBackward(): void {
+export const handleTrackBackward = (): void => {
   const plume = getPlumeUiInstance().getState();
 
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
@@ -97,9 +97,9 @@ export function handleTrackBackward(): void {
 
   bcPrevBtn.click();
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
-}
+};
 
-export function handleTrackForward(): void {
+export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
   const bcNextBtn = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
@@ -110,9 +110,9 @@ export function handleTrackForward(): void {
 
   bcNextBtn.click();
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
-}
+};
 
-export function handleTimeBackward(): void {
+export const handleTimeBackward = (): void => {
   const plume = getPlumeUiInstance().getState();
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
@@ -131,9 +131,9 @@ export function handleTimeBackward(): void {
     CPL.DEBUG,
     `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__REWIND_TIME__DISPATCHED2")}`
   );
-}
+};
 
-export function handleTimeForward(): void {
+export const handleTimeForward = (): void => {
   const plume = getPlumeUiInstance().getState();
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
@@ -152,4 +152,4 @@ export function handleTimeForward(): void {
     CPL.DEBUG,
     `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__FORWARD_TIME__DISPATCHED2")}`
   );
-}
+};

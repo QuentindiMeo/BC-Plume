@@ -5,7 +5,7 @@ import type { CleanupCallback } from "../types";
 
 const SCROLLED_CLASSNAME = "scrolled";
 
-export function setupPlayerStickiness(): CleanupCallback {
+export const setupPlayerStickiness = (): CleanupCallback => {
   const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
   const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0];
 
@@ -43,4 +43,4 @@ export function setupPlayerStickiness(): CleanupCallback {
       cancelAnimationFrame(rafId);
     }
   };
-}
+};

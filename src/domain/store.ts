@@ -1,6 +1,6 @@
-export function handleUnknownAction(action: never): never {
+export const handleUnknownAction = (action: never): never => {
   throw new Error(`Unhandled action type: ${JSON.stringify(action)} — implementation missing for this action.`);
-}
+};
 
 export type Action<T = string, P = undefined> = P extends undefined ? { type: T } : { type: T; payload: P };
 

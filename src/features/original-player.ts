@@ -4,7 +4,7 @@ import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 
-export function hideOriginalPlayerElements(): void {
+export const hideOriginalPlayerElements = (): void => {
   const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
   if (bcAudioTable) {
     bcAudioTable.style.display = "none";
@@ -12,12 +12,10 @@ export function hideOriginalPlayerElements(): void {
   }
 
   logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
-}
+};
 
-/**
- * Restore original player elements (for debugging)
- */
-export function restoreOriginalPlayerElements(): void {
+// for debugging
+export const restoreOriginalPlayerElements = (): void => {
   const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
   if (!bcAudioTable) return; // eliminate onInit function call
 
@@ -25,9 +23,9 @@ export function restoreOriginalPlayerElements(): void {
   bcAudioTable.classList.remove(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
 
   logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__RESTORED"));
-}
+};
 
-export function findOriginalPlayerContainer(): HTMLDivElement | null {
+export const findOriginalPlayerContainer = (): HTMLDivElement | null => {
   let playerContainer = null;
   for (const selector of BC_PLAYER_SELECTORS) {
     playerContainer = document.querySelector(selector);
@@ -43,4 +41,4 @@ export function findOriginalPlayerContainer(): HTMLDivElement | null {
   }
 
   return playerContainer ? (playerContainer as HTMLDivElement) : null;
-}
+};

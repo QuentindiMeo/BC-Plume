@@ -23,7 +23,7 @@ const addRuntime = () => {
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
-export async function injectEnhancements(): Promise<void> {
+export const injectEnhancements = async (): Promise<void> => {
   const store = getStoreInstance();
   const plumeUiInstance = getPlumeUiInstance();
 
@@ -105,4 +105,4 @@ export async function injectEnhancements(): Promise<void> {
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
   if (isAlbumPage) addRuntime();
-}
+};

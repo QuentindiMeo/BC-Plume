@@ -80,7 +80,7 @@ const INITIAL_STATE: AppState = {
 
 let appStoreInstance: AppStateStore | null = null;
 
-function createAppStateInstance(): AppStateStore {
+const createAppStateInstance = (): AppStateStore => {
   let state: AppState = { ...INITIAL_STATE };
 
   const listeners = new Map<keyof AppState, Set<AppStateListener<any>>>();
@@ -89,7 +89,7 @@ function createAppStateInstance(): AppStateStore {
   let persistenceTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingPersistedKeys = new Set<keyof AppState>();
 
-  function persistState(keys: Array<keyof AppState>): void {
+  const persistState = (keys: Array<keyof AppState>): void => {
     // Accumulate all keys that need to be persisted during the debounce window
     keys.forEach((key) => {
       if (PERSISTED_KEYS.has(key)) pendingPersistedKeys.add(key);
@@ -122,9 +122,9 @@ function createAppStateInstance(): AppStateStore {
       pendingPersistedKeys.clear();
       persistenceTimer = null;
     }, PERSISTENCE_DELAY_MS);
-  }
+  };
 
-  function notify<K extends keyof AppState>(key: K, prevValue: AppState[K]): void {
+  const notify = <K extends keyof AppState>(key: K, prevValue: AppState[K]): void => {
     const keyListeners = listeners.get(key);
     if (keyListeners) {
       keyListeners.forEach((listener) => {
@@ -143,9 +143,9 @@ function createAppStateInstance(): AppStateStore {
         logger(CPL.ERROR, getString("ERROR__STATE__GLOBAL_LISTENER_FAILED"), error);
       }
     });
-  }
+  };
 
-  function updateState<K extends keyof AppState>(key: K, value: AppState[K]): void {
+  const updateState = <K extends keyof AppState>(key: K, value: AppState[K]): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
@@ -157,9 +157,9 @@ function createAppStateInstance(): AppStateStore {
     if (PERSISTED_KEYS.has(key)) {
       persistState([key]);
     }
-  }
+  };
 
-  function reducer(action: AppAction): void {
+  const reducer = (action: AppAction): void => {
     switch (action.type) {
       case STORE_ACTION_TYPES.SET_PAGE_TYPE:
         updateState("pageType", action.payload);
@@ -227,9 +227,9 @@ function createAppStateInstance(): AppStateStore {
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);
     }
-  }
+  };
 
-  async function loadPersistedState(store: AppStateStore): Promise<void> {
+  const loadPersistedState = async (store: AppStateStore): Promise<void> => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
@@ -258,7 +258,7 @@ function createAppStateInstance(): AppStateStore {
     } catch (error) {
       logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);
     }
-  }
+  };
 
   return {
     getState(): Readonly<AppState> {
@@ -297,9 +297,9 @@ function createAppStateInstance(): AppStateStore {
       await loadPersistedState(this);
     },
   };
-}
+};
 
-export function getStoreInstance(): AppStateStore {
+export const getStoreInstance = (): AppStateStore => {
   appStoreInstance ??= createAppStateInstance();
   return appStoreInstance;
-}
+};

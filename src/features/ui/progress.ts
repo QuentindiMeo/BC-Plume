@@ -7,7 +7,7 @@ import { getString } from "../i18n";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
-function handleDurationClick(): void {
+const handleDurationClick = (): void => {
   const store = getStoreInstance();
   const currentMethod = store.getState().durationDisplayMethod;
   const newMethod =
@@ -25,9 +25,9 @@ function handleDurationClick(): void {
 
   const state = store.getState();
   plume.durationDisplay.textContent = getFormattedDuration(state);
-}
+};
 
-export function updateProgressBar(): void {
+export const updateProgressBar = (): void => {
   const store = getStoreInstance();
   const plumeUiInstance = getPlumeUiInstance();
   const plume = plumeUiInstance.getState();
@@ -55,9 +55,9 @@ export function updateProgressBar(): void {
 
   plume.elapsedDisplay.textContent = getFormattedElapsed(state);
   plume.durationDisplay.textContent = getFormattedDuration(state);
-}
+};
 
-export function createProgressBar(): HTMLDivElement {
+export const createProgressBar = (): HTMLDivElement => {
   const plumeUiInstance = getPlumeUiInstance();
   const plume = plumeUiInstance.getState();
 
@@ -106,4 +106,4 @@ export function createProgressBar(): HTMLDivElement {
   container.appendChild(timeDisplay);
 
   return container;
-}
+};

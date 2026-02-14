@@ -7,7 +7,7 @@ export interface TrackQuantifiers {
   total: number;
 }
 
-export function getTrackQuantifiers(trackName: string): TrackQuantifiers {
+export const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
   const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
   if (!trackTable) return { current: 0, total: 0 };
 
@@ -18,4 +18,4 @@ export function getTrackQuantifiers(trackName: string): TrackQuantifiers {
   const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
   logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackRows.length]));
   return { current: currentTrackNumber, total: trackRows.length };
-}
+};

@@ -14,7 +14,7 @@ export interface AudioEventCallbacks {
   updateTrackForwardBtnState: () => void;
 }
 
-export function setupAudioEventListeners(callbacks: AudioEventCallbacks): CleanupCallback {
+export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): CleanupCallback => {
   const store = getStoreInstance();
   const plumeUiInstance = getPlumeUiInstance();
   const plume = plumeUiInstance.getState();
@@ -87,4 +87,4 @@ export function setupAudioEventListeners(callbacks: AudioEventCallbacks): Cleanu
     plume.audioElement.removeEventListener("play", handlePlay);
     plume.audioElement.removeEventListener("pause", handlePause);
   };
-}
+};

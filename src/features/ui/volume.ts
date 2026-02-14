@@ -6,7 +6,7 @@ import { getString } from "../i18n";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
-export function syncMuteBtn(isMuted: boolean): void {
+export const syncMuteBtn = (isMuted: boolean): void => {
   const plumeUiInstance = getPlumeUiInstance();
   const plume = plumeUiInstance.getState();
   const newMuteBtn = plume.muteBtn;
@@ -17,14 +17,14 @@ export function syncMuteBtn(isMuted: boolean): void {
   newMuteBtn.ariaPressed = isMuted.toString();
   newMuteBtn.classList.toggle("muted", isMuted);
   plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
-}
+};
 
-export function handleMuteToggle(): void {
+export const handleMuteToggle = (): void => {
   const store = getStoreInstance();
   store.dispatch({ type: STORE_ACTION_TYPES.TOGGLE_MUTE });
-}
+};
 
-export async function createVolumeControlSection(): Promise<HTMLDivElement | null> {
+export const createVolumeControlSection = async (): Promise<HTMLDivElement | null> => {
   const store = getStoreInstance();
   const plumeUiInstance = getPlumeUiInstance();
   const plume = plumeUiInstance.getState();
@@ -83,4 +83,4 @@ export async function createVolumeControlSection(): Promise<HTMLDivElement | nul
   plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
 
   return container;
-}
+};

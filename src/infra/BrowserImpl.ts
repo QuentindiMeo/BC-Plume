@@ -15,20 +15,20 @@ interface BrowserAPI {
   };
 }
 
-function assertBrowserApi(): BrowserAPI {
+const assertBrowserApi = (): BrowserAPI => {
   if (!(globalThis as any).browser && !(globalThis as any).chrome)
     throw new Error(
       "No compatible browser API found. This extension requires a Chromium-based or Firefox-based browser."
     );
 
   return (globalThis as any).browser ?? (globalThis as any).chrome;
-}
+};
 
 let unifiedBrowserApi: BrowserAPI | null = null;
-function getBrowserApi(): BrowserAPI {
+const getBrowserApi = (): BrowserAPI => {
   unifiedBrowserApi ??= assertBrowserApi();
   return unifiedBrowserApi;
-}
+};
 const browserApi: BrowserAPI = new Proxy({} as BrowserAPI, {
   get(_target, prop, _receiver) {
     const api = getBrowserApi() as any;
@@ -63,10 +63,10 @@ const INITIAL_STATE: BrowserState = {
 
 let browserInstance: BrowserInstance | null = null;
 
-function createBrowserInstance(): BrowserInstance {
+const createBrowserInstance = (): BrowserInstance => {
   let state: BrowserState = { ...INITIAL_STATE };
 
-  function updateState<K extends keyof BrowserState>(key: PLUME_CACHE_KEYS, value: BrowserState[K]): void {
+  const updateState = <K extends keyof BrowserState>(key: PLUME_CACHE_KEYS, value: BrowserState[K]): void => {
     state.cache
       .set({ [key]: value })
       .then(() => {
@@ -75,11 +75,11 @@ function createBrowserInstance(): BrowserInstance {
       .catch((error) => {
         logger(CPL.ERROR, getString("ERROR__STATE__PERSIST_FAILED"), error);
       });
-  }
+  };
 
-  function reducer(action: BrowserAction): void {
+  const reducer = (action: BrowserAction): void => {
     updateState(action.payload.key, action.payload.value);
-  }
+  };
 
   return {
     getState(): Readonly<BrowserState> {
@@ -95,9 +95,9 @@ function createBrowserInstance(): BrowserInstance {
       throw new Error("BrowserInstance does not support subscribing to state changes.");
     },
   };
-}
+};
 
-export function getBrowserInstance(): BrowserInstance {
+export const getBrowserInstance = (): BrowserInstance => {
   browserInstance ??= createBrowserInstance();
   return browserInstance;
-}
+};

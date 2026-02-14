@@ -16,7 +16,7 @@ interface KeyboardHandlers {
   toggleFullscreenMode: Function;
 }
 
-export function setupHotkeys(handlers: KeyboardHandlers): CleanupCallback {
+export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
   const plumeUi = getPlumeUiInstance();
   const store = getStoreInstance();
 
@@ -91,4 +91,4 @@ export function setupHotkeys(handlers: KeyboardHandlers): CleanupCallback {
   return () => {
     document.removeEventListener("keydown", handleKeydown);
   };
-}
+};

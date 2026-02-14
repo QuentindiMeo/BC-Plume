@@ -178,7 +178,7 @@ const updateTitleDisplay = () => {
  * Initializes the Plume player enhancement
  * Sets up all observers, event listeners, and manages the application lifecycle
  */
-export function launchPlume(): void {
+export const launchPlume = (): void => {
   const store = getStoreInstance();
   const plumeUiInstance = getPlumeUiInstance();
 
@@ -244,10 +244,7 @@ export function launchPlume(): void {
       handleTimeForward,
       handleTrackBackward,
       handleTrackForward,
-      toggleFullscreenMode: () => {
-        const isAlbumPage = store.getState().pageType === "album";
-        toggleFullscreenMode();
-      },
+      toggleFullscreenMode,
     });
     initPlayback();
 
@@ -357,4 +354,4 @@ export function launchPlume(): void {
       audioEventsCleanupCallback = null;
     }
   });
-}
+};

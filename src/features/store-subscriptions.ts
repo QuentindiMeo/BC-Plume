@@ -10,7 +10,7 @@ import { syncMuteBtn } from "./ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
-export function setupStoreSubscriptions(): CleanupCallback {
+export const setupStoreSubscriptions = (): CleanupCallback => {
   const store = getStoreInstance();
   const plume = getPlumeUiInstance().getState();
   const subscriptions: Array<SubscriptionCallback> = [];
@@ -57,4 +57,4 @@ export function setupStoreSubscriptions(): CleanupCallback {
   return () => {
     subscriptions.forEach((unsubscribe) => unsubscribe());
   };
-}
+};
