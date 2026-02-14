@@ -1,21 +1,19 @@
 // Plume - TypeScript for song page and album page display
-import {
-  BC_ELEM_IDENTIFIERS,
-  BC_PLAYER_SELECTORS,
-  DebugControl,
-  TIME_DISPLAY_METHOD,
-  TimeDisplayMethodType,
-} from "./domain/bandcamp";
+import { BC_ELEM_IDENTIFIERS, DebugControl, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "./domain/bandcamp";
 import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "./domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "./domain/plume";
-import { createFullscreenButtonSection } from "./features/ui";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./features/formatting";
 import { getString, logDetectedBrowser } from "./features/i18n";
 import { setupHotkeys } from "./features/keyboard";
 import { CPL, logger } from "./features/logger";
-import { setupPlayerStickiness } from "./features/player-stickiness";
+import {
+  findOriginalPlayerContainer,
+  hideOriginalPlayerElements,
+  restoreOriginalPlayerElements,
+} from "./features/original-player";
 import { getInfoSectionWithRuntime } from "./features/runtime";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
+import { createFullscreenButtonSection, setupPlayerStickiness } from "./features/ui";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -818,46 +816,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
 
     return titleElement.textContent.trim();
-  };
-
-  // Function to hide original Bandcamp player elements
-  const hideOriginalPlayerElements = () => {
-    const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;
-    if (bcAudioTable) {
-      bcAudioTable.style.display = "none";
-      bcAudioTable.classList.add(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
-    }
-
-    logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
-  };
-
-  // Function to restore original player elements (use it for debug purposes)
-  const restoreOriginalPlayerElements = () => {
-    const bcAudioTable = document.querySelector(PLUME_ELEM_IDENTIFIERS.bcElements) as HTMLTableElement;
-    if (!bcAudioTable) return; // eliminate onInit function call
-
-    bcAudioTable.style.display = "unset";
-    bcAudioTable.classList.remove(PLUME_ELEM_IDENTIFIERS.bcElements.split("#")[1]);
-
-    logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__RESTORED"));
-  };
-
-  // Function to find the original Bandcamp player container
-  const findOriginalPlayerContainer = (): HTMLDivElement | null => {
-    let playerContainer = null;
-    for (const selector of BC_PLAYER_SELECTORS) {
-      playerContainer = document.querySelector(selector);
-      if (playerContainer) break; // found the original player container!
-    }
-
-    if (!playerContainer) {
-      const plume = plumeUiInstance.getState();
-      logger(CPL.WARN, getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
-      // Search near audio elements
-      playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;
-    }
-
-    return playerContainer ? (playerContainer as HTMLDivElement) : null;
   };
 
   const injectEnhancements = async () => {

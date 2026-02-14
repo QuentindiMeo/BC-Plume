@@ -1,7 +1,7 @@
-import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
-import type { CleanupCallback } from "../types";
-import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
+import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
+import type { CleanupCallback } from "../../types";
+import { getString } from "../i18n";
+import { CPL, logger } from "../logger";
 
 const SCROLLED_CLASSNAME = "scrolled";
 
