@@ -2,6 +2,7 @@
 import { BC_ELEM_IDENTIFIERS, DebugControl, TIME_DISPLAY_METHOD } from "./domain/bandcamp";
 import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "./domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "./domain/plume";
+import { setupAudioEventListeners } from "./features/audio-events";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./features/formatting";
 import { getString, logDetectedBrowser } from "./features/i18n";
 import { setupHotkeys } from "./features/keyboard";
@@ -616,54 +617,6 @@ const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTAN
     }
   };
 
-  // Function to set up event listeners on the audio element: progress, metadata, volume
-  const setupAudioListeners = () => {
-    const plume = plumeUiInstance.getState();
-    // Update progress container
-    plume.audioElement.addEventListener("timeupdate", updateProgressBar);
-    plume.audioElement.addEventListener("loadedmetadata", updateProgressBar);
-    plume.audioElement.addEventListener("durationchange", updateProgressBar);
-
-    // Update title when metadata loads (new track)
-    plume.audioElement.addEventListener("loadedmetadata", updateTitleDisplay);
-    plume.audioElement.addEventListener("loadedmetadata", updatePretextDisplay);
-    plume.audioElement.addEventListener("loadedmetadata", updateTrackForwardBtnState);
-    plume.audioElement.addEventListener("loadstart", updateTitleDisplay);
-    plume.audioElement.addEventListener("loadstart", updatePretextDisplay);
-    plume.audioElement.addEventListener("loadstart", updateTrackForwardBtnState);
-
-    // Sync volume slider and mute button with external volume changes
-    plume.audioElement.addEventListener("volumechange", () => {
-      if (!plume.volumeSlider) return;
-
-      const currentVolume = plume.audioElement.volume;
-      plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
-      const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
-        PLUME_ELEM_IDENTIFIERS.volumeValue
-      ) as HTMLSpanElement;
-      if (valueDisplay) {
-        valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
-      }
-
-      const isMuted = currentVolume === 0;
-      if (store.getState().isMuted !== isMuted) {
-        store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
-      }
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: currentVolume });
-    });
-
-    // Track play/pause state changes from audio element
-    plume.audioElement.addEventListener("play", () => {
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
-    });
-
-    plume.audioElement.addEventListener("pause", () => {
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
-    });
-
-    logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
-  };
-
   // Setup store subscriptions for reactive UI updates
   // Returns cleanup function to unsubscribe all subscriptions
   const setupStoreSubscriptions = (): CleanupCallback => {
@@ -719,6 +672,7 @@ const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTAN
   let storeCleanupCallback: (() => void) | null = null;
   let keyboardCleanupCallback: (() => void) | null = null;
   let stickinessCleanupCallback: (() => void) | null = null;
+  let audioEventsCleanupCallback: (() => void) | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -759,7 +713,11 @@ const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTAN
 
     // Inject enhancements
     await injectEnhancements();
-    setupAudioListeners();
+    audioEventsCleanupCallback = setupAudioEventListeners({
+      updateTitleDisplay,
+      updatePretextDisplay,
+      updateTrackForwardBtnState,
+    });
     storeCleanupCallback = setupStoreSubscriptions();
     keyboardCleanupCallback = setupHotkeys({
       handlePlayPause,
@@ -883,6 +841,12 @@ const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTAN
     if (keyboardCleanupCallback) {
       keyboardCleanupCallback();
       keyboardCleanupCallback = null;
+    }
+
+    // Cleanup audio event listeners
+    if (audioEventsCleanupCallback) {
+      audioEventsCleanupCallback();
+      audioEventsCleanupCallback = null;
     }
   });
 })();
