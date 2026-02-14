@@ -117,6 +117,7 @@
       }
     }
   },
+  "ARIA__APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
   "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
   "ARIA__TRACK": {
     "message": "The track $TRACK_TITLE$ is currently playing",

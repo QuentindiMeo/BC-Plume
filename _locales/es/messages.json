@@ -117,6 +117,7 @@
       }
     }
   },
+  "ARIA__APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
   "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
   "ARIA__TRACK": {
     "message": "La pista $TITULO_PISTA$ se está reproduciendo",

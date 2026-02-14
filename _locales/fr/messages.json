@@ -119,6 +119,7 @@
       }
     }
   },
+  "ARIA__APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
   "ARIA__TRACK": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture",

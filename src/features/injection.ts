@@ -1,5 +1,5 @@
 import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
-import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
+import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
@@ -49,7 +49,7 @@ export const injectEnhancements = async (): Promise<void> => {
   headerLogo.href = PLUME_KO_FI_URL;
   headerLogo.target = "_blank";
   headerLogo.rel = "noopener noreferrer";
-  headerLogo.ariaLabel = APP_NAME;
+  headerLogo.ariaLabel = getString("ARIA__APP_NAME");
   headerLogo.title = getString("ARIA__LOGO_LINK");
   headerContainer.appendChild(headerLogo);
 
