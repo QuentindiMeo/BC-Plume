@@ -12,6 +12,7 @@ import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from
 import { getString, logDetectedBrowser } from "./features/i18n";
 import { setupHotkeys } from "./features/keyboard";
 import { CPL, logger } from "./features/logger";
+import { setupPlayerStickiness } from "./features/player-stickiness";
 import { getInfoSectionWithRuntime } from "./features/runtime";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
 import {
@@ -1101,35 +1102,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
   };
 
-  let scrollIsTicking = false; // this variable must be outside the function scope to have persistent state
-  const SCROLLED_CLASSNAME = "scrolled"; // from `styles.css`
-  // Function to create a scroll listener to apply a specific styling to the player when it's out of viewport
-  const createPlumeStickinessListener = () => {
-    const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
-    const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0];
-    if (!plumeParentDiv) {
-      logger(CPL.ERROR, getString("ERROR__PLAYER_PARENT__NOT_FOUND"));
-      return;
-    }
-
-    const triggerHeight = (plumeParentDiv as HTMLDivElement).offsetTop;
-    window.addEventListener("scroll", () => {
-      // Check if plume is in viewport height for sticky styling
-      if (scrollIsTicking) return;
-      scrollIsTicking = true;
-
-      globalThis.requestAnimationFrame(() => {
-        const plumeIsInViewport = window.scrollY < triggerHeight;
-        if (plumeIsInViewport) {
-          plumeParentDiv.classList.remove(SCROLLED_CLASSNAME);
-        } else {
-          plumeParentDiv.classList.add(SCROLLED_CLASSNAME);
-        }
-        scrollIsTicking = false;
-      });
-    });
-  };
-
   // Load duration display method from store (already loaded during init)
   const loadDurationDisplayMethod = async (): Promise<TimeDisplayMethodType> => {
     return store.getState().durationDisplayMethod;
@@ -1189,6 +1161,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
   let isInitialized = false;
   let storeCleanupCallback: (() => void) | null = null;
   let keyboardCleanupCallback: (() => void) | null = null;
+  let stickinessCleanupCallback: (() => void) | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -1295,7 +1268,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
   domObserver.observe(document.body, { childList: true, subtree: true });
 
   init();
-  createPlumeStickinessListener();
+  stickinessCleanupCallback = setupPlayerStickiness();
 
   // Support for SPA navigation
   let lastUrl = location.href;
@@ -1339,6 +1312,12 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     if (fullscreenCleanupCallback) {
       fullscreenCleanupCallback();
       fullscreenCleanupCallback = null;
+    }
+
+    // Cleanup player stickiness
+    if (stickinessCleanupCallback) {
+      stickinessCleanupCallback();
+      stickinessCleanupCallback = null;
     }
 
     // Cleanup main UI store subscriptions
