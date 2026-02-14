@@ -13,15 +13,8 @@ import {
 } from "./features/original-player";
 import { getInfoSectionWithRuntime } from "./features/runtime";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
+import { getAppropriatePretextColor, getCurrentTrackTitle } from "./features/track-title";
 import { createFullscreenButtonSection, setupPlayerStickiness } from "./features/ui";
-import {
-  adjustColorContrast,
-  FALLBACK_GRAY_RGB_STR,
-  isGrayscale,
-  measureContrastRatioWCAG,
-  RGBToHSL,
-  WCAG_CONTRAST_NORMAL,
-} from "./features/utils/colors";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
@@ -764,60 +757,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     );
   };
 
-  const getArtistNameElement = (): HTMLSpanElement => {
-    const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
-    const infoSectionLinks = infoSection.querySelectorAll("span");
-    const artistElementIdx = infoSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
-    return infoSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
-  };
-
-  const getTrackTitleElement = (): HTMLSpanElement => {
-    return document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement;
-  };
-
-  const getAppropriatePretextColor = (): string => {
-    const trackColor = getComputedStyle(getTrackTitleElement()).color;
-    const artistColor = getComputedStyle(getArtistNameElement()).color;
-    const trackColorMatch = trackColor.match(/\d+/g);
-    const artistColorMatch = artistColor.match(/\d+/g);
-
-    // Fallback to gray if color regex matching fails
-    if (!trackColorMatch || !artistColorMatch) {
-      return FALLBACK_GRAY_RGB_STR;
-    }
-
-    const trackColorRGB = trackColorMatch.map(Number) as [number, number, number];
-    const artistColorRGB = artistColorMatch.map(Number) as [number, number, number];
-    const trackColorContrast = measureContrastRatioWCAG(trackColorRGB);
-    const artistColorContrast = measureContrastRatioWCAG(artistColorRGB);
-    if (trackColorContrast > WCAG_CONTRAST_NORMAL && artistColorContrast > WCAG_CONTRAST_NORMAL) {
-      const trackColorSaturation = RGBToHSL(...trackColorRGB)[1];
-      const artistColorSaturation = RGBToHSL(...artistColorRGB)[1];
-      return trackColorSaturation > artistColorSaturation ? trackColor : artistColor;
-    } else if (trackColorContrast > WCAG_CONTRAST_NORMAL || artistColorContrast > WCAG_CONTRAST_NORMAL) {
-      return trackColorContrast > WCAG_CONTRAST_NORMAL ? trackColor : artistColor;
-    } else {
-      const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
-      const preferredColorMatch = preferredColor.match(/\d+/g);
-      if (!preferredColorMatch) {
-        return FALLBACK_GRAY_RGB_STR;
-      }
-      const preferredColorRgb = preferredColorMatch.map(Number) as [number, number, number];
-      if (isGrayscale(preferredColorRgb)) return FALLBACK_GRAY_RGB_STR;
-      return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST_NORMAL);
-    }
-  };
-
-  // Function to get the current track title from Bandcamp
-  const getCurrentTrackTitle = (): string => {
-    const titleElement = isAlbumPage
-      ? (document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLSpanElement)
-      : (document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement);
-    if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
-
-    return titleElement.textContent.trim();
-  };
-
   const injectEnhancements = async () => {
     const bcPlayerContainer = findOriginalPlayerContainer();
     if (!bcPlayerContainer) {
@@ -844,7 +783,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     headerLogo.title = getString("ARIA__LOGO_LINK");
     headerContainer.appendChild(headerLogo);
 
-    const initialTrackTitle = getCurrentTrackTitle();
+    const initialTrackTitle = getCurrentTrackTitle(isAlbumPage);
     const initialTq = getTrackQuantifiers(initialTrackTitle);
     const currentTitleSection = document.createElement("div");
     currentTitleSection.id = PLUME_ELEM_IDENTIFIERS.headerCurrent.split("#")[1];
@@ -923,7 +862,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
     if (!preText) return;
 
-    const newTrackTitle = getCurrentTrackTitle();
+    const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
     const newTq = getTrackQuantifiers(newTrackTitle);
     const trackNumberText = isAlbumPage
       ? getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`)
@@ -949,7 +888,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
     if (!titleText) return;
 
-    const newTrackTitle = getCurrentTrackTitle();
+    const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
