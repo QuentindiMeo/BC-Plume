@@ -13,6 +13,15 @@ import { getString, logDetectedBrowser } from "./features/i18n";
 import { setupHotkeys } from "./features/keyboard";
 import { CPL, logger } from "./features/logger";
 import { getInfoSectionWithRuntime } from "./features/runtime";
+import { getTrackQuantifiers } from "./features/track-quantifiers";
+import {
+  adjustColorContrast,
+  FALLBACK_GRAY_RGB_STR,
+  isGrayscale,
+  measureContrastRatioWCAG,
+  RGBToHSL,
+  WCAG_CONTRAST_NORMAL,
+} from "./features/utils/colors";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
@@ -774,61 +783,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     );
   };
 
-  const RGBToHSL = (r: number, g: number, b: number): [number, number, number] => {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let [h, s, l] = [0, 0, (max + min) / 2];
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-    return [h * 360, s * 100, l * 100];
-  };
-  const isGrayscale = (rgb: [number, number, number]): boolean => RGBToHSL(...rgb)[1] === 0;
-  const getLuminance = (rgb: [number, number, number]): number => {
-    const [r, g, b] = rgb.map((c) => {
-      c /= 255;
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  };
-  const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
-    const bgRgb: [number, number, number] = [18, 18, 18];
-
-    const L1 = getLuminance(rgb);
-    const L2 = getLuminance(bgRgb);
-    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
-  };
-
-  const CONTRAST_ADJUSTMENT_STEP = 0.05;
-  const adjustColorContrast = (rgb: [number, number, number], minContrast: number): string => {
-    let current = [...rgb] as [number, number, number];
-    let factor = 0;
-    while (measureContrastRatioWCAG(current) < minContrast && factor < 1) {
-      factor += CONTRAST_ADJUSTMENT_STEP;
-      current = current.map((c) => Math.round(c + (255 - c) * factor)) as [number, number, number];
-    }
-
-    // return as rgb(r, g, b)
-    return `rgb(${current.map((c) => Math.round(c)).join(", ")})`;
-  };
-
   const getArtistNameElement = (): HTMLSpanElement => {
     const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
     const infoSectionLinks = infoSection.querySelectorAll("span");
@@ -840,8 +794,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     return document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement;
   };
 
-  const WCAG_CONTRAST = 4.5; // "The visual presentation of text [must have] a contrast ratio of at least 4.5:1"
-  const FALLBACK_GRAY_RGB_STR = "rgb(127, 127, 127)"; // fallback gray if the best color is grayscale, to ensure visibility on Plume's dark background
   const getAppropriatePretextColor = (): string => {
     const trackColor = getComputedStyle(getTrackTitleElement()).color;
     const artistColor = getComputedStyle(getArtistNameElement()).color;
@@ -857,12 +809,12 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     const artistColorRGB = artistColorMatch.map(Number) as [number, number, number];
     const trackColorContrast = measureContrastRatioWCAG(trackColorRGB);
     const artistColorContrast = measureContrastRatioWCAG(artistColorRGB);
-    if (trackColorContrast > WCAG_CONTRAST && artistColorContrast > WCAG_CONTRAST) {
+    if (trackColorContrast > WCAG_CONTRAST_NORMAL && artistColorContrast > WCAG_CONTRAST_NORMAL) {
       const trackColorSaturation = RGBToHSL(...trackColorRGB)[1];
       const artistColorSaturation = RGBToHSL(...artistColorRGB)[1];
       return trackColorSaturation > artistColorSaturation ? trackColor : artistColor;
-    } else if (trackColorContrast > WCAG_CONTRAST || artistColorContrast > WCAG_CONTRAST) {
-      return trackColorContrast > WCAG_CONTRAST ? trackColor : artistColor;
+    } else if (trackColorContrast > WCAG_CONTRAST_NORMAL || artistColorContrast > WCAG_CONTRAST_NORMAL) {
+      return trackColorContrast > WCAG_CONTRAST_NORMAL ? trackColor : artistColor;
     } else {
       const preferredColor = trackColorContrast > artistColorContrast ? trackColor : artistColor;
       const preferredColorMatch = preferredColor.match(/\d+/g);
@@ -871,26 +823,8 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
       }
       const preferredColorRgb = preferredColorMatch.map(Number) as [number, number, number];
       if (isGrayscale(preferredColorRgb)) return FALLBACK_GRAY_RGB_STR;
-      return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST);
+      return adjustColorContrast(preferredColorRgb, WCAG_CONTRAST_NORMAL);
     }
-  };
-
-  interface TrackQuantifiers {
-    current: number;
-    total: number;
-  }
-  // Function to get the current track quantifiers (e.g. 3rd out of 10)
-  const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
-    const trackTable = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
-    if (!trackTable) return { current: 0, total: 0 };
-
-    const trackRows = trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
-    if (trackRows.length === 0) return { current: 0, total: 0 };
-
-    const trackRowTitles = Array.from(trackTable.querySelectorAll(BC_ELEM_IDENTIFIERS.trackTitle));
-    const currentTrackNumber = trackRowTitles.findIndex((el) => el.textContent === trackName) + 1;
-    logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [currentTrackNumber, trackRows.length]));
-    return { current: currentTrackNumber, total: trackRows.length };
   };
 
   // Function to get the current track title from Bandcamp
