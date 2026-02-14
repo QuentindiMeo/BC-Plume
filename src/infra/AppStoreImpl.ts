@@ -1,4 +1,4 @@
-import { TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
+import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
 import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
 import { getString } from "../features/i18n";
@@ -11,6 +11,7 @@ export interface AppPersistedState {
 }
 
 export interface AppTransientState {
+  pageType: BcPageType | null;
   trackTitle: string | null;
   trackNumber: string | null;
   duration: number;
@@ -24,6 +25,7 @@ export interface AppTransientState {
 export interface AppState extends AppPersistedState, AppTransientState {}
 
 export enum STORE_ACTION_TYPES {
+  SET_PAGE_TYPE = "SET_PAGE_TYPE",
   SET_TRACK_TITLE = "SET_TRACK_TITLE",
   SET_TRACK_NUMBER = "SET_TRACK_NUMBER",
   SET_DURATION = "SET_DURATION",
@@ -39,6 +41,7 @@ export enum STORE_ACTION_TYPES {
 }
 
 export type AppAction =
+  | Action<STORE_ACTION_TYPES.SET_PAGE_TYPE, BcPageType | null>
   | Action<STORE_ACTION_TYPES.SET_TRACK_TITLE, string | null>
   | Action<STORE_ACTION_TYPES.SET_TRACK_NUMBER, string | null>
   | Action<STORE_ACTION_TYPES.SET_DURATION, number>
@@ -62,6 +65,7 @@ interface AppStateStore extends Store<AppState, AppAction> {
 }
 
 const INITIAL_STATE: AppState = {
+  pageType: null,
   trackTitle: null,
   trackNumber: null,
   duration: 0,
@@ -157,14 +161,15 @@ function createAppStateInstance(): AppStateStore {
 
   function reducer(action: AppAction): void {
     switch (action.type) {
+      case STORE_ACTION_TYPES.SET_PAGE_TYPE:
+        updateState("pageType", action.payload);
+        break;
       case STORE_ACTION_TYPES.SET_TRACK_TITLE:
         updateState("trackTitle", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_TRACK_NUMBER:
         updateState("trackNumber", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
           logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), action.payload);
@@ -172,27 +177,21 @@ function createAppStateInstance(): AppStateStore {
         }
         updateState("volume", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD:
         updateState("durationDisplayMethod", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_CURRENT_TIME:
         updateState("currentTime", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_DURATION:
         updateState("duration", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_IS_PLAYING:
         updateState("isPlaying", action.payload);
         break;
-
       case STORE_ACTION_TYPES.SET_IS_MUTED:
         updateState("isMuted", action.payload);
         break;
-
       case STORE_ACTION_TYPES.TOGGLE_MUTE: {
         if (state.isMuted) {
           // Unmute: restore previous volume
@@ -207,16 +206,13 @@ function createAppStateInstance(): AppStateStore {
         }
         break;
       }
-
       case STORE_ACTION_TYPES.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
-
       case STORE_ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS:
         updateState("currentTime", action.payload.currentTime);
         updateState("duration", action.payload.duration);
         break;
-
       case STORE_ACTION_TYPES.RESET_TRANSIENT_STATE:
         updateState("trackTitle", INITIAL_STATE.trackTitle);
         updateState("trackNumber", INITIAL_STATE.trackNumber);
@@ -227,7 +223,6 @@ function createAppStateInstance(): AppStateStore {
         updateState("volumeBeforeMute", INITIAL_STATE.volumeBeforeMute);
         updateState("isFullscreen", INITIAL_STATE.isFullscreen);
         break;
-
       default:
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);

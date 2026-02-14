@@ -39,3 +39,5 @@ export const BC_PLAYER_SELECTORS = [
   ".track_play_hilite",
   ".track_play_area",
 ];
+
+export type BcPageType = "album" | "track";
