@@ -18,27 +18,26 @@ const handleDurationClick = (): void => {
     payload: newMethod,
   });
 
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
 
   store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: plume.audioElement.duration });
 
   const state = store.getState();
   plume.durationDisplay.textContent = getFormattedDuration(state);
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: plume.durationDisplay });
 };
 
 export const updateProgressBar = (): void => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
+  store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: plume.audioElement.duration });
 
   const elapsed = plume.audioElement.currentTime;
   const duration = plume.audioElement.duration;
-
-  store.dispatch({
-    type: STORE_ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS,
-    payload: { currentTime: elapsed, duration },
-  });
 
   if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
 
@@ -49,17 +48,17 @@ export const updateProgressBar = (): void => {
 
   plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
   plume.progressSlider.style.backgroundImage = bgImg;
-
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: plume.audioElement.duration });
-
   plume.elapsedDisplay.textContent = getFormattedElapsed(state);
   plume.durationDisplay.textContent = getFormattedDuration(state);
+
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: plume.progressSlider });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: plume.elapsedDisplay });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: plume.durationDisplay });
 };
 
 export const createProgressBar = (): HTMLDivElement => {
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
 
   const container = document.createElement("div");
   container.id = PLUME_ELEM_IDENTIFIERS.progressContainer.split("#")[1];
@@ -92,13 +91,14 @@ export const createProgressBar = (): HTMLDivElement => {
         plume.audioElement.pause();
       }, 10);
     }
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
   });
 
   duration.addEventListener("click", handleDurationClick);
 
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
 
   timeDisplay.appendChild(elapsed);
   timeDisplay.appendChild(duration);

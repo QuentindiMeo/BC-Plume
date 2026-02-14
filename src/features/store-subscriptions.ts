@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
 import { getStoreInstance } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
@@ -12,13 +12,15 @@ const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 export const setupStoreSubscriptions = (): CleanupCallback => {
   const store = getStoreInstance();
-  const plume = getPlumeUiInstance().getState();
   const subscriptions: Array<SubscriptionCallback> = [];
 
   subscriptions.push(
     // Subscribe to volume changes to update audio element
     store.subscribe("volume", (volume) => {
+      const plumeUi = getPlumeUiInstance();
+      const plume = plumeUi.getState();
       plume.audioElement.volume = volume;
+      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
     }),
     // Subscribe to duration display method changes to update display
     store.subscribe("durationDisplayMethod", () => {
@@ -26,11 +28,15 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     }),
     // Subscribe to mute state changes
     store.subscribe("isMuted", (isMuted) => {
+      const plumeUi = getPlumeUiInstance();
+      const plume = plumeUi.getState();
+
       syncMuteBtn(isMuted);
 
       // Update volume slider and display
       const currentVolume = store.getState().volume;
       plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
+      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
 
       const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
         PLUME_ELEM_IDENTIFIERS.volumeValue
@@ -41,6 +47,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Update audio element volume
       plume.audioElement.volume = store.getState().volume;
+      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
     }),
     // Subscribe to playing state changes
     store.subscribe("isPlaying", (isPlaying) => {

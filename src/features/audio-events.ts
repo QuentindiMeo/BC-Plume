@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
@@ -16,8 +16,8 @@ export interface AudioEventCallbacks {
 
 export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): CleanupCallback => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
   const { updateTitleDisplay, updatePretextDisplay, updateTrackForwardBtnState } = callbacks;
 
   const handleTimeUpdate = () => {
@@ -46,6 +46,8 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
 
     const currentVolume = plume.audioElement.volume;
     plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
+
     const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
       PLUME_ELEM_IDENTIFIERS.volumeValue
     ) as HTMLSpanElement;
@@ -53,9 +55,10 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
       valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
     }
 
-    const isMuted = currentVolume === 0;
-    if (store.getState().isMuted !== isMuted) {
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: isMuted });
+    const currentIsMuted = store.getState().isMuted;
+    const newIsMuted = currentVolume === 0;
+    if (currentIsMuted !== newIsMuted) {
+      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: newIsMuted });
     }
     store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: currentVolume });
   };

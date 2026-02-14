@@ -25,7 +25,7 @@ const addRuntime = () => {
 
 export const injectEnhancements = async (): Promise<void> => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
+  const plumeUi = getPlumeUiInstance();
 
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
@@ -82,7 +82,7 @@ export const injectEnhancements = async (): Promise<void> => {
   store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_TITLE, payload: initialTrackTitle });
   store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_NUMBER, payload: initialTrackNumberText });
 
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, payload: headerContainer });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, payload: headerContainer });
   plumeContainer.appendChild(headerContainer);
 
   const playbackManager = document.createElement("div");

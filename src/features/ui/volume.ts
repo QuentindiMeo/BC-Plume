@@ -7,8 +7,8 @@ import { getString } from "../i18n";
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 export const syncMuteBtn = (isMuted: boolean): void => {
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
   const newMuteBtn = plume.muteBtn;
 
   newMuteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
@@ -16,7 +16,7 @@ export const syncMuteBtn = (isMuted: boolean): void => {
   newMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   newMuteBtn.ariaPressed = isMuted.toString();
   newMuteBtn.classList.toggle("muted", isMuted);
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
 };
 
 export const handleMuteToggle = (): void => {
@@ -26,8 +26,8 @@ export const handleMuteToggle = (): void => {
 
 export const createVolumeControlSection = async (): Promise<HTMLDivElement | null> => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
 
   if (plume.volumeSlider) return null;
 
@@ -53,6 +53,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
 
   // Apply saved volume to audio element
   plume.audioElement.volume = currentVolume;
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
 
   const valueDisplay = document.createElement("div");
   valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
@@ -63,8 +64,9 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   // Event listener for volume change via slider
   volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
     const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-
     plume.audioElement.volume = volume;
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+
     valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
     // Moving slider off zero counts as an intentional unmute
@@ -79,8 +81,8 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   container.appendChild(volumeSlider);
   container.appendChild(valueDisplay);
 
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
-  plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
 
   return container;
 };

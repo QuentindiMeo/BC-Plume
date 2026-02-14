@@ -1,6 +1,6 @@
 import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance } from "../../infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../../infra/AppStoreImpl";
 import { PLUME_SVG } from "../../svg/icons";
 import { getString } from "../i18n";
@@ -77,13 +77,15 @@ export const handlePlayPause = (): void => {
 };
 
 export const handleTrackBackward = (): void => {
-  const plume = getPlumeUiInstance().getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
 
   // If past TIME_BEFORE_RESTART, restart current track
   if (plume.audioElement.currentTime > TIME_BEFORE_RESTART) {
     plume.audioElement.currentTime = 0;
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
     logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
     return;
   }
@@ -113,7 +115,8 @@ export const handleTrackForward = (): void => {
 };
 
 export const handleTimeBackward = (): void => {
-  const plume = getPlumeUiInstance().getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
@@ -127,6 +130,7 @@ export const handleTimeBackward = (): void => {
     }, 10);
   }
 
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
   logger(
     CPL.DEBUG,
     `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__REWIND_TIME__DISPATCHED2")}`
@@ -134,7 +138,8 @@ export const handleTimeBackward = (): void => {
 };
 
 export const handleTimeForward = (): void => {
-  const plume = getPlumeUiInstance().getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
@@ -148,6 +153,7 @@ export const handleTimeForward = (): void => {
     }, 10);
   }
 
+  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
   logger(
     CPL.DEBUG,
     `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__FORWARD_TIME__DISPATCHED2")}`

@@ -1,6 +1,7 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
+import { NoArgFunction } from "../shared/types";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import type { CleanupCallback } from "./types";
@@ -8,12 +9,12 @@ import type { CleanupCallback } from "./types";
 const { AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 interface KeyboardHandlers {
-  handlePlayPause: Function;
-  handleTimeBackward: Function;
-  handleTimeForward: Function;
-  handleTrackBackward: Function;
-  handleTrackForward: Function;
-  toggleFullscreenMode: Function;
+  handlePlayPause: NoArgFunction;
+  handleTimeBackward: NoArgFunction;
+  handleTimeForward: NoArgFunction;
+  handleTrackBackward: NoArgFunction;
+  handleTrackForward: NoArgFunction;
+  toggleFullscreenMode: NoArgFunction;
 }
 
 export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
@@ -25,9 +26,11 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
     const currentValue = Number.parseInt(plume.volumeSlider.value);
     const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
     plume.volumeSlider.value = newValue.toString();
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
 
     const volume = newValue / VOLUME_SLIDER_GRANULARITY;
     plume.audioElement.volume = volume;
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
 
     const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
     volumeSliders.forEach((slider) => {

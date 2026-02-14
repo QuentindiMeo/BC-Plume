@@ -33,8 +33,8 @@ export const findOriginalPlayerContainer = (): HTMLDivElement | null => {
   }
 
   if (!playerContainer) {
-    const plumeUiInstance = getPlumeUiInstance();
-    const plume = plumeUiInstance.getState();
+    const plumeUi = getPlumeUiInstance();
+    const plume = plumeUi.getState();
     logger(CPL.WARN, getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
     // Search near audio elements
     playerContainer = plume.audioElement.closest("div") || plume.audioElement.parentElement;

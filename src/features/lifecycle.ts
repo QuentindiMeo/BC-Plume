@@ -120,8 +120,8 @@ const updateTrackForwardBtnState = () => {
 // Function to update the pretext display (track numbering)
 const updatePretextDisplay = () => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
   const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
   if (!preText) return;
 
@@ -149,8 +149,9 @@ const LATIN_CHAR_HEIGHT = 19;
 // Function to update the title display when track changes
 const updateTitleDisplay = () => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
-  const plume = plumeUiInstance.getState();
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
   const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
   if (!titleText) return;
 
@@ -180,7 +181,7 @@ const updateTitleDisplay = () => {
  */
 export const launchPlume = (): void => {
   const store = getStoreInstance();
-  const plumeUiInstance = getPlumeUiInstance();
+  const plumeUi = getPlumeUiInstance();
 
   // Main initialization state
   let isInitializing = false;
@@ -205,7 +206,7 @@ export const launchPlume = (): void => {
     }
 
     // Load persisted state into store
-    store.loadPersistedState();
+    await store.loadPersistedState();
 
     const isAlbumPage = globalThis.location.pathname.includes("/album/");
     store.dispatch({ type: STORE_ACTION_TYPES.SET_PAGE_TYPE, payload: isAlbumPage ? "album" : "track" });
@@ -217,7 +218,7 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: audioElement });
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: audioElement });
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -258,7 +259,7 @@ export const launchPlume = (): void => {
 
   // Observe DOM changes for players that load dynamically
   const domObserver = new MutationObserver((mutations) => {
-    const plume = plumeUiInstance.getState();
+    const plume = plumeUi.getState();
 
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
@@ -275,7 +276,15 @@ export const launchPlume = (): void => {
             `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
           );
 
-          plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: newAudio });
+          plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: newAudio });
+
+          // Re-setup audio event listeners for the new audio element
+          audioEventsCleanupCallback?.();
+          audioEventsCleanupCallback = setupAudioEventListeners({
+            updateTitleDisplay,
+            updatePretextDisplay,
+            updateTrackForwardBtnState,
+          });
 
           // Reset if needed
           if (!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer)) {

@@ -1,7 +1,6 @@
 import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
 import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
-import { getString } from "../features/i18n";
 import { CPL, logger } from "../features/logger";
 import { BROWSER_ACTION_TYPES, getBrowserInstance } from "./BrowserImpl";
 
@@ -34,7 +33,6 @@ export enum STORE_ACTION_TYPES {
   SET_DURATION_DISPLAY_METHOD = "SET_DURATION_DISPLAY_METHOD",
   SET_VOLUME = "SET_VOLUME",
   SET_IS_MUTED = "SET_IS_MUTED",
-  UPDATE_PLAYBACK_PROGRESS = "UPDATE_PLAYBACK_PROGRESS",
   TOGGLE_MUTE = "TOGGLE_MUTE",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
   RESET_TRANSIENT_STATE = "RESET_TRANSIENT_STATE",
@@ -50,7 +48,6 @@ export type AppAction =
   | Action<STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
   | Action<STORE_ACTION_TYPES.SET_VOLUME, number>
   | Action<STORE_ACTION_TYPES.SET_IS_MUTED, boolean>
-  | Action<STORE_ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS, { currentTime: number; duration: number }>
   | Action<STORE_ACTION_TYPES.TOGGLE_MUTE>
   | Action<STORE_ACTION_TYPES.SET_IS_FULLSCREEN, boolean>
   | Action<STORE_ACTION_TYPES.RESET_TRANSIENT_STATE>;
@@ -61,6 +58,8 @@ const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["vo
 const PERSISTENCE_DELAY_MS = 200;
 
 interface AppStateStore extends Store<AppState, AppAction> {
+  subscribe<K extends keyof AppState>(key: K, listener: AppStateListener<K>): () => void;
+  subscribeAll(listener: (state: AppState) => void): () => void;
   loadPersistedState(): Promise<void>;
 }
 
@@ -97,7 +96,7 @@ const createAppStateInstance = (): AppStateStore => {
 
     if (persistenceTimer) clearTimeout(persistenceTimer);
     persistenceTimer = setTimeout(() => {
-      const toSave: Record<string, any> = {};
+      const toSave: any = {};
 
       // Persist all pending keys that accumulated during debounce window
       for (const key of pendingPersistedKeys) {
@@ -110,12 +109,12 @@ const createAppStateInstance = (): AppStateStore => {
 
       if (Object.keys(toSave).length > 0) {
         const browserCache = getBrowserInstance();
+        const keys = Object.keys(toSave) as PLUME_CACHE_KEYS[];
+        const values = Object.values(toSave);
 
-        Object.keys(toSave).forEach((cacheKey) => {
-          browserCache.dispatch({
-            type: BROWSER_ACTION_TYPES.SET_CACHE_VALUE,
-            payload: { key: cacheKey as PLUME_CACHE_KEYS, value: toSave[cacheKey] },
-          });
+        browserCache.dispatch({
+          type: BROWSER_ACTION_TYPES.SET_CACHE_VALUES,
+          payload: { keys, values },
         });
       }
 
@@ -131,7 +130,7 @@ const createAppStateInstance = (): AppStateStore => {
         try {
           listener(state[key], prevValue);
         } catch (error) {
-          logger(CPL.ERROR, getString("ERROR__STATE__LISTENER_FAILED"), { key, error });
+          logger(CPL.ERROR, "State listener failed", { key, error });
         }
       });
     }
@@ -140,7 +139,7 @@ const createAppStateInstance = (): AppStateStore => {
       try {
         listener(state);
       } catch (error) {
-        logger(CPL.ERROR, getString("ERROR__STATE__GLOBAL_LISTENER_FAILED"), error);
+        logger(CPL.ERROR, "Global state listener failed", error);
       }
     });
   };
@@ -172,7 +171,7 @@ const createAppStateInstance = (): AppStateStore => {
         break;
       case STORE_ACTION_TYPES.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
-          logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), action.payload);
+          logger(CPL.WARN, "Invalid volume value", action.payload);
           return;
         }
         updateState("volume", action.payload);
@@ -209,10 +208,6 @@ const createAppStateInstance = (): AppStateStore => {
       case STORE_ACTION_TYPES.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
-      case STORE_ACTION_TYPES.UPDATE_PLAYBACK_PROGRESS:
-        updateState("currentTime", action.payload.currentTime);
-        updateState("duration", action.payload.duration);
-        break;
       case STORE_ACTION_TYPES.RESET_TRANSIENT_STATE:
         updateState("trackTitle", INITIAL_STATE.trackTitle);
         updateState("trackNumber", INITIAL_STATE.trackNumber);
@@ -244,7 +239,7 @@ const createAppStateInstance = (): AppStateStore => {
           if (volumeClamped === 0) {
             store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: true });
           }
-          logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), `${Math.round(volumeClamped * 100)}%`);
+          logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
         }
       }
 
@@ -252,11 +247,11 @@ const createAppStateInstance = (): AppStateStore => {
         const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
         if (method === "duration" || method === "remaining") {
           store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: method });
-          logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED"), method);
+          logger(CPL.INFO, "Time display method applied:", method);
         }
       }
     } catch (error) {
-      logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);
+      logger(CPL.ERROR, "Failed to load persisted state", error);
     }
   };
 

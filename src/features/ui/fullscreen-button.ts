@@ -1,9 +1,9 @@
 import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { AnyFunction } from "../../shared/types";
+import { NoArgFunction } from "../../shared/types";
 import { PLUME_SVG } from "../../svg/icons";
 import { getString } from "../i18n";
 
-const createFullscreenButton = (onToggle: AnyFunction): HTMLButtonElement => {
+const createFullscreenButton = (onToggle: NoArgFunction): HTMLButtonElement => {
   const fullscreenBtnId = PLUME_ELEM_IDENTIFIERS.fullscreenBtnLabel.split("#")[1];
   const fullscreenBtnLabel = getString("LABEL__FULLSCREEN_TOGGLE");
 
@@ -17,7 +17,7 @@ const createFullscreenButton = (onToggle: AnyFunction): HTMLButtonElement => {
   return fullscreenBtn;
 };
 
-export const createFullscreenButtonSection = (onToggle: AnyFunction): HTMLDivElement => {
+export const createFullscreenButtonSection = (onToggle: NoArgFunction): HTMLDivElement => {
   const container: HTMLDivElement = document.createElement("div");
   container.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer.split("#")[1];
 

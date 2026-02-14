@@ -1,7 +1,7 @@
 import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../domain/bandcamp";
 import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./formatting";
@@ -128,6 +128,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   );
 
   const handleProgressInput = function (this: HTMLInputElement) {
+    const plumeUi = getPlumeUiInstance();
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
 
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
@@ -136,11 +137,14 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         plume.audioElement.pause();
       }, 10);
     }
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: cloneEl.progressSlider });
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
+    const plumeUi = getPlumeUiInstance();
     const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
     plume.audioElement.volume = newVolume;
+    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: cloneEl.volumeSlider });
 
     // Moving slider off zero counts as an intentional unmute
     if (newVolume > 0 && store.getState().isMuted) {
