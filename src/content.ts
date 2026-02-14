@@ -8,6 +8,7 @@ import {
 } from "./domain/bandcamp";
 import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "./domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "./domain/plume";
+import { createFullscreenButtonSection } from "./features/ui";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./features/formatting";
 import { getString, logDetectedBrowser } from "./features/i18n";
 import { setupHotkeys } from "./features/keyboard";
@@ -278,8 +279,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     };
   };
 
-  const fullscreenBtnId = PLUME_ELEM_IDENTIFIERS.fullscreenBtnLabel.split("#")[1];
-  const fullscreenBtnLabel = getString("LABEL__FULLSCREEN_TOGGLE");
   let fullscreenCleanupCallback: (() => void) | null = null;
   const toggleFullscreenMode = () => {
     const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
@@ -441,23 +440,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
 
     store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
     logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
-  };
-
-  const createFullscreenBtnContainer = (): HTMLDivElement => {
-    const fullscreenBtn: HTMLButtonElement = document.createElement("button");
-    fullscreenBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtn.split("#")[1];
-    fullscreenBtn.type = "button";
-    fullscreenBtn.innerHTML = `<span id="${fullscreenBtnId}">${fullscreenBtnLabel}</span>${PLUME_SVG.fullscreen}`;
-    fullscreenBtn.ariaLabel = fullscreenBtnLabel;
-    fullscreenBtn.addEventListener("click", () => {
-      toggleFullscreenMode();
-    });
-
-    const container: HTMLDivElement = document.createElement("div");
-    container.id = PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer.split("#")[1];
-    container.appendChild(fullscreenBtn);
-
-    return container;
   };
 
   // Sync mute button icon and aria-label to reflect the current audio volume state
@@ -954,8 +936,8 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
       plumeContainer.appendChild(volumeContainer);
     }
 
-    const fullscreenBtnContainer = createFullscreenBtnContainer();
-    plumeContainer.appendChild(fullscreenBtnContainer);
+    const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
+    plumeContainer.appendChild(fullscreenBtnSection);
 
     bcPlayerContainer.appendChild(plumeContainer);
 
