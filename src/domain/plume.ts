@@ -13,7 +13,7 @@ export const PLUME_CONSTANTS = {
     "KeyF",
     "KeyM",
   ]),
-};
+} as const;
 
 export enum PLUME_CACHE_KEYS {
   DURATION_DISPLAY_METHOD = "plume_duration_display_method",

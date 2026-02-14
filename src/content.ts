@@ -15,6 +15,7 @@ import { getInfoSectionWithRuntime } from "./features/runtime";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
 import { getAppropriatePretextColor, getCurrentTrackTitle } from "./features/track-title";
 import { createFullscreenButtonSection, setupPlayerStickiness } from "./features/ui";
+import { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "./features/ui/volume";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
@@ -433,81 +434,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
   };
 
-  // Sync mute button icon and aria-label to reflect the current audio volume state
-  const syncMuteBtn = (isMuted: boolean) => {
-    const plume = plumeUiInstance.getState();
-    const newMuteBtn = plume.muteBtn;
-
-    newMuteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-    newMuteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-    newMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-    newMuteBtn.ariaPressed = isMuted.toString();
-    newMuteBtn.classList.toggle("muted", isMuted);
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
-  };
-
-  const handleMuteToggle = () => {
-    store.dispatch({ type: STORE_ACTION_TYPES.TOGGLE_MUTE });
-  };
-
-  // Function to create the volume slider
-  const createVolumeSlider = async (): Promise<HTMLDivElement | null> => {
-    const plume = plumeUiInstance.getState();
-    if (plume.volumeSlider) return null;
-
-    const container = document.createElement("div");
-    container.id = PLUME_ELEM_IDENTIFIERS.volumeContainer.split("#")[1];
-
-    const muteBtn = document.createElement("button");
-    muteBtn.id = PLUME_ELEM_IDENTIFIERS.muteBtn.split("#")[1];
-    muteBtn.type = "button";
-    muteBtn.title = getString("ARIA__MUTE");
-    muteBtn.ariaLabel = getString("ARIA__MUTE");
-    muteBtn.ariaPressed = "false";
-    muteBtn.innerHTML = PLUME_SVG.volumeOn;
-
-    const volumeSlider = document.createElement("input");
-    volumeSlider.id = PLUME_ELEM_IDENTIFIERS.volumeSlider.split("#")[1];
-    volumeSlider.type = "range";
-    volumeSlider.min = "0";
-    volumeSlider.max = VOLUME_SLIDER_GRANULARITY.toString();
-    const currentVolume = store.getState().volume;
-    volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
-    volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
-
-    // Apply saved volume to audio element
-    plume.audioElement.volume = currentVolume;
-
-    const valueDisplay = document.createElement("div");
-    valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
-    valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
-
-    muteBtn.addEventListener("click", handleMuteToggle);
-
-    // Event listener for volume change via slider
-    volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
-      const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-
-      plume.audioElement.volume = volume;
-      valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
-
-      // Moving slider off zero counts as an intentional unmute
-      if (volume > 0 && store.getState().isMuted) {
-        store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
-      }
-
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
-    });
-
-    container.appendChild(muteBtn);
-    container.appendChild(volumeSlider);
-    container.appendChild(valueDisplay);
-
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
-    plumeUiInstance.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
-    return container;
-  };
-
   const isFirstTrackOfAlbumPlaying = () => {
     const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
     const firstTrackRow = trackList.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
@@ -828,7 +754,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     }
     plumeContainer.appendChild(playbackManager);
 
-    const volumeContainer = await createVolumeSlider();
+    const volumeContainer = await createVolumeControlSection();
     if (volumeContainer) {
       plumeContainer.appendChild(volumeContainer);
     }
