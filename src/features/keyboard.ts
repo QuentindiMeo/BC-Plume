@@ -1,9 +1,9 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
 import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
-import type { CleanupCallback } from "../types";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
+import type { CleanupCallback } from "./types";
 
 const { AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

@@ -1,7 +1,7 @@
 import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
+import { measureContrastRatioWCAG } from "../shared/colors";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
-import { measureContrastRatioWCAG } from "./utils/colors";
 
 interface RuntimeInfo {
   totalRuntime: number;

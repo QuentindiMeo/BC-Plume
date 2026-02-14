@@ -14,11 +14,18 @@ import {
 import { getInfoSectionWithRuntime } from "./features/runtime";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
 import { getAppropriatePretextColor, getCurrentTrackTitle } from "./features/track-title";
+import { CleanupCallback, SubscriptionCallback } from "./features/types";
 import {
   createFullscreenButtonSection,
+  createPlaybackControlPanel,
   createProgressBar,
   createVolumeControlSection,
   handleMuteToggle,
+  handlePlayPause,
+  handleTimeBackward,
+  handleTimeForward,
+  handleTrackBackward,
+  handleTrackForward,
   setupPlayerStickiness,
   syncMuteBtn,
   updateProgressBar,
@@ -26,9 +33,8 @@ import {
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
 import { PLUME_SVG } from "./svg/icons";
-import { CleanupCallback, SubscriptionCallback } from "./types";
 
-const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 (() => {
   "use strict";
@@ -452,18 +458,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
   };
 
-  const isFirstTrackOfAlbumPlaying = () => {
-    const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
-    const firstTrackRow = trackList.querySelector(BC_ELEM_IDENTIFIERS.trackRow) as HTMLTableRowElement;
-    const firstTrackTitleElem = firstTrackRow.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
-    const currentTrackTitleElem = document.querySelector(
-      BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle
-    ) as HTMLAnchorElement;
-    if (!currentTrackTitleElem) return false;
-
-    return firstTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
-  };
-
   const isLastTrackOfAlbumPlaying = () => {
     const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
     if (!trackList) return false;
@@ -477,157 +471,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     if (!currentTrackTitleElem) return false;
 
     return lastTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
-  };
-
-  // Function to click on the previous track button
-  const clickPreviousTrackButton = (): true | null => {
-    const plume = plumeUiInstance.getState();
-
-    const prevButton = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
-    if (!prevButton) {
-      logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
-      return null;
-    }
-
-    const firstTrackIsPlaying = !isAlbumPage || isFirstTrackOfAlbumPlaying();
-    if (plume.audioElement.currentTime < TIME_BEFORE_RESTART && !firstTrackIsPlaying) {
-      prevButton.click();
-    } else {
-      // Restart current track instead, if more than X seconds have elapsed
-      plume.audioElement.currentTime = 0;
-      logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
-      setPauseBtnIcon();
-    }
-    return true;
-  };
-
-  // Function to click on the next track button
-  const clickNextTrackButton = (): true | null => {
-    const nextButton = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
-    if (!nextButton) {
-      logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
-      return null;
-    }
-
-    nextButton.click();
-    logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-    setPauseBtnIcon();
-    return true;
-  };
-
-  const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
-  const createPlaybackControls = () => {
-    const plume = plumeUiInstance.getState();
-    const container = document.createElement("div");
-    container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
-
-    const trackBackwardBtn = document.createElement("button");
-    trackBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackBwdBtn.split("#")[1];
-    trackBackwardBtn.type = "button";
-    trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
-    trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
-    trackBackwardBtn.addEventListener("click", handleTrackBackward);
-
-    const timeBackwardBtn = document.createElement("button");
-    timeBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeBwdBtn.split("#")[1];
-    timeBackwardBtn.type = "button";
-    timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
-    timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
-    timeBackwardBtn.addEventListener("click", handleTimeBackward);
-
-    const playPauseBtn = document.createElement("button");
-    playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
-    playPauseBtn.type = "button";
-    playPauseBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
-    playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
-    playPauseBtn.addEventListener("click", handlePlayPause);
-
-    const timeForwardBtn = document.createElement("button");
-    timeForwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeFwdBtn.split("#")[1];
-    timeForwardBtn.type = "button";
-    timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
-    timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
-    timeForwardBtn.addEventListener("click", handleTimeForward);
-
-    const trackForwardBtn = document.createElement("button");
-    trackForwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackFwdBtn.split("#")[1];
-    trackForwardBtn.type = "button";
-    trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
-    trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
-    trackForwardBtn.addEventListener("click", handleTrackForward);
-
-    container.appendChild(trackBackwardBtn);
-    container.appendChild(timeBackwardBtn);
-    container.appendChild(playPauseBtn);
-    container.appendChild(timeForwardBtn);
-    container.appendChild(trackForwardBtn);
-
-    return container;
-  };
-
-  const handleTrackBackward = () => {
-    logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
-
-    const rv = clickPreviousTrackButton();
-    if (rv === null) return; // previous track button not found
-    logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
-  };
-
-  const handleTimeBackward = () => {
-    const plume = plumeUiInstance.getState();
-    logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
-
-    const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
-    plume.audioElement.currentTime = newTime;
-    if (plume.audioElement.paused)
-      setTimeout(() => {
-        plume.audioElement.pause(); // prevent auto-play when rewinding on paused track
-      }, 10);
-
-    logger(
-      CPL.DEBUG,
-      `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
-        "DEBUG__REWIND_TIME__DISPATCHED2"
-      )}`
-    );
-  };
-
-  const handlePlayPause = () => {
-    const plume = plumeUiInstance.getState();
-    if (plume.audioElement.paused) {
-      plume.audioElement.play();
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
-    } else {
-      plume.audioElement.pause();
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
-    }
-  };
-
-  const handleTimeForward = () => {
-    const plume = plumeUiInstance.getState();
-    logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
-
-    const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
-    plume.audioElement.currentTime = newTime;
-    if (plume.audioElement.paused)
-      setTimeout(() => {
-        plume.audioElement.pause(); // prevent auto-play when forwarding on paused track
-      }, 10);
-
-    logger(
-      CPL.DEBUG,
-      `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString(
-        "DEBUG__FORWARD_TIME__DISPATCHED2"
-      )}`
-    );
-  };
-
-  const handleTrackForward = () => {
-    logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-
-    const rv = clickNextTrackButton();
-    if (rv === null) return; // next track button not found
-    logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   };
 
   const injectEnhancements = async () => {
@@ -693,7 +536,7 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
 
     const progressContainer = createProgressBar();
     playbackManager.appendChild(progressContainer);
-    const playbackControls = createPlaybackControls();
+    const playbackControls = createPlaybackControlPanel();
     if (playbackControls) {
       playbackManager.appendChild(playbackControls);
     }
@@ -712,11 +555,6 @@ const { PROGRESS_SLIDER_GRANULARITY, TIME_BEFORE_RESTART, VOLUME_SLIDER_GRANULAR
     logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
     if (isAlbumPage) addRuntime();
-  };
-
-  const setPauseBtnIcon = () => {
-    const playPauseBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
-    playPauseBtns.forEach((btn) => (btn.innerHTML = PLUME_SVG.playPause));
   };
 
   const updateTrackForwardBtnState = () => {

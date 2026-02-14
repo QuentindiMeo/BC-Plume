@@ -1,5 +1,4 @@
 import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
-import { getString } from "./i18n";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -7,7 +6,8 @@ import {
   measureContrastRatioWCAG,
   RGBToHSL,
   WCAG_CONTRAST_NORMAL,
-} from "./utils/colors";
+} from "../shared/colors";
+import { getString } from "./i18n";
 
 function getArtistNameElement(): HTMLSpanElement {
   const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
