@@ -13,6 +13,7 @@ import {
   restoreOriginalPlayerElements,
 } from "./features/original-player";
 import { getInfoSectionWithRuntime } from "./features/runtime";
+import { setupStoreSubscriptions } from "./features/store-subscriptions";
 import { getTrackQuantifiers } from "./features/track-quantifiers";
 import { getAppropriatePretextColor, getCurrentTrackTitle } from "./features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "./features/types";
@@ -28,8 +29,6 @@ import {
   handleTrackBackward,
   handleTrackForward,
   setupPlayerStickiness,
-  syncMuteBtn,
-  updateProgressBar,
 } from "./features/ui";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "./infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "./infra/AppStoreImpl";
@@ -615,55 +614,6 @@ const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTAN
       const deltaPaddingRem = deltaPaddingPx / 16; // 16px = 1rem
       logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingRem}rem`;
     }
-  };
-
-  // Setup store subscriptions for reactive UI updates
-  // Returns cleanup function to unsubscribe all subscriptions
-  const setupStoreSubscriptions = (): CleanupCallback => {
-    const plume = plumeUiInstance.getState();
-    const subscriptions: Array<SubscriptionCallback> = [];
-
-    subscriptions.push(
-      // Subscribe to volume changes to update audio element
-      store.subscribe("volume", (volume) => {
-        plume.audioElement.volume = volume;
-      }),
-      // Subscribe to duration display method changes to update display
-      store.subscribe("durationDisplayMethod", () => {
-        updateProgressBar();
-      }),
-      // Subscribe to mute state changes
-      store.subscribe("isMuted", (isMuted) => {
-        syncMuteBtn(isMuted);
-
-        // Update volume slider and display
-        const currentVolume = store.getState().volume;
-        plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
-
-        const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
-          PLUME_ELEM_IDENTIFIERS.volumeValue
-        ) as HTMLDivElement | null;
-        if (valueDisplay) {
-          valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
-        }
-
-        // Update audio element volume
-        plume.audioElement.volume = store.getState().volume;
-      }),
-      // Subscribe to playing state changes
-      store.subscribe("isPlaying", (isPlaying) => {
-        const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
-        playPauseBtns.forEach((btn) => {
-          btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
-        });
-      })
-    );
-
-    logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
-
-    return () => {
-      subscriptions.forEach((unsubscribe) => unsubscribe());
-    };
   };
 
   // Main initialization function
