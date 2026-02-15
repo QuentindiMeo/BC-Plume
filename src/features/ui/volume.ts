@@ -64,16 +64,13 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   // Event listener for volume change via slider
   volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
     const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-    plume.audioElement.volume = volume;
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
-
-    valueDisplay.textContent = `${this.value}${getString("META__PERCENTAGE")}`;
 
     // Moving slider off zero counts as an intentional unmute
     if (volume > 0 && store.getState().isMuted) {
       store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
     }
 
+    // Dispatch to store only - subscription handles audio element and display updates
     store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
   });
 

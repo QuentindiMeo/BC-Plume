@@ -144,16 +144,14 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
-    const plumeUi = getPlumeUiInstance();
     const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-    plume.audioElement.volume = newVolume;
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: cloneEl.volumeSlider });
 
     // Moving slider off zero counts as an intentional unmute
     if (newVolume > 0 && store.getState().isMuted) {
       store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
     }
 
+    // Dispatch to store only - subscription handles audio element and display updates
     store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: newVolume });
   };
 

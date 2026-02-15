@@ -57,12 +57,24 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       plume.durationDisplay.textContent = durationDisplayText;
     }),
-    // Subscribe to volume changes to update audio element
+    // Subscribe to volume changes to update audio element, slider, and display
     store.subscribe("volume", (volume) => {
       const plumeUi = getPlumeUiInstance();
       const plume = plumeUi.getState();
+
       plume.audioElement.volume = volume;
       plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+
+      plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+
+      // Update volume display text (store as single source of truth)
+      const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
+        PLUME_ELEM_IDENTIFIERS.volumeValue
+      ) as HTMLDivElement | null;
+      if (valueDisplay) {
+        valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+      }
+      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
     }),
     // Subscribe to duration display method changes to update display
     store.subscribe("durationDisplayMethod", () => {
