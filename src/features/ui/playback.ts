@@ -67,13 +67,9 @@ export const handlePlayPause = (): void => {
   const plume = getPlumeUiInstance().getState();
   const store = getStoreInstance();
 
-  if (plume.audioElement.paused) {
-    plume.audioElement.play();
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
-  } else {
-    plume.audioElement.pause();
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
-  }
+  // Dispatch to store only - subscription handles audio element state
+  const shouldPlay = plume.audioElement.paused;
+  store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: shouldPlay });
 };
 
 export const handleTrackBackward = (): void => {

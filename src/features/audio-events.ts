@@ -3,6 +3,7 @@ import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
+import { isPlaybackUpdatingFromSubscription } from "./store-subscriptions";
 import type { CleanupCallback } from "./types";
 import { updateProgressBar } from "./ui";
 
@@ -63,12 +64,14 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: currentVolume });
   };
 
-  const handlePlay = () => {
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
-  };
+  const handlePlayPause = () => {
+    if (isPlaybackUpdatingFromSubscription()) return;
 
-  const handlePause = () => {
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
+    const plumeUi = getPlumeUiInstance();
+    const plume = plumeUi.getState();
+
+    const isPlaying = !plume.audioElement.paused;
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: isPlaying });
   };
 
   plume.audioElement.addEventListener("timeupdate", handleTimeUpdate);
@@ -76,8 +79,8 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   plume.audioElement.addEventListener("durationchange", handleDurationChange);
   plume.audioElement.addEventListener("loadstart", handleLoadStart);
   plume.audioElement.addEventListener("volumechange", handleVolumeChange);
-  plume.audioElement.addEventListener("play", handlePlay);
-  plume.audioElement.addEventListener("pause", handlePause);
+  plume.audioElement.addEventListener("play", handlePlayPause);
+  plume.audioElement.addEventListener("pause", handlePlayPause);
 
   logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
 
@@ -87,7 +90,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     plume.audioElement.removeEventListener("durationchange", handleDurationChange);
     plume.audioElement.removeEventListener("loadstart", handleLoadStart);
     plume.audioElement.removeEventListener("volumechange", handleVolumeChange);
-    plume.audioElement.removeEventListener("play", handlePlay);
-    plume.audioElement.removeEventListener("pause", handlePause);
+    plume.audioElement.removeEventListener("play", handlePlayPause);
+    plume.audioElement.removeEventListener("pause", handlePlayPause);
   };
 };

@@ -10,11 +10,53 @@ import { syncMuteBtn } from "./ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
+// Flag to prevent audio event handlers from dispatching during subscription updates
+let isUpdatingFromSubscription = false;
+
+export const isPlaybackUpdatingFromSubscription = (): boolean => isUpdatingFromSubscription;
+
 export const setupStoreSubscriptions = (): CleanupCallback => {
   const store = getStoreInstance();
   const subscriptions: Array<SubscriptionCallback> = [];
 
   subscriptions.push(
+    // Subscribe to currentTime changes to update main progress slider
+    store.subscribe("currentTime", () => {
+      const plumeUi = getPlumeUiInstance();
+      const plume = plumeUi.getState();
+      const state = store.getState();
+
+      const elapsed = state.currentTime;
+      const duration = state.duration;
+
+      if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
+
+      const songProgressPercentage = (elapsed / duration) * 100;
+      const bgPercent = songProgressPercentage < 50 ? songProgressPercentage + 1 : songProgressPercentage - 1;
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+
+      plume.progressSlider.value = `${songProgressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
+      plume.progressSlider.style.backgroundImage = bgImg;
+
+      // Update time displays
+      const elapsedMinutes = Math.floor(elapsed / 60);
+      const elapsedSeconds = Math.floor(elapsed % 60);
+      plume.elapsedDisplay.textContent = `${elapsedMinutes}:${elapsedSeconds.toString().padStart(2, "0")}`;
+
+      let durationDisplayText: string;
+      if (state.durationDisplayMethod === "duration") {
+        const durationMinutes = Math.floor(duration / 60);
+        const durationSeconds = Math.floor(duration % 60);
+        durationDisplayText = `${durationMinutes}:${durationSeconds.toString().padStart(2, "0")}`;
+      } else {
+        const remainingSeconds = Math.floor(duration - elapsed);
+        const remainingMinutes = Math.floor(remainingSeconds / 60);
+        const remainingSecondsDisplay = remainingSeconds % 60;
+        durationDisplayText = `-${remainingMinutes}:${remainingSecondsDisplay.toString().padStart(2, "0")}`;
+      }
+
+      plume.durationDisplay.textContent = durationDisplayText;
+    }),
     // Subscribe to volume changes to update audio element
     store.subscribe("volume", (volume) => {
       const plumeUi = getPlumeUiInstance();
@@ -51,10 +93,32 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     }),
     // Subscribe to playing state changes
     store.subscribe("isPlaying", (isPlaying) => {
-      const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
-      playPauseBtns.forEach((btn) => {
-        btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
-      });
+      const plumeUi = getPlumeUiInstance();
+      const plume = plumeUi.getState();
+
+      // Set flag to prevent audio event handlers from dispatching
+      isUpdatingFromSubscription = true;
+
+      try {
+        // Update audio element playback state (store as single source of truth)
+        if (isPlaying && plume.audioElement.paused) {
+          plume.audioElement.play();
+        } else if (!isPlaying && !plume.audioElement.paused) {
+          plume.audioElement.pause();
+        }
+
+        // Update play/pause button icons
+        const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+        playPauseBtns.forEach((btn) => {
+          btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+        });
+        plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+      } finally {
+        // Reset flag after a tick to allow audio events to process
+        setTimeout(() => {
+          isUpdatingFromSubscription = false;
+        }, 0);
+      }
     })
   );
 

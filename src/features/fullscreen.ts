@@ -137,6 +137,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         plume.audioElement.pause();
       }, 10);
     }
+
+    // Dispatch to store to sync with main view
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
     plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: cloneEl.progressSlider });
   };
 
