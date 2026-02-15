@@ -8,5 +8,5 @@ export {
   handleTrackForward,
 } from "./playback";
 export { setupPlayerStickiness } from "./player-stickiness";
-export { createProgressBar, updateProgressBar } from "./progress";
+export { createProgressBar, syncProgressToStore } from "./progress";
 export { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "./volume";

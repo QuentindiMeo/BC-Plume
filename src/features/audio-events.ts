@@ -5,7 +5,7 @@ import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import { isPlaybackUpdatingFromSubscription } from "./store-subscriptions";
 import type { CleanupCallback } from "./types";
-import { updateProgressBar } from "./ui";
+import { syncProgressToStore } from "./ui";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -22,18 +22,18 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   const { updateTitleDisplay, updatePretextDisplay, updateTrackForwardBtnState } = callbacks;
 
   const handleTimeUpdate = () => {
-    updateProgressBar();
+    syncProgressToStore();
   };
 
   const handleLoadedMetadata = () => {
-    updateProgressBar();
+    syncProgressToStore();
     updateTitleDisplay();
     updatePretextDisplay();
     updateTrackForwardBtnState();
   };
 
   const handleDurationChange = () => {
-    updateProgressBar();
+    syncProgressToStore();
   };
 
   const handleLoadStart = () => {

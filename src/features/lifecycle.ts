@@ -22,11 +22,14 @@ import {
 
 // Function to initialize playback (necessary to make Plume buttons effective)
 const initPlayback = () => {
+  const store = getStoreInstance();
+
   const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
   if (playButton) {
     // Double-click to ensure playback has started
     playButton.click();
     playButton.click();
+    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
   } else {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
   }

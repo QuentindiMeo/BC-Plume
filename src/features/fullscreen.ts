@@ -132,11 +132,6 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
 
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-    if (plume.audioElement.paused) {
-      setTimeout(() => {
-        plume.audioElement.pause();
-      }, 10);
-    }
 
     // Dispatch to store to sync with main view
     store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });

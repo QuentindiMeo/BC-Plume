@@ -5,7 +5,6 @@ import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
-import { updateProgressBar } from "./ui/progress";
 import { syncMuteBtn } from "./ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
@@ -78,7 +77,26 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     }),
     // Subscribe to duration display method changes to update display
     store.subscribe("durationDisplayMethod", () => {
-      updateProgressBar();
+      const plumeUi = getPlumeUiInstance();
+      const plume = plumeUi.getState();
+      const state = store.getState();
+
+      const elapsed = state.currentTime;
+      const duration = state.duration;
+
+      let durationDisplayText: string;
+      if (state.durationDisplayMethod === "duration") {
+        const durationMinutes = Math.floor(duration / 60);
+        const durationSeconds = Math.floor(duration % 60);
+        durationDisplayText = `${durationMinutes}:${durationSeconds.toString().padStart(2, "0")}`;
+      } else {
+        const remainingSeconds = Math.floor(duration - elapsed);
+        const remainingMinutes = Math.floor(remainingSeconds / 60);
+        const remainingSecondsDisplay = remainingSeconds % 60;
+        durationDisplayText = `-${remainingMinutes}:${remainingSecondsDisplay.toString().padStart(2, "0")}`;
+      }
+
+      plume.durationDisplay.textContent = durationDisplayText;
     }),
     // Subscribe to mute state changes
     store.subscribe("isMuted", (isMuted) => {

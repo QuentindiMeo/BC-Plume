@@ -119,13 +119,6 @@ export const handleTimeBackward = (): void => {
   const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
   plume.audioElement.currentTime = newTime;
 
-  // Prevent auto-play when rewinding on paused track
-  if (plume.audioElement.paused) {
-    setTimeout(() => {
-      plume.audioElement.pause();
-    }, 10);
-  }
-
   plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
   logger(
     CPL.DEBUG,
@@ -141,13 +134,6 @@ export const handleTimeForward = (): void => {
 
   const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
   plume.audioElement.currentTime = newTime;
-
-  // Prevent auto-play when forwarding on paused track
-  if (plume.audioElement.paused) {
-    setTimeout(() => {
-      plume.audioElement.pause();
-    }, 10);
-  }
 
   plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
   logger(
