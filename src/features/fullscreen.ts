@@ -4,9 +4,9 @@ import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
 import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
 import { AppState, getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
-import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./formatting";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
+import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "./presenters";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 import {
   handlePlayPause,
@@ -54,7 +54,7 @@ export const cleanupFullscreenMode = (): void => {
 const renderProgressSlider = (elements: FullscreenElements, state: AppState): void => {
   if (!elements.progressSlider) return;
 
-  const percent = getProgressPercentage(state);
+  const percent = presentProgressPercentage(state);
   const bgPercent = percent < 50 ? percent + 1 : percent - 1;
   const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
   elements.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
@@ -63,12 +63,12 @@ const renderProgressSlider = (elements: FullscreenElements, state: AppState): vo
 
 const renderElapsedDisplay = (elements: FullscreenElements, state: AppState): void => {
   if (!elements.elapsedDisplay) return;
-  elements.elapsedDisplay.textContent = getFormattedElapsed(state);
+  elements.elapsedDisplay.textContent = presentFormattedElapsed(state);
 };
 
 const renderDurationDisplay = (elements: FullscreenElements, state: AppState): void => {
   if (!elements.durationDisplay) return;
-  elements.durationDisplay.textContent = getFormattedDuration(state);
+  elements.durationDisplay.textContent = presentFormattedDuration(state);
 };
 
 const renderPlayPauseButton = (elements: FullscreenElements, isPlaying: boolean): void => {

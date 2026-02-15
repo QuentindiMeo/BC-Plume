@@ -1,7 +1,7 @@
 import { TIME_DISPLAY_METHOD } from "../domain/bandcamp";
 import type { AppState } from "../infra/AppStoreImpl";
 
-// Function to format time as MM:SS
+// Internal helper: Format time as MM:SS
 const formatTime = (seconds: number): string => {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
 
@@ -10,11 +10,11 @@ const formatTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-export const getFormattedElapsed = (state: AppState): string => {
+export const presentFormattedElapsed = (state: AppState): string => {
   return formatTime(state.currentTime);
 };
 
-export const getFormattedDuration = (state: AppState): string => {
+export const presentFormattedDuration = (state: AppState): string => {
   if (state.durationDisplayMethod === TIME_DISPLAY_METHOD.REMAINING) {
     const remaining = state.duration - state.currentTime;
     return "-" + formatTime(remaining);
@@ -22,7 +22,7 @@ export const getFormattedDuration = (state: AppState): string => {
   return formatTime(state.duration);
 };
 
-export const getProgressPercentage = (state: AppState): number => {
+export const presentProgressPercentage = (state: AppState): number => {
   if (state.duration === 0) return 0;
   return (state.currentTime / state.duration) * 100;
 };
