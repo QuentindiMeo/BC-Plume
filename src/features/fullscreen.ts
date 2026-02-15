@@ -95,11 +95,13 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
   if (!elements.headerContainer || !trackTitle) return;
 
   const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
-  // TODO log error if nullish
-  if (headerTitle) {
-    headerTitle.textContent = trackTitle;
-    headerTitle.title = trackTitle;
+  if (!headerTitle) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_TITLE__NOT_FOUND"));
+    return;
   }
+
+  headerTitle.textContent = trackTitle;
+  headerTitle.title = trackTitle;
 };
 
 const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | null): void => {
@@ -107,10 +109,12 @@ const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | n
   if (!header || !trackNumber) return;
 
   const headerPretext = header.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
-  // TODO log error if nullish
-  if (headerPretext) {
-    headerPretext.textContent = trackNumber;
+  if (!headerPretext) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_PRETEXT__NOT_FOUND"));
+    return;
   }
+
+  headerPretext.textContent = trackNumber;
 };
 
 const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {

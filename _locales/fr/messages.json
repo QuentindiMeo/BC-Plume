@@ -9,6 +9,8 @@
   "ERROR__STATE__LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état :" },
   "ERROR__STATE__PERSIST_FAILED": { "message": "Échec de l'enregistrement de l'état :" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Élément parent du lecteur non trouvé" },
+  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Élément de titre d'en-tête non trouvé" },
+  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Élément de prétexte d'en-tête non trouvé" },
   "WARN__BROWSER_API__NOT_DETECTED": {
     "message": "Aucune API de navigateur détectée, utilisation de localStorage comme solution de repli"
   },
@@ -28,6 +30,15 @@
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Section d'information non trouvée pour le mode plein écran" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Conteneur Plume non trouvé pour le mode plein écran" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée, calcul de la durée totale ignoré" },
+  "WARN__VOLUME__ADJUSTING_WITH_NON_POSITIVE_DELTA": {
+    "message": "Ajustement du volume avec un delta non positif : $DELTA$",
+    "placeholders": {
+      "delta": {
+        "content": "$1",
+        "example": "-0.1"
+      }
+    }
+  },
   "LOG__MOUNT__COMPLETE": { "message": "Plume monté avec succès" },
   "LOG__INITIALIZATION__START": { "message": "Plume en cours d'initialisation..." },
   "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialisé avec succès" },
@@ -40,12 +51,44 @@
   "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "La durée totale n'a pas pu être calculée" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
-  "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Méthode d'affichage de la durée appliquée :" },
-  "INFO__VOLUME__APPLIED": { "message": "Volume appliqué à nouvel audio :" },
+  "INFO__TIME_DISPLAY_METHOD__APPLIED": {
+    "message": "Méthode d'affichage de la durée appliquée : $METHOD$",
+    "placeholders": {
+      "method": {
+        "content": "$1",
+        "example": "seconds"
+      }
+    }
+  },
+  "INFO__VOLUME__APPLIED": {
+    "message": "Volume appliqué au nouvel audio : $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Écouteurs d'événements audio configurés" },
   "INFO__AUDIO__FOUND": { "message": "Élément audio trouvé" },
   "INFO__VOLUME__LOADED": { "message": "Volume chargé depuis le stockage :" },
-  "INFO__VOLUME__FOUND": { "message": "Volume restauré :" },
+  "INFO__VOLUME__FOUND": {
+    "message": "Volume restauré : $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
   "INFO__FULLSCREEN__ENTERED": { "message": "Mode plein écran activé" },
   "INFO__FULLSCREEN__EXITED": { "message": "Mode plein écran désactivé" },
   "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Éléments de contrôle détectés ===" },
@@ -56,12 +99,26 @@
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente dispatché" },
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Bouton de rembobinage cliqué" },
-  "DEBUG__REWIND_TIME__DISPATCHED1": { "message": "Temps rembobiné à :" },
-  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": " s" },
+  "DEBUG__REWIND_TIME__DISPATCHED": {
+    "message": "Temps rembobiné à : $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Bouton Play/Pause cliqué" },
   "DEBUG__FORWARD_TIME__CLICKED": { "message": "Bouton d'avance cliqué" },
-  "DEBUG__FORWARD_TIME__DISPATCHED1": { "message": "Temps avancé à :" },
-  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": " s" },
+  "DEBUG__FORWARD_TIME__DISPATCHED": {
+    "message": "Temps avancé à : $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
   "DEBUG__TRACK__QUANTIFIERS": {

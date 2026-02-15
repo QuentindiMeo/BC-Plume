@@ -120,10 +120,7 @@ export const handleTimeBackward = (): void => {
   plume.audioElement.currentTime = newTime;
 
   plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-  logger(
-    CPL.DEBUG,
-    `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__REWIND_TIME__DISPATCHED2")}`
-  );
+  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", Math.round(newTime)));
 };
 
 export const handleTimeForward = (): void => {
@@ -136,8 +133,5 @@ export const handleTimeForward = (): void => {
   plume.audioElement.currentTime = newTime;
 
   plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-  logger(
-    CPL.DEBUG,
-    `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__FORWARD_TIME__DISPATCHED2")}`
-  );
+  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", Math.round(newTime)));
 };

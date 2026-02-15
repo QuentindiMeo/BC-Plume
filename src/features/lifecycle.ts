@@ -48,7 +48,7 @@ const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   // Load and immediately apply saved volume from store
   const volume = store.getState().volume;
   audio.volume = volume;
-  logger(CPL.INFO, `${getString("INFO__VOLUME__FOUND")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`);
+  logger(CPL.INFO, getString("INFO__VOLUME__FOUND", [Math.round(volume * 100), getString("META__PERCENTAGE")]));
 
   return audio;
 };
@@ -235,7 +235,7 @@ export const launchPlume = (): void => {
 
     // Duration display method is already loaded from persisted state
     const durationDisplayMethod = store.getState().durationDisplayMethod;
-    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
+    logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
     // Inject enhancements
     await injectEnhancements();
@@ -280,7 +280,7 @@ export const launchPlume = (): void => {
           newAudio.volume = volume;
           logger(
             CPL.INFO,
-            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
+            getString("INFO__VOLUME__APPLIED", [Math.round(volume * 100), getString("META__PERCENTAGE")])
           );
 
           plumeUi.dispatch(plumeActions.setAudioElement(newAudio));
