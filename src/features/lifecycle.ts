@@ -23,16 +23,16 @@ import {
 
 // Function to initialize playback (necessary to make Plume buttons effective)
 const initPlayback = () => {
-  const store = getStoreInstance();
-
   const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
   if (playButton) {
     // Click to ensure playback has started
     playButton.click();
     setTimeout(() => {
-      store.dispatch(storeActions.setIsPlaying(false));
-      store.dispatch(storeActions.setCurrentTime(0));
-    }, 100);
+      handleTimeForward();
+      setTimeout(() => {
+        handleTimeBackward();
+      }, 20); // delay to allow Bandcamp to register the time update and sync Plume's progress slider
+    }, 100); // delay to allow Bandcamp player to fully initialize
   } else {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
   }
@@ -239,6 +239,7 @@ export const launchPlume = (): void => {
 
     // Inject enhancements
     await injectEnhancements();
+    stickinessCleanupCallback = setupPlayerStickiness();
     audioEventsCleanupCallback = setupAudioEventListeners({
       updateTitleDisplay,
       updatePretextDisplay,
@@ -314,7 +315,6 @@ export const launchPlume = (): void => {
   domObserver.observe(document.body, { childList: true, subtree: true });
 
   init();
-  stickinessCleanupCallback = setupPlayerStickiness();
 
   // Support for SPA navigation
   let lastUrl = location.href;
