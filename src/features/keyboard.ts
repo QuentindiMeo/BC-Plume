@@ -1,6 +1,6 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTIONS } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTIONS } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { NoArgFunction } from "../shared/types";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
@@ -29,11 +29,11 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
     const currentValue = Number.parseInt(plume.volumeSlider.value);
     const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
     plume.volumeSlider.value = newValue.toString();
-    plumeUi.dispatch({ type: PLUME_ACTIONS.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
+    plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
 
     const volume = newValue / VOLUME_SLIDER_GRANULARITY;
     plume.audioElement.volume = volume;
-    plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
 
     const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
     volumeSliders.forEach((slider) => {
@@ -43,7 +43,7 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
       valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
     });
 
-    store.dispatch({ type: STORE_ACTIONS.SET_VOLUME, payload: volume });
+    store.dispatch(storeActions.setVolume(volume));
   };
 
   const handleKeydown = (e: KeyboardEvent) => {

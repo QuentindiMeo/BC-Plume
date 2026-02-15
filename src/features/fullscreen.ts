@@ -1,8 +1,8 @@
 import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTIONS } from "../infra/AppInstanceImpl";
-import { AppState, getStoreInstance, STORE_ACTIONS } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { AppState, getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./formatting";
 import { getString } from "./i18n";
@@ -47,7 +47,7 @@ export const cleanupFullscreenMode = (): void => {
 
     existingOverlay.remove();
     document.body.style.overflow = "auto";
-    getStoreInstance().dispatch({ type: STORE_ACTIONS.SET_IS_FULLSCREEN, payload: false });
+    getStoreInstance().dispatch(storeActions.setIsFullscreen(false));
   }
 };
 
@@ -186,8 +186,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     }
 
     // Dispatch to store to sync with main view
-    store.dispatch({ type: STORE_ACTIONS.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
-    plumeUi.dispatch({ type: PLUME_ACTIONS.SET_PROGRESS_SLIDER, payload: elements.progressSlider });
+    store.dispatch(storeActions.setCurrentTime(plume.audioElement.currentTime));
+    plumeUi.dispatch(plumeActions.setProgressSlider(elements.progressSlider));
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
@@ -195,11 +195,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
     // Moving slider off zero counts as an intentional unmute
     if (newVolume > 0 && store.getState().isMuted) {
-      store.dispatch({ type: STORE_ACTIONS.SET_IS_MUTED, payload: false });
+      store.dispatch(storeActions.setIsMuted(false));
     }
 
     // Dispatch to store only - subscription handles audio element and display updates
-    store.dispatch({ type: STORE_ACTIONS.SET_VOLUME, payload: newVolume });
+    store.dispatch(storeActions.setVolume(newVolume));
   };
 
   const handleFullscreenDurationClick = () => {
@@ -207,10 +207,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     const newMethod =
       currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
 
-    store.dispatch({
-      type: STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
-      payload: newMethod,
-    });
+    store.dispatch(storeActions.setDurationDisplayMethod(newMethod));
   };
 
   // Setup event listeners for fullscreen controls
@@ -389,7 +386,7 @@ export const toggleFullscreenMode = (): void => {
 
   if (isCurrentlyFullscreen) {
     // Exit fullscreen - dispatch state change first, then cleanup
-    store.dispatch({ type: STORE_ACTIONS.SET_IS_FULLSCREEN, payload: false });
+    store.dispatch(storeActions.setIsFullscreen(false));
 
     // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
     if (fullscreenCleanupCallback) {
@@ -406,12 +403,12 @@ export const toggleFullscreenMode = (): void => {
 
   // Enter fullscreen - dispatch state change first, then build DOM
   const isAlbumPage = store.getState().pageType === "album";
-  store.dispatch({ type: STORE_ACTIONS.SET_IS_FULLSCREEN, payload: true });
+  store.dispatch(storeActions.setIsFullscreen(true));
 
   const overlay = buildFullscreenOverlay(isAlbumPage);
   if (!overlay) {
     // Failed to build overlay - revert state
-    store.dispatch({ type: STORE_ACTIONS.SET_IS_FULLSCREEN, payload: false });
+    store.dispatch(storeActions.setIsFullscreen(false));
     return;
   }
 

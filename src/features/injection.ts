@@ -1,8 +1,8 @@
 import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTIONS } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTIONS } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { toggleFullscreenMode } from "./fullscreen";
 import { getString } from "./i18n";
@@ -79,10 +79,10 @@ export const injectEnhancements = async (): Promise<void> => {
   headerContainer.appendChild(currentTitleSection);
 
   // Initialize store with current track title and track number
-  store.dispatch({ type: STORE_ACTIONS.SET_TRACK_TITLE, payload: initialTrackTitle });
-  store.dispatch({ type: STORE_ACTIONS.SET_TRACK_NUMBER, payload: initialTrackNumberText });
+  store.dispatch(storeActions.setTrackTitle(initialTrackTitle));
+  store.dispatch(storeActions.setTrackNumber(initialTrackNumberText));
 
-  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_TITLE_DISPLAY, payload: headerContainer });
+  plumeUi.dispatch(plumeActions.setTitleDisplay(headerContainer));
   plumeContainer.appendChild(headerContainer);
 
   const playbackManager = document.createElement("div");

@@ -1,7 +1,7 @@
 import { BC_ELEM_IDENTIFIERS, DebugControl } from "../domain/bandcamp";
 import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTIONS } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTIONS } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
 import { getString } from "./i18n";
@@ -30,8 +30,8 @@ const initPlayback = () => {
     // Click to ensure playback has started
     playButton.click();
     setTimeout(() => {
-      store.dispatch({ type: STORE_ACTIONS.SET_IS_PLAYING, payload: false });
-      store.dispatch({ type: STORE_ACTIONS.SET_CURRENT_TIME, payload: 0 });
+      store.dispatch(storeActions.setIsPlaying(false));
+      store.dispatch(storeActions.setCurrentTime(0));
     }, 100);
   } else {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
@@ -139,7 +139,7 @@ const updatePretextDisplay = () => {
     : getString("LABEL__TRACK");
 
   // Dispatch track number change to store for fullscreen sync
-  store.dispatch({ type: STORE_ACTIONS.SET_TRACK_NUMBER, payload: trackNumberText });
+  store.dispatch(storeActions.setTrackNumber(trackNumberText));
 
   preText.textContent = trackNumberText;
 
@@ -167,7 +167,7 @@ const updateTitleDisplay = () => {
   titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
   // Dispatch title change to store for fullscreen sync
-  store.dispatch({ type: STORE_ACTIONS.SET_TRACK_TITLE, payload: newTrackTitle });
+  store.dispatch(storeActions.setTrackTitle(newTrackTitle));
 
   // Cache offsetHeight to avoid multiple layout recalculations
   const titleHeight = titleText.offsetHeight;
@@ -215,7 +215,7 @@ export const launchPlume = (): void => {
     await store.loadPersistedState();
 
     const isAlbumPage = globalThis.location.pathname.includes("/album/");
-    store.dispatch({ type: STORE_ACTIONS.SET_PAGE_TYPE, payload: isAlbumPage ? "album" : "track" });
+    store.dispatch(storeActions.setPageType(isAlbumPage ? "album" : "track"));
 
     const audioElement = await findAudioElement();
     if (!audioElement) {
@@ -224,7 +224,7 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: audioElement });
+    plumeUi.dispatch(plumeActions.setAudioElement(audioElement));
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -283,7 +283,7 @@ export const launchPlume = (): void => {
             `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
           );
 
-          plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: newAudio });
+          plumeUi.dispatch(plumeActions.setAudioElement(newAudio));
 
           // Re-setup audio event listeners for the new audio element
           audioEventsCleanupCallback?.();

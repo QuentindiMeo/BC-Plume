@@ -25,7 +25,7 @@ export interface DefinedPlumeCore {
   muteBtn: HTMLButtonElement;
 }
 
-export enum PLUME_ACTIONS {
+enum PLUME_ACTIONS {
   RESET_PLUME_UI_INSTANCE = "resetPlumeUiInstance",
   SET_AUDIO_ELEMENT = "setAudioElement",
   SET_TITLE_DISPLAY = "setTitleDisplay",
@@ -45,6 +45,41 @@ export type PlumeAction =
   | Action<PLUME_ACTIONS.SET_DURATION_DISPLAY, HTMLSpanElement | null>
   | Action<PLUME_ACTIONS.SET_VOLUME_SLIDER, HTMLInputElement | null>
   | Action<PLUME_ACTIONS.SET_MUTE_BTN, HTMLButtonElement | null>;
+
+export const plumeActions = {
+  resetPlumeUiInstance: (reason: string | null = null): PlumeAction => ({
+    type: PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE,
+    payload: reason,
+  }),
+  setAudioElement: (element: HTMLAudioElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_AUDIO_ELEMENT,
+    payload: element,
+  }),
+  setTitleDisplay: (element: HTMLDivElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_TITLE_DISPLAY,
+    payload: element,
+  }),
+  setProgressSlider: (element: HTMLInputElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_PROGRESS_SLIDER,
+    payload: element,
+  }),
+  setElapsedDisplay: (element: HTMLSpanElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_ELAPSED_DISPLAY,
+    payload: element,
+  }),
+  setDurationDisplay: (element: HTMLSpanElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_DURATION_DISPLAY,
+    payload: element,
+  }),
+  setVolumeSlider: (element: HTMLInputElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_VOLUME_SLIDER,
+    payload: element,
+  }),
+  setMuteBtn: (element: HTMLButtonElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_MUTE_BTN,
+    payload: element,
+  }),
+} as const;
 
 export type PlumeStateListener<K extends keyof DefinedPlumeCore = keyof DefinedPlumeCore> = Listener<
   DefinedPlumeCore,
