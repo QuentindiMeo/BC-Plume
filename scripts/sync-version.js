@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 
-// Read version from package.json (single source of truth)
+// ! Read version from package.json (single source of truth)
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 const packageVersion = packageJson.version;
 

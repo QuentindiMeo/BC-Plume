@@ -1,5 +1,5 @@
 import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../domain/bandcamp";
-import { APP_NAME, APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
+import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
 import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
 import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
@@ -298,7 +298,7 @@ export const toggleFullscreenMode = (): void => {
   fullscreenLogo.href = PLUME_KO_FI_URL;
   fullscreenLogo.target = "_blank";
   fullscreenLogo.rel = "noopener noreferrer";
-  fullscreenLogo.ariaLabel = APP_NAME;
+  fullscreenLogo.ariaLabel = getString("ARIA__APP_NAME");
   fullscreenLogo.title = getString("ARIA__LOGO_LINK");
   fullscreenLogo.tabIndex = 0;
   plumeClone.insertBefore(fullscreenLogo, plumeClone.firstChild);

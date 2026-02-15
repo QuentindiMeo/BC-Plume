@@ -1,36 +1,38 @@
 <div align="center" id="top">
   <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
-  <h2>:notes:Bandcamp Player Lightweight Ultimate Media Enhancer :feather:</h2>
+  <h2>Plume — Bandcamp Player Lightweight Ultimate Media Enhancer</h2>
 </div>
 
 <div align="center">
-  <a href="#memo-description">Description</a> &#xa0; | &#xa0;
-  <a href="#rocket-installation">Installation</a> &#xa0; | &#xa0;
-  <a href="#open_book-usage--general-information">Usage & General Information</a> &#xa0; | &#xa0;
-  <a href="#bug-troubleshooting">Troubleshooting</a> &#xa0; | &#xa0;
-  <a href="#card_file_box-project-roadmap">Project Roadmap</a>
-</div>
-
-&#xa0;
-
-<div align="center">
-  <a href="#memo-description"><img src="https://github.com/user-attachments/assets/751b88bd-15c1-4ce8-b185-2cdb990dbfcf" alt="Demo gif of v1.2.4" width="800px" /></a>
+  <a href="#description">Description</a> &#xa0; | &#xa0;
+  <a href="#installation">Installation</a> &#xa0; | &#xa0;
+  <a href="#usage--general-information">Usage & General Information</a> &#xa0; | &#xa0;
+  <a href="#troubleshooting">Troubleshooting</a> &#xa0; | &#xa0;
+  <a href="#project-roadmap">Project Roadmap</a>
 </div>
 
 &#xa0;
 
-<div align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.3.1-blue?logo=semver" /></a>
-  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
-</div>
-<div align="center">
+<div id="badges" align="center">
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.3.2-blue?logo=semver" /></a>
+  <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
+  <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
+</div>
+<div align="center">
+  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
 </div>
-&nbsp;
-<div align="center">
+
+&#xa0;
+
+<div id="demo" align="center">
+  <a href="#memo-description"><img alt="BC-Plume Bandcamp player enhancer demo — volume slider, seek bar, fullscreen mode; demo gif of v1.3.2" src="https://github.com/user-attachments/assets/3f72cfa0-7c42-4aa5-8e9c-4a67b617ce17" width="800px" /></a>
+</div>
+
+<div id="details" align="center">
   <sup><b>The technical stack at play:</b>&nbsp;</sup>
   <img title="TypeScript" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/typeScript.svg" width="36px" alt="TypeScript" />
   <img title="CSS" src="https://raw.githubusercontent.com/mallowigi/iconGenerator/master/assets/icons/files/css.svg" width="36px" alt="CSS" />
@@ -46,12 +48,12 @@
 
 &#xa0;
 
-## :memo: Description
+## 📝 Description
 
 A cross-browser web extension that improves the listening experience on Bandcamp with a volume slider and enhanced progress bar.  
 **Compatible with Chrome, Firefox, Edge, and all other Chromium web browsers!**
 
-### :musical_note: Features
+### 🎵 Features
 
 - **Unified player**: Completely replaces the Bandcamp player with an enhanced version
 - **Time navigation**: Click and drag to seek within the track seamlessly
@@ -60,14 +62,14 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
-- **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more to come on demand!)
+- **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more on demand!)
 
-## :rocket: Installation
+## 🚀 Installation
 
 Either install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm) or the [Mozilla Add-ons site](https://addons.mozilla.org/fr/firefox/addon/bc-plume).  
 If you want to install it manually (for local build or development), follow the instructions in [**the installation file**](./INSTALLATION.md).
 
-## :open_book: Usage & General Information
+## 📖 Usage & General Information
 
 1. Go to any Bandcamp **album or track page**
 2. The extension replaces the original player with the **Plume player**
@@ -85,7 +87,7 @@ This extension uses:
 
 The code is fully commented and structured for understanding, easy contribution and modification.
 
-## :bug: Troubleshooting
+## 🐛 Troubleshooting
 
 ### The extension doesn't load (developer mode)
 
@@ -101,7 +103,7 @@ The code is fully commented and structured for understanding, easy contribution 
 
 If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Plume/issues) with details about your web browser and the page URL.
 
-## :card_file_box: Project Roadmap
+## 🗃️ Project Roadmap
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 

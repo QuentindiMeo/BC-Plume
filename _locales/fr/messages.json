@@ -1,4 +1,7 @@
 {
+  "APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
+  "APP_DESCRIPTION": { "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, avance/recul de 10s, mode plein écran et raccourcis clavier." },
+
   "ERROR__NO_BROWSER_API": { "message": "Aucune API d'extension de navigateur détectée" },
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossible de trouver un conteneur approprié" },
   "ERROR__STATE__LOAD_FAILED": { "message": "Échec du chargement de l'état persisté :" },
@@ -25,9 +28,9 @@
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Section d'information non trouvée pour le mode plein écran" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Conteneur Plume non trouvé pour le mode plein écran" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée, calcul de la durée totale ignoré" },
-  "LOG__MOUNT__COMPLETE": { "message": "BC-Plume monté avec succès" },
-  "LOG__INITIALIZATION__START": { "message": "BC-Plume en cours d'initialisation..." },
-  "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume initialisé avec succès" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume monté avec succès" },
+  "LOG__INITIALIZATION__START": { "message": "Plume en cours d'initialisation..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialisé avec succès" },
   "LOG__NAVIGATION_DETECTED": { "message": "Navigation détectée, réinitialisation..." },
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Éléments du lecteur original cachés" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Éléments du lecteur original restaurés" },
@@ -119,6 +122,7 @@
       }
     }
   },
+  "ARIA__APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
   "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
   "ARIA__TRACK": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture",
