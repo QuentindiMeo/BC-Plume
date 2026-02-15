@@ -23,6 +23,8 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
   const store = getStoreInstance();
 
   const handleAdjustVolume = (delta: number) => {
+    // ? if delta <= 0, log warning: it's odd
+
     const plume = plumeUi.getState();
     const currentValue = Number.parseInt(plume.volumeSlider.value);
     const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
@@ -55,9 +57,16 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
     e.preventDefault();
     e.stopPropagation();
     switch (e.key) {
-      case " ":
+      case " ": {
+        const focusedElement = document.activeElement as HTMLElement;
+        const isSpaceTriggeringButton = focusedElement.tagName === "BUTTON";
+        if (isSpaceTriggeringButton) {
+          focusedElement.click();
+          return;
+        }
         handlers.handlePlayPause();
         break;
+      }
       case "ArrowLeft":
         handlers.handleTimeBackward();
         break;
