@@ -6,7 +6,7 @@ import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import type { CleanupCallback } from "./types";
 
-const { AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+const { AVAILABLE_HOTKEYS: AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 interface KeyboardHandlers {
   handlePlayPause: NoArgFunction;
@@ -14,6 +14,7 @@ interface KeyboardHandlers {
   handleTimeForward: NoArgFunction;
   handleTrackBackward: NoArgFunction;
   handleTrackForward: NoArgFunction;
+  handleMuteToggle: NoArgFunction;
   toggleFullscreenMode: NoArgFunction;
 }
 
@@ -43,22 +44,18 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
     store.dispatch({ type: STORE_ACTIONS.SET_VOLUME, payload: volume });
   };
 
-  const handleToggleMute = () => {
-    const plume = plumeUi.getState();
-    plume.muteBtn.click();
-  };
-
   const handleKeydown = (e: KeyboardEvent) => {
-    if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
+    const userIsTypingInInput =
+      (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
+    if (userIsTypingInInput) return; // don't trigger hotkeys when user is typing in an input or textarea
 
-    const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.code);
+    const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.key);
     if (!isValidHotkey) return;
 
     e.preventDefault();
     e.stopPropagation();
-
-    switch (e.code) {
-      case "Space":
+    switch (e.key) {
+      case " ":
         handlers.handlePlayPause();
         break;
       case "ArrowLeft":
@@ -79,11 +76,11 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
       case "PageDown":
         handlers.handleTrackForward();
         break;
-      case "KeyF":
+      case "f":
         handlers.toggleFullscreenMode();
         break;
-      case "KeyM":
-        handleToggleMute();
+      case "m":
+        handlers.handleMuteToggle();
         break;
     }
   };

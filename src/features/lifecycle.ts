@@ -12,6 +12,7 @@ import { setupStoreSubscriptions } from "./store-subscriptions";
 import { getTrackQuantifiers } from "./track-quantifiers";
 import { getCurrentTrackTitle } from "./track-title";
 import {
+  handleMuteToggle,
   handlePlayPause,
   handleTimeBackward,
   handleTimeForward,
@@ -26,10 +27,12 @@ const initPlayback = () => {
 
   const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
   if (playButton) {
-    // Double-click to ensure playback has started
+    // Click to ensure playback has started
     playButton.click();
-    playButton.click();
-    store.dispatch({ type: STORE_ACTIONS.SET_IS_PLAYING, payload: true });
+    setTimeout(() => {
+      store.dispatch({ type: STORE_ACTIONS.SET_IS_PLAYING, payload: false });
+      store.dispatch({ type: STORE_ACTIONS.SET_CURRENT_TIME, payload: 0 });
+    }, 100);
   } else {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
   }
@@ -189,10 +192,10 @@ export const launchPlume = (): void => {
   // Main initialization state
   let isInitializing = false;
   let isInitialized = false;
-  let storeCleanupCallback: (() => void) | null = null;
-  let keyboardCleanupCallback: (() => void) | null = null;
-  let stickinessCleanupCallback: (() => void) | null = null;
   let audioEventsCleanupCallback: (() => void) | null = null;
+  let storeCleanupCallback: (() => void) | null = null;
+  let kbCleanupCallback: (() => void) | null = null;
+  let stickinessCleanupCallback: (() => void) | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -242,12 +245,13 @@ export const launchPlume = (): void => {
       updateTrackForwardBtnState,
     });
     storeCleanupCallback = setupStoreSubscriptions();
-    keyboardCleanupCallback = setupHotkeys({
+    kbCleanupCallback = setupHotkeys({
       handlePlayPause,
       handleTimeBackward,
       handleTimeForward,
       handleTrackBackward,
       handleTrackForward,
+      handleMuteToggle,
       toggleFullscreenMode,
     });
     initPlayback();
@@ -355,9 +359,9 @@ export const launchPlume = (): void => {
     }
 
     // Cleanup keyboard hotkeys
-    if (keyboardCleanupCallback) {
-      keyboardCleanupCallback();
-      keyboardCleanupCallback = null;
+    if (kbCleanupCallback) {
+      kbCleanupCallback();
+      kbCleanupCallback = null;
     }
 
     // Cleanup audio event listeners
