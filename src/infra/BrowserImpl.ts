@@ -45,10 +45,10 @@ interface BrowserState {
   cache: BrowserApi["storage"]["local"];
 }
 
-export enum BROWSER_ACTION_TYPES {
+export enum BROWSER_ACTIONS {
   SET_CACHE_VALUES = "SET_CACHE_VALUES",
 }
-export type BrowserAction = Action<BROWSER_ACTION_TYPES.SET_CACHE_VALUES, { keys: PLUME_CACHE_KEYS[]; values: any[] }>;
+export type BrowserAction = Action<BROWSER_ACTIONS.SET_CACHE_VALUES, { keys: PLUME_CACHE_KEYS[]; values: any[] }>;
 
 interface BrowserInstance extends Store<BrowserState, BrowserAction> {}
 

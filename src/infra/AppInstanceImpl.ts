@@ -25,7 +25,7 @@ export interface DefinedPlumeCore {
   muteBtn: HTMLButtonElement;
 }
 
-export enum PLUME_ACTION_TYPES {
+export enum PLUME_ACTIONS {
   RESET_PLUME_UI_INSTANCE = "resetPlumeUiInstance",
   SET_AUDIO_ELEMENT = "setAudioElement",
   SET_TITLE_DISPLAY = "setTitleDisplay",
@@ -37,14 +37,14 @@ export enum PLUME_ACTION_TYPES {
 }
 
 export type PlumeAction =
-  | Action<PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE, string | null>
-  | Action<PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, HTMLAudioElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, HTMLDivElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, HTMLInputElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, HTMLSpanElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, HTMLSpanElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, HTMLInputElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_MUTE_BTN, HTMLButtonElement | null>;
+  | Action<PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE, string | null>
+  | Action<PLUME_ACTIONS.SET_AUDIO_ELEMENT, HTMLAudioElement | null>
+  | Action<PLUME_ACTIONS.SET_TITLE_DISPLAY, HTMLDivElement | null>
+  | Action<PLUME_ACTIONS.SET_PROGRESS_SLIDER, HTMLInputElement | null>
+  | Action<PLUME_ACTIONS.SET_ELAPSED_DISPLAY, HTMLSpanElement | null>
+  | Action<PLUME_ACTIONS.SET_DURATION_DISPLAY, HTMLSpanElement | null>
+  | Action<PLUME_ACTIONS.SET_VOLUME_SLIDER, HTMLInputElement | null>
+  | Action<PLUME_ACTIONS.SET_MUTE_BTN, HTMLButtonElement | null>;
 
 export type PlumeStateListener<K extends keyof DefinedPlumeCore = keyof DefinedPlumeCore> = Listener<
   DefinedPlumeCore,
@@ -107,7 +107,7 @@ const createPlumeUiInstance = (): AppInstance => {
 
   const reducer = (action: PlumeAction): void => {
     switch (action.type) {
-      case PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE:
+      case PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE:
         updateState("audioElement", null);
         updateState("titleDisplay", null);
         updateState("progressSlider", null);
@@ -116,25 +116,25 @@ const createPlumeUiInstance = (): AppInstance => {
         updateState("volumeSlider", null);
         updateState("muteBtn", null);
         break;
-      case PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT:
+      case PLUME_ACTIONS.SET_AUDIO_ELEMENT:
         updateState("audioElement", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_TITLE_DISPLAY:
+      case PLUME_ACTIONS.SET_TITLE_DISPLAY:
         updateState("titleDisplay", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER:
+      case PLUME_ACTIONS.SET_PROGRESS_SLIDER:
         updateState("progressSlider", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY:
+      case PLUME_ACTIONS.SET_ELAPSED_DISPLAY:
         updateState("elapsedDisplay", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_DURATION_DISPLAY:
+      case PLUME_ACTIONS.SET_DURATION_DISPLAY:
         updateState("durationDisplay", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_VOLUME_SLIDER:
+      case PLUME_ACTIONS.SET_VOLUME_SLIDER:
         updateState("volumeSlider", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_MUTE_BTN:
+      case PLUME_ACTIONS.SET_MUTE_BTN:
         updateState("muteBtn", action.payload);
         break;
       default:

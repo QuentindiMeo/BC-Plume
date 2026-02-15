@@ -1,6 +1,6 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../../infra/AppStoreImpl";
+import { getPlumeUiInstance, PLUME_ACTIONS } from "../../infra/AppInstanceImpl";
+import { getStoreInstance, STORE_ACTIONS } from "../../infra/AppStoreImpl";
 import { PLUME_SVG } from "../../svg/icons";
 import { getString } from "../i18n";
 
@@ -16,12 +16,12 @@ export const syncMuteBtn = (isMuted: boolean): void => {
   newMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   newMuteBtn.ariaPressed = isMuted.toString();
   newMuteBtn.classList.toggle("muted", isMuted);
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: newMuteBtn });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_MUTE_BTN, payload: newMuteBtn });
 };
 
 export const handleMuteToggle = (): void => {
   const store = getStoreInstance();
-  store.dispatch({ type: STORE_ACTION_TYPES.TOGGLE_MUTE });
+  store.dispatch({ type: STORE_ACTIONS.TOGGLE_MUTE });
 };
 
 export const createVolumeControlSection = async (): Promise<HTMLDivElement | null> => {
@@ -53,7 +53,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
 
   // Apply saved volume to audio element
   plume.audioElement.volume = currentVolume;
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: plume.audioElement });
 
   const valueDisplay = document.createElement("div");
   valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
@@ -67,19 +67,19 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
 
     // Moving slider off zero counts as an intentional unmute
     if (volume > 0 && store.getState().isMuted) {
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
+      store.dispatch({ type: STORE_ACTIONS.SET_IS_MUTED, payload: false });
     }
 
     // Dispatch to store only - subscription handles audio element and display updates
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
+    store.dispatch({ type: STORE_ACTIONS.SET_VOLUME, payload: volume });
   });
 
   container.appendChild(muteBtn);
   container.appendChild(volumeSlider);
   container.appendChild(valueDisplay);
 
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: volumeSlider });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_MUTE_BTN, payload: muteBtn });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_VOLUME_SLIDER, payload: volumeSlider });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_MUTE_BTN, payload: muteBtn });
 
   return container;
 };

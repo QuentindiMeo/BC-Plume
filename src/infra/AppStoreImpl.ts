@@ -2,7 +2,7 @@ import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domai
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
 import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
 import { CPL, logger } from "../features/logger";
-import { BROWSER_ACTION_TYPES, getBrowserInstance } from "./BrowserImpl";
+import { BROWSER_ACTIONS, getBrowserInstance } from "./BrowserImpl";
 
 export interface AppPersistedState {
   volume: number;
@@ -23,7 +23,7 @@ export interface AppTransientState {
 
 export interface AppState extends AppPersistedState, AppTransientState {}
 
-export enum STORE_ACTION_TYPES {
+export enum STORE_ACTIONS {
   SET_PAGE_TYPE = "SET_PAGE_TYPE",
   SET_TRACK_TITLE = "SET_TRACK_TITLE",
   SET_TRACK_NUMBER = "SET_TRACK_NUMBER",
@@ -39,18 +39,18 @@ export enum STORE_ACTION_TYPES {
 }
 
 export type AppAction =
-  | Action<STORE_ACTION_TYPES.SET_PAGE_TYPE, BcPageType | null>
-  | Action<STORE_ACTION_TYPES.SET_TRACK_TITLE, string | null>
-  | Action<STORE_ACTION_TYPES.SET_TRACK_NUMBER, string | null>
-  | Action<STORE_ACTION_TYPES.SET_DURATION, number>
-  | Action<STORE_ACTION_TYPES.SET_CURRENT_TIME, number>
-  | Action<STORE_ACTION_TYPES.SET_IS_PLAYING, boolean>
-  | Action<STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
-  | Action<STORE_ACTION_TYPES.SET_VOLUME, number>
-  | Action<STORE_ACTION_TYPES.SET_IS_MUTED, boolean>
-  | Action<STORE_ACTION_TYPES.TOGGLE_MUTE>
-  | Action<STORE_ACTION_TYPES.SET_IS_FULLSCREEN, boolean>
-  | Action<STORE_ACTION_TYPES.RESET_TRANSIENT_STATE>;
+  | Action<STORE_ACTIONS.SET_PAGE_TYPE, BcPageType | null>
+  | Action<STORE_ACTIONS.SET_TRACK_TITLE, string | null>
+  | Action<STORE_ACTIONS.SET_TRACK_NUMBER, string | null>
+  | Action<STORE_ACTIONS.SET_DURATION, number>
+  | Action<STORE_ACTIONS.SET_CURRENT_TIME, number>
+  | Action<STORE_ACTIONS.SET_IS_PLAYING, boolean>
+  | Action<STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
+  | Action<STORE_ACTIONS.SET_VOLUME, number>
+  | Action<STORE_ACTIONS.SET_IS_MUTED, boolean>
+  | Action<STORE_ACTIONS.TOGGLE_MUTE>
+  | Action<STORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
+  | Action<STORE_ACTIONS.RESET_TRANSIENT_STATE>;
 
 export type AppStateListener<K extends keyof AppState = keyof AppState> = Listener<AppState, K>;
 
@@ -113,7 +113,7 @@ const createAppStateInstance = (): AppStateStore => {
         const values = Object.values(toSave);
 
         browserCache.dispatch({
-          type: BROWSER_ACTION_TYPES.SET_CACHE_VALUES,
+          type: BROWSER_ACTIONS.SET_CACHE_VALUES,
           payload: { keys, values },
         });
       }
@@ -160,38 +160,38 @@ const createAppStateInstance = (): AppStateStore => {
 
   const reducer = (action: AppAction): void => {
     switch (action.type) {
-      case STORE_ACTION_TYPES.SET_PAGE_TYPE:
+      case STORE_ACTIONS.SET_PAGE_TYPE:
         updateState("pageType", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_TRACK_TITLE:
+      case STORE_ACTIONS.SET_TRACK_TITLE:
         updateState("trackTitle", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_TRACK_NUMBER:
+      case STORE_ACTIONS.SET_TRACK_NUMBER:
         updateState("trackNumber", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_VOLUME:
+      case STORE_ACTIONS.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
           logger(CPL.WARN, "Invalid volume value", action.payload);
           return;
         }
         updateState("volume", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD:
+      case STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         updateState("durationDisplayMethod", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_CURRENT_TIME:
+      case STORE_ACTIONS.SET_CURRENT_TIME:
         updateState("currentTime", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_DURATION:
+      case STORE_ACTIONS.SET_DURATION:
         updateState("duration", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_IS_PLAYING:
+      case STORE_ACTIONS.SET_IS_PLAYING:
         updateState("isPlaying", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_IS_MUTED:
+      case STORE_ACTIONS.SET_IS_MUTED:
         updateState("isMuted", action.payload);
         break;
-      case STORE_ACTION_TYPES.TOGGLE_MUTE: {
+      case STORE_ACTIONS.TOGGLE_MUTE: {
         if (state.isMuted) {
           // Unmute: restore previous volume
           const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
@@ -205,10 +205,10 @@ const createAppStateInstance = (): AppStateStore => {
         }
         break;
       }
-      case STORE_ACTION_TYPES.SET_IS_FULLSCREEN:
+      case STORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
-      case STORE_ACTION_TYPES.RESET_TRANSIENT_STATE:
+      case STORE_ACTIONS.RESET_TRANSIENT_STATE:
         updateState("trackTitle", INITIAL_STATE.trackTitle);
         updateState("trackNumber", INITIAL_STATE.trackNumber);
         updateState("duration", INITIAL_STATE.duration);
@@ -234,10 +234,10 @@ const createAppStateInstance = (): AppStateStore => {
         const volume = result[PLUME_CACHE_KEYS.VOLUME];
         if (typeof volume === "number") {
           const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-          store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volumeClamped });
+          store.dispatch({ type: STORE_ACTIONS.SET_VOLUME, payload: volumeClamped });
 
           if (volumeClamped === 0) {
-            store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: true });
+            store.dispatch({ type: STORE_ACTIONS.SET_IS_MUTED, payload: true });
           }
           logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
         }
@@ -246,7 +246,7 @@ const createAppStateInstance = (): AppStateStore => {
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
         const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
         if (method === "duration" || method === "remaining") {
-          store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: method });
+          store.dispatch({ type: STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, payload: method });
           logger(CPL.INFO, "Time display method applied:", method);
         }
       }

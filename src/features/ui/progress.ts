@@ -1,7 +1,7 @@
 import { TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../../infra/AppStoreImpl";
+import { getPlumeUiInstance, PLUME_ACTIONS } from "../../infra/AppInstanceImpl";
+import { getStoreInstance, STORE_ACTIONS } from "../../infra/AppStoreImpl";
 import { getString } from "../i18n";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
@@ -13,7 +13,7 @@ const handleDurationClick = (): void => {
     currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
 
   store.dispatch({
-    type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD,
+    type: STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
     payload: newMethod,
   });
 };
@@ -23,8 +23,8 @@ export const syncProgressToStore = (): void => {
   const plumeUi = getPlumeUiInstance();
   const plume = plumeUi.getState();
 
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: plume.audioElement.duration });
+  store.dispatch({ type: STORE_ACTIONS.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
+  store.dispatch({ type: STORE_ACTIONS.SET_DURATION, payload: plume.audioElement.duration });
 };
 
 export const createProgressBar = (): HTMLDivElement => {
@@ -57,14 +57,14 @@ export const createProgressBar = (): HTMLDivElement => {
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+    plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: plume.audioElement });
   });
 
   duration.addEventListener("click", handleDurationClick);
 
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_PROGRESS_SLIDER, payload: progressSlider });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_ELAPSED_DISPLAY, payload: elapsed });
+  plumeUi.dispatch({ type: PLUME_ACTIONS.SET_DURATION_DISPLAY, payload: duration });
 
   timeDisplay.appendChild(elapsed);
   timeDisplay.appendChild(duration);

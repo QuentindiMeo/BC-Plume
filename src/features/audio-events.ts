@@ -1,6 +1,6 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, PLUME_ACTIONS } from "../infra/AppInstanceImpl";
+import { getStoreInstance, STORE_ACTIONS } from "../infra/AppStoreImpl";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import { isPlaybackUpdatingFromSubscription } from "./store-subscriptions";
@@ -47,7 +47,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
 
     const currentVolume = plume.audioElement.volume;
     plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
+    plumeUi.dispatch({ type: PLUME_ACTIONS.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
 
     const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
       PLUME_ELEM_IDENTIFIERS.volumeValue
@@ -59,9 +59,9 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     const currentIsMuted = store.getState().isMuted;
     const newIsMuted = currentVolume === 0;
     if (currentIsMuted !== newIsMuted) {
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: newIsMuted });
+      store.dispatch({ type: STORE_ACTIONS.SET_IS_MUTED, payload: newIsMuted });
     }
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: currentVolume });
+    store.dispatch({ type: STORE_ACTIONS.SET_VOLUME, payload: currentVolume });
   };
 
   const handlePlayPause = () => {
@@ -71,7 +71,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     const plume = plumeUi.getState();
 
     const isPlaying = !plume.audioElement.paused;
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: isPlaying });
+    store.dispatch({ type: STORE_ACTIONS.SET_IS_PLAYING, payload: isPlaying });
   };
 
   plume.audioElement.addEventListener("timeupdate", handleTimeUpdate);

@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance, PLUME_ACTIONS } from "../infra/AppInstanceImpl";
 import { getStoreInstance } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
@@ -62,7 +62,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plume = plumeUi.getState();
 
       plume.audioElement.volume = volume;
-      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+      plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: plume.audioElement });
 
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
 
@@ -73,7 +73,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (valueDisplay) {
         valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
-      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
+      plumeUi.dispatch({ type: PLUME_ACTIONS.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
     }),
     // Subscribe to duration display method changes to update display
     store.subscribe("durationDisplayMethod", () => {
@@ -108,7 +108,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       // Update volume slider and display
       const currentVolume = store.getState().volume;
       plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
-      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
+      plumeUi.dispatch({ type: PLUME_ACTIONS.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
 
       const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
         PLUME_ELEM_IDENTIFIERS.volumeValue
@@ -119,7 +119,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Update audio element volume
       plume.audioElement.volume = store.getState().volume;
-      plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+      plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: plume.audioElement });
     }),
     // Subscribe to playing state changes
     store.subscribe("isPlaying", (isPlaying) => {
@@ -142,7 +142,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         playPauseBtns.forEach((btn) => {
           btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
         });
-        plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+        plumeUi.dispatch({ type: PLUME_ACTIONS.SET_AUDIO_ELEMENT, payload: plume.audioElement });
       } finally {
         // Reset flag after a tick to allow audio events to process
         setTimeout(() => {
