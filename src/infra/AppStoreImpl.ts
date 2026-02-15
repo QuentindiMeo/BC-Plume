@@ -204,6 +204,34 @@ const createAppStateInstance = (): AppStateStore => {
     }
   };
 
+  /**
+   * Development-only state change logger for debugging.
+   * Logs all dispatched actions and resulting state changes.
+   */
+  const logStateChange = (action: AppAction, prevState: AppState, nextState: AppState): void => {
+    // Only log in development builds
+    if (process.env.NODE_ENV !== "production") {
+      const hasPayload = "payload" in action;
+
+      logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
+
+      // Find what changed
+      const nextStateKeys = Object.keys(nextState) as Array<keyof AppState>;
+      const changes: Array<{ key: string; from: any; to: any }> = [];
+      for (const key of nextStateKeys) {
+        if (prevState[key] !== nextState[key]) {
+          changes.push({
+            key,
+            from: prevState[key],
+            to: nextState[key],
+          });
+        }
+      }
+
+      if (changes.length > 0) logger(CPL.DEBUG, "[STORE] State changes: " + JSON.stringify(changes));
+    }
+  };
+
   const reducer = (action: AppAction): void => {
     switch (action.type) {
       case STORE_ACTIONS.SET_PAGE_TYPE:
@@ -307,7 +335,9 @@ const createAppStateInstance = (): AppStateStore => {
     },
 
     dispatch(action: AppAction): void {
+      const prevState = { ...state };
       reducer(action);
+      logStateChange(action, prevState, state);
     },
 
     subscribe<K extends keyof AppState>(key: K, listener: AppStateListener<K>): () => void {
