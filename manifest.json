@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "BC-Plume - Bandcamp Player Enhancer",
+  "name": "__MSG_APP_NAME__",
   "version": "1.3.1",
-  "description": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player.",
+  "description": "__MSG_APP_DESCRIPTION__",
   "default_locale": "en",
   "permissions": ["storage"],
   "host_permissions": ["*://*.bandcamp.com/*"],

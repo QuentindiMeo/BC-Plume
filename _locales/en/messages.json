@@ -1,4 +1,7 @@
 {
+  "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
+  "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player." },
+
   "ERROR__NO_BROWSER_API": { "message": "No browser extension API detected" },
   "ERROR__STATE__LOAD_FAILED": { "message": "Failed to load persisted state:" },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Global state listener error:" },
@@ -23,9 +26,9 @@
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Info section not found for fullscreen mode" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Plume container not found for fullscreen mode" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Track list not found, skipping runtime calculation" },
-  "LOG__MOUNT__COMPLETE": { "message": "BC-Plume mounted successfully" },
-  "LOG__INITIALIZATION__START": { "message": "BC-Plume initialization..." },
-  "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume initialized successfully" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume mounted successfully" },
+  "LOG__INITIALIZATION__START": { "message": "Plume initialization..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialized successfully" },
   "LOG__NAVIGATION_DETECTED": { "message": "Navigation detected, resetting..." },
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Original player elements hidden" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },

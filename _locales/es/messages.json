@@ -1,4 +1,7 @@
 {
+  "APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
+  "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, avance/retroceso de 10s, pantalla completa y atajos de teclado." },
+
   "ERROR__NO_BROWSER_API": { "message": "No se detectó API de extensión del navegador" },
   "ERROR__STATE__LOAD_FAILED": { "message": "Error al cargar el estado guardado:" },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Error en el oyente global de estado:" },
@@ -23,9 +26,9 @@
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Sección de información no encontrada para modo de pantalla completa" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Contenedor de Plume no encontrado para modo de pantalla completa" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista de pistas no encontrada, omitiendo cálculo del tiempo total" },
-  "LOG__MOUNT__COMPLETE": { "message": "BC-Plume montado exitosamente" },
-  "LOG__INITIALIZATION__START": { "message": "Inicializando BC-Plume..." },
-  "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume inicializado exitosamente" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume montado exitosamente" },
+  "LOG__INITIALIZATION__START": { "message": "Inicializando Plume..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume inicializado exitosamente" },
   "LOG__NAVIGATION_DETECTED": { "message": "Navegación detectada, reiniciando..." },
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
