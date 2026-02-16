@@ -1,6 +1,6 @@
 import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
-import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
+import { Action, handleUnknownAction, Listener, Store, Thunk } from "../domain/store";
 import { CPL, logger } from "../features/logger";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
 
@@ -101,13 +101,16 @@ export const storeActions = {
   }),
 } as const;
 
-export type AppStateListener<K extends keyof AppState = keyof AppState> = Listener<AppState, K>;
+export type AppStateListener<AppStateProp extends keyof AppState = keyof AppState> = Listener<AppState, AppStateProp>;
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
 const PERSISTENCE_DELAY_MS = 200;
 
 interface AppStateStore extends Store<AppState, AppAction> {
-  subscribe<K extends keyof AppState>(key: K, listener: AppStateListener<K>): () => void;
+  subscribe<AppStateProp extends keyof AppState>(
+    key: AppStateProp,
+    listener: AppStateListener<AppStateProp>
+  ): () => void;
   subscribeAll(listener: (state: AppState) => void): () => void;
   loadPersistedState(): Promise<void>;
 }
@@ -169,7 +172,7 @@ const createAppStateInstance = (): AppStateStore => {
     }, PERSISTENCE_DELAY_MS);
   };
 
-  const notify = <K extends keyof AppState>(key: K, prevValue: AppState[K]): void => {
+  const notify = <AppStateProp extends keyof AppState>(key: AppStateProp, prevValue: AppState[AppStateProp]): void => {
     const keyListeners = listeners.get(key);
     if (keyListeners) {
       keyListeners.forEach((listener) => {
@@ -190,7 +193,7 @@ const createAppStateInstance = (): AppStateStore => {
     });
   };
 
-  const updateState = <K extends keyof AppState>(key: K, value: AppState[K]): void => {
+  const updateState = <AppStateProp extends keyof AppState>(key: AppStateProp, value: AppState[AppStateProp]): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
@@ -298,7 +301,7 @@ const createAppStateInstance = (): AppStateStore => {
     }
   };
 
-  const loadPersistedState = async (store: AppStateStore): Promise<void> => {
+  const loadPersistedStateThunk = (): Thunk => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
@@ -308,10 +311,10 @@ const createAppStateInstance = (): AppStateStore => {
         const volume = result[PLUME_CACHE_KEYS.VOLUME];
         if (typeof volume === "number") {
           const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-          store.dispatch(storeActions.setVolume(volumeClamped));
+          dispatch(storeActions.setVolume(volumeClamped));
 
           if (volumeClamped === 0) {
-            store.dispatch(storeActions.setIsMuted(true));
+            dispatch(storeActions.setIsMuted(true));
           }
           logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
         }
@@ -320,7 +323,7 @@ const createAppStateInstance = (): AppStateStore => {
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
         const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
         if (method === "duration" || method === "remaining") {
-          store.dispatch(storeActions.setDurationDisplayMethod(method));
+          dispatch(storeActions.setDurationDisplayMethod(method));
           logger(CPL.INFO, "Time display method applied:", method);
         }
       }
@@ -334,13 +337,23 @@ const createAppStateInstance = (): AppStateStore => {
       return state;
     },
 
-    dispatch(action: AppAction): void {
+    dispatch(action: AppAction | Thunk): void {
+      // Handle async thunks
+      if (typeof action === "function") {
+        action(this.dispatch.bind(this), this.getState.bind(this));
+        return;
+      }
+
+      // Handle regular actions
       const prevState = { ...state };
       reducer(action);
       logStateChange(action, prevState, state);
     },
 
-    subscribe<K extends keyof AppState>(key: K, listener: AppStateListener<K>): () => void {
+    subscribe<AppStateProp extends keyof AppState>(
+      key: AppStateProp,
+      listener: AppStateListener<AppStateProp>
+    ): () => void {
       if (!listeners.has(key)) listeners.set(key, new Set());
 
       listeners.get(key)!.add(listener);
@@ -365,7 +378,8 @@ const createAppStateInstance = (): AppStateStore => {
     },
 
     loadPersistedState: async function (): Promise<void> {
-      await loadPersistedState(this);
+      // Use the thunk pattern for async state loading
+      this.dispatch(loadPersistedStateThunk());
     },
   };
 };

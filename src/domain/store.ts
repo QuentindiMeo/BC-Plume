@@ -4,13 +4,17 @@ export const handleUnknownAction = (action: never): never => {
   throw new Error(`Unhandled action type: ${JSON.stringify(action)} — implementation missing for this action.`);
 };
 
-export type Action<T = string, P = undefined> = P extends undefined ? { type: T } : { type: T; payload: P };
+export type Action<ActionId = string, Payload = undefined> = Payload extends undefined
+  ? { type: ActionId }
+  : { type: ActionId; payload: Payload };
 
-export type Listener<T, K extends keyof T> = (value: T[K], prevValue: T[K]) => void;
+export type Listener<State, Key extends keyof State> = (value: State[Key], prevValue: State[Key]) => void;
 
-export interface Store<T, A extends Action = Action> {
-  getState(): Readonly<T>;
-  dispatch(action: A): void;
-  subscribe?<K extends keyof T>(key: K, listener: Listener<T, K>): NoArgFunction;
-  subscribeAll?(listener: (state: T) => void): NoArgFunction;
+export type Thunk = (dispatch: Store<any, any>["dispatch"], getState: () => Readonly<object>) => Promise<void>;
+
+export interface Store<State, Action> {
+  getState(): Readonly<State>;
+  dispatch(action: Action | Thunk): void;
+  subscribe?<Key extends keyof State>(key: Key, listener: Listener<State, Key>): NoArgFunction;
+  subscribeAll?(listener: (state: State) => void): NoArgFunction;
 }

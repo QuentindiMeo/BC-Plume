@@ -1,5 +1,4 @@
 import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
-import { CPL, logger } from "../features/logger";
 
 interface PlumeCore {
   audioElement: HTMLAudioElement | null;
@@ -81,15 +80,12 @@ export const plumeActions = {
   }),
 } as const;
 
-export type PlumeStateListener<K extends keyof DefinedPlumeCore = keyof DefinedPlumeCore> = Listener<
+export type PlumeStateListener<PlumeCoreProp extends keyof DefinedPlumeCore = keyof DefinedPlumeCore> = Listener<
   DefinedPlumeCore,
-  K
+  PlumeCoreProp
 >;
 
-interface AppInstance extends Store<DefinedPlumeCore, PlumeAction> {
-  subscribe<K extends keyof DefinedPlumeCore>(key: K, listener: PlumeStateListener<K>): () => void;
-  subscribeAll(listener: (state: DefinedPlumeCore) => void): () => void;
-}
+interface AppInstance extends Store<DefinedPlumeCore, PlumeAction> {}
 
 const INITIAL_STATE: PlumeCore = {
   audioElement: null,
@@ -106,38 +102,15 @@ let plumeUiInstance: AppInstance | null = null;
 const createPlumeUiInstance = (): AppInstance => {
   let state = { ...INITIAL_STATE };
 
-  const listeners = new Map<keyof PlumeCore, Set<PlumeStateListener<any>>>();
-  const globalListeners = new Set<(state: DefinedPlumeCore) => void>();
-
-  const notify = <K extends keyof DefinedPlumeCore>(key: K, prevValue: DefinedPlumeCore[K]): void => {
-    const keyListeners = listeners.get(key);
-    if (keyListeners) {
-      keyListeners.forEach((listener) => {
-        try {
-          listener(state[key], prevValue);
-        } catch (error) {
-          logger(CPL.ERROR, "State listener failed", { key, error });
-        }
-      });
-    }
-
-    globalListeners.forEach((listener) => {
-      try {
-        listener(state as DefinedPlumeCore);
-      } catch (error) {
-        logger(CPL.ERROR, "Global state listener failed", error);
-      }
-    });
-  };
-
-  const updateState = <K extends keyof PlumeCore>(key: K, value: PlumeCore[K]): void => {
+  const updateState = <PlumeCoreProp extends keyof PlumeCore>(
+    key: PlumeCoreProp,
+    value: PlumeCore[PlumeCoreProp]
+  ): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
 
     state = { ...state, [key]: value };
-
-    notify(key, prevValue as DefinedPlumeCore[K]);
   };
 
   const reducer = (action: PlumeAction): void => {
@@ -185,30 +158,6 @@ const createPlumeUiInstance = (): AppInstance => {
 
     dispatch(action: PlumeAction): void {
       reducer(action);
-    },
-
-    subscribe<K extends keyof PlumeCore>(key: K, listener: PlumeStateListener<K>): () => void {
-      if (!listeners.has(key)) listeners.set(key, new Set());
-
-      listeners.get(key)!.add(listener);
-
-      return () => {
-        const keyListeners = listeners.get(key);
-        if (keyListeners) {
-          keyListeners.delete(listener);
-          if (keyListeners.size === 0) {
-            listeners.delete(key);
-          }
-        }
-      };
-    },
-
-    subscribeAll(listener: (state: DefinedPlumeCore) => void): () => void {
-      globalListeners.add(listener);
-
-      return () => {
-        globalListeners.delete(listener);
-      };
     },
   };
 };

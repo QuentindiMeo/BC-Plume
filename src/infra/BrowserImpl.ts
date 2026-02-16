@@ -121,6 +121,7 @@ const createBrowserInstance = (): BrowserInstance => {
     getState(): Readonly<BrowserState> {
       return state;
     },
+
     dispatch(action: BrowserAction): void {
       const prevState = { ...state };
       reducer(action);
