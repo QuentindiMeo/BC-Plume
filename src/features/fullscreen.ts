@@ -2,11 +2,10 @@ import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
 import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
-import { AppState, getStoreInstance, storeActions } from "../infra/AppStoreImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
-import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "./presenters";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 import {
   handlePlayPause,
@@ -51,24 +50,25 @@ export const cleanupFullscreenMode = (): void => {
   }
 };
 
-const renderProgressSlider = (elements: FullscreenElements, state: AppState): void => {
+const renderProgressSlider = (elements: FullscreenElements, progressPercentage: number): void => {
   if (!elements.progressSlider) return;
 
-  const percent = presentProgressPercentage(state);
-  const bgPercent = percent < 50 ? percent + 1 : percent - 1;
+  const bgPercent = progressPercentage < 50 ? progressPercentage + 1 : progressPercentage - 1;
   const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-  elements.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+  elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
   elements.progressSlider.style.backgroundImage = bgImg;
 };
 
-const renderElapsedDisplay = (elements: FullscreenElements, state: AppState): void => {
+const renderElapsedDisplay = (elements: FullscreenElements, formattedElapsed: string): void => {
   if (!elements.elapsedDisplay) return;
-  elements.elapsedDisplay.textContent = presentFormattedElapsed(state);
+
+  elements.elapsedDisplay.textContent = formattedElapsed;
 };
 
-const renderDurationDisplay = (elements: FullscreenElements, state: AppState): void => {
+const renderDurationDisplay = (elements: FullscreenElements, formattedDuration: string): void => {
   if (!elements.durationDisplay) return;
-  elements.durationDisplay.textContent = presentFormattedDuration(state);
+
+  elements.durationDisplay.textContent = formattedDuration;
 };
 
 const renderPlayPauseButton = (elements: FullscreenElements, isPlaying: boolean): void => {
@@ -145,18 +145,15 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   // Subscribe to state changes and use pure rendering functions for updates
   subscriptions.push(
     store.subscribe("currentTime", () => {
-      const state = store.getState();
-      renderProgressSlider(elements, state);
-      renderElapsedDisplay(elements, state);
-      renderDurationDisplay(elements, state);
+      renderProgressSlider(elements, store.computed.progressPercentage());
+      renderElapsedDisplay(elements, store.computed.formattedElapsed());
+      renderDurationDisplay(elements, store.computed.formattedDuration());
     }),
     store.subscribe("duration", () => {
-      const state = store.getState();
-      renderDurationDisplay(elements, state);
+      renderDurationDisplay(elements, store.computed.formattedDuration());
     }),
     store.subscribe("durationDisplayMethod", () => {
-      const state = store.getState();
-      renderDurationDisplay(elements, state);
+      renderDurationDisplay(elements, store.computed.formattedDuration());
     }),
     store.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
@@ -233,9 +230,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
-  renderProgressSlider(elements, state);
-  renderElapsedDisplay(elements, state);
-  renderDurationDisplay(elements, state);
+  renderProgressSlider(elements, store.computed.progressPercentage());
+  renderElapsedDisplay(elements, store.computed.formattedElapsed());
+  renderDurationDisplay(elements, store.computed.formattedDuration());
   renderPlayPauseButton(elements, state.isPlaying);
   renderVolume(elements, state.volume);
   renderMuteButton(elements, state.isMuted);

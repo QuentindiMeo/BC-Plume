@@ -2,6 +2,7 @@ import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domai
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
 import { Action, handleUnknownAction, Listener, Store, Thunk } from "../domain/store";
 import { CPL, logger } from "../features/logger";
+import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
 
 export interface AppPersistedState {
@@ -106,13 +107,35 @@ export type AppStateListener<AppStateProp extends keyof AppState = keyof AppStat
 const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
 const PERSISTENCE_DELAY_MS = 200;
 
+/**
+ * Computed properties - derived state calculated on-demand from selectors.
+ * These are NOT stored in state, but computed when accessed.
+ *
+ * Benefits:
+ * - No redundant state storage
+ * - Always consistent with source data
+ * - Lazy evaluation (only computed when needed)
+ * - Can be memoized if performance becomes a concern
+ */
+interface ComputedState {
+  /** Returns formatted elapsed time (MM:SS) */
+  formattedElapsed: () => string;
+  /** Returns formatted duration (MM:SS or -MM:SS for remaining) */
+  formattedDuration: () => string;
+  /** Returns progress percentage (0-100) */
+  progressPercentage: () => number;
+}
+
 interface AppStateStore extends Store<AppState, AppAction> {
   subscribe<AppStateProp extends keyof AppState>(
     key: AppStateProp,
     listener: AppStateListener<AppStateProp>
   ): () => void;
   subscribeAll(listener: (state: AppState) => void): () => void;
+
+  // * Additional fields
   loadPersistedState(): Promise<void>;
+  computed: ComputedState;
 }
 
 const INITIAL_STATE: AppState = {
@@ -380,6 +403,12 @@ const createAppStateInstance = (): AppStateStore => {
     loadPersistedState: async function (): Promise<void> {
       // Use the thunk pattern for async state loading
       this.dispatch(loadPersistedStateThunk());
+    },
+
+    computed: {
+      formattedElapsed: () => presentFormattedElapsed(state),
+      formattedDuration: () => presentFormattedDuration(state),
+      progressPercentage: () => presentProgressPercentage(state),
     },
   };
 };
