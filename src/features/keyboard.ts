@@ -23,7 +23,7 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
   const store = getStoreInstance();
 
   const handleAdjustVolume = (delta: number) => {
-    if (delta <= 0) logger(CPL.WARN, getString("WARN__VOLUME__ADJUSTING_WITH_NON_POSITIVE_DELTA", delta));
+    if (delta === 0) logger(CPL.WARN, getString("WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA"));
 
     const plume = plumeUi.getState();
     const currentValue = Number.parseInt(plume.volumeSlider.value);

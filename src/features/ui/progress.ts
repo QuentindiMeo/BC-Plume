@@ -15,7 +15,7 @@ const handleDurationClick = (): void => {
   store.dispatch(storeActions.setDurationDisplayMethod(newMethod));
 };
 
-export const syncProgressToStore = (): void => {
+export const dispatchAudioProgressToStore = (): void => {
   const store = getStoreInstance();
   const plumeUi = getPlumeUiInstance();
   const plume = plumeUi.getState();
@@ -54,6 +54,14 @@ export const createProgressBar = (): HTMLDivElement => {
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
+
+    // Preserve paused state after seeking
+    const wasPaused = plume.audioElement.paused;
+    if (wasPaused) {
+      setTimeout(() => {
+        plume.audioElement.pause();
+      }, 10);
+    }
     plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   });
 

@@ -186,7 +186,7 @@ const createAppStateInstance = (): AppStateStore => {
   let persistenceTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingPersistedKeys = new Set<keyof AppState>();
 
-  // Scenario recorder for time-travel debugging (dev-only)
+  // Scenario recorder for time-travel debugging (test-only)
   const scenarioRecorder: ScenarioControls<AppState, AppAction> | null =
     process.env.NODE_ENV === "testing" ? createScenarioRecorder<AppState, AppAction>() : null;
 

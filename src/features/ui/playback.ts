@@ -10,11 +10,11 @@ const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
 const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
 
 export const handlePlayPause = (): void => {
-  const plume = getPlumeUiInstance().getState();
   const store = getStoreInstance();
 
   // Dispatch to store only - subscription handles audio element state
-  const shouldPlay = plume.audioElement.paused;
+  const isCurrentlyPlaying = store.getState().isPlaying;
+  const shouldPlay = !isCurrentlyPlaying;
   store.dispatch(storeActions.setIsPlaying(shouldPlay));
 };
 
@@ -65,6 +65,14 @@ export const handleTimeBackward = (): void => {
   const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
   plume.audioElement.currentTime = newTime;
 
+  // Preserve paused state after seeking
+  const wasPaused = plume.audioElement.paused;
+  if (wasPaused) {
+    setTimeout(() => {
+      plume.audioElement.pause();
+    }, 10);
+  }
+
   plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", Math.round(newTime)));
 };
@@ -77,6 +85,14 @@ export const handleTimeForward = (): void => {
 
   const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
   plume.audioElement.currentTime = newTime;
+
+  // Preserve paused state after seeking
+  const wasPaused = plume.audioElement.paused;
+  if (wasPaused) {
+    setTimeout(() => {
+      plume.audioElement.pause();
+    }, 10);
+  }
 
   plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", Math.round(newTime)));

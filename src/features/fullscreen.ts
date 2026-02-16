@@ -50,40 +50,22 @@ export const cleanupFullscreenMode = (): void => {
   }
 };
 
-const renderProgressSlider = (elements: FullscreenElements, progressPercentage: number): void => {
-  if (!elements.progressSlider) return;
-
-  const bgPercent = progressPercentage < 50 ? progressPercentage + 1 : progressPercentage - 1;
-  const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-  elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-  elements.progressSlider.style.backgroundImage = bgImg;
-};
-
-const renderElapsedDisplay = (elements: FullscreenElements, formattedElapsed: string): void => {
-  if (!elements.elapsedDisplay) return;
-
-  elements.elapsedDisplay.textContent = formattedElapsed;
-};
-
-const renderDurationDisplay = (elements: FullscreenElements, formattedDuration: string): void => {
-  if (!elements.durationDisplay) return;
-
-  elements.durationDisplay.textContent = formattedDuration;
-};
-
-const renderPlayPauseButton = (elements: FullscreenElements, isPlaying: boolean): void => {
-  if (!elements.playPauseBtn) return;
-  elements.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
-};
-
 const renderVolume = (elements: FullscreenElements, volume: number): void => {
-  if (!elements.volumeSlider || !elements.volumeDisplay) return;
+  if (!elements.volumeSlider || !elements.volumeDisplay) {
+    logger(CPL.ERROR, getString("ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND"));
+    return;
+  }
+
   elements.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
   elements.volumeDisplay.textContent = `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`;
 };
 
 const renderMuteButton = (elements: FullscreenElements, isMuted: boolean): void => {
-  if (!elements.muteBtn) return;
+  if (!elements.muteBtn) {
+    logger(CPL.ERROR, getString("ERROR__MUTE_BUTTON__NOT_FOUND"));
+    return;
+  }
+
   elements.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
   elements.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   elements.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
@@ -91,8 +73,50 @@ const renderMuteButton = (elements: FullscreenElements, isMuted: boolean): void 
   elements.muteBtn.classList.toggle("muted", isMuted);
 };
 
+const renderPlayPauseButton = (elements: FullscreenElements, isPlaying: boolean): void => {
+  if (!elements.playPauseBtn) {
+    logger(CPL.ERROR, getString("ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND"));
+    return;
+  }
+
+  elements.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+};
+
+const renderElapsedDisplay = (elements: FullscreenElements, formattedElapsed: string): void => {
+  if (!elements.elapsedDisplay) {
+    logger(CPL.ERROR, getString("ERROR__ELAPSED_DISPLAY__NOT_FOUND"));
+    return;
+  }
+
+  elements.elapsedDisplay.textContent = formattedElapsed;
+};
+
+const renderDurationDisplay = (elements: FullscreenElements, formattedDuration: string): void => {
+  if (!elements.durationDisplay) {
+    logger(CPL.ERROR, getString("ERROR__DURATION_DISPLAY__NOT_FOUND"));
+    return;
+  }
+
+  elements.durationDisplay.textContent = formattedDuration;
+};
+
+const renderProgressSlider = (elements: FullscreenElements, progressPercentage: number): void => {
+  if (!elements.progressSlider) {
+    logger(CPL.ERROR, getString("ERROR__PROGRESS_SLIDER__NOT_FOUND"));
+    return;
+  }
+
+  const bgPercent = progressPercentage < 50 ? progressPercentage + 1 : progressPercentage - 1;
+  const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+  elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+  elements.progressSlider.style.backgroundImage = bgImg;
+};
+
 const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | null): void => {
-  if (!elements.headerContainer || !trackTitle) return;
+  if (!elements.headerContainer || !trackTitle) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND"));
+    return;
+  }
 
   const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
   if (!headerTitle) {
@@ -106,7 +130,10 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
 
 const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | null): void => {
   const header = elements.headerContainer;
-  if (!header || !trackNumber) return;
+  if (!header || !trackNumber) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND"));
+    return;
+  }
 
   const headerPretext = header.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
   if (!headerPretext) {
@@ -402,7 +429,6 @@ export const toggleFullscreenMode = (): void => {
 
   // Enter fullscreen - dispatch state change first, then build DOM
   const isAlbumPage = store.getState().pageType === "album";
-  store.dispatch(storeActions.setIsFullscreen(true));
 
   const overlay = buildFullscreenOverlay(isAlbumPage);
   if (!overlay) {
@@ -420,6 +446,8 @@ export const toggleFullscreenMode = (): void => {
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
   setupFullscreenFocusTrap(overlay);
+
+  store.dispatch(storeActions.setIsFullscreen(true));
 
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

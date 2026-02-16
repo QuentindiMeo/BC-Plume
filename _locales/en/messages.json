@@ -9,8 +9,16 @@
   "ERROR__STATE__PERSIST_FAILED": { "message": "Failed to persist state:" },
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
-  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Header title element not found" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Header container or track number not found" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Header container or track title not found" },
   "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Header pretext element not found" },
+  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Header title element not found" },
+  "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Progress slider element not found" },
+  "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Duration display element not found" },
+  "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elapsed display element not found" },
+  "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Play/Pause button not found" },
+  "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
+  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
   "WARN__STATE__UNKNOWN_ACTION": { "message": "Unknown store action:" },
   "WARN__VOLUME__INVALID_VALUE": { "message": "Invalid volume value, using default" },
@@ -28,15 +36,7 @@
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Info section not found for fullscreen mode" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Plume container not found for fullscreen mode" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Track list not found, skipping runtime calculation" },
-  "WARN__VOLUME__ADJUSTING_WITH_NON_POSITIVE_DELTA": {
-    "message": "Adjusting volume with non-positive delta: $DELTA$",
-    "placeholders": {
-      "delta": {
-        "content": "$1",
-        "example": "-0.1"
-      }
-    }
-  },
+  "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": { "message": "Adjusting volume with a null delta may indicate a logic error in the code" },
   "LOG__MOUNT__COMPLETE": { "message": "Plume mounted successfully" },
   "LOG__INITIALIZATION__START": { "message": "Plume initialization..." },
   "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialized successfully" },

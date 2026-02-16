@@ -71,7 +71,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
       store.dispatch(storeActions.setIsMuted(false));
     }
 
-    // Dispatch to store only - subscription handles audio element and display updates
+    // Dispatch to store only - subscription updates the audio element and value display
     store.dispatch(storeActions.setVolume(volume));
   });
 

@@ -4,6 +4,7 @@ import { getStoreInstance } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
+import { presentFormattedTime } from "./presenters";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";
 
@@ -28,7 +29,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const elapsed = state.currentTime;
       const duration = state.duration;
 
-      if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
+      if (Number.isNaN(elapsed) || Number.isNaN(duration) || duration === 0) return;
 
       const songProgressPercentage = (elapsed / duration) * 100;
       const bgPercent = songProgressPercentage < 50 ? songProgressPercentage + 1 : songProgressPercentage - 1;
@@ -38,20 +39,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.progressSlider.style.backgroundImage = bgImg;
 
       // Update time displays
-      const elapsedMinutes = Math.floor(elapsed / 60);
-      const elapsedSeconds = Math.floor(elapsed % 60);
-      plume.elapsedDisplay.textContent = `${elapsedMinutes}:${elapsedSeconds.toString().padStart(2, "0")}`;
+      plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
 
       let durationDisplayText: string;
       if (state.durationDisplayMethod === "duration") {
-        const durationMinutes = Math.floor(duration / 60);
-        const durationSeconds = Math.floor(duration % 60);
-        durationDisplayText = `${durationMinutes}:${durationSeconds.toString().padStart(2, "0")}`;
+        durationDisplayText = presentFormattedTime(duration);
       } else {
         const remainingSeconds = Math.floor(duration - elapsed);
-        const remainingMinutes = Math.floor(remainingSeconds / 60);
-        const remainingSecondsDisplay = remainingSeconds % 60;
-        durationDisplayText = `-${remainingMinutes}:${remainingSecondsDisplay.toString().padStart(2, "0")}`;
+        durationDisplayText = `-${presentFormattedTime(remainingSeconds)}`;
       }
 
       plume.durationDisplay.textContent = durationDisplayText;
@@ -86,14 +81,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       let durationDisplayText: string;
       if (state.durationDisplayMethod === "duration") {
-        const durationMinutes = Math.floor(duration / 60);
-        const durationSeconds = Math.floor(duration % 60);
-        durationDisplayText = `${durationMinutes}:${durationSeconds.toString().padStart(2, "0")}`;
+        durationDisplayText = presentFormattedTime(duration);
       } else {
         const remainingSeconds = Math.floor(duration - elapsed);
-        const remainingMinutes = Math.floor(remainingSeconds / 60);
-        const remainingSecondsDisplay = remainingSeconds % 60;
-        durationDisplayText = `-${remainingMinutes}:${remainingSecondsDisplay.toString().padStart(2, "0")}`;
+        durationDisplayText = `-${presentFormattedTime(remainingSeconds)}`;
       }
 
       plume.durationDisplay.textContent = durationDisplayText;
