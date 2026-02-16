@@ -1,7 +1,7 @@
 import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
 import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
@@ -173,7 +173,6 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   );
 
   const handleProgressInput = function (this: HTMLInputElement) {
-    const plumeUi = getPlumeUiInstance();
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
 
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
@@ -188,7 +187,6 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
     // Dispatch to store to sync with main view
     store.dispatch(storeActions.setCurrentTime(plume.audioElement.currentTime));
-    plumeUi.dispatch(plumeActions.setProgressSlider(elements.progressSlider));
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
