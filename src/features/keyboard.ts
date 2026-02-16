@@ -1,12 +1,12 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { NoArgFunction } from "../shared/types";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import type { CleanupCallback } from "./types";
 
-const { AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+const { AVAILABLE_HOTKEYS: AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 interface KeyboardHandlers {
   handlePlayPause: NoArgFunction;
@@ -14,6 +14,7 @@ interface KeyboardHandlers {
   handleTimeForward: NoArgFunction;
   handleTrackBackward: NoArgFunction;
   handleTrackForward: NoArgFunction;
+  handleMuteToggle: NoArgFunction;
   toggleFullscreenMode: NoArgFunction;
 }
 
@@ -22,15 +23,17 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
   const store = getStoreInstance();
 
   const handleAdjustVolume = (delta: number) => {
+    if (delta === 0) logger(CPL.WARN, getString("WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA"));
+
     const plume = plumeUi.getState();
     const currentValue = Number.parseInt(plume.volumeSlider.value);
     const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
     plume.volumeSlider.value = newValue.toString();
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: plume.volumeSlider });
+    plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
 
     const volume = newValue / VOLUME_SLIDER_GRANULARITY;
     plume.audioElement.volume = volume;
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
 
     const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
     volumeSliders.forEach((slider) => {
@@ -40,27 +43,30 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
       valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
     });
 
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volume });
-  };
-
-  const handleToggleMute = () => {
-    const plume = plumeUi.getState();
-    plume.muteBtn.click();
+    store.dispatch(storeActions.setVolume(volume));
   };
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if (!(e.ctrlKey && e.altKey)) return; // require Ctrl + Alt modifier
+    const userIsTypingInInput =
+      (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
+    if (userIsTypingInInput) return; // don't trigger hotkeys when user is typing in an input or textarea
 
-    const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.code);
+    const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.key);
     if (!isValidHotkey) return;
 
     e.preventDefault();
     e.stopPropagation();
-
-    switch (e.code) {
-      case "Space":
+    switch (e.key) {
+      case " ": {
+        const focusedElement = document.activeElement as HTMLElement;
+        const isSpaceTriggeringButton = focusedElement.tagName === "BUTTON";
+        if (isSpaceTriggeringButton) {
+          focusedElement.click();
+          return;
+        }
         handlers.handlePlayPause();
         break;
+      }
       case "ArrowLeft":
         handlers.handleTimeBackward();
         break;
@@ -79,11 +85,11 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
       case "PageDown":
         handlers.handleTrackForward();
         break;
-      case "KeyF":
+      case "f":
         handlers.toggleFullscreenMode();
         break;
-      case "KeyM":
-        handleToggleMute();
+      case "m":
+        handlers.handleMuteToggle();
         break;
     }
   };

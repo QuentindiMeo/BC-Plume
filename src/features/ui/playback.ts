@@ -1,13 +1,102 @@
 import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
 import { PLUME_SVG } from "../../svg/icons";
 import { getString } from "../i18n";
 import { CPL, logger } from "../logger";
 
 const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
 const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
+
+export const handlePlayPause = (): void => {
+  const store = getStoreInstance();
+
+  // Dispatch to store only - subscription handles audio element state
+  const isCurrentlyPlaying = store.getState().isPlaying;
+  const shouldPlay = !isCurrentlyPlaying;
+  store.dispatch(storeActions.setIsPlaying(shouldPlay));
+};
+
+export const handleTrackBackward = (): void => {
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
+
+  // If past TIME_BEFORE_RESTART, restart current track
+  if (plume.audioElement.currentTime > TIME_BEFORE_RESTART) {
+    plume.audioElement.currentTime = 0;
+    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
+    logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
+    return;
+  }
+
+  // Otherwise, click BC's previous button
+  const bcPrevBtn = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
+  if (!bcPrevBtn) {
+    logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
+    return;
+  }
+
+  bcPrevBtn.click();
+  logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
+};
+
+export const handleTrackForward = (): void => {
+  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+
+  const bcNextBtn = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
+  if (!bcNextBtn) {
+    logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
+    return;
+  }
+
+  bcNextBtn.click();
+  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
+};
+
+export const handleTimeBackward = (): void => {
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
+
+  const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
+  plume.audioElement.currentTime = newTime;
+
+  // Preserve paused state after seeking
+  const wasPaused = plume.audioElement.paused;
+  if (wasPaused) {
+    setTimeout(() => {
+      plume.audioElement.pause();
+    }, 10);
+  }
+
+  plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
+  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", Math.round(newTime)));
+};
+
+export const handleTimeForward = (): void => {
+  const plumeUi = getPlumeUiInstance();
+  const plume = plumeUi.getState();
+
+  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
+
+  const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
+  plume.audioElement.currentTime = newTime;
+
+  // Preserve paused state after seeking
+  const wasPaused = plume.audioElement.paused;
+  if (wasPaused) {
+    setTimeout(() => {
+      plume.audioElement.pause();
+    }, 10);
+  }
+
+  plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
+  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", Math.round(newTime)));
+};
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
   const plume = getPlumeUiInstance().getState();
@@ -61,101 +150,4 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   container.appendChild(trackForwardBtn);
 
   return container;
-};
-
-export const handlePlayPause = (): void => {
-  const plume = getPlumeUiInstance().getState();
-  const store = getStoreInstance();
-
-  if (plume.audioElement.paused) {
-    plume.audioElement.play();
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: true });
-  } else {
-    plume.audioElement.pause();
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_PLAYING, payload: false });
-  }
-};
-
-export const handleTrackBackward = (): void => {
-  const plumeUi = getPlumeUiInstance();
-  const plume = plumeUi.getState();
-
-  logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
-
-  // If past TIME_BEFORE_RESTART, restart current track
-  if (plume.audioElement.currentTime > TIME_BEFORE_RESTART) {
-    plume.audioElement.currentTime = 0;
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
-    logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
-    return;
-  }
-
-  // Otherwise, click BC's previous button
-  const bcPrevBtn = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
-  if (!bcPrevBtn) {
-    logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
-    return;
-  }
-
-  bcPrevBtn.click();
-  logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__DISPATCHED"));
-};
-
-export const handleTrackForward = (): void => {
-  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-
-  const bcNextBtn = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
-  if (!bcNextBtn) {
-    logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
-    return;
-  }
-
-  bcNextBtn.click();
-  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
-};
-
-export const handleTimeBackward = (): void => {
-  const plumeUi = getPlumeUiInstance();
-  const plume = plumeUi.getState();
-
-  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
-
-  const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
-  plume.audioElement.currentTime = newTime;
-
-  // Prevent auto-play when rewinding on paused track
-  if (plume.audioElement.paused) {
-    setTimeout(() => {
-      plume.audioElement.pause();
-    }, 10);
-  }
-
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
-  logger(
-    CPL.DEBUG,
-    `${getString("DEBUG__REWIND_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__REWIND_TIME__DISPATCHED2")}`
-  );
-};
-
-export const handleTimeForward = (): void => {
-  const plumeUi = getPlumeUiInstance();
-  const plume = plumeUi.getState();
-
-  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
-
-  const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
-  plume.audioElement.currentTime = newTime;
-
-  // Prevent auto-play when forwarding on paused track
-  if (plume.audioElement.paused) {
-    setTimeout(() => {
-      plume.audioElement.pause();
-    }, 10);
-  }
-
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
-  logger(
-    CPL.DEBUG,
-    `${getString("DEBUG__FORWARD_TIME__DISPATCHED1")} ${Math.round(newTime)}${getString("DEBUG__FORWARD_TIME__DISPATCHED2")}`
-  );
 };

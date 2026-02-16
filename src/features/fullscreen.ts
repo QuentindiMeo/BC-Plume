@@ -1,10 +1,9 @@
 import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
-import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "./formatting";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
 import { CleanupCallback, SubscriptionCallback } from "./types";
@@ -19,6 +18,21 @@ import { handleMuteToggle } from "./ui/volume";
 
 const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
+interface FullscreenElements {
+  headerContainer: HTMLDivElement;
+  progressSlider: HTMLInputElement;
+  elapsedDisplay: HTMLSpanElement;
+  durationDisplay: HTMLSpanElement;
+  playPauseBtn: HTMLButtonElement;
+  volumeSlider: HTMLInputElement;
+  volumeDisplay: HTMLDivElement;
+  muteBtn: HTMLButtonElement;
+  trackBackwardBtn: HTMLButtonElement;
+  timeBackwardBtn: HTMLButtonElement;
+  timeForwardBtn: HTMLButtonElement;
+  trackForwardBtn: HTMLButtonElement;
+}
+
 let fullscreenCleanupCallback: CleanupCallback | null = null;
 
 export const cleanupFullscreenMode = (): void => {
@@ -32,17 +46,106 @@ export const cleanupFullscreenMode = (): void => {
 
     existingOverlay.remove();
     document.body.style.overflow = "auto";
-    getStoreInstance().dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
+    getStoreInstance().dispatch(storeActions.setIsFullscreen(false));
   }
 };
 
-// Setup store subscriptions for fullscreen UI to keep it in sync with state
-const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
-  const plume = getPlumeUiInstance().getState();
-  const store = getStoreInstance();
-  const subscriptions: Array<SubscriptionCallback> = [];
+const renderVolume = (elements: FullscreenElements, volume: number): void => {
+  if (!elements.volumeSlider || !elements.volumeDisplay) {
+    logger(CPL.ERROR, getString("ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND"));
+    return;
+  }
 
-  const cloneEl = {
+  elements.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+  elements.volumeDisplay.textContent = `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+};
+
+const renderMuteButton = (elements: FullscreenElements, isMuted: boolean): void => {
+  if (!elements.muteBtn) {
+    logger(CPL.ERROR, getString("ERROR__MUTE_BUTTON__NOT_FOUND"));
+    return;
+  }
+
+  elements.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+  elements.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+  elements.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+  elements.muteBtn.ariaPressed = isMuted.toString();
+  elements.muteBtn.classList.toggle("muted", isMuted);
+};
+
+const renderPlayPauseButton = (elements: FullscreenElements, isPlaying: boolean): void => {
+  if (!elements.playPauseBtn) {
+    logger(CPL.ERROR, getString("ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND"));
+    return;
+  }
+
+  elements.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+};
+
+const renderElapsedDisplay = (elements: FullscreenElements, formattedElapsed: string): void => {
+  if (!elements.elapsedDisplay) {
+    logger(CPL.ERROR, getString("ERROR__ELAPSED_DISPLAY__NOT_FOUND"));
+    return;
+  }
+
+  elements.elapsedDisplay.textContent = formattedElapsed;
+};
+
+const renderDurationDisplay = (elements: FullscreenElements, formattedDuration: string): void => {
+  if (!elements.durationDisplay) {
+    logger(CPL.ERROR, getString("ERROR__DURATION_DISPLAY__NOT_FOUND"));
+    return;
+  }
+
+  elements.durationDisplay.textContent = formattedDuration;
+};
+
+const renderProgressSlider = (elements: FullscreenElements, progressPercentage: number): void => {
+  if (!elements.progressSlider) {
+    logger(CPL.ERROR, getString("ERROR__PROGRESS_SLIDER__NOT_FOUND"));
+    return;
+  }
+
+  const bgPercent = progressPercentage < 50 ? progressPercentage + 1 : progressPercentage - 1;
+  const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+  elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
+  elements.progressSlider.style.backgroundImage = bgImg;
+};
+
+const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | null): void => {
+  if (!elements.headerContainer || !trackTitle) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND"));
+    return;
+  }
+
+  const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
+  if (!headerTitle) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_TITLE__NOT_FOUND"));
+    return;
+  }
+
+  headerTitle.textContent = trackTitle;
+  headerTitle.title = trackTitle;
+};
+
+const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | null): void => {
+  const header = elements.headerContainer;
+  if (!header || !trackNumber) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND"));
+    return;
+  }
+
+  const headerPretext = header.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
+  if (!headerPretext) {
+    logger(CPL.ERROR, getString("ERROR__HEADER_PRETEXT__NOT_FOUND"));
+    return;
+  }
+
+  headerPretext.textContent = trackNumber;
+};
+
+const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
+  return {
     headerContainer: clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement,
     progressSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement,
@@ -56,102 +159,73 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     timeForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement,
     trackForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement,
   };
+};
 
-  const updateFullscreenDuration = () => {
-    if (!cloneEl.durationDisplay) return;
-    const state = store.getState();
-    cloneEl.durationDisplay.textContent = getFormattedDuration(state);
-  };
+// Setup store subscriptions for fullscreen UI to keep it in sync with state
+const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
+  const plume = getPlumeUiInstance().getState();
+  const store = getStoreInstance();
+
+  const subscriptions: Array<SubscriptionCallback> = [];
+  const elements: FullscreenElements = getFullscreenElements(clone);
+
+  // Subscribe to state changes and use pure rendering functions for updates
   subscriptions.push(
-    // Subscribe to progress updates
     store.subscribe("currentTime", () => {
-      const state = store.getState();
-      if (!cloneEl.progressSlider) return;
-
-      const percent = getProgressPercentage(state);
-      const bgPercent = percent < 50 ? percent + 1 : percent - 1;
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-      cloneEl.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-      cloneEl.progressSlider.style.backgroundImage = bgImg;
+      renderProgressSlider(elements, store.computed.progressPercentage());
+      renderElapsedDisplay(elements, store.computed.formattedElapsed());
+      renderDurationDisplay(elements, store.computed.formattedDuration());
     }),
-    // Subscribe to elapsed time display
-    store.subscribe("currentTime", () => {
-      if (!cloneEl.elapsedDisplay) return;
-      const state = store.getState();
-      cloneEl.elapsedDisplay.textContent = getFormattedElapsed(state);
+    store.subscribe("duration", () => {
+      renderDurationDisplay(elements, store.computed.formattedDuration());
     }),
-    // Subscribe to duration display (updates on both duration and display method changes)
-    store.subscribe("duration", updateFullscreenDuration),
-    store.subscribe("durationDisplayMethod", updateFullscreenDuration),
-    store.subscribe("currentTime", updateFullscreenDuration),
-    // Subscribe to play/pause state
+    store.subscribe("durationDisplayMethod", () => {
+      renderDurationDisplay(elements, store.computed.formattedDuration());
+    }),
     store.subscribe("isPlaying", (isPlaying) => {
-      if (!cloneEl.playPauseBtn) return;
-      cloneEl.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+      renderPlayPauseButton(elements, isPlaying);
     }),
-    // Subscribe to volume changes
     store.subscribe("volume", (volume) => {
-      if (!cloneEl.volumeSlider || !cloneEl.volumeDisplay) return;
-      cloneEl.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
-      cloneEl.volumeDisplay.textContent = `${cloneEl.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+      renderVolume(elements, volume);
     }),
-    // Subscribe to mute state
     store.subscribe("isMuted", (isMuted) => {
-      if (!cloneEl.muteBtn) return;
-      cloneEl.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-      cloneEl.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-      cloneEl.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-      cloneEl.muteBtn.ariaPressed = isMuted.toString();
-      cloneEl.muteBtn.classList.toggle("muted", isMuted);
+      renderMuteButton(elements, isMuted);
     }),
-    // Subscribe to track title changes
     store.subscribe("trackTitle", (trackTitle) => {
-      if (!cloneEl.headerContainer || !trackTitle) return;
-      const cloneHeaderTitle = cloneEl.headerContainer.querySelector(
-        PLUME_ELEM_IDENTIFIERS.headerTitle
-      ) as HTMLSpanElement;
-      if (cloneHeaderTitle) {
-        cloneHeaderTitle.textContent = trackTitle;
-        cloneHeaderTitle.title = trackTitle;
-      }
+      renderTrackTitle(elements, trackTitle);
     }),
-    // Subscribe to track number changes
     store.subscribe("trackNumber", (trackNumber) => {
-      if (!cloneEl.headerContainer || !trackNumber) return;
-      const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
-        PLUME_ELEM_IDENTIFIERS.headerTitlePretext
-      ) as HTMLSpanElement;
-      if (cloneHeaderPretext) {
-        cloneHeaderPretext.textContent = trackNumber;
-      }
+      renderTrackNumber(elements, trackNumber);
     })
   );
 
   const handleProgressInput = function (this: HTMLInputElement) {
-    const plumeUi = getPlumeUiInstance();
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
 
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-    if (plume.audioElement.paused) {
+
+    // Preserve paused state after seeking
+    const wasPaused = plume.audioElement.paused;
+    if (wasPaused) {
       setTimeout(() => {
         plume.audioElement.pause();
       }, 10);
     }
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: cloneEl.progressSlider });
+
+    // Dispatch to store to sync with main view
+    store.dispatch(storeActions.setCurrentTime(plume.audioElement.currentTime));
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
-    const plumeUi = getPlumeUiInstance();
     const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-    plume.audioElement.volume = newVolume;
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, payload: cloneEl.volumeSlider });
 
     // Moving slider off zero counts as an intentional unmute
     if (newVolume > 0 && store.getState().isMuted) {
-      store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: false });
+      store.dispatch(storeActions.setIsMuted(false));
     }
 
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: newVolume });
+    // Dispatch to store only - subscription handles audio element and display updates
+    store.dispatch(storeActions.setVolume(newVolume));
   };
 
   const handleFullscreenDurationClick = () => {
@@ -159,55 +233,36 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     const newMethod =
       currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
 
-    store.dispatch({
-      type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD,
-      payload: newMethod,
-    });
+    store.dispatch(storeActions.setDurationDisplayMethod(newMethod));
   };
 
   // Setup event listeners for fullscreen controls
   // The listeners are automatically cleaned up when the overlay DOM is removed on exit.
-  cloneEl.progressSlider.addEventListener("input", handleProgressInput);
-  cloneEl.durationDisplay.addEventListener("click", handleFullscreenDurationClick);
-  cloneEl.trackBackwardBtn.addEventListener("click", handleTrackBackward);
-  cloneEl.timeBackwardBtn.addEventListener("click", handleTimeBackward);
-  cloneEl.playPauseBtn.addEventListener("click", handlePlayPause);
-  cloneEl.timeForwardBtn.addEventListener("click", handleTimeForward);
-  cloneEl.trackForwardBtn.addEventListener("click", handleTrackForward);
-  cloneEl.volumeSlider.addEventListener("input", handleVolumeInput);
-  cloneEl.muteBtn.addEventListener("click", handleMuteToggle);
+  elements.progressSlider.addEventListener("input", handleProgressInput);
+  elements.durationDisplay.addEventListener("click", handleFullscreenDurationClick);
+  elements.trackBackwardBtn.addEventListener("click", handleTrackBackward);
+  elements.timeBackwardBtn.addEventListener("click", handleTimeBackward);
+  elements.playPauseBtn.addEventListener("click", handlePlayPause);
+  elements.timeForwardBtn.addEventListener("click", handleTimeForward);
+  elements.trackForwardBtn.addEventListener("click", handleTrackForward);
+  elements.volumeSlider.addEventListener("input", handleVolumeInput);
+  elements.muteBtn.addEventListener("click", handleMuteToggle);
 
-  // Initialize fullscreen UI with current state
+  // Initialize fullscreen UI with current state using the same rendering functions
   const state = store.getState();
+
   // Safe use of innerHTML to clone DOM content from controlled element
-  cloneEl.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
-  // Initialize track number in fullscreen
-  if (state.trackNumber && cloneEl.headerContainer) {
-    const cloneHeaderPretext = cloneEl.headerContainer.querySelector(
-      PLUME_ELEM_IDENTIFIERS.headerTitlePretext
-    ) as HTMLSpanElement;
-    if (cloneHeaderPretext) {
-      cloneHeaderPretext.textContent = state.trackNumber;
-    }
-  }
-  updateFullscreenDuration();
-  if (cloneEl.elapsedDisplay) {
-    cloneEl.elapsedDisplay.textContent = getFormattedElapsed(state);
-  }
-  if (cloneEl.volumeSlider && cloneEl.volumeDisplay) {
-    cloneEl.volumeSlider.value = Math.round(state.volume * VOLUME_SLIDER_GRANULARITY).toString();
-    cloneEl.volumeDisplay.textContent = `${cloneEl.volumeSlider.value}${getString("META__PERCENTAGE")}`;
-  }
-  if (cloneEl.muteBtn) {
-    cloneEl.muteBtn.innerHTML = state.isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-    cloneEl.muteBtn.title = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-    cloneEl.muteBtn.ariaLabel = state.isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-    cloneEl.muteBtn.ariaPressed = state.isMuted.toString();
-    cloneEl.muteBtn.classList.toggle("muted", state.isMuted);
-  }
-  if (cloneEl.playPauseBtn) {
-    cloneEl.playPauseBtn.innerHTML = state.isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
-  }
+  elements.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
+
+  // Apply initial state using pure rendering functions (same logic as subscriptions)
+  renderProgressSlider(elements, store.computed.progressPercentage());
+  renderElapsedDisplay(elements, store.computed.formattedElapsed());
+  renderDurationDisplay(elements, store.computed.formattedDuration());
+  renderPlayPauseButton(elements, state.isPlaying);
+  renderVolume(elements, state.volume);
+  renderMuteButton(elements, state.isMuted);
+  renderTrackTitle(elements, state.trackTitle);
+  renderTrackNumber(elements, state.trackNumber);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
@@ -215,32 +270,12 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   };
 };
 
-export const toggleFullscreenMode = (): void => {
-  const store = getStoreInstance();
-  const isAlbumPage = store.getState().pageType === "album";
-  const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
-  const alreadyHasFullscreenOverlay = !!existingOverlay;
-
-  if (alreadyHasFullscreenOverlay) {
-    // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
-    if (fullscreenCleanupCallback) {
-      fullscreenCleanupCallback();
-      fullscreenCleanupCallback = null;
-    }
-
-    existingOverlay.remove();
-    document.body.style.overflow = "auto";
-
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: false });
-    logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
-    return;
-  }
-
-  // Enter fullscreen
+// Pure DOM construction function - builds fullscreen overlay without side effects
+const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
   const coverArt = document.querySelector(BC_ELEM_IDENTIFIERS.coverArt) as HTMLImageElement;
   if (!coverArt) {
     logger(CPL.WARN, getString("WARN__COVER_ART__NOT_FOUND"));
-    return;
+    return null;
   }
 
   const overlay = document.createElement("div");
@@ -268,12 +303,12 @@ export const toggleFullscreenMode = (): void => {
   const newNameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
-    return;
+    return null;
   }
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
-  adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1]; // as class because id is already used by BC
+  adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
   headTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
   if (!isAlbumPage) headTitle.textContent = '"' + headTitle.textContent.trim() + '"';
@@ -285,7 +320,7 @@ export const toggleFullscreenMode = (): void => {
   const plumeContainer = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer) as HTMLDivElement;
   if (!plumeContainer) {
     logger(CPL.WARN, getString("WARN__PLUME_CONTAINER__NOT_FOUND"));
-    return;
+    return null;
   }
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
@@ -322,59 +357,97 @@ export const toggleFullscreenMode = (): void => {
   exitBtn.addEventListener("click", toggleFullscreenMode);
   overlay.appendChild(exitBtn);
 
-  // Setup keyboard navigation for fullscreen overlay
-  // Note: These listeners are on the overlay element and are automatically
-  // cleaned up when the overlay is removed from DOM on exit
-  const setupFullscreenFocusTrap = () => {
-    const getFocusableElements = () => {
-      return Array.from(
-        overlay.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-      );
-    };
+  return overlay;
+};
 
-    const handleTabKey = (e: KeyboardEvent) => {
-      if (e.code !== "Tab") return;
+// Setup keyboard navigation for fullscreen overlay
+const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {
+  const getFocusableElements = () => {
+    return Array.from(
+      overlay.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    );
+  };
 
-      const focusableElements = getFocusableElements();
-      if (focusableElements.length === 0) return;
+  const handleTabKey = (e: KeyboardEvent) => {
+    if (e.code !== "Tab") return;
 
-      const firstFocusable = focusableElements[0];
-      const lastFocusable = focusableElements.at(-1);
-      const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
+    const focusableElements = getFocusableElements();
+    if (focusableElements.length === 0) return;
 
-      if (e.shiftKey) {
-        if (document.activeElement === firstFocusable || currentIndex === -1) {
-          e.preventDefault();
-          lastFocusable?.focus();
-        }
-      } else if (document.activeElement === lastFocusable || currentIndex === -1) {
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements.at(-1);
+    const currentIndex = focusableElements.indexOf(document.activeElement as HTMLElement);
+
+    if (e.shiftKey) {
+      if (document.activeElement === firstFocusable || currentIndex === -1) {
         e.preventDefault();
-        firstFocusable.focus();
+        lastFocusable?.focus();
       }
-    };
-
-    overlay.addEventListener("keydown", handleTabKey);
-
-    setTimeout(() => {
-      const initialFocusable = getFocusableElements()[0];
-      initialFocusable?.focus();
-    }, 0);
+    } else if (document.activeElement === lastFocusable || currentIndex === -1) {
+      e.preventDefault();
+      firstFocusable.focus();
+    }
   };
 
   const handleEscapeKey = (e: KeyboardEvent) => {
     if (e.code === "Escape") toggleFullscreenMode();
   };
+
+  overlay.addEventListener("keydown", handleTabKey);
   overlay.addEventListener("keydown", handleEscapeKey);
 
-  // Setup store subscriptions for fullscreen UI - cleanup function stored for later
+  setTimeout(() => {
+    const initialFocusable = getFocusableElements()[0];
+    initialFocusable?.focus();
+  }, 0);
+};
+
+// State-driven fullscreen toggle - follows Action → Reducer → State → Subscription → DOM pattern
+export const toggleFullscreenMode = (): void => {
+  const store = getStoreInstance();
+  const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
+  const isCurrentlyFullscreen = !!existingOverlay;
+
+  if (isCurrentlyFullscreen) {
+    // Exit fullscreen - dispatch state change first, then cleanup
+    store.dispatch(storeActions.setIsFullscreen(false));
+
+    // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
+    if (fullscreenCleanupCallback) {
+      fullscreenCleanupCallback();
+      fullscreenCleanupCallback = null;
+    }
+
+    existingOverlay.remove();
+    document.body.style.overflow = "auto";
+
+    logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
+    return;
+  }
+
+  // Enter fullscreen - dispatch state change first, then build DOM
+  const isAlbumPage = store.getState().pageType === "album";
+
+  const overlay = buildFullscreenOverlay(isAlbumPage);
+  if (!overlay) {
+    // Failed to build overlay - revert state
+    store.dispatch(storeActions.setIsFullscreen(false));
+    return;
+  }
+
+  const plumeClone = overlay.querySelector(
+    `#${PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1]}`
+  ) as HTMLDivElement;
   fullscreenCleanupCallback = setupFullscreenUi(plumeClone);
 
+  // Mount overlay to DOM
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
-  setupFullscreenFocusTrap();
+  setupFullscreenFocusTrap(overlay);
 
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_FULLSCREEN, payload: true });
+  store.dispatch(storeActions.setIsFullscreen(true));
+
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

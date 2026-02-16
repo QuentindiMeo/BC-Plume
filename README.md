@@ -4,22 +4,22 @@
 </div>
 
 <div align="center">
-  <a href="#description">Description</a> &#xa0; | &#xa0;
-  <a href="#installation">Installation</a> &#xa0; | &#xa0;
-  <a href="#usage--general-information">Usage & General Information</a> &#xa0; | &#xa0;
-  <a href="#troubleshooting">Troubleshooting</a> &#xa0; | &#xa0;
-  <a href="#project-roadmap">Project Roadmap</a>
+  <a href="#-description">Description</a> &#xa0; | &#xa0;
+  <a href="#-installation">Installation</a> &#xa0; | &#xa0;
+  <a href="#-usage--information">Usage & Information</a> &#xa0; | &#xa0;
+  <a href="#-troubleshooting">Troubleshooting</a> &#xa0; | &#xa0;
+  <a href="#%EF%B8%8F-roadmap">Roadmap</a>
 </div>
 
 &#xa0;
 
-<div id="badges" align="center">
+<div id="badges1" align="center">
   <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.3.2-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
 </div>
-<div align="center">
+<div id="badges2" align="center">
   <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
@@ -69,7 +69,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 Either install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm) or the [Mozilla Add-ons site](https://addons.mozilla.org/fr/firefox/addon/bc-plume).  
 If you want to install it manually (for local build or development), follow the instructions in [**the installation file**](./INSTALLATION.md).
 
-## 📖 Usage & General Information
+## 📖 Usage & Information
 
 1. Go to any Bandcamp **album or track page**
 2. The extension replaces the original player with the **Plume player**
@@ -103,7 +103,7 @@ The code is fully commented and structured for understanding, easy contribution 
 
 If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Plume/issues) with details about your web browser and the page URL.
 
-## 🗃️ Project Roadmap
+## 🗃️ Roadmap
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 

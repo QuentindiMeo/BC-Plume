@@ -25,7 +25,7 @@ export interface DefinedPlumeCore {
   muteBtn: HTMLButtonElement;
 }
 
-export enum PLUME_ACTION_TYPES {
+enum PLUME_ACTIONS {
   RESET_PLUME_UI_INSTANCE = "resetPlumeUiInstance",
   SET_AUDIO_ELEMENT = "setAudioElement",
   SET_TITLE_DISPLAY = "setTitleDisplay",
@@ -37,24 +37,56 @@ export enum PLUME_ACTION_TYPES {
 }
 
 export type PlumeAction =
-  | Action<PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE, string | null>
-  | Action<PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, HTMLAudioElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_TITLE_DISPLAY, HTMLDivElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, HTMLInputElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, HTMLSpanElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, HTMLSpanElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_VOLUME_SLIDER, HTMLInputElement | null>
-  | Action<PLUME_ACTION_TYPES.SET_MUTE_BTN, HTMLButtonElement | null>;
+  | Action<PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE, string | null>
+  | Action<PLUME_ACTIONS.SET_AUDIO_ELEMENT, HTMLAudioElement | null>
+  | Action<PLUME_ACTIONS.SET_TITLE_DISPLAY, HTMLDivElement | null>
+  | Action<PLUME_ACTIONS.SET_PROGRESS_SLIDER, HTMLInputElement | null>
+  | Action<PLUME_ACTIONS.SET_ELAPSED_DISPLAY, HTMLSpanElement | null>
+  | Action<PLUME_ACTIONS.SET_DURATION_DISPLAY, HTMLSpanElement | null>
+  | Action<PLUME_ACTIONS.SET_VOLUME_SLIDER, HTMLInputElement | null>
+  | Action<PLUME_ACTIONS.SET_MUTE_BTN, HTMLButtonElement | null>;
 
-export type PlumeStateListener<K extends keyof DefinedPlumeCore = keyof DefinedPlumeCore> = Listener<
+export const plumeActions = {
+  resetPlumeUiInstance: (reason: string | null = null): PlumeAction => ({
+    type: PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE,
+    payload: reason,
+  }),
+  setAudioElement: (element: HTMLAudioElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_AUDIO_ELEMENT,
+    payload: element,
+  }),
+  setTitleDisplay: (element: HTMLDivElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_TITLE_DISPLAY,
+    payload: element,
+  }),
+  setProgressSlider: (element: HTMLInputElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_PROGRESS_SLIDER,
+    payload: element,
+  }),
+  setElapsedDisplay: (element: HTMLSpanElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_ELAPSED_DISPLAY,
+    payload: element,
+  }),
+  setDurationDisplay: (element: HTMLSpanElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_DURATION_DISPLAY,
+    payload: element,
+  }),
+  setVolumeSlider: (element: HTMLInputElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_VOLUME_SLIDER,
+    payload: element,
+  }),
+  setMuteBtn: (element: HTMLButtonElement | null): PlumeAction => ({
+    type: PLUME_ACTIONS.SET_MUTE_BTN,
+    payload: element,
+  }),
+} as const;
+
+export type PlumeStateListener<PlumeCoreProp extends keyof DefinedPlumeCore = keyof DefinedPlumeCore> = Listener<
   DefinedPlumeCore,
-  K
+  PlumeCoreProp
 >;
 
-interface AppInstance extends Store<DefinedPlumeCore, PlumeAction> {
-  subscribe<K extends keyof DefinedPlumeCore>(key: K, listener: PlumeStateListener<K>): () => void;
-  subscribeAll(listener: (state: DefinedPlumeCore) => void): () => void;
-}
+interface AppInstance extends Store<DefinedPlumeCore, PlumeAction> {}
 
 const INITIAL_STATE: PlumeCore = {
   audioElement: null,
@@ -74,7 +106,10 @@ const createPlumeUiInstance = (): AppInstance => {
   const listeners = new Map<keyof PlumeCore, Set<PlumeStateListener<any>>>();
   const globalListeners = new Set<(state: DefinedPlumeCore) => void>();
 
-  const notify = <K extends keyof DefinedPlumeCore>(key: K, prevValue: DefinedPlumeCore[K]): void => {
+  const notify = <PlumeCoreProp extends keyof DefinedPlumeCore>(
+    key: PlumeCoreProp,
+    prevValue: DefinedPlumeCore[PlumeCoreProp]
+  ): void => {
     const keyListeners = listeners.get(key);
     if (keyListeners) {
       keyListeners.forEach((listener) => {
@@ -95,19 +130,22 @@ const createPlumeUiInstance = (): AppInstance => {
     });
   };
 
-  const updateState = <K extends keyof PlumeCore>(key: K, value: PlumeCore[K]): void => {
+  const updateState = <PlumeCoreProp extends keyof PlumeCore>(
+    key: PlumeCoreProp,
+    value: PlumeCore[PlumeCoreProp]
+  ): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
 
     state = { ...state, [key]: value };
 
-    notify(key, prevValue as DefinedPlumeCore[K]);
+    notify(key, prevValue as DefinedPlumeCore[PlumeCoreProp]);
   };
 
   const reducer = (action: PlumeAction): void => {
     switch (action.type) {
-      case PLUME_ACTION_TYPES.RESET_PLUME_UI_INSTANCE:
+      case PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE:
         updateState("audioElement", null);
         updateState("titleDisplay", null);
         updateState("progressSlider", null);
@@ -116,25 +154,25 @@ const createPlumeUiInstance = (): AppInstance => {
         updateState("volumeSlider", null);
         updateState("muteBtn", null);
         break;
-      case PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT:
+      case PLUME_ACTIONS.SET_AUDIO_ELEMENT:
         updateState("audioElement", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_TITLE_DISPLAY:
+      case PLUME_ACTIONS.SET_TITLE_DISPLAY:
         updateState("titleDisplay", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER:
+      case PLUME_ACTIONS.SET_PROGRESS_SLIDER:
         updateState("progressSlider", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY:
+      case PLUME_ACTIONS.SET_ELAPSED_DISPLAY:
         updateState("elapsedDisplay", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_DURATION_DISPLAY:
+      case PLUME_ACTIONS.SET_DURATION_DISPLAY:
         updateState("durationDisplay", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_VOLUME_SLIDER:
+      case PLUME_ACTIONS.SET_VOLUME_SLIDER:
         updateState("volumeSlider", action.payload);
         break;
-      case PLUME_ACTION_TYPES.SET_MUTE_BTN:
+      case PLUME_ACTIONS.SET_MUTE_BTN:
         updateState("muteBtn", action.payload);
         break;
       default:
@@ -152,7 +190,10 @@ const createPlumeUiInstance = (): AppInstance => {
       reducer(action);
     },
 
-    subscribe<K extends keyof PlumeCore>(key: K, listener: PlumeStateListener<K>): () => void {
+    subscribe<PlumeCoreProp extends keyof PlumeCore>(
+      key: PlumeCoreProp,
+      listener: PlumeStateListener<PlumeCoreProp>
+    ): () => void {
       if (!listeners.has(key)) listeners.set(key, new Set());
 
       listeners.get(key)!.add(listener);

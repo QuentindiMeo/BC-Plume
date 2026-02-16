@@ -1,8 +1,18 @@
 import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
-import { Action, handleUnknownAction, Listener, Store } from "../domain/store";
+import {
+  Action,
+  createScenarioRecorder,
+  handleUnknownAction,
+  Listener,
+  ScenarioControls,
+  ScenarioView,
+  Store,
+  Thunk,
+} from "../domain/store";
 import { CPL, logger } from "../features/logger";
-import { BROWSER_ACTION_TYPES, getBrowserInstance } from "./BrowserImpl";
+import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
+import { browserActions, getBrowserInstance } from "./BrowserImpl";
 
 export interface AppPersistedState {
   volume: number;
@@ -23,7 +33,7 @@ export interface AppTransientState {
 
 export interface AppState extends AppPersistedState, AppTransientState {}
 
-export enum STORE_ACTION_TYPES {
+enum STORE_ACTIONS {
   SET_PAGE_TYPE = "SET_PAGE_TYPE",
   SET_TRACK_TITLE = "SET_TRACK_TITLE",
   SET_TRACK_NUMBER = "SET_TRACK_NUMBER",
@@ -38,29 +48,117 @@ export enum STORE_ACTION_TYPES {
   RESET_TRANSIENT_STATE = "RESET_TRANSIENT_STATE",
 }
 
-export type AppAction =
-  | Action<STORE_ACTION_TYPES.SET_PAGE_TYPE, BcPageType | null>
-  | Action<STORE_ACTION_TYPES.SET_TRACK_TITLE, string | null>
-  | Action<STORE_ACTION_TYPES.SET_TRACK_NUMBER, string | null>
-  | Action<STORE_ACTION_TYPES.SET_DURATION, number>
-  | Action<STORE_ACTION_TYPES.SET_CURRENT_TIME, number>
-  | Action<STORE_ACTION_TYPES.SET_IS_PLAYING, boolean>
-  | Action<STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
-  | Action<STORE_ACTION_TYPES.SET_VOLUME, number>
-  | Action<STORE_ACTION_TYPES.SET_IS_MUTED, boolean>
-  | Action<STORE_ACTION_TYPES.TOGGLE_MUTE>
-  | Action<STORE_ACTION_TYPES.SET_IS_FULLSCREEN, boolean>
-  | Action<STORE_ACTION_TYPES.RESET_TRANSIENT_STATE>;
+type AppAction =
+  | Action<STORE_ACTIONS.SET_PAGE_TYPE, BcPageType | null>
+  | Action<STORE_ACTIONS.SET_TRACK_TITLE, string | null>
+  | Action<STORE_ACTIONS.SET_TRACK_NUMBER, string | null>
+  | Action<STORE_ACTIONS.SET_DURATION, number>
+  | Action<STORE_ACTIONS.SET_CURRENT_TIME, number>
+  | Action<STORE_ACTIONS.SET_IS_PLAYING, boolean>
+  | Action<STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
+  | Action<STORE_ACTIONS.SET_VOLUME, number>
+  | Action<STORE_ACTIONS.SET_IS_MUTED, boolean>
+  | Action<STORE_ACTIONS.TOGGLE_MUTE>
+  | Action<STORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
+  | Action<STORE_ACTIONS.RESET_TRANSIENT_STATE>;
 
-export type AppStateListener<K extends keyof AppState = keyof AppState> = Listener<AppState, K>;
+export const storeActions = {
+  setPageType: (pageType: BcPageType | null): AppAction => ({
+    type: STORE_ACTIONS.SET_PAGE_TYPE,
+    payload: pageType,
+  }),
+  setTrackTitle: (title: string | null): AppAction => ({
+    type: STORE_ACTIONS.SET_TRACK_TITLE,
+    payload: title,
+  }),
+  setTrackNumber: (number: string | null): AppAction => ({
+    type: STORE_ACTIONS.SET_TRACK_NUMBER,
+    payload: number,
+  }),
+  setDuration: (duration: number): AppAction => ({
+    type: STORE_ACTIONS.SET_DURATION,
+    payload: duration,
+  }),
+  setCurrentTime: (time: number): AppAction => ({
+    type: STORE_ACTIONS.SET_CURRENT_TIME,
+    payload: time,
+  }),
+  setIsPlaying: (isPlaying: boolean): AppAction => ({
+    type: STORE_ACTIONS.SET_IS_PLAYING,
+    payload: isPlaying,
+  }),
+  setDurationDisplayMethod: (method: TimeDisplayMethodType): AppAction => ({
+    type: STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
+    payload: method,
+  }),
+  setVolume: (volume: number): AppAction => ({
+    type: STORE_ACTIONS.SET_VOLUME,
+    payload: volume,
+  }),
+  setIsMuted: (isMuted: boolean): AppAction => ({
+    type: STORE_ACTIONS.SET_IS_MUTED,
+    payload: isMuted,
+  }),
+  toggleMute: (): AppAction => ({
+    type: STORE_ACTIONS.TOGGLE_MUTE,
+  }),
+  setIsFullscreen: (isFullscreen: boolean): AppAction => ({
+    type: STORE_ACTIONS.SET_IS_FULLSCREEN,
+    payload: isFullscreen,
+  }),
+  resetTransientState: (): AppAction => ({
+    type: STORE_ACTIONS.RESET_TRANSIENT_STATE,
+  }),
+} as const;
+
+export type AppStateListener<AppStateProp extends keyof AppState = keyof AppState> = Listener<AppState, AppStateProp>;
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
 const PERSISTENCE_DELAY_MS = 200;
 
+/**
+ * Computed properties - derived state calculated on-demand from selectors.
+ * These are NOT stored in state, but computed when accessed.
+ *
+ * Benefits:
+ * - No redundant state storage
+ * - Always consistent with source data
+ * - Lazy evaluation (only computed when needed)
+ * - Can be memoized if performance becomes a concern
+ */
+interface ComputedState {
+  /** Returns formatted elapsed time (MM:SS) */
+  formattedElapsed: () => string;
+  /** Returns formatted duration (MM:SS or -MM:SS for remaining) */
+  formattedDuration: () => string;
+  /** Returns progress percentage (0-100) */
+  progressPercentage: () => number;
+}
+
 interface AppStateStore extends Store<AppState, AppAction> {
-  subscribe<K extends keyof AppState>(key: K, listener: AppStateListener<K>): () => void;
+  subscribe<AppStateProp extends keyof AppState>(
+    key: AppStateProp,
+    listener: AppStateListener<AppStateProp>
+  ): () => void;
   subscribeAll(listener: (state: AppState) => void): () => void;
+
+  // * Additional fields
   loadPersistedState(): Promise<void>;
+  computed: ComputedState;
+
+  // * Scenario: time-travel debugging (dev-only)
+  scenario: {
+    /** Undo the last dispatched action, restoring the previous state. Returns `true` if undo was applied. */
+    undo(): boolean;
+    /** Redo a previously undone action, re-applying it. Returns `true` if redo was applied. */
+    redo(): boolean;
+    /** Replay the recorded scenario up to `toIndex` (inclusive). Omit to replay all. */
+    replayScenario(toIndex?: number): void;
+    /** Get a read-only view of the recorded scenario timeline. */
+    getScenarioView(): ScenarioView<AppState, AppAction>;
+    /** Clear all recorded scenario entries. */
+    clearScenario(): void;
+  };
 }
 
 const INITIAL_STATE: AppState = {
@@ -88,6 +186,10 @@ const createAppStateInstance = (): AppStateStore => {
   let persistenceTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingPersistedKeys = new Set<keyof AppState>();
 
+  // Scenario recorder for time-travel debugging (test-only)
+  const scenarioRecorder: ScenarioControls<AppState, AppAction> | null =
+    process.env.NODE_ENV === "testing" ? createScenarioRecorder<AppState, AppAction>() : null;
+
   const persistState = (keys: Array<keyof AppState>): void => {
     // Accumulate all keys that need to be persisted during the debounce window
     keys.forEach((key) => {
@@ -112,10 +214,7 @@ const createAppStateInstance = (): AppStateStore => {
         const keys = Object.keys(toSave) as PLUME_CACHE_KEYS[];
         const values = Object.values(toSave);
 
-        browserCache.dispatch({
-          type: BROWSER_ACTION_TYPES.SET_CACHE_VALUES,
-          payload: { keys, values },
-        });
+        browserCache.dispatch(browserActions.setCacheValues(keys, values));
       }
 
       pendingPersistedKeys.clear();
@@ -123,7 +222,7 @@ const createAppStateInstance = (): AppStateStore => {
     }, PERSISTENCE_DELAY_MS);
   };
 
-  const notify = <K extends keyof AppState>(key: K, prevValue: AppState[K]): void => {
+  const notify = <AppStateProp extends keyof AppState>(key: AppStateProp, prevValue: AppState[AppStateProp]): void => {
     const keyListeners = listeners.get(key);
     if (keyListeners) {
       keyListeners.forEach((listener) => {
@@ -144,7 +243,7 @@ const createAppStateInstance = (): AppStateStore => {
     });
   };
 
-  const updateState = <K extends keyof AppState>(key: K, value: AppState[K]): void => {
+  const updateState = <AppStateProp extends keyof AppState>(key: AppStateProp, value: AppState[AppStateProp]): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
@@ -158,40 +257,68 @@ const createAppStateInstance = (): AppStateStore => {
     }
   };
 
+  /**
+   * Development-only state change logger for debugging.
+   * Logs all dispatched actions and resulting state changes.
+   */
+  const logStateChange = (action: AppAction, prevState: AppState, nextState: AppState): void => {
+    // Only log in development builds
+    if (process.env.NODE_ENV !== "production") {
+      const hasPayload = "payload" in action;
+
+      logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
+
+      // Find what changed
+      const nextStateKeys = Object.keys(nextState) as Array<keyof AppState>;
+      const changes: Array<{ key: string; from: any; to: any }> = [];
+      for (const key of nextStateKeys) {
+        if (prevState[key] !== nextState[key]) {
+          changes.push({
+            key,
+            from: prevState[key],
+            to: nextState[key],
+          });
+        }
+      }
+
+      if (changes.length > 0) logger(CPL.DEBUG, "[STORE] State changes: " + JSON.stringify(changes));
+    }
+  };
+
   const reducer = (action: AppAction): void => {
     switch (action.type) {
-      case STORE_ACTION_TYPES.SET_PAGE_TYPE:
+      case STORE_ACTIONS.SET_PAGE_TYPE:
         updateState("pageType", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_TRACK_TITLE:
+      case STORE_ACTIONS.SET_TRACK_TITLE:
         updateState("trackTitle", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_TRACK_NUMBER:
+      case STORE_ACTIONS.SET_TRACK_NUMBER:
         updateState("trackNumber", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_VOLUME:
+      case STORE_ACTIONS.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
           logger(CPL.WARN, "Invalid volume value", action.payload);
           return;
         }
         updateState("volume", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD:
+      case STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         updateState("durationDisplayMethod", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_CURRENT_TIME:
+      case STORE_ACTIONS.SET_CURRENT_TIME:
         updateState("currentTime", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_DURATION:
+      case STORE_ACTIONS.SET_DURATION:
         updateState("duration", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_IS_PLAYING:
+      case STORE_ACTIONS.SET_IS_PLAYING:
         updateState("isPlaying", action.payload);
         break;
-      case STORE_ACTION_TYPES.SET_IS_MUTED:
+      case STORE_ACTIONS.SET_IS_MUTED:
         updateState("isMuted", action.payload);
         break;
-      case STORE_ACTION_TYPES.TOGGLE_MUTE: {
+      case STORE_ACTIONS.TOGGLE_MUTE: {
         if (state.isMuted) {
           // Unmute: restore previous volume
           const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
@@ -205,10 +332,10 @@ const createAppStateInstance = (): AppStateStore => {
         }
         break;
       }
-      case STORE_ACTION_TYPES.SET_IS_FULLSCREEN:
+      case STORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
-      case STORE_ACTION_TYPES.RESET_TRANSIENT_STATE:
+      case STORE_ACTIONS.RESET_TRANSIENT_STATE:
         updateState("trackTitle", INITIAL_STATE.trackTitle);
         updateState("trackNumber", INITIAL_STATE.trackNumber);
         updateState("duration", INITIAL_STATE.duration);
@@ -224,7 +351,7 @@ const createAppStateInstance = (): AppStateStore => {
     }
   };
 
-  const loadPersistedState = async (store: AppStateStore): Promise<void> => {
+  const loadPersistedStateThunk = (): Thunk => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
@@ -234,10 +361,10 @@ const createAppStateInstance = (): AppStateStore => {
         const volume = result[PLUME_CACHE_KEYS.VOLUME];
         if (typeof volume === "number") {
           const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-          store.dispatch({ type: STORE_ACTION_TYPES.SET_VOLUME, payload: volumeClamped });
+          dispatch(storeActions.setVolume(volumeClamped));
 
           if (volumeClamped === 0) {
-            store.dispatch({ type: STORE_ACTION_TYPES.SET_IS_MUTED, payload: true });
+            dispatch(storeActions.setIsMuted(true));
           }
           logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
         }
@@ -246,7 +373,7 @@ const createAppStateInstance = (): AppStateStore => {
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
         const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
         if (method === "duration" || method === "remaining") {
-          store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD, payload: method });
+          dispatch(storeActions.setDurationDisplayMethod(method));
           logger(CPL.INFO, "Time display method applied:", method);
         }
       }
@@ -260,11 +387,26 @@ const createAppStateInstance = (): AppStateStore => {
       return state;
     },
 
-    dispatch(action: AppAction): void {
+    dispatch(action: AppAction | Thunk): void {
+      // Handle async thunks
+      if (typeof action === "function") {
+        action(this.dispatch.bind(this), this.getState.bind(this));
+        return;
+      }
+
+      // Handle regular actions
+      const prevState = { ...state };
       reducer(action);
+      logStateChange(action, prevState, state);
+
+      // Record scenario entry for time-travel debugging
+      scenarioRecorder?.record(action, state);
     },
 
-    subscribe<K extends keyof AppState>(key: K, listener: AppStateListener<K>): () => void {
+    subscribe<AppStateProp extends keyof AppState>(
+      key: AppStateProp,
+      listener: AppStateListener<AppStateProp>
+    ): () => void {
       if (!listeners.has(key)) listeners.set(key, new Set());
 
       listeners.get(key)!.add(listener);
@@ -289,7 +431,82 @@ const createAppStateInstance = (): AppStateStore => {
     },
 
     loadPersistedState: async function (): Promise<void> {
-      await loadPersistedState(this);
+      // Use the thunk pattern for async state loading
+      this.dispatch(loadPersistedStateThunk());
+    },
+
+    computed: {
+      formattedElapsed: () => presentFormattedElapsed(state),
+      formattedDuration: () => presentFormattedDuration(state),
+      progressPercentage: () => presentProgressPercentage(state),
+    },
+
+    scenario: {
+      undo(): boolean {
+        if (!scenarioRecorder) return false;
+        const restored = scenarioRecorder.undo(INITIAL_STATE);
+        if (!restored) return false;
+
+        const prevState = { ...state };
+        state = { ...restored };
+
+        // Notify listeners for every key that changed
+        for (const key of Object.keys(state) as Array<keyof AppState>) {
+          if (prevState[key] !== state[key]) {
+            notify(key, prevState[key]);
+          }
+        }
+
+        logger(CPL.DEBUG, "[SCENARIO] Undo applied", scenarioRecorder.getScenarioView().cursor);
+        return true;
+      },
+
+      redo(): boolean {
+        if (!scenarioRecorder) return false;
+        const restored = scenarioRecorder.redo();
+        if (!restored) return false;
+
+        const prevState = { ...state };
+        state = { ...restored };
+
+        for (const key of Object.keys(state) as Array<keyof AppState>) {
+          if (prevState[key] !== state[key]) {
+            notify(key, prevState[key]);
+          }
+        }
+
+        logger(CPL.DEBUG, "[SCENARIO] Redo applied", scenarioRecorder.getScenarioView().cursor);
+        return true;
+      },
+
+      replayScenario(toIndex?: number): void {
+        if (!scenarioRecorder) return;
+        const restored = scenarioRecorder.replayScenario(INITIAL_STATE, toIndex);
+
+        const prevState = { ...state };
+        state = { ...restored };
+
+        for (const key of Object.keys(state) as Array<keyof AppState>) {
+          if (prevState[key] !== state[key]) {
+            notify(key, prevState[key]);
+          }
+        }
+
+        const view = scenarioRecorder.getScenarioView();
+        logger(CPL.DEBUG, `[SCENARIO] Replayed to index ${view.cursor} / ${view.entries.length - 1}`);
+      },
+
+      getScenarioView(): ScenarioView<AppState, AppAction> {
+        if (!scenarioRecorder) {
+          return { entries: [], cursor: -1 };
+        }
+        return scenarioRecorder.getScenarioView();
+      },
+
+      clearScenario(): void {
+        scenarioRecorder?.clearScenario();
+        logger(CPL.DEBUG, "[SCENARIO] Cleared");
+      },
     },
   };
 };

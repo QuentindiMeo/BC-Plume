@@ -45,10 +45,17 @@ interface BrowserState {
   cache: BrowserApi["storage"]["local"];
 }
 
-export enum BROWSER_ACTION_TYPES {
+enum BROWSER_ACTIONS {
   SET_CACHE_VALUES = "SET_CACHE_VALUES",
 }
-export type BrowserAction = Action<BROWSER_ACTION_TYPES.SET_CACHE_VALUES, { keys: PLUME_CACHE_KEYS[]; values: any[] }>;
+export type BrowserAction = Action<BROWSER_ACTIONS.SET_CACHE_VALUES, { keys: PLUME_CACHE_KEYS[]; values: any[] }>;
+
+export const browserActions = {
+  setCacheValues: (keys: PLUME_CACHE_KEYS[], values: any[]): BrowserAction => ({
+    type: BROWSER_ACTIONS.SET_CACHE_VALUES,
+    payload: { keys, values },
+  }),
+} as const;
 
 interface BrowserInstance extends Store<BrowserState, BrowserAction> {}
 
@@ -78,6 +85,34 @@ const createBrowserInstance = (): BrowserInstance => {
       });
   };
 
+  /**
+   * Development-only state change logger for debugging.
+   * Logs all dispatched actions and resulting state changes.
+   */
+  const logStateChange = (action: BrowserAction, prevState: BrowserState, nextState: BrowserState): void => {
+    // Only log in development builds
+    if (process.env.NODE_ENV !== "production") {
+      const hasPayload = "payload" in action;
+
+      logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
+
+      // Find what changed
+      const nextStateKeys = Object.keys(nextState) as Array<keyof BrowserState>;
+      const changes: Array<{ key: string; from: any; to: any }> = [];
+      for (const key of nextStateKeys) {
+        if (prevState[key] !== nextState[key]) {
+          changes.push({
+            key,
+            from: prevState[key],
+            to: nextState[key],
+          });
+        }
+      }
+
+      if (changes.length > 0) logger(CPL.DEBUG, "[STORE] State changes: " + JSON.stringify(changes));
+    }
+  };
+
   const reducer = (action: BrowserAction): void => {
     updateState(action.payload.keys, action.payload.values);
   };
@@ -86,8 +121,11 @@ const createBrowserInstance = (): BrowserInstance => {
     getState(): Readonly<BrowserState> {
       return state;
     },
+
     dispatch(action: BrowserAction): void {
+      const prevState = { ...state };
       reducer(action);
+      logStateChange(action, prevState, state);
     },
   };
 };

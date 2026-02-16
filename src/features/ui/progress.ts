@@ -1,8 +1,7 @@
 import { TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../../infra/AppStoreImpl";
-import { getFormattedDuration, getFormattedElapsed, getProgressPercentage } from "../formatting";
+import { getPlumeUiInstance, plumeActions } from "../../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
 import { getString } from "../i18n";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
@@ -13,47 +12,16 @@ const handleDurationClick = (): void => {
   const newMethod =
     currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
 
-  store.dispatch({
-    type: STORE_ACTION_TYPES.SET_DURATION_DISPLAY_METHOD,
-    payload: newMethod,
-  });
-
-  const plumeUi = getPlumeUiInstance();
-  const plume = plumeUi.getState();
-
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: plume.audioElement.duration });
-
-  const state = store.getState();
-  plume.durationDisplay.textContent = getFormattedDuration(state);
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: plume.durationDisplay });
+  store.dispatch(storeActions.setDurationDisplayMethod(newMethod));
 };
 
-export const updateProgressBar = (): void => {
+export const dispatchAudioProgressToStore = (): void => {
   const store = getStoreInstance();
   const plumeUi = getPlumeUiInstance();
   const plume = plumeUi.getState();
 
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_CURRENT_TIME, payload: plume.audioElement.currentTime });
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_DURATION, payload: plume.audioElement.duration });
-
-  const elapsed = plume.audioElement.currentTime;
-  const duration = plume.audioElement.duration;
-
-  if (Number.isNaN(elapsed) || Number.isNaN(duration)) return;
-
-  const state = store.getState();
-  const percent = getProgressPercentage(state);
-  const bgPercent = percent < 50 ? percent + 1 : percent - 1;
-  const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
-
-  plume.progressSlider.value = `${percent * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-  plume.progressSlider.style.backgroundImage = bgImg;
-  plume.elapsedDisplay.textContent = getFormattedElapsed(state);
-  plume.durationDisplay.textContent = getFormattedDuration(state);
-
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: plume.progressSlider });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: plume.elapsedDisplay });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: plume.durationDisplay });
+  store.dispatch(storeActions.setCurrentTime(plume.audioElement.currentTime));
+  store.dispatch(storeActions.setDuration(plume.audioElement.duration));
 };
 
 export const createProgressBar = (): HTMLDivElement => {
@@ -86,19 +54,22 @@ export const createProgressBar = (): HTMLDivElement => {
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
     plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-    if (plume.audioElement.paused) {
+
+    // Preserve paused state after seeking
+    const wasPaused = plume.audioElement.paused;
+    if (wasPaused) {
       setTimeout(() => {
         plume.audioElement.pause();
       }, 10);
     }
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: plume.audioElement });
+    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   });
 
   duration.addEventListener("click", handleDurationClick);
 
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_PROGRESS_SLIDER, payload: progressSlider });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_ELAPSED_DISPLAY, payload: elapsed });
-  plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_DURATION_DISPLAY, payload: duration });
+  plumeUi.dispatch(plumeActions.setProgressSlider(progressSlider));
+  plumeUi.dispatch(plumeActions.setElapsedDisplay(elapsed));
+  plumeUi.dispatch(plumeActions.setDurationDisplay(duration));
 
   timeDisplay.appendChild(elapsed);
   timeDisplay.appendChild(duration);

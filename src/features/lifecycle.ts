@@ -1,7 +1,7 @@
 import { BC_ELEM_IDENTIFIERS, DebugControl } from "../domain/bandcamp";
 import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, PLUME_ACTION_TYPES } from "../infra/AppInstanceImpl";
-import { getStoreInstance, STORE_ACTION_TYPES } from "../infra/AppStoreImpl";
+import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
 import { getString } from "./i18n";
@@ -12,6 +12,7 @@ import { setupStoreSubscriptions } from "./store-subscriptions";
 import { getTrackQuantifiers } from "./track-quantifiers";
 import { getCurrentTrackTitle } from "./track-title";
 import {
+  handleMuteToggle,
   handlePlayPause,
   handleTimeBackward,
   handleTimeForward,
@@ -24,9 +25,14 @@ import {
 const initPlayback = () => {
   const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
   if (playButton) {
-    // Double-click to ensure playback has started
+    // Click to ensure playback has started
     playButton.click();
-    playButton.click();
+    setTimeout(() => {
+      handleTimeForward();
+      setTimeout(() => {
+        handleTimeBackward();
+      }, 20); // delay to allow Bandcamp to register the time update and sync Plume's progress slider
+    }, 100); // delay to allow Bandcamp player to fully initialize
   } else {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
   }
@@ -42,7 +48,7 @@ const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   // Load and immediately apply saved volume from store
   const volume = store.getState().volume;
   audio.volume = volume;
-  logger(CPL.INFO, `${getString("INFO__VOLUME__FOUND")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`);
+  logger(CPL.INFO, getString("INFO__VOLUME__FOUND", [Math.round(volume * 100), getString("META__PERCENTAGE")]));
 
   return audio;
 };
@@ -133,7 +139,7 @@ const updatePretextDisplay = () => {
     : getString("LABEL__TRACK");
 
   // Dispatch track number change to store for fullscreen sync
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_NUMBER, payload: trackNumberText });
+  store.dispatch(storeActions.setTrackNumber(trackNumberText));
 
   preText.textContent = trackNumberText;
 
@@ -161,7 +167,7 @@ const updateTitleDisplay = () => {
   titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
   // Dispatch title change to store for fullscreen sync
-  store.dispatch({ type: STORE_ACTION_TYPES.SET_TRACK_TITLE, payload: newTrackTitle });
+  store.dispatch(storeActions.setTrackTitle(newTrackTitle));
 
   // Cache offsetHeight to avoid multiple layout recalculations
   const titleHeight = titleText.offsetHeight;
@@ -186,10 +192,10 @@ export const launchPlume = (): void => {
   // Main initialization state
   let isInitializing = false;
   let isInitialized = false;
-  let storeCleanupCallback: (() => void) | null = null;
-  let keyboardCleanupCallback: (() => void) | null = null;
-  let stickinessCleanupCallback: (() => void) | null = null;
   let audioEventsCleanupCallback: (() => void) | null = null;
+  let storeCleanupCallback: (() => void) | null = null;
+  let kbCleanupCallback: (() => void) | null = null;
+  let stickinessCleanupCallback: (() => void) | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -209,7 +215,7 @@ export const launchPlume = (): void => {
     await store.loadPersistedState();
 
     const isAlbumPage = globalThis.location.pathname.includes("/album/");
-    store.dispatch({ type: STORE_ACTION_TYPES.SET_PAGE_TYPE, payload: isAlbumPage ? "album" : "track" });
+    store.dispatch(storeActions.setPageType(isAlbumPage ? "album" : "track"));
 
     const audioElement = await findAudioElement();
     if (!audioElement) {
@@ -218,7 +224,7 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: audioElement });
+    plumeUi.dispatch(plumeActions.setAudioElement(audioElement));
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -229,22 +235,24 @@ export const launchPlume = (): void => {
 
     // Duration display method is already loaded from persisted state
     const durationDisplayMethod = store.getState().durationDisplayMethod;
-    logger(CPL.INFO, `${getString("INFO__TIME_DISPLAY_METHOD__APPLIED")} "${durationDisplayMethod}"`);
+    logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
     // Inject enhancements
     await injectEnhancements();
+    stickinessCleanupCallback = setupPlayerStickiness();
     audioEventsCleanupCallback = setupAudioEventListeners({
       updateTitleDisplay,
       updatePretextDisplay,
       updateTrackForwardBtnState,
     });
     storeCleanupCallback = setupStoreSubscriptions();
-    keyboardCleanupCallback = setupHotkeys({
+    kbCleanupCallback = setupHotkeys({
       handlePlayPause,
       handleTimeBackward,
       handleTimeForward,
       handleTrackBackward,
       handleTrackForward,
+      handleMuteToggle,
       toggleFullscreenMode,
     });
     initPlayback();
@@ -273,10 +281,10 @@ export const launchPlume = (): void => {
           newAudio.volume = volume;
           logger(
             CPL.INFO,
-            `${getString("INFO__VOLUME__APPLIED")} ${Math.round(volume * 100)}${getString("META__PERCENTAGE")}`
+            getString("INFO__VOLUME__APPLIED", [Math.round(volume * 100), getString("META__PERCENTAGE")])
           );
 
-          plumeUi.dispatch({ type: PLUME_ACTION_TYPES.SET_AUDIO_ELEMENT, payload: newAudio });
+          plumeUi.dispatch(plumeActions.setAudioElement(newAudio));
 
           // Re-setup audio event listeners for the new audio element
           audioEventsCleanupCallback?.();
@@ -307,7 +315,6 @@ export const launchPlume = (): void => {
   domObserver.observe(document.body, { childList: true, subtree: true });
 
   init();
-  stickinessCleanupCallback = setupPlayerStickiness();
 
   // Support for SPA navigation
   let lastUrl = location.href;
@@ -352,9 +359,9 @@ export const launchPlume = (): void => {
     }
 
     // Cleanup keyboard hotkeys
-    if (keyboardCleanupCallback) {
-      keyboardCleanupCallback();
-      keyboardCleanupCallback = null;
+    if (kbCleanupCallback) {
+      kbCleanupCallback();
+      kbCleanupCallback = null;
     }
 
     // Cleanup audio event listeners
