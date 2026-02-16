@@ -1,6 +1,15 @@
 import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
-import { Action, handleUnknownAction, Listener, Store, Thunk } from "../domain/store";
+import {
+  Action,
+  createScenarioRecorder,
+  handleUnknownAction,
+  Listener,
+  ScenarioControls,
+  ScenarioView,
+  Store,
+  Thunk,
+} from "../domain/store";
 import { CPL, logger } from "../features/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
@@ -136,6 +145,20 @@ interface AppStateStore extends Store<AppState, AppAction> {
   // * Additional fields
   loadPersistedState(): Promise<void>;
   computed: ComputedState;
+
+  // * Scenario: time-travel debugging (dev-only)
+  scenario: {
+    /** Undo the last dispatched action, restoring the previous state. Returns `true` if undo was applied. */
+    undo(): boolean;
+    /** Redo a previously undone action, re-applying it. Returns `true` if redo was applied. */
+    redo(): boolean;
+    /** Replay the recorded scenario up to `toIndex` (inclusive). Omit to replay all. */
+    replayScenario(toIndex?: number): void;
+    /** Get a read-only view of the recorded scenario timeline. */
+    getScenarioView(): ScenarioView<AppState, AppAction>;
+    /** Clear all recorded scenario entries. */
+    clearScenario(): void;
+  };
 }
 
 const INITIAL_STATE: AppState = {
@@ -162,6 +185,10 @@ const createAppStateInstance = (): AppStateStore => {
 
   let persistenceTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingPersistedKeys = new Set<keyof AppState>();
+
+  // Scenario recorder for time-travel debugging (dev-only)
+  const scenarioRecorder: ScenarioControls<AppState, AppAction> | null =
+    process.env.NODE_ENV === "testing" ? createScenarioRecorder<AppState, AppAction>() : null;
 
   const persistState = (keys: Array<keyof AppState>): void => {
     // Accumulate all keys that need to be persisted during the debounce window
@@ -371,6 +398,9 @@ const createAppStateInstance = (): AppStateStore => {
       const prevState = { ...state };
       reducer(action);
       logStateChange(action, prevState, state);
+
+      // Record scenario entry for time-travel debugging
+      scenarioRecorder?.record(action, state);
     },
 
     subscribe<AppStateProp extends keyof AppState>(
@@ -409,6 +439,74 @@ const createAppStateInstance = (): AppStateStore => {
       formattedElapsed: () => presentFormattedElapsed(state),
       formattedDuration: () => presentFormattedDuration(state),
       progressPercentage: () => presentProgressPercentage(state),
+    },
+
+    scenario: {
+      undo(): boolean {
+        if (!scenarioRecorder) return false;
+        const restored = scenarioRecorder.undo(INITIAL_STATE);
+        if (!restored) return false;
+
+        const prevState = { ...state };
+        state = { ...restored };
+
+        // Notify listeners for every key that changed
+        for (const key of Object.keys(state) as Array<keyof AppState>) {
+          if (prevState[key] !== state[key]) {
+            notify(key, prevState[key]);
+          }
+        }
+
+        logger(CPL.DEBUG, "[SCENARIO] Undo applied", scenarioRecorder.getScenarioView().cursor);
+        return true;
+      },
+
+      redo(): boolean {
+        if (!scenarioRecorder) return false;
+        const restored = scenarioRecorder.redo();
+        if (!restored) return false;
+
+        const prevState = { ...state };
+        state = { ...restored };
+
+        for (const key of Object.keys(state) as Array<keyof AppState>) {
+          if (prevState[key] !== state[key]) {
+            notify(key, prevState[key]);
+          }
+        }
+
+        logger(CPL.DEBUG, "[SCENARIO] Redo applied", scenarioRecorder.getScenarioView().cursor);
+        return true;
+      },
+
+      replayScenario(toIndex?: number): void {
+        if (!scenarioRecorder) return;
+        const restored = scenarioRecorder.replayScenario(INITIAL_STATE, toIndex);
+
+        const prevState = { ...state };
+        state = { ...restored };
+
+        for (const key of Object.keys(state) as Array<keyof AppState>) {
+          if (prevState[key] !== state[key]) {
+            notify(key, prevState[key]);
+          }
+        }
+
+        const view = scenarioRecorder.getScenarioView();
+        logger(CPL.DEBUG, `[SCENARIO] Replayed to index ${view.cursor} / ${view.entries.length - 1}`);
+      },
+
+      getScenarioView(): ScenarioView<AppState, AppAction> {
+        if (!scenarioRecorder) {
+          return { entries: [], cursor: -1 };
+        }
+        return scenarioRecorder.getScenarioView();
+      },
+
+      clearScenario(): void {
+        scenarioRecorder?.clearScenario();
+        logger(CPL.DEBUG, "[SCENARIO] Cleared");
+      },
     },
   };
 };
