@@ -2,7 +2,25 @@
   "APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
   "APP_DESCRIPTION": { "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, avance/recul de 10s, mode plein écran et raccourcis clavier." },
 
-  "ERROR__NO_BROWSER_API": { "message": "Aucune API d'extension de navigateur détectée" },
+  "ALERT__BC_HEALTH_CHECK__FAILED": {
+    "message": "La vérification de santé de Bandcamp a échoué : $MISSING_REQUIRED$ éléments requis manquants.\nPlume ne pourra pas fonctionner correctement. Veuillez vérifier la console pour plus de détails.",
+    "placeholders": {
+      "missing_required": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ERROR__NO_BROWSER_API": { "message": "Aucune API de navigateur détectée" },
+  "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
+    "message": "Élément Bandcamp non trouvé (requis) : $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "div.inline_player"
+      }
+    }
+  },
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossible de trouver un conteneur approprié" },
   "ERROR__STATE__LOAD_FAILED": { "message": "Échec du chargement de l'état persisté :" },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état global :" },
@@ -46,6 +64,16 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Éléments du lecteur original cachés" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Éléments du lecteur original restaurés" },
   "INFO__BROWSER__DETECTED": { "message": "Navigateur détecté :" },
+  "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
+    "message": "Élément Bandcamp non trouvé (optionnel) : $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "span.fromAlbum"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tous les éléments Bandcamp trouvés" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
   "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },

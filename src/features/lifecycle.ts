@@ -3,6 +3,7 @@ import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
 import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
 import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { setupAudioEventListeners } from "./audio-events";
+import { checkBandcampElements } from "./bc-health-check";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
 import { getString } from "./i18n";
 import { injectEnhancements } from "./injection";
@@ -210,6 +211,8 @@ export const launchPlume = (): void => {
       window.addEventListener("load", init, { once: true });
       return;
     }
+
+    checkBandcampElements();
 
     // Load persisted state into store
     await store.loadPersistedState();

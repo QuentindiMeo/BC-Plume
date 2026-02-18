@@ -2,7 +2,25 @@
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
   "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player." },
 
-  "ERROR__NO_BROWSER_API": { "message": "No browser extension API detected" },
+  "ALERT__BC_HEALTH_CHECK__FAILED": {
+    "message": "Bandcamp health check failed: $MISSING_REQUIRED$ required elements missing.\nPlume won't be able to function properly. Please check the console for details.",
+    "placeholders": {
+      "missing_required": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
+  "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
+    "message": "Bandcamp element not found (required): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "div.inline_player"
+      }
+    }
+  },
   "ERROR__STATE__LOAD_FAILED": { "message": "Failed to load persisted state:" },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Global state listener error:" },
   "ERROR__STATE__LISTENER_FAILED": { "message": "State listener error:" },
@@ -25,6 +43,7 @@
   "WARN__AUDIO__NOT_FOUND": { "message": "No audio element found" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "Runtime could not be calculated" },
   "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "Unable to load time display method:" },
   "WARN__PREV_TRACK__NOT_FOUND": { "message": "Previous track button not found" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Next track button not found" },
@@ -44,10 +63,19 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Original player elements hidden" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },
   "INFO__BROWSER__DETECTED": { "message": "Detected browser:" },
+  "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
+    "message": "Bandcamp element not found (optional): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "span.fromAlbum"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "All Bandcamp elements found" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Store subscriptions initialized" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Hotkeys registered" },
   "INFO__RUNTIME__CALCULATED": { "message": "Total runtime calculated:" },
-  "WARN__RUNTIME__NOT_CALCULATED": { "message": "Runtime could not be calculated" },
   "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Time display method applied: $METHOD$",

@@ -25,6 +25,8 @@ export const setupPlayerStickiness = (): CleanupCallback => {
     rafId = requestAnimationFrame(() => {
       const plumeIsInViewport = window.scrollY < cachedOffsetTop;
 
+      // classList mutation is intentionally direct here, bypassing the store.
+      // Sticky state is a purely local visual concern — no other feature reads it.
       if (plumeIsInViewport) {
         playerParent.classList.remove(SCROLLED_CLASSNAME);
       } else {
