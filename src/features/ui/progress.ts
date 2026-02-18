@@ -62,7 +62,6 @@ export const createProgressBar = (): HTMLDivElement => {
         plume.audioElement.pause();
       }, 10);
     }
-    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   });
 
   duration.addEventListener("click", handleDurationClick);

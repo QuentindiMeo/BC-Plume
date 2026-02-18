@@ -54,8 +54,6 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   // Apply saved volume to audio element
   plume.audioElement.volume = currentVolume;
 
-  plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-
   const valueDisplay = document.createElement("div");
   valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
   valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;

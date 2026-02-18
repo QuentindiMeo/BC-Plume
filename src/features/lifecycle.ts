@@ -1,6 +1,6 @@
 import { BC_ELEM_IDENTIFIERS, DebugControl } from "../domain/bandcamp";
 import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
 import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { setupAudioEventListeners } from "./audio-events";
 import { checkBandcampElements } from "./bc-health-check";
@@ -227,7 +227,6 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    plumeUi.dispatch(plumeActions.setAudioElement(audioElement));
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -286,8 +285,6 @@ export const launchPlume = (): void => {
             CPL.INFO,
             getString("INFO__VOLUME__APPLIED", [Math.round(volume * 100), getString("META__PERCENTAGE")])
           );
-
-          plumeUi.dispatch(plumeActions.setAudioElement(newAudio));
 
           // Re-setup audio event listeners for the new audio element
           audioEventsCleanupCallback?.();

@@ -352,7 +352,7 @@ const createAppStateInstance = (): AppStateStore => {
     }
   };
 
-  const loadPersistedStateThunk = (): Thunk => async (dispatch) => {
+  const loadPersistedStateThunk = (): Thunk<AppState, AppAction> => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
@@ -388,7 +388,7 @@ const createAppStateInstance = (): AppStateStore => {
       return state;
     },
 
-    dispatch(action: AppAction | Thunk): void {
+    dispatch(action: AppAction | Thunk<AppState, AppAction>): void {
       // Handle async thunks
       if (typeof action === "function") {
         action(this.dispatch.bind(this), this.getState.bind(this));

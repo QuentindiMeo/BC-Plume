@@ -4,7 +4,7 @@ import { getStoreInstance } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
-import { presentFormattedTime, presentFormattedDuration } from "./presenters";
+import { presentFormattedDuration, presentFormattedTime } from "./presenters";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";
 
@@ -43,7 +43,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plume = plumeUi.getState();
 
       plume.audioElement.volume = volume;
-      plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
 
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
 
@@ -85,7 +84,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Update audio element volume
       plume.audioElement.volume = store.getState().volume;
-      plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
     }),
     // Subscribe to playing state changes
     store.subscribe("isPlaying", (isPlaying) => {
@@ -106,7 +104,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       playPauseBtns.forEach((btn) => {
         btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
       });
-      plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
     })
   );
 

@@ -7,13 +7,13 @@ export const handleUnknownAction = (action: never): never => {
 export type Action<ActionId = string, Payload = undefined> = Payload extends undefined
   ? { type: ActionId }
   : { type: ActionId; payload: Payload };
-export type Thunk = (dispatch: Store<Action, Action>["dispatch"], getState: () => Readonly<object>) => Promise<void>;
+export type Thunk<S, A> = (dispatch: (action: A | Thunk<S, A>) => void, getState: () => Readonly<S>) => Promise<void>;
 
 export type Listener<State, Key extends keyof State> = (value: State[Key], prevValue: State[Key]) => void;
 
 export interface Store<State, Action> {
   getState(): Readonly<State>;
-  dispatch(action: Action | Thunk): void;
+  dispatch(action: Action | Thunk<State, Action>): void;
   subscribe?<Key extends keyof State>(key: Key, listener: Listener<State, Key>): NoArgFunction;
   subscribeAll?(listener: (state: State) => void): NoArgFunction;
 }

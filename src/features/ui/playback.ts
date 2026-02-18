@@ -1,6 +1,6 @@
 import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../../infra/AppInstanceImpl";
+import { getPlumeUiInstance } from "../../infra/AppInstanceImpl";
 import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
 import { PLUME_SVG } from "../../svg/icons";
 import { getString } from "../i18n";
@@ -27,7 +27,6 @@ export const handleTrackBackward = (): void => {
   // If past TIME_BEFORE_RESTART, restart current track
   if (plume.audioElement.currentTime > TIME_BEFORE_RESTART) {
     plume.audioElement.currentTime = 0;
-    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
     logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
     return;
   }
@@ -73,7 +72,6 @@ export const handleTimeBackward = (): void => {
     }, 10);
   }
 
-  plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 
@@ -94,7 +92,6 @@ export const handleTimeForward = (): void => {
     }, 10);
   }
 
-  plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 

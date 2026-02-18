@@ -27,7 +27,6 @@ export interface DefinedPlumeCore {
 
 enum PLUME_ACTIONS {
   RESET_PLUME_UI_INSTANCE = "resetPlumeUiInstance",
-  SET_AUDIO_ELEMENT = "setAudioElement",
   SET_TITLE_DISPLAY = "setTitleDisplay",
   SET_PROGRESS_SLIDER = "setProgressSlider",
   SET_ELAPSED_DISPLAY = "setElapsedDisplay",
@@ -38,7 +37,6 @@ enum PLUME_ACTIONS {
 
 export type PlumeAction =
   | Action<PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE, string | null>
-  | Action<PLUME_ACTIONS.SET_AUDIO_ELEMENT, HTMLAudioElement | null>
   | Action<PLUME_ACTIONS.SET_TITLE_DISPLAY, HTMLDivElement | null>
   | Action<PLUME_ACTIONS.SET_PROGRESS_SLIDER, HTMLInputElement | null>
   | Action<PLUME_ACTIONS.SET_ELAPSED_DISPLAY, HTMLSpanElement | null>
@@ -50,10 +48,6 @@ export const plumeActions = {
   resetPlumeUiInstance: (reason: string | null = null): PlumeAction => ({
     type: PLUME_ACTIONS.RESET_PLUME_UI_INSTANCE,
     payload: reason,
-  }),
-  setAudioElement: (element: HTMLAudioElement | null): PlumeAction => ({
-    type: PLUME_ACTIONS.SET_AUDIO_ELEMENT,
-    payload: element,
   }),
   setTitleDisplay: (element: HTMLDivElement | null): PlumeAction => ({
     type: PLUME_ACTIONS.SET_TITLE_DISPLAY,
@@ -153,9 +147,6 @@ const createPlumeUiInstance = (): AppInstance => {
         updateState("durationDisplay", null);
         updateState("volumeSlider", null);
         updateState("muteBtn", null);
-        break;
-      case PLUME_ACTIONS.SET_AUDIO_ELEMENT:
-        updateState("audioElement", action.payload);
         break;
       case PLUME_ACTIONS.SET_TITLE_DISPLAY:
         updateState("titleDisplay", action.payload);
