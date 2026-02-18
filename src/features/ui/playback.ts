@@ -74,7 +74,7 @@ export const handleTimeBackward = (): void => {
   }
 
   plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", Math.round(newTime)));
+  logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 
 export const handleTimeForward = (): void => {
@@ -95,7 +95,7 @@ export const handleTimeForward = (): void => {
   }
 
   plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", Math.round(newTime)));
+  logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {

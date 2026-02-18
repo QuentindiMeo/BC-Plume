@@ -136,7 +136,7 @@ const updatePretextDisplay = () => {
   const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
   const newTq = getTrackQuantifiers(newTrackTitle);
   const trackNumberText = isAlbumPage
-    ? getString("LABEL__TRACK_CURRENT", `${newTq.current}/${newTq.total}`)
+    ? getString("LABEL__TRACK_CURRENT", [`${newTq.current}/${newTq.total}`])
     : getString("LABEL__TRACK");
 
   // Dispatch track number change to store for fullscreen sync
@@ -147,7 +147,7 @@ const updatePretextDisplay = () => {
   const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerCurrent) as HTMLDivElement;
   headerCurrent.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle])
-    : getString("ARIA__TRACK", newTrackTitle);
+    : getString("ARIA__TRACK", [newTrackTitle]);
 };
 
 const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`

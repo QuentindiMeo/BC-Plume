@@ -60,11 +60,11 @@ export const injectEnhancements = async (): Promise<void> => {
   currentTitleSection.tabIndex = 0; // make it focusable for screen readers
   currentTitleSection.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle])
-    : getString("ARIA__TRACK", initialTrackTitle);
+    : getString("ARIA__TRACK", [initialTrackTitle]);
   const currentTitlePretext = document.createElement("span");
   currentTitlePretext.id = PLUME_ELEM_IDENTIFIERS.headerTitlePretext.split("#")[1];
   const initialTrackNumberText = isAlbumPage
-    ? getString("LABEL__TRACK_CURRENT", `${initialTq.current}/${initialTq.total}`)
+    ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
   currentTitlePretext.textContent = initialTrackNumberText;
   currentTitlePretext.style.color = getAppropriatePretextColor();
