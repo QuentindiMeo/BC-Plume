@@ -1,5 +1,4 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
+import { PLUME_CONSTANTS } from "../domain/plume";
 import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { NoArgFunction } from "../shared/types";
 import { getString } from "./i18n";
@@ -19,31 +18,16 @@ interface KeyboardHandlers {
 }
 
 export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
-  const plumeUi = getPlumeUiInstance();
   const store = getStoreInstance();
 
   const handleAdjustVolume = (delta: number) => {
     if (delta === 0) logger(CPL.WARN, getString("WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA"));
 
-    const plume = plumeUi.getState();
-    const currentValue = Number.parseInt(plume.volumeSlider.value);
+    const currentVolume = store.getState().volume;
+    const currentValue = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY);
     const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
-    plume.volumeSlider.value = newValue.toString();
-    plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
 
-    const volume = newValue / VOLUME_SLIDER_GRANULARITY;
-    plume.audioElement.volume = volume;
-    plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-
-    const volumeSliders = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.volumeSlider);
-    volumeSliders.forEach((slider) => {
-      (slider as HTMLInputElement).value = newValue.toString();
-
-      const valueDisplay = slider.parentElement!.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement;
-      valueDisplay.textContent = `${newValue}${getString("META__PERCENTAGE")}`;
-    });
-
-    store.dispatch(storeActions.setVolume(volume));
+    store.dispatch(storeActions.setVolume(newValue / VOLUME_SLIDER_GRANULARITY));
   };
 
   const handleKeydown = (e: KeyboardEvent) => {
