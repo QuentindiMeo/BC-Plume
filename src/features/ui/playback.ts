@@ -5,6 +5,7 @@ import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
 import { PLUME_SVG } from "../../svg/icons";
 import { getString } from "../i18n";
 import { CPL, logger } from "../logger";
+import { seekAndPreservePause } from "../seeking";
 
 const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
 const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
@@ -56,41 +57,29 @@ export const handleTrackForward = (): void => {
 };
 
 export const handleTimeBackward = (): void => {
+  const store = getStoreInstance();
   const plumeUi = getPlumeUiInstance();
   const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
   const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
-  plume.audioElement.currentTime = newTime;
-
-  // Preserve paused state after seeking
-  const wasPaused = plume.audioElement.paused;
-  if (wasPaused) {
-    setTimeout(() => {
-      plume.audioElement.pause();
-    }, 10);
-  }
+  seekAndPreservePause(plume.audioElement, newTime);
+  store.dispatch(storeActions.setCurrentTime(newTime));
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 
 export const handleTimeForward = (): void => {
+  const store = getStoreInstance();
   const plumeUi = getPlumeUiInstance();
   const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
   const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
-  plume.audioElement.currentTime = newTime;
-
-  // Preserve paused state after seeking
-  const wasPaused = plume.audioElement.paused;
-  if (wasPaused) {
-    setTimeout(() => {
-      plume.audioElement.pause();
-    }, 10);
-  }
+  seekAndPreservePause(plume.audioElement, newTime);
+  store.dispatch(storeActions.setCurrentTime(newTime));
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", [Math.round(newTime)]));
 };

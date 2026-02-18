@@ -6,6 +6,7 @@ import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
+import { seekAndPreservePause } from "./seeking";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 import {
   handlePlayPause,
@@ -201,19 +202,10 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
   const handleProgressInput = function (this: HTMLInputElement) {
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
+    const targetTime = progress * (plume.audioElement.duration || 0);
 
-    plume.audioElement.currentTime = progress * (plume.audioElement.duration || 0);
-
-    // Preserve paused state after seeking
-    const wasPaused = plume.audioElement.paused;
-    if (wasPaused) {
-      setTimeout(() => {
-        plume.audioElement.pause();
-      }, 10);
-    }
-
-    // Dispatch to store to sync with main view
-    store.dispatch(storeActions.setCurrentTime(plume.audioElement.currentTime));
+    seekAndPreservePause(plume.audioElement, targetTime);
+    store.dispatch(storeActions.setCurrentTime(targetTime));
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {

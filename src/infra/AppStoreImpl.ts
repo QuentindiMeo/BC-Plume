@@ -143,11 +143,11 @@ interface AppStateStore extends Store<AppState, AppAction> {
   ): () => void;
   subscribeAll(listener: (state: AppState) => void): () => void;
 
-  // * Additional fields
+  // Additional fields
   loadPersistedState(): Promise<void>;
   computed: ComputedState;
 
-  // * Scenario: time-travel debugging (dev-only)
+  // Scenario: time-travel debugging (dev-only)
   scenario: {
     // Undo the last dispatched action, restoring the previous state. Returns `true` if undo was applied.
     undo(): boolean;
