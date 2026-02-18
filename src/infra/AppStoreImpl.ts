@@ -149,15 +149,15 @@ interface AppStateStore extends Store<AppState, AppAction> {
 
   // * Scenario: time-travel debugging (dev-only)
   scenario: {
-    /** Undo the last dispatched action, restoring the previous state. Returns `true` if undo was applied. */
+    // Undo the last dispatched action, restoring the previous state. Returns `true` if undo was applied.
     undo(): boolean;
-    /** Redo a previously undone action, re-applying it. Returns `true` if redo was applied. */
+    // Redo a previously undone action, re-applying it. Returns `true` if redo was applied.
     redo(): boolean;
-    /** Replay the recorded scenario up to `toIndex` (inclusive). Omit to replay all. */
+    // Replay the recorded scenario up to `toIndex` (inclusive). Omit to replay all.
     replayScenario(toIndex?: number): void;
-    /** Get a read-only view of the recorded scenario timeline. */
+    // Get a read-only view of the recorded scenario timeline.
     getScenarioView(): ScenarioView<AppState, AppAction>;
-    /** Clear all recorded scenario entries. */
+    // Clear all recorded scenario entries.
     clearScenario(): void;
   };
 }
