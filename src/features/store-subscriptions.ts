@@ -4,7 +4,7 @@ import { getStoreInstance } from "../infra/AppStoreImpl";
 import { PLUME_SVG } from "../svg/icons";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
-import { presentFormattedTime } from "./presenters";
+import { presentFormattedTime, presentFormattedDuration } from "./presenters";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";
 
@@ -35,16 +35,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Update time displays
       plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
-
-      let durationDisplayText: string;
-      if (state.durationDisplayMethod === "duration") {
-        durationDisplayText = presentFormattedTime(duration);
-      } else {
-        const remainingSeconds = Math.floor(duration - elapsed);
-        durationDisplayText = `-${presentFormattedTime(remainingSeconds)}`;
-      }
-
-      plume.durationDisplay.textContent = durationDisplayText;
+      plume.durationDisplay.textContent = presentFormattedDuration(state);
     }),
     // Subscribe to volume changes to update audio element, slider, and display
     store.subscribe("volume", (volume) => {
@@ -71,18 +62,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plume = plumeUi.getState();
       const state = store.getState();
 
-      const elapsed = state.currentTime;
-      const duration = state.duration;
-
-      let durationDisplayText: string;
-      if (state.durationDisplayMethod === "duration") {
-        durationDisplayText = presentFormattedTime(duration);
-      } else {
-        const remainingSeconds = Math.floor(duration - elapsed);
-        durationDisplayText = `-${presentFormattedTime(remainingSeconds)}`;
-      }
-
-      plume.durationDisplay.textContent = durationDisplayText;
+      plume.durationDisplay.textContent = presentFormattedDuration(state);
     }),
     // Subscribe to mute state changes
     store.subscribe("isMuted", (isMuted) => {

@@ -16,7 +16,7 @@ export const presentFormattedElapsed = (state: AppState): string => {
 
 export const presentFormattedDuration = (state: AppState): string => {
   if (state.durationDisplayMethod === TIME_DISPLAY_METHOD.REMAINING) {
-    const remaining = state.duration - state.currentTime;
+    const remaining = Math.floor(state.duration - state.currentTime);
     return "-" + presentFormattedTime(remaining);
   }
   return presentFormattedTime(state.duration);
