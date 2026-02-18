@@ -10,11 +10,6 @@ import { syncMuteBtn } from "./ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
-// Flag to prevent audio event handlers from dispatching during subscription updates
-let isUpdatingFromSubscription = false;
-
-export const isPlaybackUpdatingFromSubscription = (): boolean => isUpdatingFromSubscription;
-
 export const setupStoreSubscriptions = (): CleanupCallback => {
   const store = getStoreInstance();
   const subscriptions: Array<SubscriptionCallback> = [];
@@ -117,29 +112,21 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plumeUi = getPlumeUiInstance();
       const plume = plumeUi.getState();
 
-      // Set flag to prevent audio event handlers from dispatching
-      isUpdatingFromSubscription = true;
-
-      try {
-        // Update audio element playback state (store as single source of truth)
-        if (isPlaying && plume.audioElement.paused) {
-          plume.audioElement.play();
-        } else if (!isPlaying && !plume.audioElement.paused) {
-          plume.audioElement.pause();
-        }
-
-        // Update play/pause button icons
-        const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
-        playPauseBtns.forEach((btn) => {
-          btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
-        });
-        plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
-      } finally {
-        // Reset flag after a tick to allow audio events to process
-        setTimeout(() => {
-          isUpdatingFromSubscription = false;
-        }, 0);
+      // Update audio element playback state (store as single source of truth).
+      // Audio events guard against re-entrant dispatch via idempotent comparison:
+      // if the audio element's state already matches the store, the resulting play/pause event will not trigger a redundant dispatch.
+      if (isPlaying && plume.audioElement.paused) {
+        plume.audioElement.play();
+      } else if (!isPlaying && !plume.audioElement.paused) {
+        plume.audioElement.pause();
       }
+
+      // Update play/pause button icons
+      const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+      playPauseBtns.forEach((btn) => {
+        btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+      });
+      plumeUi.dispatch(plumeActions.setAudioElement(plume.audioElement));
     })
   );
 

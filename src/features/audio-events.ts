@@ -3,7 +3,6 @@ import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
 import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
 import { getString } from "./i18n";
 import { CPL, logger } from "./logger";
-import { isPlaybackUpdatingFromSubscription } from "./store-subscriptions";
 import type { CleanupCallback } from "./types";
 import { syncProgressToStore } from "./ui";
 
@@ -65,12 +64,12 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   };
 
   const handlePlayPause = () => {
-    if (isPlaybackUpdatingFromSubscription()) return;
-
     const plumeUi = getPlumeUiInstance();
     const plume = plumeUi.getState();
 
     const isPlaying = !plume.audioElement.paused;
+    // Guard against circular dispatch: when a subscription calls play()/pause(), the resulting event arrives with a state already reflected in the store.
+    if (isPlaying === store.getState().isPlaying) return;
     store.dispatch(storeActions.setIsPlaying(isPlaying));
   };
 
