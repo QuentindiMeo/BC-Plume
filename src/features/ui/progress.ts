@@ -3,6 +3,7 @@ import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { getPlumeUiInstance, plumeActions } from "../../infra/AppInstanceImpl";
 import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
 import { getString } from "../i18n";
+import { CPL, logger } from "../logger";
 import { seekAndPreservePause } from "../seeking";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
@@ -53,9 +54,13 @@ export const createProgressBar = (): HTMLDivElement => {
   duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
 
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
-    const store = getStoreInstance();
-    const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
+    const targetValue = Number.parseFloat(this.value);
+    const progress = targetValue / PROGRESS_SLIDER_GRANULARITY;
     const targetTime = progress * (plume.audioElement.duration || 0);
+
+    logger(CPL.DEBUG, getString("DEBUG__PROGRESS_SLIDER__INPUT", [targetTime.toFixed(2)]));
+
+    const store = getStoreInstance();
 
     seekAndPreservePause(plume.audioElement, progress * (plume.audioElement.duration || 0));
     store.dispatch(storeActions.setCurrentTime(targetTime));

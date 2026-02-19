@@ -11,6 +11,8 @@ const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
 const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
 
 export const handlePlayPause = (): void => {
+  logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
+
   const store = getStoreInstance();
 
   // Dispatch to store only - subscription handles audio element state

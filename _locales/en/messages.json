@@ -121,6 +121,15 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Potential controls found:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== END DEBUG ===" },
   "DEBUG__STATE__PERSISTED": { "message": "State persisted to storage:" },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Progress slider moved: $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Previous track button clicked" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Previous track event dispatched" },
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Current track restarted" },

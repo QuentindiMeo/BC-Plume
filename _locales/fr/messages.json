@@ -123,6 +123,15 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Contrôles potentiels trouvés :" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
   "DEBUG__STATE__PERSISTED": { "message": "État enregistré dans le stockage :" },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Déplacement du curseur de progression : $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Bouton de piste précédente cliqué" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente dispatché" },
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },

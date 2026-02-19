@@ -121,6 +121,15 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controles potenciales encontrados:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
   "DEBUG__STATE__PERSISTED": { "message": "Estado guardado en almacenamiento:" },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Control deslizante de progreso movido: $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Botón de pista anterior presionado" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Evento de pista anterior enviado" },
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
