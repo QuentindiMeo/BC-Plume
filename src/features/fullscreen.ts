@@ -36,20 +36,24 @@ interface FullscreenElements {
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
 
-export const cleanupFullscreenMode = (): void => {
+const exitFullscreenMode = (): void => {
   const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
-  if (existingOverlay) {
-    // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
-    if (fullscreenCleanupCallback) {
-      fullscreenCleanupCallback();
-      fullscreenCleanupCallback = null;
-    }
+  if (!existingOverlay) return;
 
-    existingOverlay.remove();
-    document.body.style.overflow = "auto";
-    getStoreInstance().dispatch(storeActions.setIsFullscreen(false));
+  const store = getStoreInstance();
+  store.dispatch(storeActions.setIsFullscreen(false));
+
+  // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
+  if (fullscreenCleanupCallback) {
+    fullscreenCleanupCallback();
+    fullscreenCleanupCallback = null;
   }
+
+  existingOverlay.remove();
+  document.body.style.overflow = "auto";
 };
+
+export const cleanupFullscreenMode = exitFullscreenMode;
 
 const renderVolume = (elements: FullscreenElements, volume: number): void => {
   if (!elements.volumeSlider || !elements.volumeDisplay) {
@@ -403,18 +407,7 @@ export const toggleFullscreenMode = (): void => {
   const isCurrentlyFullscreen = !!existingOverlay;
 
   if (isCurrentlyFullscreen) {
-    // Exit fullscreen - dispatch state change first, then cleanup
-    store.dispatch(storeActions.setIsFullscreen(false));
-
-    // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
-    if (fullscreenCleanupCallback) {
-      fullscreenCleanupCallback();
-      fullscreenCleanupCallback = null;
-    }
-
-    existingOverlay.remove();
-    document.body.style.overflow = "auto";
-
+    exitFullscreenMode();
     logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
     return;
   }
