@@ -1,4 +1,4 @@
-import { process } from "../domain/node";
+import { process, PROCESS_ENV } from "../domain/node";
 import { PLUME_CACHE_KEYS } from "../domain/plume";
 import { Action, Store } from "../domain/store";
 import { CPL, logger } from "../features/logger";
@@ -88,7 +88,7 @@ const createBrowserInstance = (): BrowserInstance => {
 
   // Development-only action logger
   const logStateChange = (action: BrowserAction): void => {
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env !== PROCESS_ENV.PRODUCTION) {
       const hasPayload = "payload" in action;
       logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
     }

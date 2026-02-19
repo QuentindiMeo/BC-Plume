@@ -56,7 +56,7 @@ const DEFAULT_MAX_SCENARIO_ENTRIES = 200;
 
 /**
  * Creates a scenario recorder that tracks dispatched actions and resulting state snapshots, enabling undo, redo, and full scenario replay for time-travel debugging.
- * Testing-only: consumers should gate instantiation behind a `process.env.NODE_ENV` check.
+ * Should be used in testing environment only due to memory overhead of storing state snapshots.
  */
 export const createScenarioRecorder = <State, Action>(
   maxEntries: number = DEFAULT_MAX_SCENARIO_ENTRIES

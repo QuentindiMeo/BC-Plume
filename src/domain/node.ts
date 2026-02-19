@@ -1,9 +1,13 @@
-type ProcessEnv = "development" | "production" | "test";
+export enum PROCESS_ENV {
+  PRODUCTION = "production",
+  STAGING = "staging",
+  TESTING = "testing",
+  DEVELOPMENT = "development",
+}
+type ProcessEnvType = `${PROCESS_ENV}`;
 
-export const process = ((mode: ProcessEnv): { env: { NODE_ENV: string } } => {
+export const process = ((mode: ProcessEnvType): { env: ProcessEnvType } => {
   return {
-    env: {
-      NODE_ENV: mode,
-    },
+    env: mode,
   };
-})("production"); // Default to development mode; can be overridden in tests or production builds.
+})(PROCESS_ENV.DEVELOPMENT); // Default to development mode; can be overridden in tests or production builds.

@@ -1,5 +1,5 @@
 import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
-import { process } from "../domain/node";
+import { process, PROCESS_ENV } from "../domain/node";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
 import {
   Action,
@@ -189,7 +189,7 @@ const createAppStateInstance = (): AppStateStore => {
 
   // Scenario recorder for time-travel debugging (test-only)
   const scenarioRecorder: ScenarioControls<AppState, AppAction> | null =
-    process.env.NODE_ENV === "testing" ? createScenarioRecorder<AppState, AppAction>() : null;
+    process.env === PROCESS_ENV.TESTING ? createScenarioRecorder<AppState, AppAction>() : null;
 
   const persistState = (keys: Array<keyof AppState>): void => {
     // Accumulate all keys that need to be persisted during the debounce window
@@ -264,7 +264,7 @@ const createAppStateInstance = (): AppStateStore => {
    */
   const logStateChange = (action: AppAction, prevState: AppState, nextState: AppState): void => {
     // Only log in development builds
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env !== PROCESS_ENV.PRODUCTION) {
       const hasPayload = "payload" in action;
 
       logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
