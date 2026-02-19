@@ -86,31 +86,11 @@ const createBrowserInstance = (): BrowserInstance => {
       });
   };
 
-  /**
-   * Development-only state change logger for debugging.
-   * Logs all dispatched actions and resulting state changes.
-   */
-  const logStateChange = (action: BrowserAction, prevState: BrowserState, nextState: BrowserState): void => {
-    // Only log in development builds
+  // Development-only action logger
+  const logStateChange = (action: BrowserAction): void => {
     if (process.env.NODE_ENV !== "production") {
       const hasPayload = "payload" in action;
-
       logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
-
-      // Find what changed
-      const nextStateKeys = Object.keys(nextState) as Array<keyof BrowserState>;
-      const changes: Array<{ key: string; from: any; to: any }> = [];
-      for (const key of nextStateKeys) {
-        if (prevState[key] !== nextState[key]) {
-          changes.push({
-            key,
-            from: prevState[key],
-            to: nextState[key],
-          });
-        }
-      }
-
-      if (changes.length > 0) logger(CPL.DEBUG, "[STORE] State changes: " + JSON.stringify(changes));
     }
   };
 
@@ -124,9 +104,8 @@ const createBrowserInstance = (): BrowserInstance => {
     },
 
     dispatch(action: BrowserAction): void {
-      const prevState = { ...state };
       reducer(action);
-      logStateChange(action, prevState, state);
+      logStateChange(action);
     },
   };
 };
