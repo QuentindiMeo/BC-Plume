@@ -12,9 +12,15 @@ const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 export const setupStoreSubscriptions = (): CleanupCallback => {
   const store = getStoreInstance();
-  const subscriptions: Array<SubscriptionCallback> = [];
+  const storeSubscriptions: Array<SubscriptionCallback> = [];
+  const plume = getPlumeUiInstance().getState();
 
-  subscriptions.push(
+  // Cached once at setup time since bpe-volume-value is a static node.
+  const volumeValueDisplay = plume.volumeSlider.parentElement?.querySelector(
+    PLUME_ELEM_IDENTIFIERS.volumeValue
+  ) as HTMLDivElement | null;
+
+  storeSubscriptions.push(
     // Subscribe to currentTime changes to update main progress slider
     store.subscribe("currentTime", () => {
       const plumeUi = getPlumeUiInstance();
@@ -47,11 +53,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
 
       // Update volume display text (store as single source of truth)
-      const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
-        PLUME_ELEM_IDENTIFIERS.volumeValue
-      ) as HTMLDivElement | null;
-      if (valueDisplay) {
-        valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+      if (volumeValueDisplay) {
+        volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
       plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
     }),
@@ -75,11 +78,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
       plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
 
-      const valueDisplay = plume.volumeSlider.parentElement?.querySelector(
-        PLUME_ELEM_IDENTIFIERS.volumeValue
-      ) as HTMLDivElement | null;
-      if (valueDisplay) {
-        valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
+      if (volumeValueDisplay) {
+        volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
       // Update audio element volume
@@ -111,6 +111,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
   // Return cleanup function
   return () => {
-    subscriptions.forEach((unsubscribe) => unsubscribe());
+    storeSubscriptions.forEach((unsubscribe) => unsubscribe());
   };
 };
