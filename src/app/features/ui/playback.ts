@@ -1,5 +1,6 @@
-import { BC_ELEM_IDENTIFIERS } from "../../../domain/bandcamp";
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
+import { PLUME_CONSTANTS } from "../../../domain/plume";
+import { BC_ELEM_SELECTORS } from "../../../infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
@@ -35,7 +36,7 @@ export const handleTrackBackward = (): void => {
   }
 
   // Otherwise, click BC's previous button
-  const bcPrevBtn = document.querySelector(BC_ELEM_IDENTIFIERS.previousTrack) as HTMLButtonElement;
+  const bcPrevBtn = document.querySelector(BC_ELEM_SELECTORS.previousTrack) as HTMLButtonElement;
   if (!bcPrevBtn) {
     logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
     return;
@@ -48,7 +49,7 @@ export const handleTrackBackward = (): void => {
 export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
-  const bcNextBtn = document.querySelector(BC_ELEM_IDENTIFIERS.nextTrack) as HTMLButtonElement;
+  const bcNextBtn = document.querySelector(BC_ELEM_SELECTORS.nextTrack) as HTMLButtonElement;
   if (!bcNextBtn) {
     logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
     return;
@@ -89,10 +90,10 @@ export const handleTimeForward = (): void => {
 export const createPlaybackControlPanel = (): HTMLDivElement => {
   const plume = getGuiInstance().getState();
   const container = document.createElement("div");
-  container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
+  container.id = PLUME_ELEM_SELECTORS.playbackControls.split("#")[1];
 
   const trackBackwardBtn = document.createElement("button");
-  trackBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackBwdBtn.split("#")[1];
+  trackBackwardBtn.id = PLUME_ELEM_SELECTORS.trackBwdBtn.split("#")[1];
   trackBackwardBtn.type = "button";
   trackBackwardBtn.innerHTML = PLUME_SVG.trackBackward;
   trackBackwardBtn.title = getString("LABEL__TRACK_BACKWARD");
@@ -100,7 +101,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   trackBackwardBtn.addEventListener("click", handleTrackBackward);
 
   const timeBackwardBtn = document.createElement("button");
-  timeBackwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeBwdBtn.split("#")[1];
+  timeBackwardBtn.id = PLUME_ELEM_SELECTORS.timeBwdBtn.split("#")[1];
   timeBackwardBtn.type = "button";
   timeBackwardBtn.innerHTML = PLUME_SVG.timeBackward;
   timeBackwardBtn.title = getString("LABEL__TIME_BACKWARD");
@@ -108,7 +109,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   timeBackwardBtn.addEventListener("click", handleTimeBackward);
 
   const playPauseBtn = document.createElement("button");
-  playPauseBtn.id = PLUME_ELEM_IDENTIFIERS.playPauseBtn.split("#")[1];
+  playPauseBtn.id = PLUME_ELEM_SELECTORS.playPauseBtn.split("#")[1];
   playPauseBtn.type = "button";
   playPauseBtn.innerHTML = plume.audioElement.paused ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
   playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
@@ -116,7 +117,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   playPauseBtn.addEventListener("click", handlePlayPause);
 
   const timeForwardBtn = document.createElement("button");
-  timeForwardBtn.id = PLUME_ELEM_IDENTIFIERS.timeFwdBtn.split("#")[1];
+  timeForwardBtn.id = PLUME_ELEM_SELECTORS.timeFwdBtn.split("#")[1];
   timeForwardBtn.type = "button";
   timeForwardBtn.innerHTML = PLUME_SVG.timeForward;
   timeForwardBtn.title = getString("LABEL__TIME_FORWARD");
@@ -124,7 +125,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   timeForwardBtn.addEventListener("click", handleTimeForward);
 
   const trackForwardBtn = document.createElement("button");
-  trackForwardBtn.id = PLUME_ELEM_IDENTIFIERS.trackFwdBtn.split("#")[1];
+  trackForwardBtn.id = PLUME_ELEM_SELECTORS.trackFwdBtn.split("#")[1];
   trackForwardBtn.type = "button";
   trackForwardBtn.innerHTML = PLUME_SVG.trackForward;
   trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");

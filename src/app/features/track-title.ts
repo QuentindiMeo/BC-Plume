@@ -1,4 +1,4 @@
-import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -10,14 +10,14 @@ import {
 import { getString } from "./i18n";
 
 const getArtistNameElement = (): HTMLSpanElement => {
-  const infoSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+  const infoSection = document.querySelector(BC_ELEM_SELECTORS.infoSection) as HTMLDivElement;
   const infoSectionLinks = infoSection.querySelectorAll("span");
   const artistElementIdx = infoSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
   return infoSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
 };
 
 const getTrackTitleElement = (): HTMLSpanElement => {
-  return document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement;
+  return document.querySelector(BC_ELEM_SELECTORS.songPageCurrentTrackTitle) as HTMLSpanElement;
 };
 
 // Determine appropriate pretext color based on WCAG contrast with Bandcamp theme colors
@@ -56,8 +56,8 @@ export const getAppropriatePretextColor = (): string => {
 
 export const getCurrentTrackTitle = (isAlbumPage: boolean): string => {
   const titleElement = isAlbumPage
-    ? (document.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle) as HTMLSpanElement)
-    : (document.querySelector(BC_ELEM_IDENTIFIERS.songPageCurrentTrackTitle) as HTMLSpanElement);
+    ? (document.querySelector(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle) as HTMLSpanElement)
+    : (document.querySelector(BC_ELEM_SELECTORS.songPageCurrentTrackTitle) as HTMLSpanElement);
   if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
 
   return titleElement.textContent.trim();

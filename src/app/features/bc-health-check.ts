@@ -1,4 +1,4 @@
-import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { CPL, logger } from "../../shared/logger";
 import { getString } from "./i18n";
 
@@ -25,8 +25,8 @@ const TRACK_ONLY_KEYS = new Set<string>(["songPageCurrentTrackTitle"]);
 export const checkBandcampElements = (): BcHealthCheckResult => {
   const isAlbumPage = globalThis.location.pathname.includes("/album/");
 
-  const checks = (Object.keys(BC_ELEM_IDENTIFIERS) as Array<keyof typeof BC_ELEM_IDENTIFIERS>).map((key) => {
-    const selector = BC_ELEM_IDENTIFIERS[key];
+  const checks = (Object.keys(BC_ELEM_SELECTORS) as Array<keyof typeof BC_ELEM_SELECTORS>).map((key) => {
+    const selector = BC_ELEM_SELECTORS[key];
 
     // Optional when the selector belongs to a page type that does not match the current page,
     // or when fromAlbum may legitimately be absent on standalone track pages.

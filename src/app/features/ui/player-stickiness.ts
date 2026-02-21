@@ -1,4 +1,4 @@
-import { BC_ELEM_IDENTIFIERS } from "../../../domain/bandcamp";
+import { BC_ELEM_SELECTORS } from "../../../infra/elements/bandcamp";
 import { CPL, logger } from "../../../shared/logger";
 import { getString } from "../i18n";
 import type { CleanupCallback } from "../types";
@@ -6,7 +6,7 @@ import type { CleanupCallback } from "../types";
 const SCROLLED_CLASSNAME = "scrolled";
 
 export const setupPlayerStickiness = (): CleanupCallback => {
-  const parentDivClassName = BC_ELEM_IDENTIFIERS.playerParent.split(".")[1];
+  const parentDivClassName = BC_ELEM_SELECTORS.playerParent.split(".")[1];
   const plumeParentDiv = document.getElementsByClassName(parentDivClassName)[0];
 
   if (!plumeParentDiv) {

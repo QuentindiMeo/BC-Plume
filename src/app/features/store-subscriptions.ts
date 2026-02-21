@@ -1,4 +1,5 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { PLUME_CONSTANTS } from "../../domain/plume";
+import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -17,7 +18,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
   // Cached once at setup time since bpe-volume-value is a static node.
   const volumeValueDisplay = plume.volumeSlider.parentElement?.querySelector(
-    PLUME_ELEM_IDENTIFIERS.volumeValue
+    PLUME_ELEM_SELECTORS.volumeValue
   ) as HTMLDivElement | null;
 
   storeSubscriptions.push(
@@ -99,7 +100,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       }
 
       // Update play/pause button icons
-      const playPauseBtns = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.playPauseBtn);
+      const playPauseBtns = document.querySelectorAll(PLUME_ELEM_SELECTORS.playPauseBtn);
       playPauseBtns.forEach((btn) => {
         btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
       });

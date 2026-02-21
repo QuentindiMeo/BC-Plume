@@ -1,4 +1,4 @@
-import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { measureContrastRatioWCAG } from "../../shared/colors";
 import { CPL, logger } from "../../shared/logger";
 import { getString } from "./i18n";
@@ -19,7 +19,7 @@ const runtimeInfo: RuntimeInfo = {
 
 export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   if (!runtimeInfo.calculated) {
-    const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+    const trackList = document.querySelector(BC_ELEM_SELECTORS.trackList) as HTMLTableElement;
     if (!trackList) {
       logger(CPL.WARN, getString("WARN__TRACK_LIST__NOT_FOUND"));
       const errorDiv = document.createElement("div");
@@ -27,9 +27,9 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
       return errorDiv;
     }
 
-    const trackRows = trackList?.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow) ?? [];
+    const trackRows = trackList?.querySelectorAll(BC_ELEM_SELECTORS.trackRow) ?? [];
     trackRows.forEach((row, idx) => {
-      const durationCell = row.querySelector(BC_ELEM_IDENTIFIERS.trackDuration) as HTMLSpanElement;
+      const durationCell = row.querySelector(BC_ELEM_SELECTORS.trackDuration) as HTMLSpanElement;
       if (!durationCell) {
         logger(CPL.WARN, getString("WARN__DURATION_CELL__NOT_FOUND"), [row, idx]);
         return;
@@ -62,7 +62,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
     runtimeInfo.calculated = true;
   }
 
-  const infoSectionId = BC_ELEM_IDENTIFIERS.infoSection.split("#")[1];
+  const infoSectionId = BC_ELEM_SELECTORS.infoSection.split("#")[1];
   const infoSection = document.getElementById(infoSectionId) as HTMLDivElement;
   const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true);
   const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true);
@@ -74,7 +74,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   newTitleHeading.className = infoSectionId + "__titling";
   newTitleHeading.appendChild(titleHeadingClone);
 
-  const pageBackgroundId = BC_ELEM_IDENTIFIERS.pageBackground.split("#")[1];
+  const pageBackgroundId = BC_ELEM_SELECTORS.pageBackground.split("#")[1];
   const mainSectionBackground = document.getElementById(pageBackgroundId)!;
   const bgColor = globalThis.getComputedStyle(mainSectionBackground).getPropertyValue("background");
   const bgColorAsRGB = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bgColor);

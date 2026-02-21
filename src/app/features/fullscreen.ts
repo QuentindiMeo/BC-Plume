@@ -1,6 +1,8 @@
-import { BC_ELEM_IDENTIFIERS, TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
+import { TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { PLUME_CONSTANTS } from "../../domain/plume";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -37,7 +39,7 @@ interface FullscreenElements {
 let fullscreenCleanupCallback: CleanupCallback | null = null;
 
 const exitFullscreenMode = (): void => {
-  const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
+  const existingOverlay = document.querySelector(PLUME_ELEM_SELECTORS.fullscreenOverlay) as HTMLDivElement;
   if (!existingOverlay) return;
 
   const appCore = getAppCoreInstance();
@@ -123,7 +125,7 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
     return;
   }
 
-  const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
+  const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
   if (!headerTitle) {
     logger(CPL.ERROR, getString("ERROR__HEADER_TITLE__NOT_FOUND"));
     return;
@@ -140,7 +142,7 @@ const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | n
     return;
   }
 
-  const headerPretext = header.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
+  const headerPretext = header.querySelector(PLUME_ELEM_SELECTORS.headerTitlePretext) as HTMLSpanElement;
   if (!headerPretext) {
     logger(CPL.ERROR, getString("ERROR__HEADER_PRETEXT__NOT_FOUND"));
     return;
@@ -151,18 +153,18 @@ const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | n
 
 const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
   return {
-    headerContainer: clone.querySelector(PLUME_ELEM_IDENTIFIERS.headerContainer) as HTMLDivElement,
-    progressSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.progressSlider) as HTMLInputElement,
-    elapsedDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.elapsedDisplay) as HTMLSpanElement,
-    durationDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.durationDisplay) as HTMLSpanElement,
-    playPauseBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.playPauseBtn) as HTMLButtonElement,
-    volumeSlider: clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeSlider) as HTMLInputElement,
-    volumeDisplay: clone.querySelector(PLUME_ELEM_IDENTIFIERS.volumeValue) as HTMLDivElement,
-    muteBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.muteBtn) as HTMLButtonElement,
-    trackBackwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackBwdBtn) as HTMLButtonElement,
-    timeBackwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeBwdBtn) as HTMLButtonElement,
-    timeForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.timeFwdBtn) as HTMLButtonElement,
-    trackForwardBtn: clone.querySelector(PLUME_ELEM_IDENTIFIERS.trackFwdBtn) as HTMLButtonElement,
+    headerContainer: clone.querySelector(PLUME_ELEM_SELECTORS.headerContainer) as HTMLDivElement,
+    progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
+    elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
+    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLSpanElement,
+    playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
+    volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
+    volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
+    muteBtn: clone.querySelector(PLUME_ELEM_SELECTORS.muteBtn) as HTMLButtonElement,
+    trackBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackBwdBtn) as HTMLButtonElement,
+    timeBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeBwdBtn) as HTMLButtonElement,
+    timeForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeFwdBtn) as HTMLButtonElement,
+    trackForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackFwdBtn) as HTMLButtonElement,
   };
 };
 
@@ -268,35 +270,35 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
 // Pure DOM construction function - builds fullscreen overlay without side effects
 const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
-  const coverArt = document.querySelector(BC_ELEM_IDENTIFIERS.coverArt) as HTMLImageElement;
+  const coverArt = document.querySelector(BC_ELEM_SELECTORS.coverArt) as HTMLImageElement;
   if (!coverArt) {
     logger(CPL.WARN, getString("WARN__COVER_ART__NOT_FOUND"));
     return null;
   }
 
   const overlay = document.createElement("div");
-  overlay.id = PLUME_ELEM_IDENTIFIERS.fullscreenOverlay.split("#")[1];
+  overlay.id = PLUME_ELEM_SELECTORS.fullscreenOverlay.split("#")[1];
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
-  background.id = PLUME_ELEM_IDENTIFIERS.fullscreenBackground.split("#")[1];
+  background.id = PLUME_ELEM_SELECTORS.fullscreenBackground.split("#")[1];
   const coverArtUrl = encodeURI(coverArt.src);
   background.style.backgroundImage = `url("${coverArtUrl}")`;
   overlay.appendChild(background);
 
   const contentContainer = document.createElement("div");
-  contentContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenContent.split("#")[1];
+  contentContainer.id = PLUME_ELEM_SELECTORS.fullscreenContent.split("#")[1];
 
   const presentationContainer = document.createElement("div");
-  presentationContainer.id = PLUME_ELEM_IDENTIFIERS.fullscreenPresentationContainer.split("#")[1];
+  presentationContainer.id = PLUME_ELEM_SELECTORS.fullscreenPresentationContainer.split("#")[1];
 
   const coverArtImg = document.createElement("img");
-  coverArtImg.id = PLUME_ELEM_IDENTIFIERS.fullscreenCoverArt.split("#")[1];
+  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
   coverArtImg.src = coverArt.src;
   coverArtImg.alt = getString("ARIA__COVER_ART");
   presentationContainer.appendChild(coverArtImg);
 
-  const newNameSection = document.querySelector(BC_ELEM_IDENTIFIERS.infoSection) as HTMLDivElement;
+  const newNameSection = document.querySelector(BC_ELEM_SELECTORS.infoSection) as HTMLDivElement;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return null;
@@ -304,16 +306,16 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
-  adjustedNameSection.className = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingContainer.split(".")[1];
+  adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
-  headTitle.id = PLUME_ELEM_IDENTIFIERS.fullscreenTitlingProject.split("#")[1];
+  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingProject.split("#")[1];
   if (!isAlbumPage) headTitle.textContent = '"' + headTitle.textContent.trim() + '"';
 
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);
 
   // Clone the plume module (right side)
-  const plumeContainer = document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer) as HTMLDivElement;
+  const plumeContainer = document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer) as HTMLDivElement;
   if (!plumeContainer) {
     logger(CPL.WARN, getString("WARN__PLUME_CONTAINER__NOT_FOUND"));
     return null;
@@ -321,10 +323,10 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
   const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
-  plumeClone.id = PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1];
+  plumeClone.id = PLUME_ELEM_SELECTORS.fullscreenClone.split("#")[1];
 
   const fullscreenLogo = document.createElement("a");
-  fullscreenLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
+  fullscreenLogo.id = PLUME_ELEM_SELECTORS.headerLogo.split("#")[1];
   fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}__version">${APP_VERSION}</p>`;
   fullscreenLogo.href = PLUME_KO_FI_URL;
   fullscreenLogo.target = "_blank";
@@ -336,7 +338,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Hide the fullscreen button section in the cloned module
   const clonedFullscreenBtn = plumeClone.querySelector(
-    PLUME_ELEM_IDENTIFIERS.fullscreenBtnContainer
+    PLUME_ELEM_SELECTORS.fullscreenBtnContainer
   ) as HTMLButtonElement;
   clonedFullscreenBtn.style.display = "none";
 
@@ -345,7 +347,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Create exit fullscreen button in top right corner
   const exitBtn = document.createElement("button");
-  exitBtn.id = PLUME_ELEM_IDENTIFIERS.fullscreenExitBtn.split("#")[1];
+  exitBtn.id = PLUME_ELEM_SELECTORS.fullscreenExitBtn.split("#")[1];
   exitBtn.type = "button";
   exitBtn.innerHTML = PLUME_SVG.fullscreenExit;
   exitBtn.title = getString("ARIA__EXIT_FULLSCREEN_BTN");
@@ -403,7 +405,7 @@ const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {
 // State-driven fullscreen toggle - follows Action → Reducer → State → Subscription → DOM pattern
 export const toggleFullscreenMode = (): void => {
   const appCore = getAppCoreInstance();
-  const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
+  const existingOverlay = document.querySelector(PLUME_ELEM_SELECTORS.fullscreenOverlay) as HTMLDivElement;
   const isCurrentlyFullscreen = !!existingOverlay;
 
   if (isCurrentlyFullscreen) {
@@ -422,9 +424,7 @@ export const toggleFullscreenMode = (): void => {
     return;
   }
 
-  const plumeClone = overlay.querySelector(
-    `#${PLUME_ELEM_IDENTIFIERS.fullscreenClone.split("#")[1]}`
-  ) as HTMLDivElement;
+  const plumeClone = overlay.querySelector(`#${PLUME_ELEM_SELECTORS.fullscreenClone.split("#")[1]}`) as HTMLDivElement;
   fullscreenCleanupCallback = setupFullscreenUi(plumeClone);
 
   // Mount overlay to DOM

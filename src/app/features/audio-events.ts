@@ -1,4 +1,5 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { PLUME_CONSTANTS } from "../../domain/plume";
+import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
@@ -49,7 +50,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
 
     const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
-      PLUME_ELEM_IDENTIFIERS.volumeValue
+      PLUME_ELEM_SELECTORS.volumeValue
     ) as HTMLSpanElement;
     if (valueDisplay) {
       valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;

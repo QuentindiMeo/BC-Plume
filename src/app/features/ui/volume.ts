@@ -1,4 +1,5 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
+import { PLUME_CONSTANTS } from "../../../domain/plume";
+import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { PLUME_SVG } from "../../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../../stores/GuiImpl";
@@ -32,10 +33,10 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   if (plume.volumeSlider) return null;
 
   const container = document.createElement("div");
-  container.id = PLUME_ELEM_IDENTIFIERS.volumeContainer.split("#")[1];
+  container.id = PLUME_ELEM_SELECTORS.volumeContainer.split("#")[1];
 
   const muteBtn = document.createElement("button");
-  muteBtn.id = PLUME_ELEM_IDENTIFIERS.muteBtn.split("#")[1];
+  muteBtn.id = PLUME_ELEM_SELECTORS.muteBtn.split("#")[1];
   muteBtn.type = "button";
   muteBtn.title = getString("ARIA__MUTE");
   muteBtn.ariaLabel = getString("ARIA__MUTE");
@@ -43,7 +44,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   muteBtn.innerHTML = PLUME_SVG.volumeOn;
 
   const volumeSlider = document.createElement("input");
-  volumeSlider.id = PLUME_ELEM_IDENTIFIERS.volumeSlider.split("#")[1];
+  volumeSlider.id = PLUME_ELEM_SELECTORS.volumeSlider.split("#")[1];
   volumeSlider.type = "range";
   volumeSlider.min = "0";
   volumeSlider.max = VOLUME_SLIDER_GRANULARITY.toString();
@@ -55,7 +56,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   plume.audioElement.volume = currentVolume;
 
   const valueDisplay = document.createElement("div");
-  valueDisplay.id = PLUME_ELEM_IDENTIFIERS.volumeValue.split("#")[1];
+  valueDisplay.id = PLUME_ELEM_SELECTORS.volumeValue.split("#")[1];
   valueDisplay.textContent = `${volumeSlider.value}${getString("META__PERCENTAGE")}`;
 
   muteBtn.addEventListener("click", handleMuteToggle);

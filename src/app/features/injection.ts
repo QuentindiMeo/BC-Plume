@@ -1,6 +1,6 @@
-import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -19,7 +19,7 @@ import {
 } from "./ui";
 
 const addRuntime = () => {
-  const trackView = document.querySelector(BC_ELEM_IDENTIFIERS.trackView) as HTMLDivElement;
+  const trackView = document.querySelector(BC_ELEM_SELECTORS.trackView) as HTMLDivElement;
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
@@ -38,13 +38,13 @@ export const injectEnhancements = async (): Promise<void> => {
   hideOriginalPlayerElements();
 
   const plumeContainer = document.createElement("div");
-  plumeContainer.id = PLUME_ELEM_IDENTIFIERS.plumeContainer.split("#")[1];
+  plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
 
   const headerContainer = document.createElement("div");
-  headerContainer.id = PLUME_ELEM_IDENTIFIERS.headerContainer.split("#")[1];
+  headerContainer.id = PLUME_ELEM_SELECTORS.headerContainer.split("#")[1];
 
   const headerLogo = document.createElement("a");
-  headerLogo.id = PLUME_ELEM_IDENTIFIERS.headerLogo.split("#")[1];
+  headerLogo.id = PLUME_ELEM_SELECTORS.headerLogo.split("#")[1];
   headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}__version">${APP_VERSION}</p>`;
   headerLogo.href = PLUME_KO_FI_URL;
   headerLogo.target = "_blank";
@@ -56,13 +56,13 @@ export const injectEnhancements = async (): Promise<void> => {
   const initialTrackTitle = getCurrentTrackTitle(isAlbumPage);
   const initialTq = getTrackQuantifiers(initialTrackTitle);
   const currentTitleSection = document.createElement("div");
-  currentTitleSection.id = PLUME_ELEM_IDENTIFIERS.headerCurrent.split("#")[1];
+  currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
   currentTitleSection.tabIndex = 0; // make it focusable for screen readers
   currentTitleSection.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
   const currentTitlePretext = document.createElement("span");
-  currentTitlePretext.id = PLUME_ELEM_IDENTIFIERS.headerTitlePretext.split("#")[1];
+  currentTitlePretext.id = PLUME_ELEM_SELECTORS.headerTitlePretext.split("#")[1];
   const initialTrackNumberText = isAlbumPage
     ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
@@ -71,7 +71,7 @@ export const injectEnhancements = async (): Promise<void> => {
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
   const currentTitleText = document.createElement("span");
-  currentTitleText.id = PLUME_ELEM_IDENTIFIERS.headerTitle.split("#")[1];
+  currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
   currentTitleText.textContent = initialTrackTitle;
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
@@ -86,7 +86,7 @@ export const injectEnhancements = async (): Promise<void> => {
   plumeContainer.appendChild(headerContainer);
 
   const playbackManager = document.createElement("div");
-  playbackManager.id = PLUME_ELEM_IDENTIFIERS.playbackManager.split("#")[1];
+  playbackManager.id = PLUME_ELEM_SELECTORS.playbackManager.split("#")[1];
 
   const progressContainer = createProgressBar();
   playbackManager.appendChild(progressContainer);

@@ -1,5 +1,5 @@
-import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
-import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
@@ -24,7 +24,7 @@ import {
 
 // Function to initialize playback (necessary to make Plume buttons effective)
 const initPlayback = () => {
-  const playButton = document.querySelector(BC_ELEM_IDENTIFIERS.playPause) as HTMLButtonElement;
+  const playButton = document.querySelector(BC_ELEM_SELECTORS.playPause) as HTMLButtonElement;
   if (playButton) {
     // Click to ensure playback has started
     playButton.click();
@@ -42,7 +42,7 @@ const initPlayback = () => {
 // Function to find the audio element
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   const appCore = getAppCoreInstance();
-  const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
+  const audio = document.querySelector(BC_ELEM_SELECTORS.audioPlayer) as HTMLAudioElement;
   if (!audio) return null;
   logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 
@@ -108,14 +108,14 @@ const debugBandcampControls = (): Array<DebugControl> => {
 };
 
 const isLastTrackOfAlbumPlaying = () => {
-  const trackList = document.querySelector(BC_ELEM_IDENTIFIERS.trackList) as HTMLTableElement;
+  const trackList = document.querySelector(BC_ELEM_SELECTORS.trackList) as HTMLTableElement;
   if (!trackList) return false;
 
-  const trackRows = trackList.querySelectorAll(BC_ELEM_IDENTIFIERS.trackRow);
+  const trackRows = trackList.querySelectorAll(BC_ELEM_SELECTORS.trackRow);
   const lastTrackRow = trackRows[trackRows.length - 1] as HTMLTableRowElement;
-  const lastTrackTitleElem = lastTrackRow?.querySelector(BC_ELEM_IDENTIFIERS.trackTitle) as HTMLSpanElement;
+  const lastTrackTitleElem = lastTrackRow?.querySelector(BC_ELEM_SELECTORS.trackTitle) as HTMLSpanElement;
   const currentTrackTitleElem = document.querySelector(
-    BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle
+    BC_ELEM_SELECTORS.albumPageCurrentTrackTitle
   ) as HTMLAnchorElement;
   if (!currentTrackTitleElem) return false;
 
@@ -124,7 +124,7 @@ const isLastTrackOfAlbumPlaying = () => {
 
 const updateTrackForwardBtnState = () => {
   const appCore = getAppCoreInstance();
-  const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.trackFwdBtn);
+  const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_SELECTORS.trackFwdBtn);
   if (trackFwdBtns.length === 0) return;
 
   const isAlbumPage = appCore.getState().pageType === "album";
@@ -137,7 +137,7 @@ const updatePretextDisplay = () => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
-  const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
+  const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitlePretext) as HTMLSpanElement;
   if (!preText) return;
 
   const isAlbumPage = appCore.getState().pageType === "album";
@@ -152,7 +152,7 @@ const updatePretextDisplay = () => {
 
   preText.textContent = trackNumberText;
 
-  const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerCurrent) as HTMLDivElement;
+  const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerCurrent) as HTMLDivElement;
   headerCurrent.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle])
     : getString("ARIA__TRACK", [newTrackTitle]);
@@ -167,7 +167,7 @@ const updateTitleDisplay = () => {
   const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
-  const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
+  const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
   if (!titleText) return;
 
   const isAlbumPage = appCore.getState().pageType === "album";
@@ -181,7 +181,7 @@ const updateTitleDisplay = () => {
   // Cache offsetHeight to avoid multiple layout recalculations
   const titleHeight = titleText.offsetHeight;
   if (titleHeight !== LATIN_CHAR_HEIGHT) {
-    const logo = document.querySelector(PLUME_ELEM_IDENTIFIERS.headerLogo) as HTMLAnchorElement;
+    const logo = document.querySelector(PLUME_ELEM_SELECTORS.headerLogo) as HTMLAnchorElement;
     if (!logo) return;
 
     const deltaPaddingPx = titleHeight - LATIN_CHAR_HEIGHT; // calculate difference in px
@@ -237,7 +237,7 @@ export const launchPlume = (): void => {
     }
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
 
-    const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
+    const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
     if (plumeIsAlreadyInjected) {
       isInitializing = false;
       isInitialized = true;
@@ -283,7 +283,7 @@ export const launchPlume = (): void => {
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
-        const newAudio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
+        const newAudio = document.querySelector(BC_ELEM_SELECTORS.audioPlayer) as HTMLAudioElement;
         if (newAudio && newAudio !== plume.audioElement) {
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
@@ -306,7 +306,7 @@ export const launchPlume = (): void => {
           });
 
           // Reset if needed
-          if (!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer)) {
+          if (!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer)) {
             setTimeout(init, 500);
           }
         }
@@ -314,8 +314,8 @@ export const launchPlume = (): void => {
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&
-          (mutation.target.classList.contains(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle.slice(1)) ||
-            mutation.target.querySelector(BC_ELEM_IDENTIFIERS.albumPageCurrentTrackTitle))
+          (mutation.target.classList.contains(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle.slice(1)) ||
+            mutation.target.querySelector(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle))
         ) {
           updateTitleDisplay();
           updatePretextDisplay();
