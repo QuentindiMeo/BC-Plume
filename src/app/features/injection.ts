@@ -1,6 +1,8 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
+import { IAppCore } from "../../infra/AppCore";
 import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
+import { IGui } from "../../infra/Gui";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -18,25 +20,21 @@ import {
   createVolumeControlSection,
 } from "./ui";
 
+interface PlumeView {
+  plumeContainer: HTMLDivElement;
+  headerContainer: HTMLDivElement;
+
+  // Derived values computed during construction, forwarded to hydration
+  initialTrackTitle: string;
+  initialTrackNumberText: string;
+}
+
 const addRuntime = () => {
   const trackView = document.querySelector(BC_ELEM_SELECTORS.trackView) as HTMLDivElement;
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
-export const injectEnhancements = async (): Promise<void> => {
-  const appCore = getAppCoreInstance();
-  const plumeUi = getGuiInstance();
-
-  const bcPlayerContainer = findOriginalPlayerContainer();
-  if (!bcPlayerContainer) {
-    logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
-    return;
-  }
-
-  const isAlbumPage = appCore.getState().pageType === "album";
-
-  hideOriginalPlayerElements();
-
+const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
 
@@ -78,11 +76,6 @@ export const injectEnhancements = async (): Promise<void> => {
   currentTitleSection.appendChild(currentTitleText);
   headerContainer.appendChild(currentTitleSection);
 
-  // Initialize store with current track title and track number
-  appCore.dispatch(coreActions.setTrackTitle(initialTrackTitle));
-  appCore.dispatch(coreActions.setTrackNumber(initialTrackNumberText));
-
-  plumeUi.dispatch(guiActions.setTitleDisplay(headerContainer));
   plumeContainer.appendChild(headerContainer);
 
   const playbackManager = document.createElement("div");
@@ -100,7 +93,38 @@ export const injectEnhancements = async (): Promise<void> => {
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
   plumeContainer.appendChild(fullscreenBtnSection);
 
-  bcPlayerContainer.appendChild(plumeContainer);
+  return { plumeContainer, headerContainer, initialTrackTitle, initialTrackNumberText };
+};
+
+const hydratePlumeView = (view: PlumeView, appCore: IAppCore, plumeUi: IGui): void => {
+  appCore.dispatch(coreActions.setTrackTitle(view.initialTrackTitle));
+  appCore.dispatch(coreActions.setTrackNumber(view.initialTrackNumberText));
+
+  plumeUi.dispatch(guiActions.setTitleDisplay(view.headerContainer));
+};
+
+// Appends the Plume root element to the Bandcamp player container.
+const mountPlumeView = (view: PlumeView, container: Element): void => {
+  container.appendChild(view.plumeContainer);
+};
+
+export const injectEnhancements = async (): Promise<void> => {
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
+
+  const bcPlayerContainer = findOriginalPlayerContainer();
+  if (!bcPlayerContainer) {
+    logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
+    return;
+  }
+
+  const isAlbumPage = appCore.getState().pageType === "album";
+
+  hideOriginalPlayerElements();
+
+  const view = await buildPlumeView(isAlbumPage);
+  hydratePlumeView(view, appCore, plumeUi);
+  mountPlumeView(view, bcPlayerContainer);
 
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
