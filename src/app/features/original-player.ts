@@ -1,8 +1,8 @@
-import { BC_ELEM_IDENTIFIERS, BC_PLAYER_SELECTORS } from "../domain/bandcamp";
-import { PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance } from "../infra/AppInstanceImpl";
+import { BC_ELEM_IDENTIFIERS, BC_PLAYER_SELECTORS } from "../../domain/bandcamp";
+import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { CPL, logger } from "../../shared/logger";
+import { getPlumeUiInstance } from "../stores/AppInstanceImpl";
 import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
 
 export const hideOriginalPlayerElements = (): void => {
   const bcAudioTable = document.querySelector(BC_ELEM_IDENTIFIERS.inlinePlayerTable) as HTMLTableElement;

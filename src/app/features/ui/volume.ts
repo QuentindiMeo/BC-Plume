@@ -1,7 +1,7 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
-import { PLUME_SVG } from "../../svg/icons";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
+import { PLUME_SVG } from "../../../svg/icons";
+import { getPlumeUiInstance, plumeActions } from "../../stores/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../../stores/AppStoreImpl";
 import { getString } from "../i18n";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;

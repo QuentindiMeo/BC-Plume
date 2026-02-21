@@ -1,4 +1,4 @@
-import { BC_ELEM_IDENTIFIERS } from "../domain/bandcamp";
+import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -6,7 +6,7 @@ import {
   measureContrastRatioWCAG,
   RGBToHSL,
   WCAG_CONTRAST_NORMAL,
-} from "../shared/colors";
+} from "../../shared/colors";
 import { getString } from "./i18n";
 
 const getArtistNameElement = (): HTMLSpanElement => {

@@ -1,9 +1,9 @@
-import { TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
+import { TIME_DISPLAY_METHOD } from "../../../domain/bandcamp";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
+import { CPL, logger } from "../../../shared/logger";
+import { getPlumeUiInstance, plumeActions } from "../../stores/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../../stores/AppStoreImpl";
 import { getString } from "../i18n";
-import { CPL, logger } from "../logger";
 import { seekAndPreservePause } from "../seeking";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;

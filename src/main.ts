@@ -1,5 +1,5 @@
-import { logDetectedBrowser } from "./features/i18n";
-import { launchPlume } from "./features/lifecycle";
+import { logDetectedBrowser } from "./app/features/i18n";
+import { launchPlume } from "./app/features/lifecycle";
 
 (() => {
   "use strict";

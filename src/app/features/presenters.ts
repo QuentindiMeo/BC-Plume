@@ -1,5 +1,5 @@
-import { TIME_DISPLAY_METHOD } from "../domain/bandcamp";
-import type { AppState } from "../domain/state";
+import { TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
+import type { AppState } from "../../domain/state";
 
 // Internal helper: Format time as MM:SS
 export const presentFormattedTime = (seconds: number): string => {

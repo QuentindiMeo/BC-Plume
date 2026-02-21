@@ -1,10 +1,10 @@
-import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { getPlumeUiInstance } from "../../infra/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../../infra/AppStoreImpl";
-import { PLUME_SVG } from "../../svg/icons";
+import { BC_ELEM_IDENTIFIERS } from "../../../domain/bandcamp";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
+import { CPL, logger } from "../../../shared/logger";
+import { PLUME_SVG } from "../../../svg/icons";
+import { getPlumeUiInstance } from "../../stores/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../../stores/AppStoreImpl";
 import { getString } from "../i18n";
-import { CPL, logger } from "../logger";
 import { seekAndPreservePause } from "../seeking";
 
 const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;

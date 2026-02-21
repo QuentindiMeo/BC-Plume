@@ -1,8 +1,8 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { CPL, logger } from "../../shared/logger";
+import { getPlumeUiInstance, plumeActions } from "../stores/AppInstanceImpl";
+import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
 import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
 import type { CleanupCallback } from "./types";
 import { syncProgressToStore } from "./ui";
 

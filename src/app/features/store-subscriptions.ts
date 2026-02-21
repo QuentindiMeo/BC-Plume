@@ -1,9 +1,9 @@
-import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../domain/plume";
-import { getPlumeUiInstance, plumeActions } from "../infra/AppInstanceImpl";
-import { getStoreInstance } from "../infra/AppStoreImpl";
-import { PLUME_SVG } from "../svg/icons";
+import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
+import { CPL, logger } from "../../shared/logger";
+import { PLUME_SVG } from "../../svg/icons";
+import { getPlumeUiInstance, plumeActions } from "../stores/AppInstanceImpl";
+import { getStoreInstance } from "../stores/AppStoreImpl";
 import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
 import { presentFormattedDuration, presentFormattedTime } from "./presenters";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";

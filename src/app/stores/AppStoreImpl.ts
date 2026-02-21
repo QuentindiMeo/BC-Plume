@@ -1,51 +1,14 @@
-import { BcPageType, TIME_DISPLAY_METHOD, type TimeDisplayMethodType } from "../domain/bandcamp";
-import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
-import type { AppState } from "../domain/state";
-import {
-  Action,
-  createScenarioRecorder,
-  handleUnknownAction,
-  Listener,
-  ScenarioControls,
-  ScenarioView,
-  Store,
-  Thunk,
-} from "../domain/store";
-import { CPL, logger } from "../features/logger";
+import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../../domain/bandcamp";
+import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../../domain/plume";
+import type { AppState } from "../../domain/state";
+import { createScenarioRecorder, handleUnknownAction, ScenarioControls, ScenarioView, Thunk } from "../../domain/store";
+import { AppAction, AppStateListener, AppStateStore, IStoreActions, STORE_ACTIONS } from "../../infra/AppStore";
+import { meta, PROCESS_ENV } from "../../infra/node";
+import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
-import { meta, PROCESS_ENV } from "./node";
 
-enum STORE_ACTIONS {
-  SET_PAGE_TYPE = "SET_PAGE_TYPE",
-  SET_TRACK_TITLE = "SET_TRACK_TITLE",
-  SET_TRACK_NUMBER = "SET_TRACK_NUMBER",
-  SET_DURATION = "SET_DURATION",
-  SET_CURRENT_TIME = "SET_CURRENT_TIME",
-  SET_IS_PLAYING = "SET_IS_PLAYING",
-  SET_DURATION_DISPLAY_METHOD = "SET_DURATION_DISPLAY_METHOD",
-  SET_VOLUME = "SET_VOLUME",
-  SET_IS_MUTED = "SET_IS_MUTED",
-  TOGGLE_MUTE = "TOGGLE_MUTE",
-  SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
-  RESET_TRANSIENT_STATE = "RESET_TRANSIENT_STATE",
-}
-
-type AppAction =
-  | Action<STORE_ACTIONS.SET_PAGE_TYPE, BcPageType | null>
-  | Action<STORE_ACTIONS.SET_TRACK_TITLE, string | null>
-  | Action<STORE_ACTIONS.SET_TRACK_NUMBER, string | null>
-  | Action<STORE_ACTIONS.SET_DURATION, number>
-  | Action<STORE_ACTIONS.SET_CURRENT_TIME, number>
-  | Action<STORE_ACTIONS.SET_IS_PLAYING, boolean>
-  | Action<STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
-  | Action<STORE_ACTIONS.SET_VOLUME, number>
-  | Action<STORE_ACTIONS.SET_IS_MUTED, boolean>
-  | Action<STORE_ACTIONS.TOGGLE_MUTE>
-  | Action<STORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
-  | Action<STORE_ACTIONS.RESET_TRANSIENT_STATE>;
-
-export const storeActions = {
+export const storeActions: IStoreActions = {
   setPageType: (pageType: BcPageType | null): AppAction => ({
     type: STORE_ACTIONS.SET_PAGE_TYPE,
     payload: pageType,
@@ -94,56 +57,6 @@ export const storeActions = {
   }),
 } as const;
 
-export type AppStateListener<AppStateProp extends keyof AppState = keyof AppState> = Listener<AppState, AppStateProp>;
-
-const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
-const PERSISTENCE_DELAY_MS = 200;
-
-/**
- * Computed properties - derived state calculated on-demand from selectors.
- * These are NOT stored in state, but computed when accessed.
- *
- * Benefits:
- * - No redundant state storage
- * - Always consistent with source data
- * - Lazy evaluation (only computed when needed)
- * - Can be memoized if performance becomes a concern
- */
-interface ComputedState {
-  /** Returns formatted elapsed time (MM:SS) */
-  formattedElapsed: () => string;
-  /** Returns formatted duration (MM:SS or -MM:SS for remaining) */
-  formattedDuration: () => string;
-  /** Returns progress percentage (0-100) */
-  progressPercentage: () => number;
-}
-
-interface AppStateStore extends Store<AppState, AppAction> {
-  subscribe<AppStateProp extends keyof AppState>(
-    key: AppStateProp,
-    listener: AppStateListener<AppStateProp>
-  ): () => void;
-  subscribeAll(listener: (state: AppState) => void): () => void;
-
-  // Additional fields
-  loadPersistedState(): Promise<void>;
-  computed: ComputedState;
-
-  // Scenario: time-travel debugging (dev-only)
-  scenario: {
-    // Undo the last dispatched action, restoring the previous state. Returns `true` if undo was applied.
-    undo(): boolean;
-    // Redo a previously undone action, re-applying it. Returns `true` if redo was applied.
-    redo(): boolean;
-    // Replay the recorded scenario up to `toIndex` (inclusive). Omit to replay all.
-    replayScenario(toIndex?: number): void;
-    // Get a read-only view of the recorded scenario timeline.
-    getScenarioView(): ScenarioView<AppState, AppAction>;
-    // Clear all recorded scenario entries.
-    clearScenario(): void;
-  };
-}
-
 const INITIAL_STATE: AppState = {
   pageType: null,
   trackTitle: null,
@@ -160,7 +73,10 @@ const INITIAL_STATE: AppState = {
 
 let appStoreInstance: AppStateStore | null = null;
 
-const createAppStateInstance = (): AppStateStore => {
+const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
+const PERSISTENCE_DELAY_MS = 200;
+
+const createAppStateStoreInstance = (): AppStateStore => {
   let state: AppState = { ...INITIAL_STATE };
 
   const listeners = new Map<keyof AppState, Set<AppStateListener<any>>>();
@@ -495,6 +411,6 @@ const createAppStateInstance = (): AppStateStore => {
 };
 
 export const getStoreInstance = (): AppStateStore => {
-  appStoreInstance ??= createAppStateInstance();
+  appStoreInstance ??= createAppStateStoreInstance();
   return appStoreInstance;
 };

@@ -1,6 +1,6 @@
-import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
-import { NoArgFunction } from "../../shared/types";
-import { PLUME_SVG } from "../../svg/icons";
+import { PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
+import { NoArgFunction } from "../../../shared/types";
+import { PLUME_SVG } from "../../../svg/icons";
 import { getString } from "../i18n";
 
 const createFullscreenButton = (onToggle: NoArgFunction): HTMLButtonElement => {

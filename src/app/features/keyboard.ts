@@ -1,8 +1,8 @@
-import { PLUME_CONSTANTS } from "../domain/plume";
-import { getStoreInstance, storeActions } from "../infra/AppStoreImpl";
-import { NoArgFunction } from "../shared/types";
+import { PLUME_CONSTANTS } from "../../domain/plume";
+import { CPL, logger } from "../../shared/logger";
+import { NoArgFunction } from "../../shared/types";
+import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
 import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
 import type { CleanupCallback } from "./types";
 
 const { AVAILABLE_HOTKEYS: AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;

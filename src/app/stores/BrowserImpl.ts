@@ -1,16 +1,14 @@
-import { PLUME_CACHE_KEYS } from "../domain/plume";
-import { Action, Store } from "../domain/store";
-import { CPL, logger } from "../features/logger";
-import { meta, PROCESS_ENV } from "./node";
-
-interface BrowserApi {
-  storage: {
-    local: {
-      get: (keys: Array<string>) => Promise<any>;
-      set: (items: any) => Promise<void>;
-    };
-  };
-}
+import { PLUME_CACHE_KEYS } from "../../domain/plume";
+import {
+  Browser,
+  BROWSER_ACTIONS,
+  BrowserAction,
+  BrowserApi,
+  BrowserState,
+  IBrowserActions,
+} from "../../infra/Browser";
+import { meta, PROCESS_ENV } from "../../infra/node";
+import { CPL, logger } from "../../shared/logger";
 
 const assertBrowserApi = (): BrowserApi => {
   if (!(globalThis as any).browser && !(globalThis as any).chrome)
@@ -41,33 +39,21 @@ const browserCache = new Proxy({} as BrowserApi["storage"]["local"], {
   },
 });
 
-interface BrowserState {
-  api: BrowserApi;
-  cache: BrowserApi["storage"]["local"];
-}
-
-enum BROWSER_ACTIONS {
-  SET_CACHE_VALUES = "SET_CACHE_VALUES",
-}
-export type BrowserAction = Action<BROWSER_ACTIONS.SET_CACHE_VALUES, { keys: PLUME_CACHE_KEYS[]; values: any[] }>;
-
-export const browserActions = {
+export const browserActions: IBrowserActions = {
   setCacheValues: (keys: PLUME_CACHE_KEYS[], values: any[]): BrowserAction => ({
     type: BROWSER_ACTIONS.SET_CACHE_VALUES,
     payload: { keys, values },
   }),
 } as const;
 
-interface BrowserInstance extends Store<BrowserState, BrowserAction> {}
-
 const INITIAL_STATE: BrowserState = {
   api: browserApi,
   cache: browserCache,
 };
 
-let browserInstance: BrowserInstance | null = null;
+let browserInstance: Browser | null = null;
 
-const createBrowserInstance = (): BrowserInstance => {
+const createBrowserInstance = (): Browser => {
   let state: BrowserState = { ...INITIAL_STATE };
 
   const updateState = (keys: PLUME_CACHE_KEYS[], values: any[]): void => {
@@ -110,7 +96,7 @@ const createBrowserInstance = (): BrowserInstance => {
   };
 };
 
-export const getBrowserInstance = (): BrowserInstance => {
+export const getBrowserInstance = (): Browser => {
   browserInstance ??= createBrowserInstance();
   return browserInstance;
 };
