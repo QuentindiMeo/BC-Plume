@@ -1,63 +1,64 @@
 import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../../domain/bandcamp";
-import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../../domain/plume";
-import type { AppState } from "../../domain/state";
-import { createScenarioRecorder, handleUnknownAction, ScenarioControls, ScenarioView, Thunk } from "../../domain/store";
-import { AppAction, AppStateListener, AppStateStore, IStoreActions, STORE_ACTIONS } from "../../infra/AppStore";
+import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
+import { PLUME_DEFAULTS } from "../../domain/plume";
+import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
+import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, IAppCore, ICoreActions } from "../../infra/AppCore";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
+import { handleUnknownAction } from "./shared";
 
-export const storeActions: IStoreActions = {
-  setPageType: (pageType: BcPageType | null): AppAction => ({
-    type: STORE_ACTIONS.SET_PAGE_TYPE,
+export const coreActions: ICoreActions = {
+  setPageType: (pageType: BcPageType | null): CoreAction => ({
+    type: CORE_ACTIONS.SET_PAGE_TYPE,
     payload: pageType,
   }),
-  setTrackTitle: (title: string | null): AppAction => ({
-    type: STORE_ACTIONS.SET_TRACK_TITLE,
+  setTrackTitle: (title: string | null): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_TITLE,
     payload: title,
   }),
-  setTrackNumber: (number: string | null): AppAction => ({
-    type: STORE_ACTIONS.SET_TRACK_NUMBER,
+  setTrackNumber: (number: string | null): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_NUMBER,
     payload: number,
   }),
-  setDuration: (duration: number): AppAction => ({
-    type: STORE_ACTIONS.SET_DURATION,
+  setDuration: (duration: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_DURATION,
     payload: duration,
   }),
-  setCurrentTime: (time: number): AppAction => ({
-    type: STORE_ACTIONS.SET_CURRENT_TIME,
+  setCurrentTime: (time: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_CURRENT_TIME,
     payload: time,
   }),
-  setIsPlaying: (isPlaying: boolean): AppAction => ({
-    type: STORE_ACTIONS.SET_IS_PLAYING,
+  setIsPlaying: (isPlaying: boolean): CoreAction => ({
+    type: CORE_ACTIONS.SET_IS_PLAYING,
     payload: isPlaying,
   }),
-  setDurationDisplayMethod: (method: TimeDisplayMethodType): AppAction => ({
-    type: STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
+  setDurationDisplayMethod: (method: TimeDisplayMethodType): CoreAction => ({
+    type: CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
     payload: method,
   }),
-  setVolume: (volume: number): AppAction => ({
-    type: STORE_ACTIONS.SET_VOLUME,
+  setVolume: (volume: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_VOLUME,
     payload: volume,
   }),
-  setIsMuted: (isMuted: boolean): AppAction => ({
-    type: STORE_ACTIONS.SET_IS_MUTED,
+  setIsMuted: (isMuted: boolean): CoreAction => ({
+    type: CORE_ACTIONS.SET_IS_MUTED,
     payload: isMuted,
   }),
-  toggleMute: (): AppAction => ({
-    type: STORE_ACTIONS.TOGGLE_MUTE,
+  toggleMute: (): CoreAction => ({
+    type: CORE_ACTIONS.TOGGLE_MUTE,
   }),
-  setIsFullscreen: (isFullscreen: boolean): AppAction => ({
-    type: STORE_ACTIONS.SET_IS_FULLSCREEN,
+  setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
+    type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
   }),
-  resetTransientState: (): AppAction => ({
-    type: STORE_ACTIONS.RESET_TRANSIENT_STATE,
+  resetTransientState: (): CoreAction => ({
+    type: CORE_ACTIONS.RESET_TRANSIENT_STATE,
   }),
 } as const;
 
-const INITIAL_STATE: AppState = {
+const INITIAL_STATE: AppCore = {
   pageType: null,
   trackTitle: null,
   trackNumber: null,
@@ -71,25 +72,23 @@ const INITIAL_STATE: AppState = {
   isFullscreen: false,
 };
 
-let appStoreInstance: AppStateStore | null = null;
-
-const PERSISTED_KEYS: ReadonlySet<keyof AppState> = new Set<keyof AppState>(["volume", "durationDisplayMethod"]);
+const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>(["volume", "durationDisplayMethod"]);
 const PERSISTENCE_DELAY_MS = 200;
 
-const createAppStateStoreInstance = (): AppStateStore => {
-  let state: AppState = { ...INITIAL_STATE };
+const createAppCoreInstance = (): IAppCore => {
+  let state: AppCore = { ...INITIAL_STATE };
 
-  const listeners = new Map<keyof AppState, Set<AppStateListener<any>>>();
-  const globalListeners = new Set<(state: AppState) => void>();
+  const listeners = new Map<keyof AppCore, Set<AppCoreListener<any>>>();
+  const globalListeners = new Set<(state: AppCore) => void>();
 
   let persistenceTimer: ReturnType<typeof setTimeout> | null = null;
-  let pendingPersistedKeys = new Set<keyof AppState>();
+  let pendingPersistedKeys = new Set<keyof AppCore>();
 
   // Scenario recorder for time-travel debugging (test-only)
-  const scenarioRecorder: ScenarioControls<AppState, AppAction> | null =
-    meta.env === PROCESS_ENV.TESTING ? createScenarioRecorder<AppState, AppAction>() : null;
+  const scenarioRecorder: IScenarioControls<AppCore, CoreAction> | null =
+    meta.env === PROCESS_ENV.TESTING ? createScenarioRecorder<AppCore, CoreAction>() : null;
 
-  const persistState = (keys: Array<keyof AppState>): void => {
+  const persistState = (keys: Array<keyof AppCore>): void => {
     // Accumulate all keys that need to be persisted during the debounce window
     keys.forEach((key) => {
       if (PERSISTED_KEYS.has(key)) pendingPersistedKeys.add(key);
@@ -97,7 +96,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
 
     if (persistenceTimer) clearTimeout(persistenceTimer);
     persistenceTimer = setTimeout(() => {
-      const toSave: any = {};
+      const toSave: Partial<LocalStorage> = {};
 
       // Persist all pending keys that accumulated during debounce window
       for (const key of pendingPersistedKeys) {
@@ -110,7 +109,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
 
       if (Object.keys(toSave).length > 0) {
         const browserCache = getBrowserInstance();
-        const keys = Object.keys(toSave) as PLUME_CACHE_KEYS[];
+        const keys = Object.keys(toSave) as PlumeCacheKey[];
         const values = Object.values(toSave);
 
         browserCache.dispatch(browserActions.setCacheValues(keys, values));
@@ -121,7 +120,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
     }, PERSISTENCE_DELAY_MS);
   };
 
-  const notify = <AppStateProp extends keyof AppState>(key: AppStateProp, prevValue: AppState[AppStateProp]): void => {
+  const notify = <AppCoreProp extends keyof AppCore>(key: AppCoreProp, prevValue: AppCore[AppCoreProp]): void => {
     const keyListeners = listeners.get(key);
     if (keyListeners) {
       keyListeners.forEach((listener) => {
@@ -142,7 +141,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
     });
   };
 
-  const updateState = <AppStateProp extends keyof AppState>(key: AppStateProp, value: AppState[AppStateProp]): void => {
+  const updateState = <AppCoreProp extends keyof AppCore>(key: AppCoreProp, value: AppCore[AppCoreProp]): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
@@ -160,7 +159,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
    * Development-only state change logger for debugging.
    * Logs all dispatched actions and resulting state changes.
    */
-  const logStateChange = (action: AppAction, prevState: AppState, nextState: AppState): void => {
+  const logStateChange = (action: CoreAction, prevState: AppCore, nextState: AppCore): void => {
     // Only log in development builds
     if (meta.env !== PROCESS_ENV.PRODUCTION) {
       const hasPayload = "payload" in action;
@@ -168,7 +167,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
       logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
 
       // Find what changed
-      const nextStateKeys = Object.keys(nextState) as Array<keyof AppState>;
+      const nextStateKeys = Object.keys(nextState) as Array<keyof AppCore>;
       const changes: Array<{ key: string; from: any; to: any }> = [];
       for (const key of nextStateKeys) {
         if (prevState[key] !== nextState[key]) {
@@ -184,40 +183,40 @@ const createAppStateStoreInstance = (): AppStateStore => {
     }
   };
 
-  const reducer = (action: AppAction): void => {
+  const reducer = (action: CoreAction): void => {
     switch (action.type) {
-      case STORE_ACTIONS.SET_PAGE_TYPE:
+      case CORE_ACTIONS.SET_PAGE_TYPE:
         updateState("pageType", action.payload);
         break;
-      case STORE_ACTIONS.SET_TRACK_TITLE:
+      case CORE_ACTIONS.SET_TRACK_TITLE:
         updateState("trackTitle", action.payload);
         break;
-      case STORE_ACTIONS.SET_TRACK_NUMBER:
+      case CORE_ACTIONS.SET_TRACK_NUMBER:
         updateState("trackNumber", action.payload);
         break;
-      case STORE_ACTIONS.SET_VOLUME:
+      case CORE_ACTIONS.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
           logger(CPL.WARN, "Invalid volume value", action.payload);
           return;
         }
         updateState("volume", action.payload);
         break;
-      case STORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
+      case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         updateState("durationDisplayMethod", action.payload);
         break;
-      case STORE_ACTIONS.SET_CURRENT_TIME:
+      case CORE_ACTIONS.SET_CURRENT_TIME:
         updateState("currentTime", action.payload);
         break;
-      case STORE_ACTIONS.SET_DURATION:
+      case CORE_ACTIONS.SET_DURATION:
         updateState("duration", action.payload);
         break;
-      case STORE_ACTIONS.SET_IS_PLAYING:
+      case CORE_ACTIONS.SET_IS_PLAYING:
         updateState("isPlaying", action.payload);
         break;
-      case STORE_ACTIONS.SET_IS_MUTED:
+      case CORE_ACTIONS.SET_IS_MUTED:
         updateState("isMuted", action.payload);
         break;
-      case STORE_ACTIONS.TOGGLE_MUTE: {
+      case CORE_ACTIONS.TOGGLE_MUTE: {
         if (state.isMuted) {
           // Unmute: restore previous volume
           const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
@@ -231,10 +230,10 @@ const createAppStateStoreInstance = (): AppStateStore => {
         }
         break;
       }
-      case STORE_ACTIONS.SET_IS_FULLSCREEN:
+      case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
-      case STORE_ACTIONS.RESET_TRANSIENT_STATE:
+      case CORE_ACTIONS.RESET_TRANSIENT_STATE:
         updateState("trackTitle", INITIAL_STATE.trackTitle);
         updateState("trackNumber", INITIAL_STATE.trackNumber);
         updateState("duration", INITIAL_STATE.duration);
@@ -250,7 +249,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
     }
   };
 
-  const loadPersistedStateThunk = (): Thunk<AppState, AppAction> => async (dispatch) => {
+  const loadPersistedStateThunk = (): Thunk<AppCore, CoreAction> => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
@@ -260,10 +259,10 @@ const createAppStateStoreInstance = (): AppStateStore => {
         const volume = result[PLUME_CACHE_KEYS.VOLUME];
         if (typeof volume === "number") {
           const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-          dispatch(storeActions.setVolume(volumeClamped));
+          dispatch(coreActions.setVolume(volumeClamped));
 
           if (volumeClamped === 0) {
-            dispatch(storeActions.setIsMuted(true));
+            dispatch(coreActions.setIsMuted(true));
           }
           logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
         }
@@ -272,7 +271,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
         const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
         if (method === "duration" || method === "remaining") {
-          dispatch(storeActions.setDurationDisplayMethod(method));
+          dispatch(coreActions.setDurationDisplayMethod(method));
           logger(CPL.INFO, "Time display method applied:", method);
         }
       }
@@ -282,11 +281,11 @@ const createAppStateStoreInstance = (): AppStateStore => {
   };
 
   return {
-    getState(): Readonly<AppState> {
+    getState(): Readonly<AppCore> {
       return state;
     },
 
-    dispatch(action: AppAction | Thunk<AppState, AppAction>): void {
+    dispatch(action: CoreAction | Thunk<AppCore, CoreAction>): void {
       // Handle async thunks
       if (typeof action === "function") {
         action(this.dispatch.bind(this), this.getState.bind(this));
@@ -302,10 +301,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
       scenarioRecorder?.record(action, state);
     },
 
-    subscribe<AppStateProp extends keyof AppState>(
-      key: AppStateProp,
-      listener: AppStateListener<AppStateProp>
-    ): () => void {
+    subscribe<AppCoreProp extends keyof AppCore>(key: AppCoreProp, listener: AppCoreListener<AppCoreProp>): () => void {
       if (!listeners.has(key)) listeners.set(key, new Set());
 
       listeners.get(key)!.add(listener);
@@ -321,7 +317,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
       };
     },
 
-    subscribeAll(listener: (state: AppState) => void): () => void {
+    subscribeAll(listener: (state: AppCore) => void): () => void {
       globalListeners.add(listener);
 
       return () => {
@@ -350,7 +346,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
         state = { ...restored };
 
         // Notify listeners for every key that changed
-        for (const key of Object.keys(state) as Array<keyof AppState>) {
+        for (const key of Object.keys(state) as Array<keyof AppCore>) {
           if (prevState[key] !== state[key]) {
             notify(key, prevState[key]);
           }
@@ -368,7 +364,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
         const prevState = { ...state };
         state = { ...restored };
 
-        for (const key of Object.keys(state) as Array<keyof AppState>) {
+        for (const key of Object.keys(state) as Array<keyof AppCore>) {
           if (prevState[key] !== state[key]) {
             notify(key, prevState[key]);
           }
@@ -385,7 +381,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
         const prevState = { ...state };
         state = { ...restored };
 
-        for (const key of Object.keys(state) as Array<keyof AppState>) {
+        for (const key of Object.keys(state) as Array<keyof AppCore>) {
           if (prevState[key] !== state[key]) {
             notify(key, prevState[key]);
           }
@@ -395,7 +391,7 @@ const createAppStateStoreInstance = (): AppStateStore => {
         logger(CPL.DEBUG, `[SCENARIO] Replayed to index ${view.cursor} / ${view.entries.length - 1}`);
       },
 
-      getScenarioView(): ScenarioView<AppState, AppAction> {
+      getScenarioView(): IScenarioView<AppCore, CoreAction> {
         if (!scenarioRecorder) {
           return { entries: [], cursor: -1 };
         }
@@ -410,7 +406,8 @@ const createAppStateStoreInstance = (): AppStateStore => {
   };
 };
 
-export const getStoreInstance = (): AppStateStore => {
-  appStoreInstance ??= createAppStateStoreInstance();
-  return appStoreInstance;
+let appCoreInstance: IAppCore | null = null;
+export const getAppCoreInstance = (): IAppCore => {
+  appCoreInstance ??= createAppCoreInstance();
+  return appCoreInstance;
 };

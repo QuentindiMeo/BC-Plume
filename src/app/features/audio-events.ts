@@ -1,7 +1,7 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
-import { getPlumeUiInstance, plumeActions } from "../stores/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
 import type { CleanupCallback } from "./types";
 import { syncProgressToStore } from "./ui";
@@ -15,8 +15,8 @@ export interface AudioEventCallbacks {
 }
 
 export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): CleanupCallback => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
   const { updateTitleDisplay, updatePretextDisplay, updateTrackForwardBtnState } = callbacks;
 
@@ -46,7 +46,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
 
     const currentVolume = plume.audioElement.volume;
     plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
-    plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
+    plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
 
     const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
       PLUME_ELEM_IDENTIFIERS.volumeValue
@@ -55,22 +55,22 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
       valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
     }
 
-    const currentIsMuted = store.getState().isMuted;
+    const currentIsMuted = appCore.getState().isMuted;
     const newIsMuted = currentVolume === 0;
     if (currentIsMuted !== newIsMuted) {
-      store.dispatch(storeActions.setIsMuted(newIsMuted));
+      appCore.dispatch(coreActions.setIsMuted(newIsMuted));
     }
-    store.dispatch(storeActions.setVolume(currentVolume));
+    appCore.dispatch(coreActions.setVolume(currentVolume));
   };
 
   const handlePlayPause = () => {
-    const plumeUi = getPlumeUiInstance();
+    const plumeUi = getGuiInstance();
     const plume = plumeUi.getState();
 
     const isPlaying = !plume.audioElement.paused;
     // Guard against circular dispatch: when a subscription calls play()/pause(), the resulting event arrives with a state already reflected in the store.
-    if (isPlaying === store.getState().isPlaying) return;
-    store.dispatch(storeActions.setIsPlaying(isPlaying));
+    if (isPlaying === appCore.getState().isPlaying) return;
+    appCore.dispatch(coreActions.setIsPlaying(isPlaying));
   };
 
   plume.audioElement.addEventListener("timeupdate", handleTimeUpdate);

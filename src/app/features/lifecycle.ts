@@ -1,8 +1,8 @@
 import { BC_ELEM_IDENTIFIERS, DebugControl } from "../../domain/bandcamp";
 import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
-import { getPlumeUiInstance, plumeActions } from "../stores/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { setupAudioEventListeners } from "./audio-events";
 import { checkBandcampElements } from "./bc-health-check";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
@@ -41,13 +41,13 @@ const initPlayback = () => {
 
 // Function to find the audio element
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
-  const store = getStoreInstance();
+  const appCore = getAppCoreInstance();
   const audio = document.querySelector(BC_ELEM_IDENTIFIERS.audioPlayer) as HTMLAudioElement;
   if (!audio) return null;
   logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 
   // Load and immediately apply saved volume from store
-  const volume = store.getState().volume;
+  const volume = appCore.getState().volume;
   audio.volume = volume;
   logger(CPL.INFO, getString("INFO__VOLUME__FOUND", [Math.round(volume * 100), getString("META__PERCENTAGE")]));
 
@@ -115,24 +115,24 @@ const isLastTrackOfAlbumPlaying = () => {
 };
 
 const updateTrackForwardBtnState = () => {
-  const store = getStoreInstance();
+  const appCore = getAppCoreInstance();
   const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_IDENTIFIERS.trackFwdBtn);
   if (trackFwdBtns.length === 0) return;
 
-  const isAlbumPage = store.getState().pageType === "album";
+  const isAlbumPage = appCore.getState().pageType === "album";
   const shouldDisable = !isAlbumPage || isLastTrackOfAlbumPlaying();
   trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
 };
 
 // Function to update the pretext display (track numbering)
 const updatePretextDisplay = () => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
   const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitlePretext) as HTMLSpanElement;
   if (!preText) return;
 
-  const isAlbumPage = store.getState().pageType === "album";
+  const isAlbumPage = appCore.getState().pageType === "album";
   const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
   const newTq = getTrackQuantifiers(newTrackTitle);
   const trackNumberText = isAlbumPage
@@ -140,7 +140,7 @@ const updatePretextDisplay = () => {
     : getString("LABEL__TRACK");
 
   // Dispatch track number change to store for fullscreen sync
-  store.dispatch(storeActions.setTrackNumber(trackNumberText));
+  appCore.dispatch(coreActions.setTrackNumber(trackNumberText));
 
   preText.textContent = trackNumberText;
 
@@ -155,20 +155,20 @@ const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
 const LATIN_CHAR_HEIGHT = 19;
 // Function to update the title display when track changes
 const updateTitleDisplay = () => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
   const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_IDENTIFIERS.headerTitle) as HTMLSpanElement;
   if (!titleText) return;
 
-  const isAlbumPage = store.getState().pageType === "album";
+  const isAlbumPage = appCore.getState().pageType === "album";
   const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
   titleText.textContent = newTrackTitle;
   titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
   // Dispatch title change to store for fullscreen sync
-  store.dispatch(storeActions.setTrackTitle(newTrackTitle));
+  appCore.dispatch(coreActions.setTrackTitle(newTrackTitle));
 
   // Cache offsetHeight to avoid multiple layout recalculations
   const titleHeight = titleText.offsetHeight;
@@ -187,8 +187,8 @@ const updateTitleDisplay = () => {
  * Sets up all observers, event listeners, and manages the application lifecycle
  */
 export const launchPlume = (): void => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
 
   // Main initialization state
   let isInitializing = false;
@@ -215,10 +215,10 @@ export const launchPlume = (): void => {
     checkBandcampElements();
 
     // Load persisted state into store
-    await store.loadPersistedState();
+    await appCore.loadPersistedState();
 
     const isAlbumPage = globalThis.location.pathname.includes("/album/");
-    store.dispatch(storeActions.setPageType(isAlbumPage ? "album" : "track"));
+    appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
 
     const audioElement = await findAudioElement();
     if (!audioElement) {
@@ -227,7 +227,7 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    plumeUi.dispatch(plumeActions.setAudioElement(audioElement));
+    plumeUi.dispatch(guiActions.setAudioElement(audioElement));
 
     const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_IDENTIFIERS.plumeContainer);
     if (plumeIsAlreadyInjected) {
@@ -237,7 +237,7 @@ export const launchPlume = (): void => {
     }
 
     // Duration display method is already loaded from persisted state
-    const durationDisplayMethod = store.getState().durationDisplayMethod;
+    const durationDisplayMethod = appCore.getState().durationDisplayMethod;
     logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
     // Inject enhancements
@@ -280,14 +280,14 @@ export const launchPlume = (): void => {
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
           // Load and apply saved volume to the new element
-          const volume = store.getState().volume;
+          const volume = appCore.getState().volume;
           newAudio.volume = volume;
           logger(
             CPL.INFO,
             getString("INFO__VOLUME__APPLIED", [Math.round(volume * 100), getString("META__PERCENTAGE")])
           );
 
-          plumeUi.dispatch(plumeActions.setAudioElement(newAudio));
+          plumeUi.dispatch(guiActions.setAudioElement(newAudio));
 
           // Re-setup audio event listeners for the new audio element
           audioEventsCleanupCallback?.();

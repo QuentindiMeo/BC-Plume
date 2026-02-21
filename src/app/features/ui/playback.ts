@@ -2,8 +2,8 @@ import { BC_ELEM_IDENTIFIERS } from "../../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
-import { getPlumeUiInstance } from "../../stores/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
+import { getGuiInstance } from "../../stores/GuiImpl";
 import { getString } from "../i18n";
 import { seekAndPreservePause } from "../seeking";
 
@@ -13,16 +13,16 @@ const TIME_STEP_DURATION = 10; // seconds to skip forward/backward
 export const handlePlayPause = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
 
-  const store = getStoreInstance();
+  const appCore = getAppCoreInstance();
 
-  // Dispatch to store only - subscription handles audio element state
-  const isCurrentlyPlaying = store.getState().isPlaying;
+  // Dispatch to appCore only - subscription handles audio element state
+  const isCurrentlyPlaying = appCore.getState().isPlaying;
   const shouldPlay = !isCurrentlyPlaying;
-  store.dispatch(storeActions.setIsPlaying(shouldPlay));
+  appCore.dispatch(coreActions.setIsPlaying(shouldPlay));
 };
 
 export const handleTrackBackward = (): void => {
-  const plumeUi = getPlumeUiInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
@@ -59,35 +59,35 @@ export const handleTrackForward = (): void => {
 };
 
 export const handleTimeBackward = (): void => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
   const newTime = Math.max(0, plume.audioElement.currentTime - TIME_STEP_DURATION);
   seekAndPreservePause(plume.audioElement, newTime);
-  store.dispatch(storeActions.setCurrentTime(newTime));
+  appCore.dispatch(coreActions.setCurrentTime(newTime));
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 
 export const handleTimeForward = (): void => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
   const newTime = Math.min(plume.audioElement.duration || 0, plume.audioElement.currentTime + TIME_STEP_DURATION);
   seekAndPreservePause(plume.audioElement, newTime);
-  store.dispatch(storeActions.setCurrentTime(newTime));
+  appCore.dispatch(coreActions.setCurrentTime(newTime));
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", [Math.round(newTime)]));
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
-  const plume = getPlumeUiInstance().getState();
+  const plume = getGuiInstance().getState();
   const container = document.createElement("div");
   container.id = PLUME_ELEM_IDENTIFIERS.playbackControls.split("#")[1];
 

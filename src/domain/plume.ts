@@ -5,11 +5,6 @@ export const PLUME_CONSTANTS = {
   AVAILABLE_HOTKEYS: new Set([" ", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "f", "m"]),
 } as const;
 
-export enum PLUME_CACHE_KEYS {
-  DURATION_DISPLAY_METHOD = "plume_duration_display_method",
-  VOLUME = "plume_volume",
-}
-
 export const PLUME_DEFAULTS = {
   savedVolume: 0.5,
 } as const;

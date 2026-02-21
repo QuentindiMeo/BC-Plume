@@ -1,7 +1,7 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
 import { NoArgFunction } from "../../shared/types";
-import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getString } from "./i18n";
 import type { CleanupCallback } from "./types";
 
@@ -18,16 +18,16 @@ interface KeyboardHandlers {
 }
 
 export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
-  const store = getStoreInstance();
+  const appCore = getAppCoreInstance();
 
   const handleAdjustVolume = (delta: number) => {
     if (delta === 0) logger(CPL.WARN, getString("WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA"));
 
-    const currentVolume = store.getState().volume;
+    const currentVolume = appCore.getState().volume;
     const currentValue = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY);
     const newValue = Math.max(0, Math.min(VOLUME_SLIDER_GRANULARITY, currentValue + delta));
 
-    store.dispatch(storeActions.setVolume(newValue / VOLUME_SLIDER_GRANULARITY));
+    appCore.dispatch(coreActions.setVolume(newValue / VOLUME_SLIDER_GRANULARITY));
   };
 
   const handleKeydown = (e: KeyboardEvent) => {

@@ -1,16 +1,17 @@
-import { PLUME_CACHE_KEYS } from "../../domain/plume";
+import { PlumeCacheKey } from "../../domain/browser";
 import {
-  Browser,
   BROWSER_ACTIONS,
   BrowserAction,
-  BrowserApi,
-  BrowserState,
+  IBrowser,
   IBrowserActions,
+  IBrowserApi,
+  IBrowserCache,
+  IBrowserState,
 } from "../../infra/Browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 
-const assertBrowserApi = (): BrowserApi => {
+const assertBrowserApi = (): IBrowserApi => {
   if (!(globalThis as any).browser && !(globalThis as any).chrome)
     throw new Error(
       "No compatible browser API found. This extension requires a Chromium-based or Firefox-based browser."
@@ -19,19 +20,19 @@ const assertBrowserApi = (): BrowserApi => {
   return (globalThis as any).browser ?? (globalThis as any).chrome;
 };
 
-let unifiedBrowserApi: BrowserApi | null = null;
-const getBrowserApi = (): BrowserApi => {
+let unifiedBrowserApi: IBrowserApi | null = null;
+const getBrowserApi = (): IBrowserApi => {
   unifiedBrowserApi ??= assertBrowserApi();
   return unifiedBrowserApi;
 };
-const browserApi: BrowserApi = new Proxy({} as BrowserApi, {
+const browserApi: IBrowserApi = new Proxy({} as IBrowserApi, {
   get(_target, prop, _receiver) {
     const api = getBrowserApi() as any;
     const value = api[prop];
     return typeof value === "function" ? value.bind(api) : value;
   },
 });
-const browserCache = new Proxy({} as BrowserApi["storage"]["local"], {
+const browserCache = new Proxy({} as IBrowserCache, {
   get(_target, prop, _receiver) {
     const cache = getBrowserApi().storage.local as any;
     const value = cache[prop];
@@ -40,23 +41,21 @@ const browserCache = new Proxy({} as BrowserApi["storage"]["local"], {
 });
 
 export const browserActions: IBrowserActions = {
-  setCacheValues: (keys: PLUME_CACHE_KEYS[], values: any[]): BrowserAction => ({
+  setCacheValues: (keys: PlumeCacheKey[], values: any[]): BrowserAction => ({
     type: BROWSER_ACTIONS.SET_CACHE_VALUES,
     payload: { keys, values },
   }),
 } as const;
 
-const INITIAL_STATE: BrowserState = {
+const INITIAL_STATE: IBrowserState = {
   api: browserApi,
   cache: browserCache,
 };
 
-let browserInstance: Browser | null = null;
+const createBrowserInstance = (): IBrowser => {
+  let state: IBrowserState = { ...INITIAL_STATE };
 
-const createBrowserInstance = (): Browser => {
-  let state: BrowserState = { ...INITIAL_STATE };
-
-  const updateState = (keys: PLUME_CACHE_KEYS[], values: any[]): void => {
+  const updateState = (keys: PlumeCacheKey[], values: any[]): void => {
     const toSet: any = {};
     keys.forEach((key, index) => {
       toSet[key] = values[index];
@@ -85,7 +84,7 @@ const createBrowserInstance = (): Browser => {
   };
 
   return {
-    getState(): Readonly<BrowserState> {
+    getState(): Readonly<IBrowserState> {
       return state;
     },
 
@@ -96,7 +95,8 @@ const createBrowserInstance = (): Browser => {
   };
 };
 
-export const getBrowserInstance = (): Browser => {
+let browserInstance: IBrowser | null = null;
+export const getBrowserInstance = (): IBrowser => {
   browserInstance ??= createBrowserInstance();
   return browserInstance;
 };

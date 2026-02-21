@@ -1,19 +1,19 @@
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
-import { getPlumeUiInstance, plumeActions } from "../stores/AppInstanceImpl";
-import { getStoreInstance } from "../stores/AppStoreImpl";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
-import { presentFormattedDuration, presentFormattedTime } from "./presenters";
+import { presentFormattedTime } from "./presenters";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 export const setupStoreSubscriptions = (): CleanupCallback => {
-  const store = getStoreInstance();
+  const appCore = getAppCoreInstance();
   const storeSubscriptions: Array<SubscriptionCallback> = [];
-  const plume = getPlumeUiInstance().getState();
+  const plume = getGuiInstance().getState();
 
   // Cached once at setup time since bpe-volume-value is a static node.
   const volumeValueDisplay = plume.volumeSlider.parentElement?.querySelector(
@@ -22,10 +22,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
   storeSubscriptions.push(
     // Subscribe to currentTime changes to update main progress slider
-    store.subscribe("currentTime", () => {
-      const plumeUi = getPlumeUiInstance();
+    appCore.subscribe("currentTime", () => {
+      const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
-      const state = store.getState();
+      const state = appCore.getState();
 
       const elapsed = state.currentTime;
       const duration = state.duration;
@@ -41,11 +41,11 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Update time displays
       plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
-      plume.durationDisplay.textContent = presentFormattedDuration(state);
+      plume.durationDisplay.textContent = appCore.computed.formattedDuration();
     }),
     // Subscribe to volume changes to update audio element, slider, and display
-    store.subscribe("volume", (volume) => {
-      const plumeUi = getPlumeUiInstance();
+    appCore.subscribe("volume", (volume) => {
+      const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
       plume.audioElement.volume = volume;
@@ -56,38 +56,37 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (volumeValueDisplay) {
         volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
-      plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
+      plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
     }),
     // Subscribe to duration display method changes to update display
-    store.subscribe("durationDisplayMethod", () => {
-      const plumeUi = getPlumeUiInstance();
+    appCore.subscribe("durationDisplayMethod", () => {
+      const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
-      const state = store.getState();
 
-      plume.durationDisplay.textContent = presentFormattedDuration(state);
+      plume.durationDisplay.textContent = appCore.computed.formattedDuration();
     }),
     // Subscribe to mute state changes
-    store.subscribe("isMuted", (isMuted) => {
-      const plumeUi = getPlumeUiInstance();
+    appCore.subscribe("isMuted", (isMuted) => {
+      const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
       syncMuteBtn(isMuted);
 
       // Update volume slider and display
-      const currentVolume = store.getState().volume;
+      const currentVolume = appCore.getState().volume;
       plume.volumeSlider.value = Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY).toString();
-      plumeUi.dispatch(plumeActions.setVolumeSlider(plume.volumeSlider));
+      plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
 
       if (volumeValueDisplay) {
         volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
       // Update audio element volume
-      plume.audioElement.volume = store.getState().volume;
+      plume.audioElement.volume = appCore.getState().volume;
     }),
     // Subscribe to playing state changes
-    store.subscribe("isPlaying", (isPlaying) => {
-      const plumeUi = getPlumeUiInstance();
+    appCore.subscribe("isPlaying", (isPlaying) => {
+      const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
       // Update audio element playback state (store as single source of truth).

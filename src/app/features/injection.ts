@@ -3,8 +3,8 @@ import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
-import { getPlumeUiInstance, plumeActions } from "../stores/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { toggleFullscreenMode } from "./fullscreen";
 import { getString } from "./i18n";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "./original-player";
@@ -24,8 +24,8 @@ const addRuntime = () => {
 };
 
 export const injectEnhancements = async (): Promise<void> => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
 
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
@@ -33,7 +33,7 @@ export const injectEnhancements = async (): Promise<void> => {
     return;
   }
 
-  const isAlbumPage = store.getState().pageType === "album";
+  const isAlbumPage = appCore.getState().pageType === "album";
 
   hideOriginalPlayerElements();
 
@@ -79,10 +79,10 @@ export const injectEnhancements = async (): Promise<void> => {
   headerContainer.appendChild(currentTitleSection);
 
   // Initialize store with current track title and track number
-  store.dispatch(storeActions.setTrackTitle(initialTrackTitle));
-  store.dispatch(storeActions.setTrackNumber(initialTrackNumberText));
+  appCore.dispatch(coreActions.setTrackTitle(initialTrackTitle));
+  appCore.dispatch(coreActions.setTrackNumber(initialTrackNumberText));
 
-  plumeUi.dispatch(plumeActions.setTitleDisplay(headerContainer));
+  plumeUi.dispatch(guiActions.setTitleDisplay(headerContainer));
   plumeContainer.appendChild(headerContainer);
 
   const playbackManager = document.createElement("div");

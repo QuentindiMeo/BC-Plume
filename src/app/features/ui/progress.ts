@@ -1,33 +1,33 @@
 import { TIME_DISPLAY_METHOD } from "../../../domain/bandcamp";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../../domain/plume";
 import { CPL, logger } from "../../../shared/logger";
-import { getPlumeUiInstance, plumeActions } from "../../stores/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
+import { getGuiInstance, guiActions } from "../../stores/GuiImpl";
 import { getString } from "../i18n";
 import { seekAndPreservePause } from "../seeking";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 const handleDurationClick = (): void => {
-  const store = getStoreInstance();
-  const currentMethod = store.getState().durationDisplayMethod;
+  const appCore = getAppCoreInstance();
+  const currentMethod = appCore.getState().durationDisplayMethod;
   const newMethod =
     currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
 
-  store.dispatch(storeActions.setDurationDisplayMethod(newMethod));
+  appCore.dispatch(coreActions.setDurationDisplayMethod(newMethod));
 };
 
 export const dispatchAudioProgressToStore = (): void => {
-  const store = getStoreInstance();
-  const plumeUi = getPlumeUiInstance();
+  const appCore = getAppCoreInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
-  store.dispatch(storeActions.setCurrentTime(plume.audioElement.currentTime));
-  store.dispatch(storeActions.setDuration(plume.audioElement.duration));
+  appCore.dispatch(coreActions.setCurrentTime(plume.audioElement.currentTime));
+  appCore.dispatch(coreActions.setDuration(plume.audioElement.duration));
 };
 
 export const createProgressBar = (): HTMLDivElement => {
-  const plumeUi = getPlumeUiInstance();
+  const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
 
   const container = document.createElement("div");
@@ -60,17 +60,17 @@ export const createProgressBar = (): HTMLDivElement => {
 
     logger(CPL.DEBUG, getString("DEBUG__PROGRESS_SLIDER__INPUT", [targetTime.toFixed(2)]));
 
-    const store = getStoreInstance();
+    const appCore = getAppCoreInstance();
 
     seekAndPreservePause(plume.audioElement, progress * (plume.audioElement.duration || 0));
-    store.dispatch(storeActions.setCurrentTime(targetTime));
+    appCore.dispatch(coreActions.setCurrentTime(targetTime));
   });
 
   duration.addEventListener("click", handleDurationClick);
 
-  plumeUi.dispatch(plumeActions.setProgressSlider(progressSlider));
-  plumeUi.dispatch(plumeActions.setElapsedDisplay(elapsed));
-  plumeUi.dispatch(plumeActions.setDurationDisplay(duration));
+  plumeUi.dispatch(guiActions.setProgressSlider(progressSlider));
+  plumeUi.dispatch(guiActions.setElapsedDisplay(elapsed));
+  plumeUi.dispatch(guiActions.setDurationDisplay(duration));
 
   timeDisplay.appendChild(elapsed);
   timeDisplay.appendChild(duration);

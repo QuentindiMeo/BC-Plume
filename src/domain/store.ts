@@ -1,38 +1,37 @@
 import { NoArgFunction } from "../shared/types";
 
-export const handleUnknownAction = (action: never): never => {
-  throw new Error(`Unhandled action type: ${JSON.stringify(action)} — implementation missing for this action.`);
-};
-
-export type Action<ActionId = string, Payload = undefined> = Payload extends undefined
+export type IAction<ActionId = string, Payload = undefined> = Payload extends undefined
   ? { type: ActionId }
   : { type: ActionId; payload: Payload };
-export type Thunk<S, A> = (dispatch: (action: A | Thunk<S, A>) => void, getState: () => Readonly<S>) => Promise<void>;
+export type Thunk<Store, Action> = (
+  dispatch: (action: Action | Thunk<Store, Action>) => void,
+  getState: () => Readonly<Store>
+) => Promise<void>;
 
-export type Listener<State, Key extends keyof State> = (value: State[Key], prevValue: State[Key]) => void;
+export type IListener<State, Key extends keyof State> = (value: State[Key], prevValue: State[Key]) => void;
 
-export interface Store<State, Action> {
+export interface IStore<State, Action> {
   getState(): Readonly<State>;
   dispatch(action: Action | Thunk<State, Action>): void;
-  subscribe?<Key extends keyof State>(key: Key, listener: Listener<State, Key>): NoArgFunction;
+  subscribe?<Key extends keyof State>(key: Key, listener: IListener<State, Key>): NoArgFunction;
   subscribeAll?(listener: (state: State) => void): NoArgFunction;
 }
 
-export interface ScenarioEntry<State, Action> {
+export interface IScenarioEntry<State, Action> {
   action: Action;
   stateAfter: Readonly<State>;
   timestamp: number;
 }
 
-export interface ScenarioView<State, Action> {
-  readonly entries: ReadonlyArray<ScenarioEntry<State, Action>>;
+export interface IScenarioView<State, Action> {
+  readonly entries: ReadonlyArray<IScenarioEntry<State, Action>>;
 
   /** Index of the *current* position in the scenario timeline (points to the last applied entry, -1 when at initial state). */
   readonly cursor: number;
 }
 
 /** Controls exposed by the scenario recorder. */
-export interface ScenarioControls<State, Action> {
+export interface IScenarioControls<State, Action> {
   /** Record a new entry. Clears any redo-able future beyond the current cursor. */
   record(action: Action, stateAfter: Readonly<State>): void;
 
@@ -46,7 +45,7 @@ export interface ScenarioControls<State, Action> {
   replayScenario(initialState: Readonly<State>, toIndex?: number): Readonly<State>;
 
   /** Get a read-only view of the scenario. */
-  getScenarioView(): ScenarioView<State, Action>;
+  getScenarioView(): IScenarioView<State, Action>;
 
   /** Clear all recorded entries and reset the cursor. */
   clearScenario(): void;
@@ -60,8 +59,8 @@ const DEFAULT_MAX_SCENARIO_ENTRIES = 200;
  */
 export const createScenarioRecorder = <State, Action>(
   maxEntries: number = DEFAULT_MAX_SCENARIO_ENTRIES
-): ScenarioControls<State, Action> => {
-  let entries: Array<ScenarioEntry<State, Action>> = [];
+): IScenarioControls<State, Action> => {
+  let entries: Array<IScenarioEntry<State, Action>> = [];
   let cursor = -1; // Points to the last *applied* entry. -1 means we're at the initial state (before any action).
 
   const record = (action: Action, stateAfter: Readonly<State>): void => {
@@ -106,7 +105,7 @@ export const createScenarioRecorder = <State, Action>(
     return { ...entries[clampedTarget].stateAfter };
   };
 
-  const getScenarioView = (): ScenarioView<State, Action> => ({
+  const getScenarioView = (): IScenarioView<State, Action> => ({
     entries,
     cursor,
   });

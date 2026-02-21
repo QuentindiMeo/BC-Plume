@@ -3,8 +3,8 @@ import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { PLUME_CONSTANTS, PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
-import { getPlumeUiInstance } from "../stores/AppInstanceImpl";
-import { getStoreInstance, storeActions } from "../stores/AppStoreImpl";
+import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
 import { getString } from "./i18n";
 import { seekAndPreservePause } from "./seeking";
 import { CleanupCallback, SubscriptionCallback } from "./types";
@@ -40,8 +40,8 @@ const exitFullscreenMode = (): void => {
   const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
   if (!existingOverlay) return;
 
-  const store = getStoreInstance();
-  store.dispatch(storeActions.setIsFullscreen(false));
+  const appCore = getAppCoreInstance();
+  appCore.dispatch(coreActions.setIsFullscreen(false));
 
   // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
   if (fullscreenCleanupCallback) {
@@ -168,38 +168,38 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
 
 // Setup store subscriptions for fullscreen UI to keep it in sync with state
 const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
-  const plume = getPlumeUiInstance().getState();
-  const store = getStoreInstance();
+  const plume = getGuiInstance().getState();
+  const appCore = getAppCoreInstance();
 
   const subscriptions: Array<SubscriptionCallback> = [];
   const elements: FullscreenElements = getFullscreenElements(clone);
 
   // Subscribe to state changes and use pure rendering functions for updates
   subscriptions.push(
-    store.subscribe("currentTime", () => {
-      renderProgressSlider(elements, store.computed.progressPercentage());
-      renderElapsedDisplay(elements, store.computed.formattedElapsed());
-      renderDurationDisplay(elements, store.computed.formattedDuration());
+    appCore.subscribe("currentTime", () => {
+      renderProgressSlider(elements, appCore.computed.progressPercentage());
+      renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
+      renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
-    store.subscribe("duration", () => {
-      renderDurationDisplay(elements, store.computed.formattedDuration());
+    appCore.subscribe("duration", () => {
+      renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
-    store.subscribe("durationDisplayMethod", () => {
-      renderDurationDisplay(elements, store.computed.formattedDuration());
+    appCore.subscribe("durationDisplayMethod", () => {
+      renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
-    store.subscribe("isPlaying", (isPlaying) => {
+    appCore.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
     }),
-    store.subscribe("volume", (volume) => {
+    appCore.subscribe("volume", (volume) => {
       renderVolume(elements, volume);
     }),
-    store.subscribe("isMuted", (isMuted) => {
+    appCore.subscribe("isMuted", (isMuted) => {
       renderMuteButton(elements, isMuted);
     }),
-    store.subscribe("trackTitle", (trackTitle) => {
+    appCore.subscribe("trackTitle", (trackTitle) => {
       renderTrackTitle(elements, trackTitle);
     }),
-    store.subscribe("trackNumber", (trackNumber) => {
+    appCore.subscribe("trackNumber", (trackNumber) => {
       renderTrackNumber(elements, trackNumber);
     })
   );
@@ -209,27 +209,27 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     const targetTime = progress * (plume.audioElement.duration || 0);
 
     seekAndPreservePause(plume.audioElement, targetTime);
-    store.dispatch(storeActions.setCurrentTime(targetTime));
+    appCore.dispatch(coreActions.setCurrentTime(targetTime));
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
     const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
 
     // Moving slider off zero counts as an intentional unmute
-    if (newVolume > 0 && store.getState().isMuted) {
-      store.dispatch(storeActions.setIsMuted(false));
+    if (newVolume > 0 && appCore.getState().isMuted) {
+      appCore.dispatch(coreActions.setIsMuted(false));
     }
 
     // Dispatch to store only - subscription handles audio element and display updates
-    store.dispatch(storeActions.setVolume(newVolume));
+    appCore.dispatch(coreActions.setVolume(newVolume));
   };
 
   const handleFullscreenDurationClick = () => {
-    const currentMethod = store.getState().durationDisplayMethod;
+    const currentMethod = appCore.getState().durationDisplayMethod;
     const newMethod =
       currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
 
-    store.dispatch(storeActions.setDurationDisplayMethod(newMethod));
+    appCore.dispatch(coreActions.setDurationDisplayMethod(newMethod));
   };
 
   // Setup event listeners for fullscreen controls
@@ -245,15 +245,15 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.muteBtn.addEventListener("click", handleMuteToggle);
 
   // Initialize fullscreen UI with current state using the same rendering functions
-  const state = store.getState();
+  const state = appCore.getState();
 
   // Safe use of innerHTML to clone DOM content from controlled element
   elements.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
-  renderProgressSlider(elements, store.computed.progressPercentage());
-  renderElapsedDisplay(elements, store.computed.formattedElapsed());
-  renderDurationDisplay(elements, store.computed.formattedDuration());
+  renderProgressSlider(elements, appCore.computed.progressPercentage());
+  renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
+  renderDurationDisplay(elements, appCore.computed.formattedDuration());
   renderPlayPauseButton(elements, state.isPlaying);
   renderVolume(elements, state.volume);
   renderMuteButton(elements, state.isMuted);
@@ -402,7 +402,7 @@ const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {
 
 // State-driven fullscreen toggle - follows Action → Reducer → State → Subscription → DOM pattern
 export const toggleFullscreenMode = (): void => {
-  const store = getStoreInstance();
+  const appCore = getAppCoreInstance();
   const existingOverlay = document.querySelector(PLUME_ELEM_IDENTIFIERS.fullscreenOverlay) as HTMLDivElement;
   const isCurrentlyFullscreen = !!existingOverlay;
 
@@ -413,12 +413,12 @@ export const toggleFullscreenMode = (): void => {
   }
 
   // Enter fullscreen - dispatch state change first, then build DOM
-  const isAlbumPage = store.getState().pageType === "album";
+  const isAlbumPage = appCore.getState().pageType === "album";
 
   const overlay = buildFullscreenOverlay(isAlbumPage);
   if (!overlay) {
     // Failed to build overlay - revert state
-    store.dispatch(storeActions.setIsFullscreen(false));
+    appCore.dispatch(coreActions.setIsFullscreen(false));
     return;
   }
 
@@ -432,7 +432,7 @@ export const toggleFullscreenMode = (): void => {
   document.body.style.overflow = "hidden";
   setupFullscreenFocusTrap(overlay);
 
-  store.dispatch(storeActions.setIsFullscreen(true));
+  appCore.dispatch(coreActions.setIsFullscreen(true));
 
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

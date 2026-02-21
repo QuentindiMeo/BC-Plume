@@ -1,7 +1,7 @@
 import { BC_ELEM_IDENTIFIERS, BC_PLAYER_SELECTORS } from "../../domain/bandcamp";
 import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
-import { getPlumeUiInstance } from "../stores/AppInstanceImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
 import { getString } from "./i18n";
 
 export const hideOriginalPlayerElements = (): void => {
@@ -33,7 +33,7 @@ export const findOriginalPlayerContainer = (): HTMLDivElement | null => {
   }
 
   if (!playerContainer) {
-    const plumeUi = getPlumeUiInstance();
+    const plumeUi = getGuiInstance();
     const plume = plumeUi.getState();
     logger(CPL.WARN, getString("WARN__PLAYER_CONTAINER_NOT_FOUND"));
     // Search near audio elements
