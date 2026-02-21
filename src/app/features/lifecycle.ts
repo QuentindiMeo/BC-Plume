@@ -22,18 +22,11 @@ import {
   setupPlayerStickiness,
 } from "./ui";
 
-// Function to initialize playback (necessary to make Plume buttons effective)
+// Function to initialize playback
 const initPlayback = () => {
   const playButton = document.querySelector(BC_ELEM_SELECTORS.playPause) as HTMLButtonElement;
   if (playButton) {
-    // Click to ensure playback has started
     playButton.click();
-    setTimeout(() => {
-      handleTimeForward();
-      setTimeout(() => {
-        handleTimeBackward();
-      }, 20); // delay to allow Bandcamp to register the time update and sync Plume's progress slider
-    }, 100); // delay to allow Bandcamp player to fully initialize
   } else {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
   }
