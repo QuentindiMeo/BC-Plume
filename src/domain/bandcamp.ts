@@ -14,6 +14,7 @@ export interface DebugControl {
 }
 
 export enum BC_ELEM_IDENTIFIERS {
+  pageBackground = "#pgBd",
   infoSection = "div#name-section",
   trackView = "div.trackView",
   fromAlbum = "span.fromAlbum",

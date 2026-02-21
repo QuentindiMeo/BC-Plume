@@ -74,7 +74,8 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   newTitleHeading.className = infoSectionId + "__titling";
   newTitleHeading.appendChild(titleHeadingClone);
 
-  const mainSectionBackground = document.getElementById("pgBd")!;
+  const pageBackgroundId = BC_ELEM_IDENTIFIERS.pageBackground.split("#")[1];
+  const mainSectionBackground = document.getElementById(pageBackgroundId)!;
   const bgColor = globalThis.getComputedStyle(mainSectionBackground).getPropertyValue("background");
   const bgColorAsRGB = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bgColor);
   const r = Number.parseInt(bgColorAsRGB![1], 10);
