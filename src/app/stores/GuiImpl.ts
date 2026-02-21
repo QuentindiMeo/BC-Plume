@@ -1,5 +1,4 @@
-import { DefinedGui, Gui, GUI_ACTIONS, GuiAction, GuiListener, IGui, IGuiActions } from "../../infra/Gui";
-import { CPL, logger } from "../../shared/logger";
+import { DefinedGui, Gui, GUI_ACTIONS, GuiAction, IGui, IGuiActions } from "../../infra/Gui";
 import { handleUnknownAction } from "./shared";
 
 export const guiActions: IGuiActions = {
@@ -50,38 +49,12 @@ const INITIAL_STATE: Gui = {
 const createGuiInstance = (): IGui => {
   let state = { ...INITIAL_STATE };
 
-  const listeners = new Map<keyof Gui, Set<GuiListener<any>>>();
-  const globalListeners = new Set<(state: DefinedGui) => void>();
-
-  const notify = <GuiProp extends keyof DefinedGui>(key: GuiProp, prevValue: DefinedGui[GuiProp]): void => {
-    const keyListeners = listeners.get(key);
-    if (keyListeners) {
-      keyListeners.forEach((listener) => {
-        try {
-          listener(state[key], prevValue);
-        } catch (error) {
-          logger(CPL.ERROR, "State listener failed", { key, error });
-        }
-      });
-    }
-
-    globalListeners.forEach((listener) => {
-      try {
-        listener(state as DefinedGui);
-      } catch (error) {
-        logger(CPL.ERROR, "Global state listener failed", error);
-      }
-    });
-  };
-
   const updateState = <GuiProp extends keyof Gui>(key: GuiProp, value: Gui[GuiProp]): void => {
     const prevValue = state[key];
 
     if (prevValue === value) return;
 
     state = { ...state, [key]: value };
-
-    notify(key, prevValue as DefinedGui[GuiProp]);
   };
 
   const reducer = (action: GuiAction): void => {
@@ -129,30 +102,6 @@ const createGuiInstance = (): IGui => {
 
     dispatch(action: GuiAction): void {
       reducer(action);
-    },
-
-    subscribe<GuiProp extends keyof DefinedGui>(key: GuiProp, listener: GuiListener<GuiProp>): () => void {
-      if (!listeners.has(key)) listeners.set(key, new Set());
-
-      listeners.get(key)!.add(listener);
-
-      return () => {
-        const keyListeners = listeners.get(key);
-        if (keyListeners) {
-          keyListeners.delete(listener);
-          if (keyListeners.size === 0) {
-            listeners.delete(key);
-          }
-        }
-      };
-    },
-
-    subscribeAll(listener: (state: DefinedGui) => void): () => void {
-      globalListeners.add(listener);
-
-      return () => {
-        globalListeners.delete(listener);
-      };
     },
   };
 };

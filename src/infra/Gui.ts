@@ -1,4 +1,4 @@
-import { IAction, IListener, IStore } from "../domain/store";
+import { IAction, IStore } from "../domain/store";
 
 export interface Gui {
   audioElement: HTMLAudioElement | null;
@@ -55,7 +55,5 @@ export interface IGuiActions {
   setVolumeSlider: (element: HTMLInputElement | null) => GuiAction;
   setMuteBtn: (element: HTMLButtonElement | null) => GuiAction;
 }
-
-export type GuiListener<GuiProp extends keyof DefinedGui = keyof DefinedGui> = IListener<DefinedGui, GuiProp>;
 
 export interface IGui extends IStore<DefinedGui, GuiAction> {}
