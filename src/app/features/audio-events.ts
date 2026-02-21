@@ -1,5 +1,4 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
@@ -48,13 +47,6 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     const currentVolume = plume.audioElement.volume;
     plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
     plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
-
-    const valueDisplay = plume.volumeSlider.parentElement!.querySelector(
-      PLUME_ELEM_SELECTORS.volumeValue
-    ) as HTMLSpanElement;
-    if (valueDisplay) {
-      valueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
-    }
 
     const currentIsMuted = appCore.getState().isMuted;
     const newIsMuted = currentVolume === 0;
