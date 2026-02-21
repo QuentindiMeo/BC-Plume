@@ -1,4 +1,4 @@
-import { BC_ELEM_IDENTIFIERS, DebugControl } from "../../domain/bandcamp";
+import { BC_ELEM_IDENTIFIERS } from "../../domain/bandcamp";
 import { PLUME_ELEM_IDENTIFIERS } from "../../domain/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -54,6 +54,14 @@ const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   return audio;
 };
 
+interface DebugControl {
+  index: number;
+  tagName: string;
+  classes: string;
+  title: string;
+  text: string;
+  onclick: string;
+}
 // Debug function to identify Bandcamp controls
 const debugBandcampControls = (): Array<DebugControl> => {
   logger(CPL.DEBUG, getString("DEBUG__CONTROL_ELEMENTS__DETECTED"));

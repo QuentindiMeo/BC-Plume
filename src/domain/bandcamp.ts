@@ -4,15 +4,6 @@ export enum TIME_DISPLAY_METHOD {
 }
 export type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`;
 
-export interface DebugControl {
-  index: number;
-  tagName: string;
-  classes: string;
-  title: string;
-  text: string;
-  onclick: string;
-}
-
 export enum BC_ELEM_IDENTIFIERS {
   pageBackground = "#pgBd",
   infoSection = "div#name-section",
