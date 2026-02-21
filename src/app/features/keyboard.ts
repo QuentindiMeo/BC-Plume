@@ -5,7 +5,7 @@ import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getString } from "./i18n";
 import type { CleanupCallback } from "./types";
 
-const { AVAILABLE_HOTKEYS: AVAILABLE_HOTKEY_CODES, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 interface KeyboardHandlers {
   handlePlayPause: NoArgFunction;
@@ -16,6 +16,18 @@ interface KeyboardHandlers {
   handleMuteToggle: NoArgFunction;
   toggleFullscreenMode: NoArgFunction;
 }
+
+const AVAILABLE_HOTKEYS = new Set<string>([
+  " ",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "PageUp",
+  "PageDown",
+  "f",
+  "m",
+]);
 
 export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
   const appCore = getAppCoreInstance();
@@ -35,7 +47,7 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
       (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
     if (userIsTypingInInput) return; // don't trigger hotkeys when user is typing in an input or textarea
 
-    const isValidHotkey = AVAILABLE_HOTKEY_CODES.has(e.key);
+    const isValidHotkey = AVAILABLE_HOTKEYS.has(e.key);
     if (!isValidHotkey) return;
 
     e.preventDefault();

@@ -1,5 +1,4 @@
-import { BC_PLAYER_SELECTORS } from "../../domain/bandcamp";
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { BC_ELEM_SELECTORS, BC_PLAYER_SELECTORS } from "../../infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { getGuiInstance } from "../stores/GuiImpl";

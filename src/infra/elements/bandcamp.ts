@@ -18,3 +18,11 @@ export enum BC_ELEM_SELECTORS {
   trackDuration = "span.time",
   coverArt = "div#tralbumArt img",
 }
+
+export const BC_PLAYER_SELECTORS = new Set<string>([
+  "div.inline_player",
+  "div#trackInfoInner",
+  ".track_play_auxiliary",
+  ".track_play_hilite",
+  ".track_play_area",
+]);
