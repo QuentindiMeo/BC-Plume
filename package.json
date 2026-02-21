@@ -8,6 +8,7 @@
     "build": "node scripts/build.js --dev",
     "build:watch": "node scripts/build.js --dev --watch",
     "build:prod": "node scripts/build.js",
+    "build:test": "node scripts/build.js --test",
     "clean": "rimraf dist build",
     "dev": "pnpm clean && pnpm build:watch",
     "sync-version": "node scripts/sync-version.js",

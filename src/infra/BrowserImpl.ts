@@ -1,7 +1,7 @@
 import { PLUME_CACHE_KEYS } from "../domain/plume";
 import { Action, Store } from "../domain/store";
 import { CPL, logger } from "../features/logger";
-import { process, PROCESS_ENV } from "./node";
+import { meta, PROCESS_ENV } from "./node";
 
 interface BrowserApi {
   storage: {
@@ -88,7 +88,7 @@ const createBrowserInstance = (): BrowserInstance => {
 
   // Development-only action logger
   const logStateChange = (action: BrowserAction): void => {
-    if (process.env !== PROCESS_ENV.PRODUCTION) {
+    if (meta.env !== PROCESS_ENV.PRODUCTION) {
       const hasPayload = "payload" in action;
       logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
     }

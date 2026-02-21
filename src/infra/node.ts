@@ -6,8 +6,9 @@ export enum PROCESS_ENV {
 }
 type ProcessEnvType = `${PROCESS_ENV}`;
 
-export const process = ((mode: ProcessEnvType): { env: ProcessEnvType } => {
+export const meta = ((mode: ProcessEnvType): { env: ProcessEnvType } => {
   return {
     env: mode,
   };
-})(PROCESS_ENV.DEVELOPMENT); // Default to development mode; can be overridden in tests or production builds.
+  // Use DEVELOPMENT as runtime fallback for TypeScript type-checking and for any environment that runs TS source directly.
+})(process.env.NODE_ENV || PROCESS_ENV.DEVELOPMENT);

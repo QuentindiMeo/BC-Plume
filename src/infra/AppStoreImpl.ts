@@ -14,7 +14,7 @@ import {
 import { CPL, logger } from "../features/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
-import { process, PROCESS_ENV } from "./node";
+import { meta, PROCESS_ENV } from "./node";
 
 enum STORE_ACTIONS {
   SET_PAGE_TYPE = "SET_PAGE_TYPE",
@@ -171,7 +171,7 @@ const createAppStateInstance = (): AppStateStore => {
 
   // Scenario recorder for time-travel debugging (test-only)
   const scenarioRecorder: ScenarioControls<AppState, AppAction> | null =
-    process.env === PROCESS_ENV.TESTING ? createScenarioRecorder<AppState, AppAction>() : null;
+    meta.env === PROCESS_ENV.TESTING ? createScenarioRecorder<AppState, AppAction>() : null;
 
   const persistState = (keys: Array<keyof AppState>): void => {
     // Accumulate all keys that need to be persisted during the debounce window
@@ -246,7 +246,7 @@ const createAppStateInstance = (): AppStateStore => {
    */
   const logStateChange = (action: AppAction, prevState: AppState, nextState: AppState): void => {
     // Only log in development builds
-    if (process.env !== PROCESS_ENV.PRODUCTION) {
+    if (meta.env !== PROCESS_ENV.PRODUCTION) {
       const hasPayload = "payload" in action;
 
       logger(CPL.DEBUG, `[STORE] ${action.type}${hasPayload ? ` → ${JSON.stringify(action.payload)}` : ""}`);
