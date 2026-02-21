@@ -1,7 +1,7 @@
-import { process, PROCESS_ENV } from "../domain/node";
 import { PLUME_CACHE_KEYS } from "../domain/plume";
 import { Action, Store } from "../domain/store";
 import { CPL, logger } from "../features/logger";
+import { process, PROCESS_ENV } from "./node";
 
 interface BrowserApi {
   storage: {

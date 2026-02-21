@@ -1,6 +1,6 @@
-import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../domain/bandcamp";
-import { process, PROCESS_ENV } from "../domain/node";
+import { BcPageType, TIME_DISPLAY_METHOD, type TimeDisplayMethodType } from "../domain/bandcamp";
 import { PLUME_CACHE_KEYS, PLUME_DEFAULTS } from "../domain/plume";
+import type { AppState } from "../domain/state";
 import {
   Action,
   createScenarioRecorder,
@@ -14,25 +14,7 @@ import {
 import { CPL, logger } from "../features/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
-
-export interface AppPersistedState {
-  volume: number;
-  durationDisplayMethod: TimeDisplayMethodType;
-}
-
-export interface AppTransientState {
-  pageType: BcPageType | null;
-  trackTitle: string | null;
-  trackNumber: string | null;
-  duration: number;
-  currentTime: number;
-  isPlaying: boolean;
-  isMuted: boolean;
-  volumeBeforeMute: number;
-  isFullscreen: boolean;
-}
-
-export interface AppState extends AppPersistedState, AppTransientState {}
+import { process, PROCESS_ENV } from "./node";
 
 enum STORE_ACTIONS {
   SET_PAGE_TYPE = "SET_PAGE_TYPE",
