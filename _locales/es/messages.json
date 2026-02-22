@@ -2,7 +2,25 @@
   "APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
   "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, avance/retroceso de 10s, pantalla completa y atajos de teclado." },
 
-  "ERROR__NO_BROWSER_API": { "message": "No se detectó API de extensión del navegador" },
+  "ALERT__BC_HEALTH_CHECK__FAILED": {
+    "message": "¡La verificación de salud de Bandcamp ha fallado! Faltan $REQUIRED_COUNT$ elementos requeridos. Consulta la consola para más detalles.",
+    "placeholders": {
+      "required_count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ERROR__NO_BROWSER_API": { "message": "No se detectó API del navegador" },
+  "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
+    "message": "La respuesta de verificación de salud de Bandcamp no contiene el campo requerido: $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "div.inline_player"
+      }
+    }
+  },
   "ERROR__STATE__LOAD_FAILED": { "message": "Error al cargar el estado guardado:" },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Error en el oyente global de estado:" },
   "ERROR__STATE__LISTENER_FAILED": { "message": "Error en el oyente de estado:" },
@@ -25,6 +43,7 @@
   "WARN__AUDIO__NOT_FOUND": { "message": "No se encontró elemento de audio" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando en 2s..." },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Contenedor del reproductor no encontrado, buscando una alternativa..." },
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "No se pudo calcular el tiempo total" },
   "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "No se pudo cargar el método de visualización de tiempo:" },
   "WARN__PREV_TRACK__NOT_FOUND": { "message": "Botón de pista anterior no encontrado" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Botón de pista siguiente no encontrado" },
@@ -44,10 +63,19 @@
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
   "INFO__BROWSER__DETECTED": { "message": "Navegador detectado:" },
+  "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
+    "message": "Elemento de Bandcamp no encontrado (opcional): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "span.fromAlbum"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Todos los elementos de Bandcamp encontrados" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Suscripciones de almacén inicializadas" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Atajos de teclado registrados" },
   "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
-  "WARN__RUNTIME__NOT_CALCULATED": { "message": "El tiempo total no se pudo calcular" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Método de visualización de tiempo aplicado: $METHOD$",
@@ -93,6 +121,15 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controles potenciales encontrados:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
   "DEBUG__STATE__PERSISTED": { "message": "Estado guardado en almacenamiento:" },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Control deslizante de progreso movido: $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Botón de pista anterior presionado" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Evento de pista anterior enviado" },
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },

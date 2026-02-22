@@ -4,9 +4,19 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const isDev = process.argv.includes("--dev");
+const isTest = process.argv.includes("--test");
 const isWatch = process.argv.includes("--watch");
 
-console.log(`📦 Building with esbuild (${isDev ? "development" : "production"} mode)...`);
+let mode;
+if (isTest) {
+  mode = "testing";
+} else if (isDev) {
+  mode = "development";
+} else {
+  mode = "production";
+}
+
+console.log(`📦 Building with esbuild (${mode} mode)...`);
 
 const distDir = path.join(__dirname, "..", "dist");
 if (!fs.existsSync(distDir)) {
@@ -19,9 +29,13 @@ const buildOptions = {
   outfile: path.join(distDir, "content.js"),
   platform: "browser",
   target: "es2022",
-  sourcemap: isDev,
-  minify: !isDev,
+  sourcemap: isDev || isTest,
+  minify: !isDev && !isTest,
   logLevel: "info",
+  // esbuild replaces every occurrence of the token `process.env`
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(mode),
+  },
 };
 
 async function build() {

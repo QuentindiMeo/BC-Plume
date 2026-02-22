@@ -1,7 +1,12 @@
-import { TimeDisplayMethodType } from "./bandcamp";
-import { PLUME_CACHE_KEYS } from "./plume";
+import { TimeDisplayMethodType } from "./plume";
+
+export enum PLUME_CACHE_KEYS {
+  DURATION_DISPLAY_METHOD = "plume_duration_display_method",
+  VOLUME = "plume_volume",
+}
 
 export interface LocalStorage {
   [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: TimeDisplayMethodType | undefined;
   [PLUME_CACHE_KEYS.VOLUME]: number | undefined;
 }
+export type PlumeCacheKey = keyof LocalStorage;
