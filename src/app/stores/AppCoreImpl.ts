@@ -1,6 +1,7 @@
-import { BcPageType, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../../domain/bandcamp";
+import { TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../../domain/plume";
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
 import { PLUME_DEFAULTS } from "../../domain/plume";
+import { BcPageType } from "../../domain/ports/bc-player";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
 import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, IAppCore, ICoreActions } from "../../infra/AppCore";
 import { meta, PROCESS_ENV } from "../../infra/node";

@@ -7,7 +7,7 @@ export interface BcHealthCheckResult {
   missing: Array<{ key: string; selector: string; required: boolean }>;
 }
 
-// Selectors that only exist on album pages (/album/…)
+// Selectors that only exist on album pages (/album/*)
 const ALBUM_ONLY_KEYS = new Set<string>([
   "albumPageCurrentTrackTitle",
   "trackList",
@@ -19,7 +19,7 @@ const ALBUM_ONLY_KEYS = new Set<string>([
 // Selectors that only exist on track pages belonging to an album
 const TRACK_WITH_ALBUM_ONLY_KEYS = new Set<string>(["fromAlbum"]);
 
-// Selectors that only exist on track pages (/track/…)
+// Selectors that only exist on track pages (/track/*)
 const TRACK_ONLY_KEYS = new Set<string>(["songPageCurrentTrackTitle"]);
 
 export const checkBandcampElements = (): BcHealthCheckResult => {

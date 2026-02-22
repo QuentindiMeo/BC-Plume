@@ -1,7 +1,7 @@
-import { TIME_DISPLAY_METHOD } from "../../domain/bandcamp";
+import { TIME_DISPLAY_METHOD } from "../../domain/plume";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { PLUME_CONSTANTS } from "../../domain/plume";
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { bandcampPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
@@ -270,8 +270,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
 // Pure DOM construction function - builds fullscreen overlay without side effects
 const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
-  const coverArt = document.querySelector(BC_ELEM_SELECTORS.coverArt) as HTMLImageElement;
-  if (!coverArt) {
+  const artworkUrl = bandcampPlayer.getArtworkUrl();
+  if (!artworkUrl) {
     logger(CPL.WARN, getString("WARN__COVER_ART__NOT_FOUND"));
     return null;
   }
@@ -282,8 +282,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
   background.id = PLUME_ELEM_SELECTORS.fullscreenBackground.split("#")[1];
-  const coverArtUrl = encodeURI(coverArt.src);
-  background.style.backgroundImage = `url("${coverArtUrl}")`;
+  background.style.backgroundImage = `url("${encodeURI(artworkUrl)}")`;
   overlay.appendChild(background);
 
   const contentContainer = document.createElement("div");
@@ -294,11 +293,11 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   const coverArtImg = document.createElement("img");
   coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
-  coverArtImg.src = coverArt.src;
+  coverArtImg.src = artworkUrl;
   coverArtImg.alt = getString("ARIA__COVER_ART");
   presentationContainer.appendChild(coverArtImg);
 
-  const newNameSection = document.querySelector(BC_ELEM_SELECTORS.infoSection) as HTMLDivElement;
+  const newNameSection = bandcampPlayer.getInfoSection() as HTMLDivElement | null;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return null;

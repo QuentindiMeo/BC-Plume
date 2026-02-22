@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { BC_ELEM_SELECTORS } from "../../../infra/elements/bandcamp";
+import { bandcampPlayer } from "../../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
@@ -36,7 +36,7 @@ export const handleTrackBackward = (): void => {
   }
 
   // Otherwise, click BC's previous button
-  const bcPrevBtn = document.querySelector(BC_ELEM_SELECTORS.previousTrack) as HTMLButtonElement;
+  const bcPrevBtn = bandcampPlayer.getPreviousTrackButton();
   if (!bcPrevBtn) {
     logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
     return;
@@ -49,7 +49,7 @@ export const handleTrackBackward = (): void => {
 export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
-  const bcNextBtn = document.querySelector(BC_ELEM_SELECTORS.nextTrack) as HTMLButtonElement;
+  const bcNextBtn = bandcampPlayer.getNextTrackButton();
   if (!bcNextBtn) {
     logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
     return;

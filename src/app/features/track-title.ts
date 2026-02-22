@@ -1,4 +1,4 @@
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { bandcampPlayer } from "../../infra/adapters";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -10,20 +10,24 @@ import {
 import { getString } from "./i18n";
 
 const getArtistNameElement = (): HTMLSpanElement => {
-  const infoSection = document.querySelector(BC_ELEM_SELECTORS.infoSection) as HTMLDivElement;
-  const infoSectionLinks = infoSection.querySelectorAll("span");
-  const artistElementIdx = infoSectionLinks.length - 1; // idx should be 0 if album page, 1 if track page
+  const infoSection = bandcampPlayer.getInfoSection();
+  const infoSectionLinks = infoSection?.querySelectorAll("span") ?? [];
+  const artistElementIdx = infoSectionLinks.length - 1; // 0 on album pages, 1 on track pages
   return infoSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
 };
 
-const getTrackTitleElement = (): HTMLSpanElement => {
-  return document.querySelector(BC_ELEM_SELECTORS.songPageCurrentTrackTitle) as HTMLSpanElement;
+const getTrackTitleElement = (): HTMLElement | null => {
+  return bandcampPlayer.getTrackTitleElement();
 };
 
 // Determine appropriate pretext color based on WCAG contrast with Bandcamp theme colors
 export const getAppropriatePretextColor = (): string => {
-  const trackColor = getComputedStyle(getTrackTitleElement()).color;
-  const artistColor = getComputedStyle(getArtistNameElement()).color;
+  const trackTitleEl = getTrackTitleElement();
+  const artistEl = getArtistNameElement();
+  if (!trackTitleEl || !artistEl) return FALLBACK_GRAY_RGB_STR;
+
+  const trackColor = getComputedStyle(trackTitleEl).color;
+  const artistColor = getComputedStyle(artistEl).color;
   const trackColorMatch = trackColor.match(/\d+/g);
   const artistColorMatch = artistColor.match(/\d+/g);
 
@@ -55,10 +59,5 @@ export const getAppropriatePretextColor = (): string => {
 };
 
 export const getCurrentTrackTitle = (isAlbumPage: boolean): string => {
-  const titleElement = isAlbumPage
-    ? (document.querySelector(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle) as HTMLSpanElement)
-    : (document.querySelector(BC_ELEM_SELECTORS.songPageCurrentTrackTitle) as HTMLSpanElement);
-  if (!titleElement?.textContent) return getString("LABEL__TRACK_UNKNOWN");
-
-  return titleElement.textContent.trim();
+  return bandcampPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
 };

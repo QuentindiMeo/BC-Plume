@@ -1,4 +1,5 @@
-import { BcPageType, TimeDisplayMethodType } from "../domain/bandcamp";
+import { TimeDisplayMethodType } from "../domain/plume";
+import { BcPageType } from "../domain/ports/bc-player";
 import { IAction, IListener, IScenarioView, IStore } from "../domain/store";
 
 interface AppPersistedState {

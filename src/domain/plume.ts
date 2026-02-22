@@ -7,3 +7,9 @@ export const PLUME_CONSTANTS = {
 export const PLUME_DEFAULTS = {
   savedVolume: 0.5,
 } as const;
+
+export enum TIME_DISPLAY_METHOD {
+  DURATION = "duration",
+  REMAINING = "remaining",
+}
+export type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`;

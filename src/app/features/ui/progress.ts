@@ -1,4 +1,4 @@
-import { TIME_DISPLAY_METHOD } from "../../../domain/bandcamp";
+import { TIME_DISPLAY_METHOD } from "../../../domain/plume";
 import { PLUME_CONSTANTS } from "../../../domain/plume";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";

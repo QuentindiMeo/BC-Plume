@@ -1,9 +1,9 @@
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { bandcampPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
-import { checkBandcampElements } from "./bc-health-check";
+import { checkBandcampElements } from "./bc-diagnostic";
 import { debugBandcampControls } from "./debug";
 import { getString } from "./i18n";
 import { injectEnhancements } from "./injection";
@@ -16,7 +16,8 @@ import {
 } from "./observers";
 
 const initPlayback = () => {
-  const playButton = document.querySelector(BC_ELEM_SELECTORS.playPause) as HTMLButtonElement;
+  // BC's native play button is clicked to trigger its own internal playback bootstrap
+  const playButton = bandcampPlayer.getPlayPauseButton();
   if (playButton) {
     playButton.click();
   } else {
@@ -26,7 +27,7 @@ const initPlayback = () => {
 
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   const appCore = getAppCoreInstance();
-  const audio = document.querySelector(BC_ELEM_SELECTORS.audioPlayer) as HTMLAudioElement;
+  const audio = bandcampPlayer.getAudioElement();
   if (!audio) return null;
   logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 

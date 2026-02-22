@@ -1,6 +1,6 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { IAppCore } from "../../infra/AppCore";
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { bandcampPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { IGui } from "../../infra/Gui";
 import { CPL, logger } from "../../shared/logger";
@@ -30,7 +30,8 @@ interface PlumeView {
 }
 
 const addRuntime = () => {
-  const trackView = document.querySelector(BC_ELEM_SELECTORS.trackView) as HTMLDivElement;
+  const trackView = bandcampPlayer.getTrackView();
+  if (!trackView) return;
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 

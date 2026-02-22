@@ -1,4 +1,4 @@
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { bandcampPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -22,18 +22,14 @@ import {
 } from "./ui";
 
 const isLastTrackOfAlbumPlaying = () => {
-  const trackList = document.querySelector(BC_ELEM_SELECTORS.trackList) as HTMLTableElement;
-  if (!trackList) return false;
+  const trackRowTitles = bandcampPlayer.getTrackRowTitles();
+  if (trackRowTitles.length === 0) return false;
 
-  const trackRows = trackList.querySelectorAll(BC_ELEM_SELECTORS.trackRow);
-  const lastTrackRow = trackRows[trackRows.length - 1] as HTMLTableRowElement;
-  const lastTrackTitleElem = lastTrackRow?.querySelector(BC_ELEM_SELECTORS.trackTitle) as HTMLSpanElement;
-  const currentTrackTitleElem = document.querySelector(
-    BC_ELEM_SELECTORS.albumPageCurrentTrackTitle
-  ) as HTMLAnchorElement;
-  if (!currentTrackTitleElem) return false;
+  const lastTrackTitle = trackRowTitles[trackRowTitles.length - 1];
+  const currentTrackTitle = bandcampPlayer.getTrackTitle("album");
+  if (!currentTrackTitle) return false;
 
-  return lastTrackTitleElem?.textContent === currentTrackTitleElem.textContent;
+  return lastTrackTitle === currentTrackTitle;
 };
 
 const updateTrackForwardBtnState = () => {
@@ -154,7 +150,7 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
-        const newAudio = document.querySelector(BC_ELEM_SELECTORS.audioPlayer) as HTMLAudioElement;
+        const newAudio = bandcampPlayer.getAudioElement();
         if (newAudio && newAudio !== plume.audioElement) {
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
@@ -172,8 +168,7 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&
-          (mutation.target.classList.contains(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle.slice(1)) ||
-            mutation.target.querySelector(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle))
+          (mutation.target.classList.contains("title_link") || mutation.target.querySelector("a.title_link"))
         ) {
           updateTitleDisplay();
           updatePretextDisplay();
