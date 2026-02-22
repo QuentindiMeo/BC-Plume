@@ -1,4 +1,5 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
+import { musicPlayer } from "../../infra/adapters";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
@@ -44,7 +45,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   const handleVolumeChange = () => {
     if (!plume.volumeSlider) return;
 
-    const currentVolume = plume.audioElement.volume;
+    const currentVolume = musicPlayer.getVolume();
     plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
     plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
 
@@ -57,32 +58,29 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   };
 
   const handlePlayPause = () => {
-    const plumeUi = getGuiInstance();
-    const plume = plumeUi.getState();
-
-    const isPlaying = !plume.audioElement.paused;
+    const isPlaying = !musicPlayer.isPaused();
     // Guard against circular dispatch: when a subscription calls play()/pause(), the resulting event arrives with a state already reflected in the store.
     if (isPlaying === appCore.getState().isPlaying) return;
     appCore.dispatch(coreActions.setIsPlaying(isPlaying));
   };
 
-  plume.audioElement.addEventListener("timeupdate", handleTimeUpdate);
-  plume.audioElement.addEventListener("loadedmetadata", handleLoadedMetadata);
-  plume.audioElement.addEventListener("durationchange", handleDurationChange);
-  plume.audioElement.addEventListener("loadstart", handleLoadStart);
-  plume.audioElement.addEventListener("volumechange", handleVolumeChange);
-  plume.audioElement.addEventListener("play", handlePlayPause);
-  plume.audioElement.addEventListener("pause", handlePlayPause);
+  musicPlayer.on("timeupdate", handleTimeUpdate);
+  musicPlayer.on("loadedmetadata", handleLoadedMetadata);
+  musicPlayer.on("durationchange", handleDurationChange);
+  musicPlayer.on("loadstart", handleLoadStart);
+  musicPlayer.on("volumechange", handleVolumeChange);
+  musicPlayer.on("play", handlePlayPause);
+  musicPlayer.on("pause", handlePlayPause);
 
   logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
 
   return () => {
-    plume.audioElement.removeEventListener("timeupdate", handleTimeUpdate);
-    plume.audioElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
-    plume.audioElement.removeEventListener("durationchange", handleDurationChange);
-    plume.audioElement.removeEventListener("loadstart", handleLoadStart);
-    plume.audioElement.removeEventListener("volumechange", handleVolumeChange);
-    plume.audioElement.removeEventListener("play", handlePlayPause);
-    plume.audioElement.removeEventListener("pause", handlePlayPause);
+    musicPlayer.off("timeupdate", handleTimeUpdate);
+    musicPlayer.off("loadedmetadata", handleLoadedMetadata);
+    musicPlayer.off("durationchange", handleDurationChange);
+    musicPlayer.off("loadstart", handleLoadStart);
+    musicPlayer.off("volumechange", handleVolumeChange);
+    musicPlayer.off("play", handlePlayPause);
+    musicPlayer.off("pause", handlePlayPause);
   };
 };

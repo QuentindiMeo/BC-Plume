@@ -1,11 +1,11 @@
 import { TIME_DISPLAY_METHOD } from "../../../domain/plume";
 import { PLUME_CONSTANTS } from "../../../domain/plume";
+import { musicPlayer } from "../../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../../stores/GuiImpl";
 import { getString } from "../i18n";
-import { seekAndPreservePause } from "../seeking";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -20,11 +20,8 @@ const handleDurationClick = (): void => {
 
 export const dispatchAudioProgressToStore = (): void => {
   const appCore = getAppCoreInstance();
-  const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
-
-  appCore.dispatch(coreActions.setCurrentTime(plume.audioElement.currentTime));
-  appCore.dispatch(coreActions.setDuration(plume.audioElement.duration));
+  appCore.dispatch(coreActions.setCurrentTime(musicPlayer.getCurrentTime()));
+  appCore.dispatch(coreActions.setDuration(musicPlayer.getDuration()));
 };
 
 export const createProgressBar = (): HTMLDivElement => {
@@ -57,13 +54,13 @@ export const createProgressBar = (): HTMLDivElement => {
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
     const targetValue = Number.parseFloat(this.value);
     const progress = targetValue / PROGRESS_SLIDER_GRANULARITY;
-    const targetTime = progress * (plume.audioElement.duration || 0);
+    const targetTime = progress * (musicPlayer.getDuration() || 0);
 
     logger(CPL.DEBUG, getString("DEBUG__PROGRESS_SLIDER__INPUT", [targetTime.toFixed(2)]));
 
     const appCore = getAppCoreInstance();
 
-    seekAndPreservePause(plume.audioElement, progress * (plume.audioElement.duration || 0));
+    musicPlayer.seekAndPreservePause(targetTime);
     appCore.dispatch(coreActions.setCurrentTime(targetTime));
   });
 

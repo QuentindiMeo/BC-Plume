@@ -1,4 +1,5 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
+import { musicPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
@@ -49,7 +50,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
-      plume.audioElement.volume = volume;
+      musicPlayer.setVolume(volume);
 
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
 
@@ -82,21 +83,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
-      // Update audio element volume
-      plume.audioElement.volume = appCore.getState().volume;
+      musicPlayer.setVolume(appCore.getState().volume);
     }),
     // Subscribe to playing state changes
     appCore.subscribe("isPlaying", (isPlaying) => {
-      const plumeUi = getGuiInstance();
-      const plume = plumeUi.getState();
-
-      // Update audio element playback state (store as single source of truth).
-      // Audio events guard against re-entrant dispatch via idempotent comparison:
-      // if the audio element's state already matches the store, the resulting play/pause event will not trigger a redundant dispatch.
-      if (isPlaying && plume.audioElement.paused) {
-        plume.audioElement.play();
-      } else if (!isPlaying && !plume.audioElement.paused) {
-        plume.audioElement.pause();
+      if (isPlaying && musicPlayer.isPaused()) {
+        musicPlayer.play();
+      } else if (!isPlaying && !musicPlayer.isPaused()) {
+        musicPlayer.pause();
       }
 
       // Update play/pause button icons

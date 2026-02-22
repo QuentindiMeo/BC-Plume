@@ -1,14 +1,12 @@
-import { TIME_DISPLAY_METHOD } from "../../domain/plume";
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { bandcampPlayer } from "../../infra/adapters";
+import { PLUME_CONSTANTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
+import { bandcampPlayer, musicPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
 import { getString } from "./i18n";
-import { seekAndPreservePause } from "./seeking";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 import {
   handlePlayPause,
@@ -208,9 +206,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
   const handleProgressInput = function (this: HTMLInputElement) {
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-    const targetTime = progress * (plume.audioElement.duration || 0);
+    const targetTime = progress * (musicPlayer.getDuration() || 0);
 
-    seekAndPreservePause(plume.audioElement, targetTime);
+    musicPlayer.seekAndPreservePause(targetTime);
     appCore.dispatch(coreActions.setCurrentTime(targetTime));
   };
 
