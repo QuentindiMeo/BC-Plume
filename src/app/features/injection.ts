@@ -1,6 +1,6 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { IAppCore } from "../../infra/AppCore";
 import { bandcampPlayer } from "../../infra/adapters";
+import { IAppCore } from "../../infra/AppCore";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { IGui } from "../../infra/Gui";
 import { CPL, logger } from "../../shared/logger";
@@ -112,14 +112,14 @@ const mountPlumeView = (view: PlumeView, container: Element): void => {
   container.appendChild(view.plumeContainer);
 };
 
-export const injectEnhancements = async (): Promise<void> => {
+export const injectEnhancements = async (): Promise<boolean> => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
 
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
     logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
-    return;
+    return false;
   }
 
   const isAlbumPage = appCore.getState().pageType === "album";
@@ -133,4 +133,5 @@ export const injectEnhancements = async (): Promise<void> => {
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
   if (isAlbumPage) addRuntime();
+  return true;
 };

@@ -1,5 +1,4 @@
-import { TIME_DISPLAY_METHOD } from "../../../domain/plume";
-import { PLUME_CONSTANTS } from "../../../domain/plume";
+import { PLUME_CONSTANTS, TIME_DISPLAY_METHOD } from "../../../domain/plume";
 import { musicPlayer } from "../../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";
@@ -26,7 +25,6 @@ export const dispatchAudioProgressToStore = (): void => {
 
 export const createProgressBar = (): HTMLDivElement => {
   const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
 
   const container = document.createElement("div");
   container.id = PLUME_ELEM_SELECTORS.progressContainer.split("#")[1];

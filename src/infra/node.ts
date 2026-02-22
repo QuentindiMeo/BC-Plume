@@ -6,9 +6,15 @@ export enum PROCESS_ENV {
 }
 type ProcessEnvType = `${PROCESS_ENV}`;
 
-export const meta = ((mode: ProcessEnvType): { env: ProcessEnvType } => {
+const isNodeEnvValid = (val: string): val is ProcessEnvType => {
+  return (Object.values(PROCESS_ENV) as string[]).includes(val);
+};
+
+const getMeta = (mode: ProcessEnvType): { env: ProcessEnvType } => {
   return {
     env: mode,
   };
-  // Use DEVELOPMENT as runtime fallback for TypeScript type-checking and for any environment that runs TS source directly.
-})(process.env.NODE_ENV || PROCESS_ENV.DEVELOPMENT);
+};
+
+// Use DEVELOPMENT as runtime fallback for TypeScript type-checking and for any environment that runs TS source directly.
+export const meta = getMeta(isNodeEnvValid(process.env.NODE_ENV) ? process.env.NODE_ENV : PROCESS_ENV.DEVELOPMENT);

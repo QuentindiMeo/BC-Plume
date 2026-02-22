@@ -22,9 +22,6 @@ export const handlePlayPause = (): void => {
 };
 
 export const handleTrackBackward = (): void => {
-  const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
-
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
 
   // If past TIME_BEFORE_RESTART, restart current track
@@ -60,8 +57,6 @@ export const handleTrackForward = (): void => {
 
 export const handleTimeBackward = (): void => {
   const appCore = getAppCoreInstance();
-  const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
@@ -74,8 +69,6 @@ export const handleTimeBackward = (): void => {
 
 export const handleTimeForward = (): void => {
   const appCore = getAppCoreInstance();
-  const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
@@ -88,7 +81,6 @@ export const handleTimeForward = (): void => {
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
   const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
   const container = document.createElement("div");
   container.id = PLUME_ELEM_SELECTORS.playbackControls.split("#")[1];
 

@@ -1,4 +1,4 @@
-import { TimeDisplayMethodType } from "./bandcamp";
+import { TimeDisplayMethodType } from "./plume";
 
 export enum PLUME_CACHE_KEYS {
   DURATION_DISPLAY_METHOD = "plume_duration_display_method",

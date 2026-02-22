@@ -59,7 +59,11 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   }
 
   const infoSectionId = "name-section";
-  const infoSection = bandcampPlayer.getInfoSection() as HTMLDivElement | null;
+  const infoSection = bandcampPlayer.getInfoSection();
+  if (!infoSection) {
+    logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
+    return document.createElement("div");
+  }
   const titleHeadingClone = infoSection.querySelector("h2")!.cloneNode(true);
   const artistHeadingClone = infoSection.querySelector("h3")!.cloneNode(true);
 

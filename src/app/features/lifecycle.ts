@@ -71,14 +71,6 @@ export const launchPlume = (): void => {
       return;
     }
 
-    checkBandcampElements();
-
-    // Load persisted state into store
-    await appCore.loadPersistedState();
-
-    const isAlbumPage = globalThis.location.pathname.includes("/album/");
-    appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
-
     const audioElement = await findAudioElement();
     if (!audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
@@ -86,6 +78,13 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
+    checkBandcampElements();
+
+    // Load persisted state into store
+    await appCore.loadPersistedState();
+
+    const isAlbumPage = globalThis.location.pathname.includes("/album/");
+    appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
 
     const plumeIsAlreadyInjected = isPlumeInjected();
@@ -99,7 +98,13 @@ export const launchPlume = (): void => {
     const durationDisplayMethod = appCore.getState().durationDisplayMethod;
     logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
-    await injectEnhancements();
+    const isInjected = await injectEnhancements();
+    if (!isInjected) {
+      alert(getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
+      isInitializing = false;
+      return;
+    }
+
     setupListeners(handles);
     initPlayback();
 

@@ -3,7 +3,7 @@ const esbuild = require("esbuild");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const isDev  = process.argv.includes("--dev");
+const isDev = process.argv.includes("--dev");
 const isTest = process.argv.includes("--test");
 const isWatch = process.argv.includes("--watch");
 
@@ -34,7 +34,7 @@ const buildOptions = {
   logLevel: "info",
   // esbuild replaces every occurrence of the token `process.env`
   define: {
-    "process.env": JSON.stringify(mode),
+    "process.env.NODE_ENV": JSON.stringify(mode),
   },
 };
 
