@@ -1,10 +1,10 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { bandcampPlayer } from "../../infra/adapters";
 import { IAppCore } from "../../infra/AppCore";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { IGui } from "../../infra/Gui";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
+import { getBcPlayerInstance } from "../stores/adapters";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { toggleFullscreenMode } from "./fullscreen";
@@ -31,7 +31,8 @@ interface PlumeView {
 }
 
 const addRuntime = () => {
-  const trackView = bandcampPlayer.getTrackView();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const trackView = bcPlayerInstance.getTrackView();
   if (!trackView) return;
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };

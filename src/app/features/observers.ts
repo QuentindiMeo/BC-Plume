@@ -1,6 +1,6 @@
-import { bandcampPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
+import { getBcPlayerInstance } from "../stores/adapters";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { setupAudioEventListeners } from "./audio-events";
@@ -26,11 +26,12 @@ import {
 export const isPlumeInjected = (): boolean => !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
 
 const isLastTrackOfAlbumPlaying = () => {
-  const trackRowTitles = bandcampPlayer.getTrackRowTitles();
+  const bcPlayer = getBcPlayerInstance();
+  const trackRowTitles = bcPlayer.getTrackRowTitles();
   if (trackRowTitles.length === 0) return false;
 
   const lastTrackTitle = trackRowTitles.at(-1);
-  const currentTrackTitle = bandcampPlayer.getTrackTitle("album");
+  const currentTrackTitle = bcPlayer.getTrackTitle("album");
   if (!currentTrackTitle) return false;
 
   return lastTrackTitle === currentTrackTitle;
@@ -155,7 +156,8 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
         // Check if a new audio element was added
-        const newAudio = bandcampPlayer.getAudioElement();
+        const bcPlayerInstance = getBcPlayerInstance();
+        const newAudio = bcPlayerInstance.getAudioElement();
         if (newAudio && newAudio !== plume.audioElement) {
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 

@@ -13,3 +13,9 @@ export enum TIME_DISPLAY_METHOD {
   REMAINING = "remaining",
 }
 export type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`;
+
+export interface TimeState {
+  currentTime: number;
+  duration: number;
+  durationDisplayMethod: TimeDisplayMethodType;
+}

@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { musicPlayer } from "../../../infra/adapters";
+import { getMusicPlayerInstance } from "../../stores/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { PLUME_SVG } from "../../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
@@ -54,7 +54,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
   // Apply saved volume to audio element
-  musicPlayer.setVolume(currentVolume);
+  getMusicPlayerInstance().setVolume(currentVolume);
 
   const valueDisplay = document.createElement("div");
   valueDisplay.id = PLUME_ELEM_SELECTORS.volumeValue.split("#")[1];

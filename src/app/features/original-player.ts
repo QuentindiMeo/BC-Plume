@@ -1,12 +1,13 @@
-import { bandcampPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
+import { getBcPlayerInstance } from "../stores/adapters";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
 
 export const hideOriginalPlayerElements = (): void => {
   const plumeUi = getGuiInstance();
-  const bcAudioTable = bandcampPlayer.getInlinePlayerTable();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const bcAudioTable = bcPlayerInstance.getInlinePlayerTable();
   if (!bcAudioTable) {
     logger(CPL.LOG, getString("LOG__ORIGINAL_PLAYER__HIDDEN"));
     return;
@@ -31,7 +32,8 @@ export const restoreOriginalPlayerElements = (): void => {
 };
 
 export const findOriginalPlayerContainer = (): HTMLDivElement | null => {
-  const playerParent = bandcampPlayer.getPlayerParent();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const playerParent = bcPlayerInstance.getPlayerParent();
   if (playerParent) return playerParent as HTMLDivElement;
 
   const plume = getGuiInstance().getState();

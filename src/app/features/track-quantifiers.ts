@@ -1,5 +1,5 @@
-import { bandcampPlayer } from "../../infra/adapters";
 import { CPL, logger } from "../../shared/logger";
+import { getBcPlayerInstance } from "../stores/adapters";
 import { getString } from "./i18n";
 
 export interface TrackQuantifiers {
@@ -8,7 +8,8 @@ export interface TrackQuantifiers {
 }
 
 export const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
-  const trackRowTitles = bandcampPlayer.getTrackRowTitles();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const trackRowTitles = bcPlayerInstance.getTrackRowTitles();
   if (trackRowTitles.length === 0) return { current: 0, total: 0 };
 
   const currentTrackNumber = trackRowTitles.indexOf(trackName) + 1;

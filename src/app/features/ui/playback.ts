@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { bandcampPlayer, musicPlayer } from "../../../infra/adapters";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "../../stores/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
@@ -25,14 +25,14 @@ export const handleTrackBackward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
 
   // If past TIME_BEFORE_RESTART, restart current track
-  if (musicPlayer.getCurrentTime() > TIME_BEFORE_RESTART) {
-    musicPlayer.seekTo(0);
+  if (getMusicPlayerInstance().getCurrentTime() > TIME_BEFORE_RESTART) {
+    getMusicPlayerInstance().seekTo(0);
     logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
     return;
   }
 
   // Otherwise, click BC's previous button
-  const bcPrevBtn = bandcampPlayer.getPreviousTrackButton();
+  const bcPrevBtn = getBcPlayerInstance().getPreviousTrackButton();
   if (!bcPrevBtn) {
     logger(CPL.WARN, getString("WARN__PREV_TRACK__NOT_FOUND"));
     return;
@@ -45,7 +45,7 @@ export const handleTrackBackward = (): void => {
 export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
-  const bcNextBtn = bandcampPlayer.getNextTrackButton();
+  const bcNextBtn = getBcPlayerInstance().getNextTrackButton();
   if (!bcNextBtn) {
     logger(CPL.WARN, getString("WARN__NEXT_TRACK__NOT_FOUND"));
     return;
@@ -60,8 +60,8 @@ export const handleTimeBackward = (): void => {
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
-  const newTime = Math.max(0, musicPlayer.getCurrentTime() - TIME_STEP_DURATION);
-  musicPlayer.seekAndPreservePause(newTime);
+  const newTime = Math.max(0, getMusicPlayerInstance().getCurrentTime() - TIME_STEP_DURATION);
+  getMusicPlayerInstance().seekAndPreservePause(newTime);
   appCore.dispatch(coreActions.setCurrentTime(newTime));
 
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__DISPATCHED", [Math.round(newTime)]));
@@ -72,8 +72,11 @@ export const handleTimeForward = (): void => {
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
-  const newTime = Math.min(musicPlayer.getDuration() || 0, musicPlayer.getCurrentTime() + TIME_STEP_DURATION);
-  musicPlayer.seekAndPreservePause(newTime);
+  const newTime = Math.min(
+    getMusicPlayerInstance().getDuration() || 0,
+    getMusicPlayerInstance().getCurrentTime() + TIME_STEP_DURATION
+  );
+  getMusicPlayerInstance().seekAndPreservePause(newTime);
   appCore.dispatch(coreActions.setCurrentTime(newTime));
 
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__DISPATCHED", [Math.round(newTime)]));
@@ -103,7 +106,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   const playPauseBtn = document.createElement("button");
   playPauseBtn.id = PLUME_ELEM_SELECTORS.playPauseBtn.split("#")[1];
   playPauseBtn.type = "button";
-  playPauseBtn.innerHTML = musicPlayer.isPaused() ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
+  playPauseBtn.innerHTML = getMusicPlayerInstance().isPaused() ? PLUME_SVG.playPlay : PLUME_SVG.playPause;
   playPauseBtn.title = getString("LABEL__PLAY_PAUSE");
   playPauseBtn.ariaLabel = getString("LABEL__PLAY_PAUSE");
   playPauseBtn.addEventListener("click", handlePlayPause);

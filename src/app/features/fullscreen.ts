@@ -1,9 +1,9 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { PLUME_CONSTANTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
-import { bandcampPlayer, musicPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
@@ -215,10 +215,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   );
 
   const handleProgressInput = function (this: HTMLInputElement) {
+    const bcPlayerInstance = getMusicPlayerInstance();
     const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-    const targetTime = progress * (musicPlayer.getDuration() || 0);
+    const targetTime = progress * (bcPlayerInstance.getDuration() || 0);
 
-    musicPlayer.seekAndPreservePause(targetTime);
+    bcPlayerInstance.seekAndPreservePause(targetTime);
     appCore.dispatch(coreActions.setCurrentTime(targetTime));
   };
 
@@ -278,7 +279,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
 // Pure DOM construction function - builds fullscreen overlay without side effects
 const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
-  const artworkUrl = bandcampPlayer.getArtworkUrl();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const artworkUrl = bcPlayerInstance.getArtworkUrl();
   if (!artworkUrl) {
     logger(CPL.WARN, getString("WARN__COVER_ART__NOT_FOUND"));
     return null;
@@ -305,7 +307,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   coverArtImg.alt = getString("ARIA__COVER_ART");
   presentationContainer.appendChild(coverArtImg);
 
-  const newNameSection = bandcampPlayer.getInfoSection() as HTMLDivElement | null;
+  const newNameSection = bcPlayerInstance.getInfoSection() as HTMLDivElement | null;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return null;

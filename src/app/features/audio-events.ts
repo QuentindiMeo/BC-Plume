@@ -1,6 +1,6 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
-import { musicPlayer } from "../../infra/adapters";
 import { CPL, logger } from "../../shared/logger";
+import { getMusicPlayerInstance } from "../stores/adapters";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
@@ -16,6 +16,7 @@ export interface AudioEventCallbacks {
 }
 
 export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): CleanupCallback => {
+  const musicPlayer = getMusicPlayerInstance();
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();

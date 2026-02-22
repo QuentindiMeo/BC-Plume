@@ -1,5 +1,5 @@
-import { bandcampPlayer } from "../../infra/adapters";
 import { CPL, logger } from "../../shared/logger";
+import { getBcPlayerInstance } from "../stores/adapters";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { checkBandcampElements } from "./bc-diagnostic";
@@ -17,7 +17,8 @@ import {
 
 const initPlayback = () => {
   // BC's native play button is clicked to trigger its own internal playback bootstrap
-  const playButton = bandcampPlayer.getPlayPauseButton();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const playButton = bcPlayerInstance.getPlayPauseButton();
   if (playButton) {
     playButton.click();
   } else {
@@ -27,7 +28,8 @@ const initPlayback = () => {
 
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   const appCore = getAppCoreInstance();
-  const audio = bandcampPlayer.getAudioElement();
+  const bcPlayerInstance = getBcPlayerInstance();
+  const audio = bcPlayerInstance.getAudioElement();
   if (!audio) return null;
   logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 

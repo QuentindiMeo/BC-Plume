@@ -5,7 +5,7 @@ import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from 
 import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, IAppCore, ICoreActions } from "../../infra/AppCore";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
-import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../features/presenters";
+import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
 import { browserActions, getBrowserInstance } from "./BrowserImpl";
 import { handleUnknownAction } from "./shared";
 

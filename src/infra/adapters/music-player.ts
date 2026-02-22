@@ -1,12 +1,14 @@
-import { getGuiInstance } from "../../app/stores/GuiImpl";
+import type { AudioProviderPort } from "../../domain/ports/audio-provider";
 import type { MusicPlayerPort } from "../../domain/ports/music-player";
 
 // WeakMap key is the underlying HTMLAudioElement so entries are GC'd when the element is replaced.
 const pendingSeekPause = new WeakMap<HTMLAudioElement, AbortController>();
 
 export class MusicPlayerAdapter implements MusicPlayerPort {
+  constructor(private readonly audioProvider: AudioProviderPort) {}
+
   private get audio(): HTMLAudioElement {
-    return getGuiInstance().getState().audioElement;
+    return this.audioProvider.getAudioElement();
   }
 
   isPaused(): boolean {

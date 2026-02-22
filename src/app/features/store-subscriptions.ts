@@ -1,12 +1,12 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
-import { musicPlayer } from "../../infra/adapters";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
+import { presentFormattedTime } from "../../shared/presenters";
 import { PLUME_SVG } from "../../svg/icons";
+import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
-import { presentFormattedTime } from "./presenters";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";
 
@@ -50,7 +50,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
-      musicPlayer.setVolume(volume);
+      const bcPlayerInstance = getMusicPlayerInstance();
+      bcPlayerInstance.setVolume(volume);
 
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
 
@@ -83,12 +84,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
-      musicPlayer.setVolume(appCore.getState().volume);
+      const bcPlayerInstance = getMusicPlayerInstance();
+      bcPlayerInstance.setVolume(appCore.getState().volume);
     }),
     // Subscribe to playing state changes
     appCore.subscribe("isPlaying", (isPlaying) => {
-      if (isPlaying && musicPlayer.isPaused()) musicPlayer.play();
-      else if (!isPlaying && !musicPlayer.isPaused()) musicPlayer.pause();
+      const bcPlayerInstance = getMusicPlayerInstance();
+      if (isPlaying && bcPlayerInstance.isPaused()) bcPlayerInstance.play();
+      else if (!isPlaying && !bcPlayerInstance.isPaused()) bcPlayerInstance.pause();
 
       const plume = getGuiInstance().getState();
       plume.playPauseBtns.forEach((btn) => {
