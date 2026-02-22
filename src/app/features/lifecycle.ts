@@ -1,5 +1,4 @@
 import { bandcampPlayer } from "../../infra/adapters";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance, guiActions } from "../stores/GuiImpl";
@@ -11,6 +10,7 @@ import {
   CleanupHandles,
   createDomObserver,
   createSpaNavigationObserver,
+  isPlumeInjected,
   registerUnloadCleanup,
   setupListeners,
 } from "./observers";
@@ -88,7 +88,7 @@ export const launchPlume = (): void => {
     }
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
 
-    const plumeIsAlreadyInjected = !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
+    const plumeIsAlreadyInjected = isPlumeInjected();
     if (plumeIsAlreadyInjected) {
       isInitializing = false;
       isInitializedRef.value = true;

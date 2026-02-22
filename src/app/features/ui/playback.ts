@@ -4,7 +4,7 @@ import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance } from "../../stores/GuiImpl";
+import { getGuiInstance, guiActions } from "../../stores/GuiImpl";
 import { getString } from "../i18n";
 
 const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
@@ -87,7 +87,8 @@ export const handleTimeForward = (): void => {
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
-  const plume = getGuiInstance().getState();
+  const plumeUi = getGuiInstance();
+  const plume = plumeUi.getState();
   const container = document.createElement("div");
   container.id = PLUME_ELEM_SELECTORS.playbackControls.split("#")[1];
 
@@ -136,6 +137,10 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   container.appendChild(playPauseBtn);
   container.appendChild(timeForwardBtn);
   container.appendChild(trackForwardBtn);
+
+  // Seed the store arrays with the main-panel buttons; fullscreen.ts appends its clones
+  plumeUi.dispatch(guiActions.setPlayPauseBtns([playPauseBtn]));
+  plumeUi.dispatch(guiActions.setTrackFwdBtns([trackForwardBtn]));
 
   return container;
 };

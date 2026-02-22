@@ -23,6 +23,7 @@ import {
 interface PlumeView {
   plumeContainer: HTMLDivElement;
   headerContainer: HTMLDivElement;
+  headerLogo: HTMLAnchorElement;
 
   // Derived values computed during construction, forwarded to hydration
   initialTrackTitle: string;
@@ -94,7 +95,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
   plumeContainer.appendChild(fullscreenBtnSection);
 
-  return { plumeContainer, headerContainer, initialTrackTitle, initialTrackNumberText };
+  return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText };
 };
 
 const hydratePlumeView = (view: PlumeView, appCore: IAppCore, plumeUi: IGui): void => {
@@ -102,6 +103,8 @@ const hydratePlumeView = (view: PlumeView, appCore: IAppCore, plumeUi: IGui): vo
   appCore.dispatch(coreActions.setTrackNumber(view.initialTrackNumberText));
 
   plumeUi.dispatch(guiActions.setTitleDisplay(view.headerContainer));
+  plumeUi.dispatch(guiActions.setPlumeContainer(view.plumeContainer));
+  plumeUi.dispatch(guiActions.setHeaderLogo(view.headerLogo));
 };
 
 // Appends the Plume root element to the Bandcamp player container.

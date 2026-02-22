@@ -21,11 +21,15 @@ import {
   setupPlayerStickiness,
 } from "./ui";
 
+// Bootstrapping check — runs before the GUI store is populated, so it queries the DOM directly.
+// All other code should read from the store instead of using querySelector on Plume selectors.
+export const isPlumeInjected = (): boolean => !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
+
 const isLastTrackOfAlbumPlaying = () => {
   const trackRowTitles = bandcampPlayer.getTrackRowTitles();
   if (trackRowTitles.length === 0) return false;
 
-  const lastTrackTitle = trackRowTitles[trackRowTitles.length - 1];
+  const lastTrackTitle = trackRowTitles.at(-1);
   const currentTrackTitle = bandcampPlayer.getTrackTitle("album");
   if (!currentTrackTitle) return false;
 
@@ -34,7 +38,8 @@ const isLastTrackOfAlbumPlaying = () => {
 
 const updateTrackForwardBtnState = () => {
   const appCore = getAppCoreInstance();
-  const trackFwdBtns: NodeListOf<HTMLButtonElement> = document.querySelectorAll(PLUME_ELEM_SELECTORS.trackFwdBtn);
+  const plume = getGuiInstance().getState();
+  const trackFwdBtns = plume.trackFwdBtns;
   if (trackFwdBtns.length === 0) return;
 
   const isAlbumPage = appCore.getState().pageType === "album";
@@ -91,7 +96,7 @@ const updateTitleDisplay = () => {
   // Cache offsetHeight to avoid multiple layout recalculations
   const titleHeight = titleText.offsetHeight;
   if (titleHeight !== LATIN_CHAR_HEIGHT) {
-    const logo = document.querySelector(PLUME_ELEM_SELECTORS.headerLogo) as HTMLAnchorElement;
+    const logo = plume.headerLogo;
     if (!logo) return;
 
     const deltaPaddingPx = titleHeight - LATIN_CHAR_HEIGHT; // calculate difference in px
@@ -160,9 +165,7 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
           // Re-setup audio event listeners for the new audio element
           rewireAudioEventListeners(handles);
 
-          if (!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer)) {
-            setTimeout(reinit, 500);
-          }
+          if (!isPlumeInjected()) setTimeout(reinit, 500);
         }
 
         // Check if the title section has changed (new track)

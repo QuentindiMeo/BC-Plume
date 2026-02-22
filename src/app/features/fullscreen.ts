@@ -5,7 +5,7 @@ import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
+import { getGuiInstance, guiActions } from "../stores/GuiImpl";
 import { getString } from "./i18n";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 import {
@@ -37,7 +37,8 @@ interface FullscreenElements {
 let fullscreenCleanupCallback: CleanupCallback | null = null;
 
 const exitFullscreenMode = (): void => {
-  const existingOverlay = document.querySelector(PLUME_ELEM_SELECTORS.fullscreenOverlay) as HTMLDivElement;
+  const plumeUi = getGuiInstance();
+  const existingOverlay = plumeUi.getState().fullscreenOverlay;
   if (!existingOverlay) return;
 
   const appCore = getAppCoreInstance();
@@ -49,6 +50,15 @@ const exitFullscreenMode = (): void => {
     fullscreenCleanupCallback = null;
   }
 
+  // Clear the fullscreen-specific buttons from the store arrays before removing the DOM
+  const plume = plumeUi.getState();
+  plumeUi.dispatch(
+    guiActions.setPlayPauseBtns(plume.playPauseBtns.filter((btn) => existingOverlay.contains(btn) === false))
+  );
+  plumeUi.dispatch(
+    guiActions.setTrackFwdBtns(plume.trackFwdBtns.filter((btn) => existingOverlay.contains(btn) === false))
+  );
+  plumeUi.dispatch(guiActions.setFullscreenOverlay(null));
   existingOverlay.remove();
   document.body.style.overflow = "auto";
 };
@@ -312,7 +322,8 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   contentContainer.appendChild(presentationContainer);
 
   // Clone the plume module (right side)
-  const plumeContainer = document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer) as HTMLDivElement;
+  const plume = getGuiInstance().getState();
+  const plumeContainer = plume.plumeContainer;
   if (!plumeContainer) {
     logger(CPL.WARN, getString("WARN__PLUME_CONTAINER__NOT_FOUND"));
     return null;
@@ -399,11 +410,12 @@ const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {
   }, 0);
 };
 
-// State-driven fullscreen toggle - follows Action → Reducer → State → Subscription → DOM pattern
+// State-driven fullscreen toggle
 export const toggleFullscreenMode = (): void => {
   const appCore = getAppCoreInstance();
-  const existingOverlay = document.querySelector(PLUME_ELEM_SELECTORS.fullscreenOverlay) as HTMLDivElement;
-  const isCurrentlyFullscreen = !!existingOverlay;
+  const plumeUi = getGuiInstance();
+  const plume = plumeUi.getState();
+  const isCurrentlyFullscreen = !!plume.fullscreenOverlay;
 
   if (isCurrentlyFullscreen) {
     exitFullscreenMode();
@@ -424,11 +436,17 @@ export const toggleFullscreenMode = (): void => {
   const plumeClone = overlay.querySelector(`#${PLUME_ELEM_SELECTORS.fullscreenClone.split("#")[1]}`) as HTMLDivElement;
   fullscreenCleanupCallback = setupFullscreenUi(plumeClone);
 
-  // Mount overlay to DOM
+  // Register the fullscreen buttons in the store alongside the main-panel buttons
+  const fsElements = getFullscreenElements(plumeClone);
+  plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
+  plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));
+
+  // Mount overlay to DOM and record it in the store
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
   setupFullscreenFocusTrap(overlay);
 
+  plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));
 
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));

@@ -87,15 +87,11 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     }),
     // Subscribe to playing state changes
     appCore.subscribe("isPlaying", (isPlaying) => {
-      if (isPlaying && musicPlayer.isPaused()) {
-        musicPlayer.play();
-      } else if (!isPlaying && !musicPlayer.isPaused()) {
-        musicPlayer.pause();
-      }
+      if (isPlaying && musicPlayer.isPaused()) musicPlayer.play();
+      else if (!isPlaying && !musicPlayer.isPaused()) musicPlayer.pause();
 
-      // Update play/pause button icons
-      const playPauseBtns = document.querySelectorAll(PLUME_ELEM_SELECTORS.playPauseBtn);
-      playPauseBtns.forEach((btn) => {
+      const plume = getGuiInstance().getState();
+      plume.playPauseBtns.forEach((btn) => {
         btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
       });
     })
