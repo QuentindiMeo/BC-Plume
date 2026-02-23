@@ -305,7 +305,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
   headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingProject.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = '"' + headTitle.textContent?.trim() + '"';
+  if (!isAlbumPage) headTitle.textContent = `"${headTitle.textContent?.trim()}"`;
 
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);

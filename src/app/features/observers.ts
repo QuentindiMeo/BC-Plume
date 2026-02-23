@@ -10,7 +10,6 @@ import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
 import { setupHotkeys } from "./keyboard";
 import { setupStoreSubscriptions } from "./store-subscriptions";
-import { getCurrentTrackTitle } from "./track-title";
 import { CleanupCallback } from "./types";
 import {
   handleMuteToggle,
@@ -55,13 +54,12 @@ const updateTrackDisplay = () => {
   const plume = plumeUi.getState();
 
   const bcPlayer = getBcPlayerInstance();
-  const { trackNumberText, current, total } = updateTrackMetadata(appCore, bcPlayer);
+  const { trackTitle: newTrackTitle, trackNumberText, current, total } = updateTrackMetadata(appCore, bcPlayer);
 
   const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
   const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitlePretext) as HTMLSpanElement;
 
   const isAlbumPage = appCore.getState().pageType === "album";
-  const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
 
   if (titleText) {
     titleText.textContent = newTrackTitle;
@@ -102,9 +100,17 @@ export interface CleanupHandles {
   stickiness: CleanupCallback | null;
 }
 
-// Wires audio event listeners and updates the handles object in-place
-const rewireAudioEventListeners = (handles: CleanupHandles): void => {
+// Wires audio event listeners and updates handles in-place. This avoids leaking listeners of the old element.
+// Re-setup audio event listeners: cleanup old → update store → attach new
+const rewireAudioEventListeners = (handles: CleanupHandles, newAudio?: HTMLAudioElement): void => {
   handles.audioEvents?.();
+  handles.audioEvents = null;
+
+  if (newAudio) {
+    const plumeUi = getGuiInstance();
+    plumeUi.dispatch(guiActions.setAudioElement(newAudio));
+  }
+
   handles.audioEvents = setupAudioEventListeners({
     updateTrackDisplay,
     updateTrackForwardBtnState,
@@ -150,10 +156,9 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
           applyPersistedVolume(newAudio);
-          plumeUi.dispatch(guiActions.setAudioElement(newAudio));
 
-          // Re-setup audio event listeners for the new audio element
-          rewireAudioEventListeners(handles);
+          // Re-setup audio event listeners: cleanup old → update store → attach new
+          rewireAudioEventListeners(handles, newAudio);
 
           if (!isPlumeInjected()) setTimeout(reinit, 500);
         }
