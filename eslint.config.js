@@ -21,7 +21,7 @@ const compat = new FlatCompat({
 module.exports = defineConfig([{
   languageOptions: {
     parser: tsParser,
-    ecmaVersion: 2020,
+    ecmaVersion: 2022,
     sourceType: "module",
 
     parserOptions: {

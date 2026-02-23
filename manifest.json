@@ -1,19 +1,33 @@
 {
   "manifest_version": 3,
-  "name": "BC-Plume - Bandcamp Player Enhancer",
-  "version": "1.3.1",
-  "description": "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
+  "name": "__MSG_APP_NAME__",
+  "version": "1.3.2",
+  "description": "__MSG_APP_DESCRIPTION__",
   "default_locale": "en",
-  "permissions": ["storage"],
-  "host_permissions": ["*://*.bandcamp.com/*"],
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.bandcamp.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://*.bandcamp.com/album/*", "*://*.bandcamp.com/track/*"],
-      "js": ["dist/content.js"],
-      "css": ["styles.css"],
+      "matches": [
+        "*://*.bandcamp.com/album/*",
+        "*://*.bandcamp.com/track/*"
+      ],
+      "js": [
+        "dist/content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
       "run_at": "document_end"
     }
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
   "icons": {
     "16": "icons/icon16.svg",
     "48": "icons/icon48.svg",

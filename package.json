@@ -1,25 +1,26 @@
 {
   "author": "Quentin DI MEO",
-  "name": "bc-plume",
+  "name": "plume",
   "license": "MIT",
-  "version": "1.3.1",
-  "description": "Improves the Bandcamp player interface with a volume slider and enhanced playback bar",
+  "version": "1.3.2",
+  "description": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player.",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
-    "build:prod": "tsc --sourceMap false",
+    "build": "node scripts/build.js --dev",
+    "build:watch": "node scripts/build.js --dev --watch",
+    "build:prod": "node scripts/build.js",
+    "build:test": "node scripts/build.js --test",
     "clean": "rimraf dist build",
-    "dev": "pnpm run clean && pnpm run build:watch",
-    "package": "pnpm run build:prod && pnpm run package:chrome && pnpm run package:firefox",
-    "package:chrome": "node scripts/package-chrome.js && cp -r _locales build/chrome",
-    "package:firefox": "node scripts/package-firefox.js && cp -r _locales build/firefox",
-    "deploy": "pnpm run clean && pnpm run package",
-    "lint": "pnpm run prettier && pnpm run eslint",
+    "sync-version": "node scripts/sync-version.js",
+    "package": "tsc --noEmit && pnpm build:prod && node scripts/package-deployer.js",
+    "deploy": "pnpm clean && pnpm sync-version && pnpm package",
+
+    "lint": "pnpm prettier && pnpm eslint",
     "eslint": "eslint src/**/*.ts",
     "eslint:fix": "eslint src/**/*.ts --fix",
     "prettier": "prettier --check 'src/**/*.{ts,js,json,css,html}'",
     "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}'",
-    "format": "pnpm run prettier:fix && pnpm run eslint:fix"
+    "format": "pnpm prettier:fix && pnpm eslint:fix",
+    "prepare": "tsc --noEmit && husky"
   },
   "keywords": [
     "bandcamp",
@@ -27,7 +28,14 @@
     "chrome-extension",
     "firefox-addon",
     "typescript",
-    "audio-player"
+    "audio-player",
+    "volume-control",
+    "music-player",
+    "bandcamp-enhancer",
+    "seek-bar",
+    "fullscreen",
+    "web-extension",
+    "manifest-v3"
   ],
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -37,8 +45,11 @@
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
+    "esbuild": "^0.27.3",
     "eslint": "^9.33.0",
     "globals": "^16.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "typescript": "^5.9.2"
@@ -46,5 +57,10 @@
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=10.0.0"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,js,json,css,html}": [
+      "prettier --write"
+    ]
   }
 }

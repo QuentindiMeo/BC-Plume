@@ -1,10 +1,49 @@
 {
+  "APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
+  "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, avance/retroceso de 10s, pantalla completa y atajos de teclado." },
+
+  "ALERT__BC_HEALTH_CHECK__FAILED": {
+    "message": "¡La verificación de salud de Bandcamp ha fallado! Faltan $REQUIRED_COUNT$ elementos requeridos. Consulta la consola para más detalles.",
+    "placeholders": {
+      "required_count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "ERROR__NO_BROWSER_API": { "message": "No se detectó API del navegador" },
+  "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
+    "message": "La respuesta de verificación de salud de Bandcamp no contiene el campo requerido: $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "div.inline_player"
+      }
+    }
+  },
+  "ERROR__STATE__LOAD_FAILED": { "message": "Error al cargar el estado guardado:" },
+  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Error en el oyente global de estado:" },
+  "ERROR__STATE__LISTENER_FAILED": { "message": "Error en el oyente de estado:" },
+  "ERROR__STATE__PERSIST_FAILED": { "message": "Error al guardar el estado:" },
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "No se puede encontrar un contenedor adecuado" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento padre del reproductor no encontrado" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Contenedor de encabezado o número de pista no encontrado" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Contenedor de encabezado o título de pista no encontrado" },
+  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Elemento de texto previo del encabezado no encontrado" },
+  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Elemento de título de encabezado no encontrado" },
+  "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Elemento de control deslizante de progreso no encontrado" },
+  "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Elemento de visualización de duración no encontrado" },
+  "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elemento de visualización de tiempo transcurrido no encontrado" },
+  "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Botón de reproducir/pausar no encontrado" },
+  "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Botón de silencio no encontrado" },
+  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Elemento de control deslizante de volumen o visualización no encontrado" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No se detectó API del navegador, usando localStorage como alternativa" },
+  "WARN__STATE__UNKNOWN_ACTION": { "message": "Acción de almacén desconocida:" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Valor de volumen inválido, usando valor predeterminado" },
   "WARN__AUDIO__NOT_FOUND": { "message": "No se encontró elemento de audio" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando en 2s..." },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Contenedor del reproductor no encontrado, buscando una alternativa..." },
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "No se pudo calcular el tiempo total" },
   "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "No se pudo cargar el método de visualización de tiempo:" },
   "WARN__PREV_TRACK__NOT_FOUND": { "message": "Botón de pista anterior no encontrado" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Botón de pista siguiente no encontrado" },
@@ -12,36 +51,109 @@
   "WARN__VOLUME__NOT_LOADED": { "message": "No se pudo cargar el volumen:" },
   "WARN__VOLUME__NOT_SAVED": { "message": "No se pudo guardar el volumen:" },
   "WARN__COVER_ART__NOT_FOUND": { "message": "Portada no encontrada" },
-  "LOG__MOUNT__COMPLETE": { "message": "BC-Plume montado exitosamente" },
-  "LOG__INITIALIZATION__START": { "message": "Inicializando BC-Plume..." },
-  "LOG__INITIALIZATION__COMPLETE": { "message": "BC-Plume inicializado exitosamente" },
+  "WARN__DURATION_CELL__NOT_FOUND": { "message": "Celda de duración no encontrada para pista" },
+  "WARN__INFO_SECTION__NOT_FOUND": { "message": "Sección de información no encontrada para modo de pantalla completa" },
+  "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Contenedor de Plume no encontrado para modo de pantalla completa" },
+  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista de pistas no encontrada, omitiendo cálculo del tiempo total" },
+  "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": { "message": "Ajustar el volumen con un delta nulo puede indicar un error lógico en el código" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume montado exitosamente" },
+  "LOG__INITIALIZATION__START": { "message": "Inicializando Plume..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume inicializado exitosamente" },
   "LOG__NAVIGATION_DETECTED": { "message": "Navegación detectada, reiniciando..." },
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
   "INFO__BROWSER__DETECTED": { "message": "Navegador detectado:" },
-  "INFO__SHORTCUTS__REGISTERED": { "message": "Atajos de teclado registrados" },
+  "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
+    "message": "Elemento de Bandcamp no encontrado (opcional): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "span.fromAlbum"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Todos los elementos de Bandcamp encontrados" },
+  "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Suscripciones de almacén inicializadas" },
+  "INFO__HOTKEYS__REGISTERED": { "message": "Atajos de teclado registrados" },
   "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
-  "INFO__TIME_DISPLAY_METHOD__APPLIED": { "message": "Método de visualización de tiempo aplicado:" },
-  "INFO__VOLUME__APPLIED": { "message": "Volumen aplicado al nuevo audio:" },
+  "INFO__TIME_DISPLAY_METHOD__APPLIED": {
+    "message": "Método de visualización de tiempo aplicado: $METHOD$",
+    "placeholders": {
+      "method": {
+        "content": "$1",
+        "example": "seconds"
+      }
+    }
+  },
+  "INFO__VOLUME__APPLIED": {
+    "message": "Volumen aplicado al nuevo audio: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Oyentes de eventos de audio configurados" },
   "INFO__AUDIO__FOUND": { "message": "Elemento de audio encontrado" },
-  "INFO__VOLUME__FOUND": { "message": "Volumen restaurado:" },
+  "INFO__VOLUME__LOADED": { "message": "Volumen cargado desde almacenamiento:" },
+  "INFO__VOLUME__FOUND": {
+    "message": "Volumen restaurado: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
   "INFO__FULLSCREEN__ENTERED": { "message": "Pasar a pantalla completa" },
   "INFO__FULLSCREEN__EXITED": { "message": "Salir de pantalla completa" },
   "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Elementos de control detectados ===" },
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controles potenciales encontrados:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
+  "DEBUG__STATE__PERSISTED": { "message": "Estado guardado en almacenamiento:" },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Control deslizante de progreso movido: $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Botón de pista anterior presionado" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Evento de pista anterior enviado" },
   "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Botón de retroceso presionado" },
-  "DEBUG__REWIND_TIME__DISPATCHED1": { "message": "Tiempo retrocedido a:" },
-  "DEBUG__REWIND_TIME__DISPATCHED2": { "message": " s" },
+  "DEBUG__REWIND_TIME__DISPATCHED": {
+    "message": "Tiempo retrocedido a: $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Botón Play/Pausa presionado" },
   "DEBUG__FORWARD_TIME__CLICKED": { "message": "Botón de avance presionado" },
-  "DEBUG__FORWARD_TIME__DISPATCHED1": { "message": "Tiempo avanzado a:" },
-  "DEBUG__FORWARD_TIME__DISPATCHED2": { "message": " s" },
+  "DEBUG__FORWARD_TIME__DISPATCHED": {
+    "message": "Tiempo avanzado a: $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Botón de pista siguiente presionado" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Evento de pista siguiente enviado" },
   "DEBUG__TRACK__QUANTIFIERS": {
@@ -87,9 +199,7 @@
   "LABEL__PLAY_PAUSE": { "message": "Reproducir/Pausar" },
   "LABEL__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
   "LABEL__TRACK_FORWARD": { "message": "Ir a pista siguiente" },
-  "LABEL__VOLUME": { "message": "Volumen" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
-  "LABEL__BY": { "message": "de" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__RUNTIME__LABEL": {
     "message": "El tiempo total es de $MINUTOS$ minutos y $SEGUNDOS$ segundos" ,
@@ -104,6 +214,7 @@
       }
     }
   },
+  "ARIA__APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
   "ARIA__LOGO_LINK": { "message": "Apoya Plume en Ko-fi" },
   "ARIA__TRACK": {
     "message": "La pista $TITULO_PISTA$ se está reproduciendo",
@@ -133,6 +244,8 @@
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
   "ARIA__VOLUME_SLIDER": { "message": "Deslizador de volumen" },
+  "ARIA__MUTE": { "message": "Silenciar" },
+  "ARIA__UNMUTE": { "message": "Activar sonido" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" }
 }
