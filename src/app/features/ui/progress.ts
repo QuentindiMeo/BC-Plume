@@ -1,24 +1,25 @@
-import { PLUME_CONSTANTS, TIME_DISPLAY_METHOD } from "../../../domain/plume";
-import { musicPlayer } from "../../../infra/adapters";
+import { PLUME_CONSTANTS } from "../../../domain/plume";
+import { coreActions } from "../../../domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
+import { guiActions } from "../../../infra/Gui";
+import { getString } from "../../../shared/i18n";
 import { CPL, logger } from "../../../shared/logger";
-import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../../stores/GuiImpl";
-import { getString } from "../i18n";
+import { getMusicPlayerInstance } from "../../stores/adapters";
+import { getAppCoreInstance } from "../../stores/AppCoreImpl";
+import { getGuiInstance } from "../../stores/GuiImpl";
+import { seekToProgress, toggleDurationDisplay } from "../../use-cases";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 const handleDurationClick = (): void => {
   const appCore = getAppCoreInstance();
-  const currentMethod = appCore.getState().durationDisplayMethod;
-  const newMethod =
-    currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
-
-  appCore.dispatch(coreActions.setDurationDisplayMethod(newMethod));
+  toggleDurationDisplay(appCore);
 };
 
 export const dispatchAudioProgressToStore = (): void => {
   const appCore = getAppCoreInstance();
+  const musicPlayer = getMusicPlayerInstance();
+
   appCore.dispatch(coreActions.setCurrentTime(musicPlayer.getCurrentTime()));
   appCore.dispatch(coreActions.setDuration(musicPlayer.getDuration()));
 };
@@ -50,16 +51,12 @@ export const createProgressBar = (): HTMLDivElement => {
   duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
 
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
+    const musicPlayer = getMusicPlayerInstance();
     const targetValue = Number.parseFloat(this.value);
-    const progress = targetValue / PROGRESS_SLIDER_GRANULARITY;
-    const targetTime = progress * (musicPlayer.getDuration() || 0);
+    const readableValue = ((targetValue / PROGRESS_SLIDER_GRANULARITY) * (musicPlayer.getDuration() || 0)).toFixed(2);
 
-    logger(CPL.DEBUG, getString("DEBUG__PROGRESS_SLIDER__INPUT", [targetTime.toFixed(2)]));
-
-    const appCore = getAppCoreInstance();
-
-    musicPlayer.seekAndPreservePause(targetTime);
-    appCore.dispatch(coreActions.setCurrentTime(targetTime));
+    logger(CPL.DEBUG, getString("DEBUG__PROGRESS_SLIDER__INPUT", [readableValue]));
+    seekToProgress(targetValue, getAppCoreInstance(), musicPlayer);
   });
 
   duration.addEventListener("click", handleDurationClick);

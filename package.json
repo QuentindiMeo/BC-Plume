@@ -10,9 +10,8 @@
     "build:prod": "node scripts/build.js",
     "build:test": "node scripts/build.js --test",
     "clean": "rimraf dist build",
-    "dev": "pnpm clean && pnpm build:watch",
     "sync-version": "node scripts/sync-version.js",
-    "package": "pnpm build:prod && node scripts/package-deployer.js",
+    "package": "tsc --noEmit && pnpm build:prod && node scripts/package-deployer.js",
     "deploy": "pnpm clean && pnpm sync-version && pnpm package",
 
     "lint": "pnpm prettier && pnpm eslint",
@@ -21,7 +20,7 @@
     "prettier": "prettier --check 'src/**/*.{ts,js,json,css,html}'",
     "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}'",
     "format": "pnpm prettier:fix && pnpm eslint:fix",
-    "prepare": "husky"
+    "prepare": "tsc --noEmit && husky"
   },
   "keywords": [
     "bandcamp",

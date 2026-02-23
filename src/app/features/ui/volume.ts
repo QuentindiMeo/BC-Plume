@@ -1,10 +1,13 @@
 import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { musicPlayer } from "../../../infra/adapters";
+import { coreActions } from "../../../domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
+import { guiActions } from "../../../infra/Gui";
+import { getString } from "../../../shared/i18n";
 import { PLUME_SVG } from "../../../svg/icons";
-import { coreActions, getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../../stores/GuiImpl";
-import { getString } from "../i18n";
+import { getMusicPlayerInstance } from "../../stores/adapters";
+import { getAppCoreInstance } from "../../stores/AppCoreImpl";
+import { getGuiInstance } from "../../stores/GuiImpl";
+import { setVolume } from "../../use-cases/set-volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -54,6 +57,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   volumeSlider.ariaLabel = getString("ARIA__VOLUME_SLIDER");
 
   // Apply saved volume to audio element
+  const musicPlayer = getMusicPlayerInstance();
   musicPlayer.setVolume(currentVolume);
 
   const valueDisplay = document.createElement("div");
@@ -62,17 +66,8 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
 
   muteBtn.addEventListener("click", handleMuteToggle);
 
-  // Event listener for volume change via slider
   volumeSlider.addEventListener("input", function (this: HTMLInputElement) {
-    const volume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-
-    // Moving slider off zero counts as an intentional unmute
-    if (volume > 0 && appCore.getState().isMuted) {
-      appCore.dispatch(coreActions.setIsMuted(false));
-    }
-
-    // Dispatch to store only - subscription updates the audio element and value display
-    appCore.dispatch(coreActions.setVolume(volume));
+    setVolume(Number.parseInt(this.value), appCore);
   });
 
   container.appendChild(muteBtn);

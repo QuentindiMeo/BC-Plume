@@ -1,5 +1,4 @@
-import { TIME_DISPLAY_METHOD } from "../../domain/plume";
-import { AppCore } from "../../infra/AppCore";
+import { TIME_DISPLAY_METHOD, TimeState } from "../domain/plume";
 
 // Internal helper: Format time as MM:SS
 export const presentFormattedTime = (seconds: number): string => {
@@ -10,11 +9,11 @@ export const presentFormattedTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-export const presentFormattedElapsed = (state: AppCore): string => {
+export const presentFormattedElapsed = (state: TimeState): string => {
   return presentFormattedTime(state.currentTime);
 };
 
-export const presentFormattedDuration = (state: AppCore): string => {
+export const presentFormattedDuration = (state: TimeState): string => {
   if (state.durationDisplayMethod === TIME_DISPLAY_METHOD.REMAINING) {
     const remaining = Math.floor(state.duration - state.currentTime);
     return "-" + presentFormattedTime(remaining);
@@ -22,7 +21,7 @@ export const presentFormattedDuration = (state: AppCore): string => {
   return presentFormattedTime(state.duration);
 };
 
-export const presentProgressPercentage = (state: AppCore): number => {
+export const presentProgressPercentage = (state: TimeState): number => {
   if (state.duration === 0) return 0;
   return (state.currentTime / state.duration) * 100;
 };

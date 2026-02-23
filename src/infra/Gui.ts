@@ -75,7 +75,7 @@ export type GuiAction =
   | IAction<GUI_ACTIONS.SET_FULLSCREEN_OVERLAY, HTMLDivElement | null>
   | IAction<GUI_ACTIONS.SET_HIDDEN_BC_TABLE, HTMLTableElement | null>;
 
-export interface IGuiActions {
+interface IGuiActions {
   resetGuiInstance: (reason?: string | null) => GuiAction;
   setPlumeContainer: (element: HTMLDivElement | null) => GuiAction;
   setHeaderLogo: (element: HTMLAnchorElement | null) => GuiAction;
@@ -91,5 +91,63 @@ export interface IGuiActions {
   setFullscreenOverlay: (element: HTMLDivElement | null) => GuiAction;
   setHiddenBcTable: (element: HTMLTableElement | null) => GuiAction;
 }
+export const guiActions: IGuiActions = {
+  resetGuiInstance: (reason: string | null = null): GuiAction => ({
+    type: GUI_ACTIONS.RESET_GUI_INSTANCE,
+    payload: reason,
+  }),
+  setPlumeContainer: (element: HTMLDivElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_PLUME_CONTAINER,
+    payload: element,
+  }),
+  setHeaderLogo: (element: HTMLAnchorElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_HEADER_LOGO,
+    payload: element,
+  }),
+  setAudioElement: (element: HTMLAudioElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_AUDIO_ELEMENT,
+    payload: element,
+  }),
+  setTitleDisplay: (element: HTMLDivElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_TITLE_DISPLAY,
+    payload: element,
+  }),
+  setProgressSlider: (element: HTMLInputElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_PROGRESS_SLIDER,
+    payload: element,
+  }),
+  setElapsedDisplay: (element: HTMLSpanElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_ELAPSED_DISPLAY,
+    payload: element,
+  }),
+  setDurationDisplay: (element: HTMLSpanElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_DURATION_DISPLAY,
+    payload: element,
+  }),
+  setPlayPauseBtns: (buttons: HTMLButtonElement[]): GuiAction => ({
+    type: GUI_ACTIONS.SET_PLAY_PAUSE_BTNS,
+    payload: buttons,
+  }),
+  setTrackFwdBtns: (buttons: HTMLButtonElement[]): GuiAction => ({
+    type: GUI_ACTIONS.SET_TRACK_FWD_BTNS,
+    payload: buttons,
+  }),
+  setVolumeSlider: (element: HTMLInputElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_VOLUME_SLIDER,
+    payload: element,
+  }),
+  setMuteBtn: (element: HTMLButtonElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_MUTE_BTN,
+    payload: element,
+  }),
+  setFullscreenOverlay: (element: HTMLDivElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_FULLSCREEN_OVERLAY,
+    payload: element,
+  }),
+  setHiddenBcTable: (element: HTMLTableElement | null): GuiAction => ({
+    type: GUI_ACTIONS.SET_HIDDEN_BC_TABLE,
+    payload: element,
+  }),
+} as const;
 
 export interface IGui extends IStore<DefinedGui, GuiAction> {}

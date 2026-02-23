@@ -1,12 +1,15 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { PLUME_CONSTANTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
-import { bandcampPlayer, musicPlayer } from "../../infra/adapters";
+import { PLUME_CONSTANTS } from "../../domain/plume";
+import { coreActions } from "../../domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
+import { guiActions } from "../../infra/Gui";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
-import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../stores/GuiImpl";
-import { getString } from "./i18n";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
+import { seekToProgress, setVolume, toggleDurationDisplay } from "../use-cases";
 import { CleanupCallback, SubscriptionCallback } from "./types";
 import {
   handlePlayPause,
@@ -215,31 +218,16 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   );
 
   const handleProgressInput = function (this: HTMLInputElement) {
-    const progress = Number.parseFloat(this.value) / PROGRESS_SLIDER_GRANULARITY;
-    const targetTime = progress * (musicPlayer.getDuration() || 0);
-
-    musicPlayer.seekAndPreservePause(targetTime);
-    appCore.dispatch(coreActions.setCurrentTime(targetTime));
+    const musicPlayer = getMusicPlayerInstance();
+    seekToProgress(Number.parseFloat(this.value), appCore, musicPlayer);
   };
 
   const handleVolumeInput = function (this: HTMLInputElement) {
-    const newVolume = Number.parseInt(this.value) / VOLUME_SLIDER_GRANULARITY;
-
-    // Moving slider off zero counts as an intentional unmute
-    if (newVolume > 0 && appCore.getState().isMuted) {
-      appCore.dispatch(coreActions.setIsMuted(false));
-    }
-
-    // Dispatch to store only - subscription handles audio element and display updates
-    appCore.dispatch(coreActions.setVolume(newVolume));
+    setVolume(Number.parseInt(this.value), appCore);
   };
 
   const handleFullscreenDurationClick = () => {
-    const currentMethod = appCore.getState().durationDisplayMethod;
-    const newMethod =
-      currentMethod === TIME_DISPLAY_METHOD.DURATION ? TIME_DISPLAY_METHOD.REMAINING : TIME_DISPLAY_METHOD.DURATION;
-
-    appCore.dispatch(coreActions.setDurationDisplayMethod(newMethod));
+    toggleDurationDisplay(appCore);
   };
 
   // Setup event listeners for fullscreen controls
@@ -278,7 +266,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
 // Pure DOM construction function - builds fullscreen overlay without side effects
 const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
-  const artworkUrl = bandcampPlayer.getArtworkUrl();
+  const bcPlayer = getBcPlayerInstance();
+  const artworkUrl = bcPlayer.getArtworkUrl();
   if (!artworkUrl) {
     logger(CPL.WARN, getString("WARN__COVER_ART__NOT_FOUND"));
     return null;
@@ -305,7 +294,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   coverArtImg.alt = getString("ARIA__COVER_ART");
   presentationContainer.appendChild(coverArtImg);
 
-  const newNameSection = bandcampPlayer.getInfoSection() as HTMLDivElement | null;
+  const newNameSection = bcPlayer.getInfoSection() as HTMLDivElement | null;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return null;
@@ -316,7 +305,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
   headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingProject.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = '"' + headTitle.textContent.trim() + '"';
+  if (!isAlbumPage) headTitle.textContent = `"${headTitle.textContent?.trim()}"`;
 
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);

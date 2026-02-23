@@ -1,10 +1,12 @@
-import { bandcampPlayer } from "../../infra/adapters";
+import { coreActions } from "../../domain/ports/app-core";
+import { guiActions } from "../../infra/Gui";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
-import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../stores/GuiImpl";
+import { getBcPlayerInstance } from "../stores/adapters";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
 import { checkBandcampElements } from "./bc-diagnostic";
 import { debugBandcampControls } from "./debug";
-import { getString } from "./i18n";
 import { injectEnhancements } from "./injection";
 import {
   CleanupHandles,
@@ -17,7 +19,8 @@ import {
 
 const initPlayback = () => {
   // BC's native play button is clicked to trigger its own internal playback bootstrap
-  const playButton = bandcampPlayer.getPlayPauseButton();
+  const bcPlayer = getBcPlayerInstance();
+  const playButton = bcPlayer.getPlayPauseButton();
   if (playButton) {
     playButton.click();
   } else {
@@ -27,7 +30,8 @@ const initPlayback = () => {
 
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   const appCore = getAppCoreInstance();
-  const audio = bandcampPlayer.getAudioElement();
+  const bcPlayer = getBcPlayerInstance();
+  const audio = bcPlayer.getAudioElement();
   if (!audio) return null;
   logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
 

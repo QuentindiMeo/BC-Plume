@@ -1,7 +1,7 @@
-import { bandcampPlayer } from "../../infra/adapters";
 import { measureContrastRatioWCAG } from "../../shared/colors";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
-import { getString } from "./i18n";
+import { getBcPlayerInstance } from "../stores/adapters";
 
 interface RuntimeInfo {
   totalRuntime: number;
@@ -18,8 +18,9 @@ const runtimeInfo: RuntimeInfo = {
 };
 
 export const getInfoSectionWithRuntime = (): HTMLDivElement => {
+  const bcPlayer = getBcPlayerInstance();
   if (!runtimeInfo.calculated) {
-    const trackRowDurations = bandcampPlayer.getTrackRowDurations();
+    const trackRowDurations = bcPlayer.getTrackRowDurations();
     if (trackRowDurations.length === 0) {
       logger(CPL.WARN, getString("WARN__TRACK_LIST__NOT_FOUND"));
       const errorDiv = document.createElement("div");
@@ -59,7 +60,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   }
 
   const infoSectionId = "name-section";
-  const infoSection = bandcampPlayer.getInfoSection();
+  const infoSection = bcPlayer.getInfoSection();
   if (!infoSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return document.createElement("div");
@@ -74,7 +75,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   newTitleHeading.className = infoSectionId + "__titling";
   newTitleHeading.appendChild(titleHeadingClone);
 
-  const mainSectionBackground = bandcampPlayer.getPageBackground()!;
+  const mainSectionBackground = bcPlayer.getPageBackground()!;
   const bgColor = globalThis.getComputedStyle(mainSectionBackground).getPropertyValue("background");
   const bgColorAsRGB = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bgColor);
   const r = Number.parseInt(bgColorAsRGB![1], 10);

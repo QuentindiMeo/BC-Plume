@@ -1,14 +1,14 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { bandcampPlayer } from "../../infra/adapters";
-import { IAppCore } from "../../infra/AppCore";
+import { coreActions, IAppCore } from "../../domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { IGui } from "../../infra/Gui";
+import { guiActions, IGui } from "../../infra/Gui";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
-import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../stores/GuiImpl";
+import { getBcPlayerInstance } from "../stores/adapters";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
 import { toggleFullscreenMode } from "./fullscreen";
-import { getString } from "./i18n";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "./original-player";
 import { getInfoSectionWithRuntime } from "./runtime";
 import { getTrackQuantifiers } from "./track-quantifiers";
@@ -31,7 +31,8 @@ interface PlumeView {
 }
 
 const addRuntime = () => {
-  const trackView = bandcampPlayer.getTrackView();
+  const bcPlayer = getBcPlayerInstance();
+  const trackView = bcPlayer.getTrackView();
   if (!trackView) return;
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };

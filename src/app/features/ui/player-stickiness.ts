@@ -1,12 +1,13 @@
-import { bandcampPlayer } from "../../../infra/adapters";
+import { getString } from "../../../shared/i18n";
 import { CPL, logger } from "../../../shared/logger";
-import { getString } from "../i18n";
+import { getBcPlayerInstance } from "../../stores/adapters";
 import type { CleanupCallback } from "../types";
 
 const SCROLLED_CLASSNAME = "scrolled";
 
 export const setupPlayerStickiness = (): CleanupCallback => {
-  const plumeParentDiv = bandcampPlayer.getPlayerParent();
+  const bcPlayer = getBcPlayerInstance();
+  const plumeParentDiv = bcPlayer.getPlayerParent();
 
   if (!plumeParentDiv) {
     logger(CPL.ERROR, getString("ERROR__PLAYER_PARENT__NOT_FOUND"));

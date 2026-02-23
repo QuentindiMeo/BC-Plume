@@ -1,4 +1,3 @@
-import { bandcampPlayer } from "../../infra/adapters";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -7,17 +6,20 @@ import {
   RGBToHSL,
   WCAG_CONTRAST_NORMAL,
 } from "../../shared/colors";
-import { getString } from "./i18n";
+import { getString } from "../../shared/i18n";
+import { getBcPlayerInstance } from "../stores/adapters";
 
 const getArtistNameElement = (): HTMLSpanElement => {
-  const infoSection = bandcampPlayer.getInfoSection();
+  const bcPlayer = getBcPlayerInstance();
+  const infoSection = bcPlayer.getInfoSection();
   const infoSectionLinks = infoSection?.querySelectorAll("span") ?? [];
   const artistElementIdx = infoSectionLinks.length - 1; // 0 on album pages, 1 on track pages
   return infoSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
 };
 
 const getTrackTitleElement = (): HTMLElement | null => {
-  return bandcampPlayer.getTrackTitleElement();
+  const bcPlayer = getBcPlayerInstance();
+  return bcPlayer.getTrackTitleElement();
 };
 
 // Determine appropriate pretext color based on WCAG contrast with Bandcamp theme colors
@@ -59,5 +61,6 @@ export const getAppropriatePretextColor = (): string => {
 };
 
 export const getCurrentTrackTitle = (isAlbumPage: boolean): string => {
-  return bandcampPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
+  const bcPlayer = getBcPlayerInstance();
+  return bcPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
 };

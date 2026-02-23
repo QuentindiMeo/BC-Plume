@@ -1,13 +1,5 @@
 import { PlumeCacheKey } from "../../domain/browser";
-import {
-  BROWSER_ACTIONS,
-  BrowserAction,
-  IBrowser,
-  IBrowserActions,
-  IBrowserApi,
-  IBrowserCache,
-  IBrowserState,
-} from "../../infra/Browser";
+import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "../../infra/Browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 
@@ -39,13 +31,6 @@ const browserCache = new Proxy({} as IBrowserCache, {
     return typeof value === "function" ? value.bind(cache) : value;
   },
 });
-
-export const browserActions: IBrowserActions = {
-  setCacheValues: (keys: PlumeCacheKey[], values: any[]): BrowserAction => ({
-    type: BROWSER_ACTIONS.SET_CACHE_VALUES,
-    payload: { keys, values },
-  }),
-} as const;
 
 const INITIAL_STATE: IBrowserState = {
   api: browserApi,

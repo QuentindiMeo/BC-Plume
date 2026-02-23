@@ -1,8 +1,9 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
+import { coreActions } from "../../domain/ports/app-core";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { NoArgFunction } from "../../shared/types";
-import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getString } from "./i18n";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import type { CleanupCallback } from "./types";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
