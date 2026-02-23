@@ -1,6 +1,6 @@
 import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
-import { getString } from "./i18n";
 
 export interface BcHealthCheckResult {
   allRequiredFound: boolean;

@@ -1,12 +1,13 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
+import { guiActions } from "../../infra/Gui";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedTime } from "../../shared/presenters";
 import { PLUME_SVG } from "../../svg/icons";
 import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../stores/GuiImpl";
-import { getString } from "./i18n";
+import { getGuiInstance } from "../stores/GuiImpl";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncMuteBtn } from "./ui/volume";
 
@@ -50,8 +51,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
-      const bcPlayerInstance = getMusicPlayerInstance();
-      bcPlayerInstance.setVolume(volume);
+      const musicPlayer = getMusicPlayerInstance();
+      musicPlayer.setVolume(volume);
 
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
 
@@ -84,14 +85,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         volumeValueDisplay.textContent = `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`;
       }
 
-      const bcPlayerInstance = getMusicPlayerInstance();
-      bcPlayerInstance.setVolume(appCore.getState().volume);
+      const musicPlayer = getMusicPlayerInstance();
+      musicPlayer.setVolume(appCore.getState().volume);
     }),
     // Subscribe to playing state changes
     appCore.subscribe("isPlaying", (isPlaying) => {
-      const bcPlayerInstance = getMusicPlayerInstance();
-      if (isPlaying && bcPlayerInstance.isPaused()) bcPlayerInstance.play();
-      else if (!isPlaying && !bcPlayerInstance.isPaused()) bcPlayerInstance.pause();
+      const musicPlayer = getMusicPlayerInstance();
+      if (isPlaying && musicPlayer.isPaused()) musicPlayer.play();
+      else if (!isPlaying && !musicPlayer.isPaused()) musicPlayer.pause();
 
       const plume = getGuiInstance().getState();
       plume.playPauseBtns.forEach((btn) => {

@@ -1,6 +1,6 @@
 import { registerBcPlayer, registerMusicPlayer } from "./app/stores/adapters";
 import { getGuiInstance } from "./app/stores/GuiImpl";
-import { logDetectedBrowser } from "./app/features/i18n";
+import { logDetectedBrowser } from "./shared/i18n";
 import { launchPlume } from "./app/features/lifecycle";
 import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter } from "./infra/adapters";
 import type { BcPlayerPort } from "./domain/ports/bc-player";

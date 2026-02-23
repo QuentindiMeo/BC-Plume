@@ -21,8 +21,14 @@ export enum BROWSER_ACTIONS {
 }
 export type BrowserAction = IAction<BROWSER_ACTIONS.SET_CACHE_VALUES, { keys: PlumeCacheKey[]; values: any[] }>;
 
-export interface IBrowserActions {
+interface IBrowserActions {
   setCacheValues: (keys: PlumeCacheKey[], values: any[]) => BrowserAction;
 }
+export const browserActions: IBrowserActions = {
+  setCacheValues: (keys: PlumeCacheKey[], values: any[]): BrowserAction => ({
+    type: BROWSER_ACTIONS.SET_CACHE_VALUES,
+    payload: { keys, values },
+  }),
+} as const;
 
 export interface IBrowser extends IStore<IBrowserState, BrowserAction> {}

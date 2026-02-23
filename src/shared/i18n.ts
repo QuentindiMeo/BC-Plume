@@ -1,5 +1,5 @@
-import enMessages from "../../../_locales/en/messages.json";
-import { CPL, logger } from "../../shared/logger";
+import enMessages from "../../_locales/en/messages.json";
+import { CPL, logger } from "./logger";
 
 interface BrowserApiI18n {
   getMessage: (key: string, substitutions?: Array<unknown>, options?: object) => string;

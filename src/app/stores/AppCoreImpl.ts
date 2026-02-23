@@ -1,62 +1,13 @@
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
-import { PLUME_DEFAULTS, TIME_DISPLAY_METHOD, TimeDisplayMethodType } from "../../domain/plume";
-import { BcPageType } from "../../domain/ports/bc-player";
+import { PLUME_DEFAULTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
+import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
-import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, IAppCore, ICoreActions } from "../../infra/AppCore";
+import { browserActions } from "../../infra/Browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
-import { browserActions, getBrowserInstance } from "./BrowserImpl";
+import { getBrowserInstance } from "./BrowserImpl";
 import { handleUnknownAction } from "./shared";
-
-export const coreActions: ICoreActions = {
-  setPageType: (pageType: BcPageType | null): CoreAction => ({
-    type: CORE_ACTIONS.SET_PAGE_TYPE,
-    payload: pageType,
-  }),
-  setTrackTitle: (title: string | null): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_TITLE,
-    payload: title,
-  }),
-  setTrackNumber: (number: string | null): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_NUMBER,
-    payload: number,
-  }),
-  setDuration: (duration: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_DURATION,
-    payload: duration,
-  }),
-  setCurrentTime: (time: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_CURRENT_TIME,
-    payload: time,
-  }),
-  setIsPlaying: (isPlaying: boolean): CoreAction => ({
-    type: CORE_ACTIONS.SET_IS_PLAYING,
-    payload: isPlaying,
-  }),
-  setDurationDisplayMethod: (method: TimeDisplayMethodType): CoreAction => ({
-    type: CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
-    payload: method,
-  }),
-  setVolume: (volume: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_VOLUME,
-    payload: volume,
-  }),
-  setIsMuted: (isMuted: boolean): CoreAction => ({
-    type: CORE_ACTIONS.SET_IS_MUTED,
-    payload: isMuted,
-  }),
-  toggleMute: (): CoreAction => ({
-    type: CORE_ACTIONS.TOGGLE_MUTE,
-  }),
-  setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
-    type: CORE_ACTIONS.SET_IS_FULLSCREEN,
-    payload: isFullscreen,
-  }),
-  resetTransientState: (): CoreAction => ({
-    type: CORE_ACTIONS.RESET_TRANSIENT_STATE,
-  }),
-} as const;
 
 const INITIAL_STATE: AppCore = {
   pageType: null,

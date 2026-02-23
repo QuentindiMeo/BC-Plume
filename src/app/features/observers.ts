@@ -1,14 +1,15 @@
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
+import { guiActions } from "../../infra/Gui";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance } from "../stores/adapters";
-import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../stores/GuiImpl";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
+import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
-import { getString } from "./i18n";
 import { setupHotkeys } from "./keyboard";
 import { setupStoreSubscriptions } from "./store-subscriptions";
-import { getTrackQuantifiers } from "./track-quantifiers";
 import { getCurrentTrackTitle } from "./track-title";
 import { CleanupCallback } from "./types";
 import {
@@ -21,7 +22,7 @@ import {
   setupPlayerStickiness,
 } from "./ui";
 
-// Bootstrapping check — runs before the GUI store is populated, so it queries the DOM directly.
+// Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.
 export const isPlumeInjected = (): boolean => !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
 
@@ -48,61 +49,48 @@ const updateTrackForwardBtnState = () => {
   trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
 };
 
-// Function to update the pretext display (track numbering)
-const updatePretextDisplay = () => {
+const updateTrackDisplay = () => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
-  const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitlePretext) as HTMLSpanElement;
-  if (!preText) return;
 
-  const isAlbumPage = appCore.getState().pageType === "album";
-  const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
-  const newTq = getTrackQuantifiers(newTrackTitle);
-  const trackNumberText = isAlbumPage
-    ? getString("LABEL__TRACK_CURRENT", [`${newTq.current}/${newTq.total}`])
-    : getString("LABEL__TRACK");
-
-  // Dispatch track number change to store for fullscreen sync
-  appCore.dispatch(coreActions.setTrackNumber(trackNumberText));
-
-  preText.textContent = trackNumberText;
-
-  const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerCurrent) as HTMLDivElement;
-  headerCurrent.ariaLabel = isAlbumPage
-    ? getString("ARIA__TRACK_CURRENT", [newTq.current, newTq.total, newTrackTitle])
-    : getString("ARIA__TRACK", [newTrackTitle]);
-};
-
-const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
-// Expected single-line height for Latin characters in px. Used as baseline to calculate additional padding needed when title wraps to multiple lines or uses taller character sets.
-const LATIN_CHAR_HEIGHT = 19;
-// Function to update the title display when track changes
-const updateTitleDisplay = () => {
-  const appCore = getAppCoreInstance();
-  const plumeUi = getGuiInstance();
-  const plume = plumeUi.getState();
+  const bcPlayer = getBcPlayerInstance();
+  const { trackNumberText, current, total } = updateTrackMetadata(appCore, bcPlayer);
 
   const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
-  if (!titleText) return;
+  const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitlePretext) as HTMLSpanElement;
 
   const isAlbumPage = appCore.getState().pageType === "album";
   const newTrackTitle = getCurrentTrackTitle(isAlbumPage);
-  titleText.textContent = newTrackTitle;
-  titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
-  // Dispatch title change to store for fullscreen sync
-  appCore.dispatch(coreActions.setTrackTitle(newTrackTitle));
+  if (titleText) {
+    titleText.textContent = newTrackTitle;
+    titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
-  // Cache offsetHeight to avoid multiple layout recalculations
-  const titleHeight = titleText.offsetHeight;
-  if (titleHeight !== LATIN_CHAR_HEIGHT) {
-    const logo = plume.headerLogo;
-    if (!logo) return;
+    // Cache offsetHeight to avoid multiple layout recalculations
+    const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
+    // Expected single-line height for Latin characters in px. Used as baseline to calculate additional padding needed when title wraps to multiple lines or uses taller character sets.
+    const LATIN_CHAR_HEIGHT = 19;
+    const titleHeight = titleText.offsetHeight;
+    if (titleHeight !== LATIN_CHAR_HEIGHT) {
+      const logo = plume.headerLogo;
+      if (logo) {
+        const deltaPaddingPx = titleHeight - LATIN_CHAR_HEIGHT;
+        const deltaPaddingRem = deltaPaddingPx / 16; // 16px = 1rem
+        logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingRem}rem`;
+      }
+    }
+  }
 
-    const deltaPaddingPx = titleHeight - LATIN_CHAR_HEIGHT; // calculate difference in px
-    const deltaPaddingRem = deltaPaddingPx / 16; // 16px = 1rem
-    logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingRem}rem`;
+  if (preText) {
+    preText.textContent = trackNumberText;
+
+    const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerCurrent) as HTMLDivElement;
+    if (headerCurrent) {
+      headerCurrent.ariaLabel = isAlbumPage
+        ? getString("ARIA__TRACK_CURRENT", [current, total, newTrackTitle])
+        : getString("ARIA__TRACK", [newTrackTitle]);
+    }
   }
 };
 
@@ -118,8 +106,7 @@ export interface CleanupHandles {
 const rewireAudioEventListeners = (handles: CleanupHandles): void => {
   handles.audioEvents?.();
   handles.audioEvents = setupAudioEventListeners({
-    updateTitleDisplay,
-    updatePretextDisplay,
+    updateTrackDisplay,
     updateTrackForwardBtnState,
   });
 };
@@ -155,9 +142,10 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
 
     mutations.forEach(async (mutation) => {
       if (mutation.type === "childList") {
+        const bcPlayer = getBcPlayerInstance();
+        const newAudio = bcPlayer.getAudioElement();
+
         // Check if a new audio element was added
-        const bcPlayerInstance = getBcPlayerInstance();
-        const newAudio = bcPlayerInstance.getAudioElement();
         if (newAudio && newAudio !== plume.audioElement) {
           logger(CPL.INFO, getString("INFO__NEW_AUDIO__FOUND"));
 
@@ -175,8 +163,7 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
           mutation.target instanceof Element &&
           (mutation.target.classList.contains("title_link") || mutation.target.querySelector("a.title_link"))
         ) {
-          updateTitleDisplay();
-          updatePretextDisplay();
+          updateTrackDisplay();
         }
       }
     });
@@ -204,8 +191,8 @@ export const createSpaNavigationObserver = (
     isInitializedRef.value = false;
     setTimeout(() => {
       reinit();
-      setTimeout(updateTitleDisplay, 500);
-      setTimeout(updatePretextDisplay, 600); // slight delay to ensure track display is updated
+      // slight delay to ensure track display is updated after navigation reinit
+      setTimeout(updateTrackDisplay, 500);
     }, 1000);
   });
 

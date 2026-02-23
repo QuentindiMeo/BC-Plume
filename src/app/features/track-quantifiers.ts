@@ -1,6 +1,6 @@
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance } from "../stores/adapters";
-import { getString } from "./i18n";
 
 export interface TrackQuantifiers {
   current: number;
@@ -8,8 +8,8 @@ export interface TrackQuantifiers {
 }
 
 export const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
-  const bcPlayerInstance = getBcPlayerInstance();
-  const trackRowTitles = bcPlayerInstance.getTrackRowTitles();
+  const bcPlayer = getBcPlayerInstance();
+  const trackRowTitles = bcPlayer.getTrackRowTitles();
   if (trackRowTitles.length === 0) return { current: 0, total: 0 };
 
   const currentTrackNumber = trackRowTitles.indexOf(trackName) + 1;

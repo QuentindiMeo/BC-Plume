@@ -1,8 +1,7 @@
 import type { BcPlayerPort } from "../../domain/ports/bc-player";
 import type { MusicPlayerPort } from "../../domain/ports/music-player";
 
-// Populated once at the composition root (main.ts) before launchPlume() runs.
-// All app-layer features read through these accessors rather than importing infra singletons directly.
+// Populated once at the composition root (main.ts), before launchPlume() runs
 let bcPlayerInstance: BcPlayerPort | null = null;
 let musicPlayerInstance: MusicPlayerPort | null = null;
 

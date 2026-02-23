@@ -1,17 +1,18 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
+import { coreActions } from "../../domain/ports/app-core";
+import { guiActions } from "../../infra/Gui";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { getMusicPlayerInstance } from "../stores/adapters";
-import { coreActions, getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance, guiActions } from "../stores/GuiImpl";
-import { getString } from "./i18n";
+import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { getGuiInstance } from "../stores/GuiImpl";
 import type { CleanupCallback } from "./types";
 import { syncProgressToStore } from "./ui";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 export interface AudioEventCallbacks {
-  updateTitleDisplay: () => void;
-  updatePretextDisplay: () => void;
+  updateTrackDisplay: () => void;
   updateTrackForwardBtnState: () => void;
 }
 
@@ -20,7 +21,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
   const plume = plumeUi.getState();
-  const { updateTitleDisplay, updatePretextDisplay, updateTrackForwardBtnState } = callbacks;
+  const { updateTrackDisplay, updateTrackForwardBtnState } = callbacks;
 
   const handleTimeUpdate = () => {
     syncProgressToStore();
@@ -28,8 +29,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
 
   const handleLoadedMetadata = () => {
     syncProgressToStore();
-    updateTitleDisplay();
-    updatePretextDisplay();
+    updateTrackDisplay();
     updateTrackForwardBtnState();
   };
 
@@ -38,8 +38,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   };
 
   const handleLoadStart = () => {
-    updateTitleDisplay();
-    updatePretextDisplay();
+    updateTrackDisplay();
     updateTrackForwardBtnState();
   };
 

@@ -1,13 +1,13 @@
-import { TimeDisplayMethodType } from "../domain/plume";
-import { BcPageType } from "../domain/ports/bc-player";
-import { IAction, IListener, IScenarioView, IStore } from "../domain/store";
+import { TimeDisplayMethodType } from "../plume";
+import { BcPageType } from "./bc-player";
+import { IAction, IScenarioView, IStore } from "../store";
 
-interface AppPersistedState {
+export interface AppPersistedState {
   volume: number;
   durationDisplayMethod: TimeDisplayMethodType;
 }
 
-interface AppTransientState {
+export interface AppTransientState {
   pageType: BcPageType | null;
   trackTitle: string | null;
   trackNumber: string | null;
@@ -50,7 +50,7 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
   | IAction<CORE_ACTIONS.RESET_TRANSIENT_STATE>;
 
-export interface ICoreActions {
+interface ICoreActions {
   setPageType: (pageType: BcPageType | null) => CoreAction;
   setTrackTitle: (title: string | null) => CoreAction;
   setTrackNumber: (number: string | null) => CoreAction;
@@ -65,18 +65,32 @@ export interface ICoreActions {
   resetTransientState: () => CoreAction;
 }
 
-export type AppCoreListener<AppCoreProp extends keyof AppCore = keyof AppCore> = IListener<AppCore, AppCoreProp>;
+export const coreActions: ICoreActions = {
+  setPageType: (pageType: BcPageType | null): CoreAction => ({ type: CORE_ACTIONS.SET_PAGE_TYPE, payload: pageType }),
+  setTrackTitle: (title: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_TITLE, payload: title }),
+  setTrackNumber: (number: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_NUMBER, payload: number }),
+  setDuration: (duration: number): CoreAction => ({ type: CORE_ACTIONS.SET_DURATION, payload: duration }),
+  setCurrentTime: (time: number): CoreAction => ({ type: CORE_ACTIONS.SET_CURRENT_TIME, payload: time }),
+  setIsPlaying: (isPlaying: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_PLAYING, payload: isPlaying }),
+  setDurationDisplayMethod: (method: TimeDisplayMethodType): CoreAction => ({
+    type: CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
+    payload: method,
+  }),
+  setVolume: (volume: number): CoreAction => ({ type: CORE_ACTIONS.SET_VOLUME, payload: volume }),
+  setIsMuted: (isMuted: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_MUTED, payload: isMuted }),
+  toggleMute: (): CoreAction => ({ type: CORE_ACTIONS.TOGGLE_MUTE }),
+  setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
+    type: CORE_ACTIONS.SET_IS_FULLSCREEN,
+    payload: isFullscreen,
+  }),
+  resetTransientState: (): CoreAction => ({ type: CORE_ACTIONS.RESET_TRANSIENT_STATE }),
+} as const;
 
-/**
- * Computed properties - derived state calculated on-demand from selectors.
- * These are NOT stored in state, but computed when accessed.
- *
- * Benefits:
- * - No redundant state storage
- * - Always consistent with source data
- * - Lazy evaluation (only computed when needed)
- * - Can be memoized if performance becomes a concern
- */
+export type AppCoreListener<AppCoreProp extends keyof AppCore = keyof AppCore> = (
+  value: AppCore[AppCoreProp],
+  prevValue: AppCore[AppCoreProp]
+) => void;
+
 interface ComputedState {
   /** Returns formatted elapsed time (MM:SS) */
   formattedElapsed: () => string;
@@ -90,7 +104,6 @@ export interface IAppCore extends IStore<AppCore, CoreAction> {
   subscribe<AppCoreProp extends keyof AppCore>(key: AppCoreProp, listener: AppCoreListener<AppCoreProp>): () => void;
   subscribeAll(listener: (state: AppCore) => void): () => void;
 
-  // Additional fields
   loadPersistedState(): Promise<void>;
   computed: ComputedState;
 
