@@ -2,7 +2,7 @@ import enMessages from "../../_locales/en/messages.json";
 import { CPL, logger } from "./logger";
 
 interface BrowserApiI18n {
-  getMessage: (key: string, substitutions?: Array<unknown>, options?: object) => string;
+  getMessage: (key: string, substitutions?: string | string[]) => string;
 }
 
 const browserI18n = ((): BrowserApiI18n | null => {
@@ -15,19 +15,11 @@ type EnglishLocaleEntry = {
   placeholders?: Record<string, { content: string; example?: string }>;
 };
 
-const applyEnglishSubstitutions = (entry: EnglishLocaleEntry, substitutions?: Array<unknown>): string => {
+const applyEnglishSubstitutions = (entry: EnglishLocaleEntry, substitutions?: string[]): string => {
   let subs: string[];
 
   if (Array.isArray(substitutions)) {
-    subs = substitutions.map(String);
-  } else if (substitutions === null || substitutions === undefined) {
-    subs = [];
-  } else if (
-    typeof substitutions === "string" ||
-    typeof substitutions === "number" ||
-    typeof substitutions === "boolean"
-  ) {
-    subs = [String(substitutions)];
+    subs = substitutions;
   } else {
     subs = [];
   }
@@ -44,9 +36,9 @@ const applyEnglishSubstitutions = (entry: EnglishLocaleEntry, substitutions?: Ar
   return message;
 };
 
-export const getString = (key: string, substitutions?: Array<unknown>, options?: object): string => {
+export const getString = (key: string, substitutions?: string[]): string => {
   if (browserI18n) {
-    const result = browserI18n.getMessage(key, substitutions, options);
+    const result = browserI18n.getMessage(key, substitutions);
     if (result !== "") return result;
   }
 

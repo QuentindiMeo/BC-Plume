@@ -47,12 +47,12 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
     const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
     const seconds = runtimeInfo.totalRuntime % 60;
     runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
-      minutes,
+      String(minutes),
       seconds < 10 ? "0" + seconds : seconds.toString(),
     ]);
     runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [
-      Math.floor(runtimeInfo.totalRuntime / 60),
-      runtimeInfo.totalRuntime % 60,
+      String(Math.floor(runtimeInfo.totalRuntime / 60)),
+      String(runtimeInfo.totalRuntime % 60),
     ]);
     logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
 
