@@ -3,6 +3,7 @@ node_modules/
 dist/
 build/
 *lock*
+*.zip
 
 # To prevent committing sensitive files
 .env*
