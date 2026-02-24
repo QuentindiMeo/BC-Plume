@@ -38,7 +38,7 @@ const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
   // Load and immediately apply saved volume from store
   const volume = appCore.getState().volume;
   audio.volume = volume;
-  logger(CPL.INFO, getString("INFO__VOLUME__FOUND", [Math.round(volume * 100), getString("META__PERCENTAGE")]));
+  logger(CPL.INFO, getString("INFO__VOLUME__FOUND", [String(Math.round(volume * 100)), getString("META__PERCENTAGE")]));
 
   return audio;
 };

@@ -53,7 +53,7 @@ export const checkBandcampElements = (): BcHealthCheckResult => {
   if (missingRequired.length === 0) {
     logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__ALL_FOUND"));
   } else {
-    alert(getString("ALERT__BC_HEALTH_CHECK__FAILED", [missingRequired.length]));
+    alert(getString("ALERT__BC_HEALTH_CHECK__FAILED", [String(missingRequired.length)]));
   }
   return {
     allRequiredFound: missingRequired.length === 0,

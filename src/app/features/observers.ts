@@ -86,7 +86,7 @@ const updateTrackDisplay = () => {
     const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerCurrent) as HTMLDivElement;
     if (headerCurrent) {
       headerCurrent.ariaLabel = isAlbumPage
-        ? getString("ARIA__TRACK_CURRENT", [current, total, newTrackTitle])
+        ? getString("ARIA__TRACK_CURRENT", [String(current), String(total), newTrackTitle])
         : getString("ARIA__TRACK", [newTrackTitle]);
     }
   }
@@ -121,7 +121,10 @@ const applyPersistedVolume = (audio: HTMLAudioElement): void => {
   const appCore = getAppCoreInstance();
   const volume = appCore.getState().volume;
   audio.volume = volume;
-  logger(CPL.INFO, getString("INFO__VOLUME__APPLIED", [Math.round(volume * 100), getString("META__PERCENTAGE")]));
+  logger(
+    CPL.INFO,
+    getString("INFO__VOLUME__APPLIED", [String(Math.round(volume * 100)), getString("META__PERCENTAGE")])
+  );
 };
 
 // Registers all post-injection listeners and stores their teardown callbacks
