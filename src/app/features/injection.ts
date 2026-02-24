@@ -60,7 +60,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
   currentTitleSection.tabIndex = 0; // make it focusable for screen readers
   currentTitleSection.ariaLabel = isAlbumPage
-    ? getString("ARIA__TRACK_CURRENT", [initialTq.current, initialTq.total, initialTrackTitle])
+    ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
   const currentTitlePretext = document.createElement("span");
   currentTitlePretext.id = PLUME_ELEM_SELECTORS.headerTitlePretext.split("#")[1];

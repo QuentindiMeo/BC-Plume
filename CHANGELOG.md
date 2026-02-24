@@ -3,8 +3,13 @@
   <h2>:card_file_box: Full-Fleshed Changelog :card_file_box:</h2>
 </div>
 
-- later releases to come.
+- later releases to come with new releases!! Know more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues)
 
+  - _**[1.3.3]** ..._: ...
+
+    - _**[1.3.2.1]** Feb 24 2026_: Oops! The next architecture broke the Firefox version, let's hotfix it :'\) [#82](https://github.com/QuentindiMeo/BC-Plume/pull/82)
+
+  - _**[1.3.2]** Feb 23 2026_: Software architecture is hauled, new muting mechanism, SEO is revamped. [#81](https://github.com/QuentindiMeo/BC-Plume/pull/81)
   - _**[1.3.1]** Feb 01 2026_: Fullscreen mode is improved, album runtime is displayed, hotkeys are added. [#76](https://github.com/QuentindiMeo/BC-Plume/pull/76)
 
 - _**[1.3.0]** Jan 18 2026_: **Pedal To The Metal** — Fullscreen mode, playback bugfixes and Spanish language support. [#67](https://github.com/QuentindiMeo/BC-Plume/pull/67)
