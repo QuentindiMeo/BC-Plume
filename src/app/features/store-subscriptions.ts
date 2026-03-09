@@ -9,6 +9,7 @@ import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
+import { updateTrackForwardBtnState } from "./observers";
 import { syncLoopBtn } from "./ui/loop";
 import { syncMuteBtn } from "./ui/volume";
 
@@ -87,6 +88,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     }),
     appCore.subscribe("loopMode", (loopMode) => {
       syncLoopBtn(loopMode);
+      updateTrackForwardBtnState();
     }),
     appCore.subscribe("pageType", () => {
       syncLoopBtn(appCore.getState().loopMode);

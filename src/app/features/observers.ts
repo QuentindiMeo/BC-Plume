@@ -1,3 +1,4 @@
+import { LOOP_MODE } from "../../domain/plume";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
@@ -38,14 +39,14 @@ const isLastTrackOfAlbumPlaying = () => {
   return lastTrackTitle === currentTrackTitle;
 };
 
-const updateTrackForwardBtnState = () => {
+export const updateTrackForwardBtnState = () => {
   const appCore = getAppCoreInstance();
   const plume = getGuiInstance().getState();
   const trackFwdBtns = plume.trackFwdBtns;
   if (trackFwdBtns.length === 0) return;
 
-  const isAlbumPage = appCore.getState().pageType === "album";
-  const shouldDisable = !isAlbumPage || isLastTrackOfAlbumPlaying();
+  const isNotLooping = appCore.getState().loopMode === LOOP_MODE.NONE;
+  const shouldDisable = isNotLooping && isLastTrackOfAlbumPlaying();
   trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
 };
 
