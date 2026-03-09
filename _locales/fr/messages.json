@@ -21,11 +21,11 @@
       }
     }
   },
+  "ERROR__STATE__LOAD_FAILED": { "message": "Échec du chargement de l'état persisté : " },
+  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état global : " },
+  "ERROR__STATE__LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état : " },
+  "ERROR__STATE__PERSIST_FAILED": { "message": "Échec de l'enregistrement de l'état : " },
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossible de trouver un conteneur approprié" },
-  "ERROR__STATE__LOAD_FAILED": { "message": "Échec du chargement de l'état persisté :" },
-  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état global :" },
-  "ERROR__STATE__LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état :" },
-  "ERROR__STATE__PERSIST_FAILED": { "message": "Échec de l'enregistrement de l'état :" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Élément parent du lecteur non trouvé" },
   "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Conteneur d'en-tête ou numéro de piste non trouvé" },
   "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Conteneur d'en-tête ou titre de piste non trouvé" },
@@ -35,35 +35,35 @@
   "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Élément d'affichage de la durée non trouvé" },
   "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Élément d'affichage du temps écoulé non trouvé" },
   "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Bouton de lecture/pause non trouvé" },
+  "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Bouton de répétition non trouvé" },
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Bouton de coupure du son non trouvé" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Élément de curseur de volume ou d'affichage non trouvé" },
-  "WARN__BROWSER_API__NOT_DETECTED": {
-    "message": "Aucune API de navigateur détectée, utilisation de localStorage comme solution de repli"
-  },
-  "WARN__STATE__UNKNOWN_ACTION": { "message": "Action du store inconnue :" },
-  "WARN__VOLUME__INVALID_VALUE": { "message": "Valeur de volume invalide, utilisation de la valeur par défaut" },
+  "WARN__BROWSER_API__NOT_DETECTED": { "message": "Aucune API de navigateur détectée, utilisation de localStorage comme solution de repli" },
+  "WARN__STATE__UNKNOWN_ACTION": { "message": "Action du store inconnue : " },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Valeur de volume invalide,  utilisation de la valeur par défaut" },
   "WARN__AUDIO__NOT_FOUND": { "message": "Aucun élément audio trouvé" },
-  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Élément audio non trouvé, nouvelle tentative dans 2s..." },
-  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Conteneur du lecteur non trouvé, recherche d'une alternative..." },
-  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "Impossible de charger la méthode d'affichage de durée :" },
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Élément audio non trouvé,  nouvelle tentative dans 2s..." },
+  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Conteneur du lecteur non trouvé,  recherche d'une alternative..." },
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "La durée totale n'a pas pu être calculée" },
+  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "Impossible de charger la méthode d'affichage de durée : " },
   "WARN__PREV_TRACK__NOT_FOUND": { "message": "Bouton de piste précédente non trouvé" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Bouton de piste suivante non trouvé" },
   "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Bouton Play/Pause non trouvé" },
-  "WARN__VOLUME__NOT_LOADED": { "message": "Impossible de charger le volume :" },
-  "WARN__VOLUME__NOT_SAVED": { "message": "Impossible de sauvegarder le volume :" },
+  "WARN__VOLUME__NOT_LOADED": { "message": "Impossible de charger le volume : " },
+  "WARN__VOLUME__NOT_SAVED": { "message": "Impossible de sauvegarder le volume : " },
   "WARN__COVER_ART__NOT_FOUND": { "message": "Pochette non trouvée" },
   "WARN__DURATION_CELL__NOT_FOUND": { "message": "Cellule de durée non trouvée pour la piste" },
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Section d'information non trouvée pour le mode plein écran" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Conteneur Plume non trouvé pour le mode plein écran" },
-  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée, calcul de la durée totale ignoré" },
+  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée,  calcul de la durée totale ignoré" },
   "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": { "message": "Ajuster le volume avec un delta nul peut indiquer une erreur logique dans le code" },
   "LOG__MOUNT__COMPLETE": { "message": "Plume monté avec succès" },
   "LOG__INITIALIZATION__START": { "message": "Plume en cours d'initialisation..." },
   "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialisé avec succès" },
-  "LOG__NAVIGATION_DETECTED": { "message": "Navigation détectée, réinitialisation..." },
+  "LOG__NAVIGATION_DETECTED": { "message": "Navigation détectée,  réinitialisation..." },
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Éléments du lecteur original cachés" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Éléments du lecteur original restaurés" },
-  "INFO__BROWSER__DETECTED": { "message": "Navigateur détecté :" },
+  "INFO__BROWSER__DETECTED": { "message": "Navigateur détecté : " },
   "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
     "message": "Élément Bandcamp non trouvé (optionnel) : $SELECTOR$",
     "placeholders": {
@@ -76,8 +76,7 @@
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tous les éléments Bandcamp trouvés" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
-  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
-  "WARN__RUNTIME__NOT_CALCULATED": { "message": "La durée totale n'a pas pu être calculée" },
+  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée : " },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Méthode d'affichage de la durée appliquée : $METHOD$",
@@ -103,7 +102,7 @@
   },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Écouteurs d'événements audio configurés" },
   "INFO__AUDIO__FOUND": { "message": "Élément audio trouvé" },
-  "INFO__VOLUME__LOADED": { "message": "Volume chargé depuis le stockage :" },
+  "INFO__VOLUME__LOADED": { "message": "Volume chargé depuis le stockage : " },
   "INFO__VOLUME__FOUND": {
     "message": "Volume restauré : $VOLUME$$PERCENTAGE$",
     "placeholders": {
@@ -119,10 +118,23 @@
   },
   "INFO__FULLSCREEN__ENTERED": { "message": "Mode plein écran activé" },
   "INFO__FULLSCREEN__EXITED": { "message": "Mode plein écran désactivé" },
-  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Éléments de contrôle détectés ===" },
-  "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Contrôles potentiels trouvés :" },
+  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG:  Éléments de contrôle détectés ===" },
+  "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Contrôles potentiels trouvés : " },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
-  "DEBUG__STATE__PERSISTED": { "message": "État enregistré dans le stockage :" },
+  "DEBUG__STATE__PERSISTED": { "message": "État enregistré dans le stockage : " },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Numéro de piste actuelle : $NUMERO_PISTE$, Total de pistes : $TOTAL_PISTES$",
+    "placeholders": {
+      "numero_piste": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_pistes": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
   "DEBUG__PROGRESS_SLIDER__INPUT": {
     "message": "Déplacement du curseur de progression : $VALUE$ s",
     "placeholders": {
@@ -134,7 +146,7 @@
   },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Bouton de piste précédente cliqué" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente dispatché" },
-  "DEBUG__PREV_TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Bouton de rembobinage cliqué" },
   "DEBUG__REWIND_TIME__DISPATCHED": {
     "message": "Temps rembobiné à : $TIME$ s",
@@ -158,19 +170,7 @@
   },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
-  "DEBUG__TRACK__QUANTIFIERS": {
-    "message": "Numéro de piste actuelle : $NUMERO_PISTE$, Total de pistes : $TOTAL_PISTES$",
-    "placeholders": {
-      "numero_piste": {
-        "content": "$1",
-        "example": "3"
-      },
-      "total_pistes": {
-        "content": "$2",
-        "example": "10"
-      }
-    }
-  },
+  "DEBUG__LOOP__CYCLED": { "message": "Mode de répétition changé" },
   "LABEL__RUNTIME": {
     "message": "$MINUTES$ min $SECONDES$ s",
     "placeholders": {
@@ -184,7 +184,7 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "en cours de lecture :" },
+  "LABEL__TRACK": { "message": "en cours de lecture : " },
   "LABEL__TRACK_CURRENT": {
     "message": "en cours de lecture ($PISTE$) :",
     "placeholders": {
@@ -201,6 +201,7 @@
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
   "LABEL__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
+  "LABEL__LOOP": { "message": "Répétition" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
   "META__PERCENTAGE": { "message": " %" },
   "ARIA__RUNTIME__LABEL": {
@@ -245,6 +246,10 @@
     }
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
+  "ARIA__LOOP__OFF": { "message": "Répétition : désactivée" },
+  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Répétition : album" },
+  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Répétition : piste" },
+  "ARIA__LOOP__ONE_TRACK": { "message": "Répétition : activée" },
   "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" },
   "ARIA__MUTE": { "message": "Couper le son" },
   "ARIA__UNMUTE": { "message": "Rétablir le son" },

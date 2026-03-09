@@ -18,6 +18,7 @@ interface KeyboardHandlers {
   handleTrackForward: NoArgFunction;
   handleMuteToggle: NoArgFunction;
   toggleFullscreenMode: NoArgFunction;
+  handleLoopCycle: NoArgFunction;
 }
 
 // e.code values for both digit row and numpad
@@ -33,6 +34,7 @@ const AVAILABLE_HOTKEYS = new Set<string>([
   "PageDown",
   "f",
   "m",
+  "l",
 ]);
 
 export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
@@ -94,6 +96,9 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
         break;
       case "m":
         handlers.handleMuteToggle();
+        break;
+      case "l":
+        handlers.handleLoopCycle();
         break;
       default:
         if (DIGIT_CODES.has(e.code)) {

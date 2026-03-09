@@ -1,3 +1,4 @@
+import { LOOP_MODE } from "../../domain/plume";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
@@ -5,6 +6,7 @@ import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
+import { isLastTrackOfAlbumPlaying } from "../use-cases/navigate-track";
 import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
@@ -20,31 +22,22 @@ import {
   handleTrackForward,
   setupPlayerStickiness,
 } from "./ui";
+import { handleLoopCycle } from "./ui/loop";
 
 // Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.
 export const isPlumeInjected = (): boolean => !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
 
-const isLastTrackOfAlbumPlaying = () => {
+export const updateTrackForwardBtnState = () => {
   const bcPlayer = getBcPlayerInstance();
-  const trackRowTitles = bcPlayer.getTrackRowTitles();
-  if (trackRowTitles.length === 0) return false;
-
-  const lastTrackTitle = trackRowTitles.at(-1);
-  const currentTrackTitle = bcPlayer.getTrackTitle("album");
-  if (!currentTrackTitle) return false;
-
-  return lastTrackTitle === currentTrackTitle;
-};
-
-const updateTrackForwardBtnState = () => {
   const appCore = getAppCoreInstance();
   const plume = getGuiInstance().getState();
   const trackFwdBtns = plume.trackFwdBtns;
   if (trackFwdBtns.length === 0) return;
 
-  const isAlbumPage = appCore.getState().pageType === "album";
-  const shouldDisable = !isAlbumPage || isLastTrackOfAlbumPlaying();
+  const isNotLooping = appCore.getState().loopMode === LOOP_MODE.NONE;
+  const pageType = appCore.getState().pageType;
+  const shouldDisable = isNotLooping && (isLastTrackOfAlbumPlaying(bcPlayer) || pageType === "track");
   trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
 };
 
@@ -140,6 +133,7 @@ export const setupListeners = (handles: CleanupHandles): void => {
     handleTrackForward,
     handleMuteToggle,
     toggleFullscreenMode,
+    handleLoopCycle,
   });
 };
 

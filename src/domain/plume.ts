@@ -5,15 +5,25 @@ export const PLUME_CONSTANTS = {
   VOLUME_SLIDER_GRANULARITY: 100,
 } as const;
 
-export const PLUME_DEFAULTS = {
-  savedVolume: 0.5,
-} as const;
+export enum LOOP_MODE {
+  NONE = "none",
+  COLLECTION = "collection",
+  TRACK = "track",
+}
+export type LoopModeType = `${LOOP_MODE}`;
+export const LOOP_MODE_CYCLE: readonly LoopModeType[] = [LOOP_MODE.NONE, LOOP_MODE.COLLECTION, LOOP_MODE.TRACK];
 
 export enum TIME_DISPLAY_METHOD {
   DURATION = "duration",
   REMAINING = "remaining",
 }
 export type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`;
+
+export const PLUME_DEFAULTS = {
+  durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+  loopMode: LOOP_MODE.NONE,
+  savedVolume: 0.5,
+} as const;
 
 export interface TimeState {
   currentTime: number;
