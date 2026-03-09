@@ -9,7 +9,7 @@ import { cycleLoopMode } from "../../use-cases/cycle-loop-mode";
 
 export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType): void => {
   const appCore = getAppCoreInstance();
-  const pageType = appCore.getState().pageType;
+  const isAlbumPage = appCore.getState().pageType === "album";
   switch (loopMode) {
     case LOOP_MODE.NONE:
       const btnStringNone = getString("ARIA__LOOP__OFF");
@@ -19,8 +19,9 @@ export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType
       btn.title = btnStringNone;
       break;
     case LOOP_MODE.COLLECTION: {
-      const btnStringCollection =
-        pageType === "album" ? getString("ARIA__LOOP__COLLECTION_ALBUM") : getString("ARIA__LOOP__COLLECTION_TRACK");
+      const btnStringCollection = isAlbumPage
+        ? getString("ARIA__LOOP__COLLECTION_ALBUM")
+        : getString("ARIA__LOOP__COLLECTION_TRACK");
       btn.innerHTML = PLUME_SVG.loopCollection;
       btn.ariaPressed = "true";
       btn.ariaLabel = btnStringCollection;

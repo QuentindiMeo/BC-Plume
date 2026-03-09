@@ -87,9 +87,10 @@ const renderMuteButton = (elements: FullscreenElements, isMuted: boolean): void 
     return;
   }
 
+  const muteBtnString = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   elements.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-  elements.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-  elements.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+  elements.muteBtn.title = muteBtnString;
+  elements.muteBtn.ariaLabel = muteBtnString;
   elements.muteBtn.ariaPressed = isMuted.toString();
   elements.muteBtn.classList.toggle("muted", isMuted);
 };
