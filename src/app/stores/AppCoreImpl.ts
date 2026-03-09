@@ -8,8 +8,8 @@ import {
   TimeDisplayMethodType,
 } from "../../domain/plume";
 import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
+import { browserActions } from "../../domain/ports/browser";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
-import { browserActions } from "../../infra/Browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";

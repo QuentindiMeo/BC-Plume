@@ -1,5 +1,5 @@
 import { PlumeCacheKey } from "../../domain/browser";
-import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "../../infra/Browser";
+import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "../../domain/ports/browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 
