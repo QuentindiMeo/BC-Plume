@@ -241,8 +241,8 @@ div.name-section__titling h2 {
 }
 
 #bpe-play-pause-btn {
-  width: 3.75rem !important;
-  height: 3.75rem !important;
+  width: 3.5rem !important;
+  height: 3.5rem !important;
 
   background: rgba(29, 160, 195, 0.2) !important;
   border-color: var(--progbar-fill-bg-right) !important;

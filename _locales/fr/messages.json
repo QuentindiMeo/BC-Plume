@@ -146,7 +146,7 @@
   },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Bouton de piste précédente cliqué" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente dispatché" },
-  "DEBUG__PREV_TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Bouton de rembobinage cliqué" },
   "DEBUG__REWIND_TIME__DISPATCHED": {
     "message": "Temps rembobiné à : $TIME$ s",
@@ -246,10 +246,10 @@
     }
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
-  "ARIA__LOOP__OFF": { "message": "Répétition :  désactivée" },
-  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Répétition :  album" },
-  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Répétition :  piste" },
-  "ARIA__LOOP__ONE_TRACK": { "message": "Répétition :  activée" },
+  "ARIA__LOOP__OFF": { "message": "Répétition : désactivée" },
+  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Répétition : album" },
+  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Répétition : piste" },
+  "ARIA__LOOP__ONE_TRACK": { "message": "Répétition : activée" },
   "ARIA__VOLUME_SLIDER": { "message": "Curseur de volume" },
   "ARIA__MUTE": { "message": "Couper le son" },
   "ARIA__UNMUTE": { "message": "Rétablir le son" },

@@ -146,7 +146,7 @@
   },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Previous track button clicked" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Previous track event dispatched" },
-  "DEBUG__PREV_TRACK__RESTARTED": { "message": "Current track restarted" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Current track restarted" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Rewind button clicked" },
   "DEBUG__REWIND_TIME__DISPATCHED": {
     "message": "Time rewound to: $TIME$ s",

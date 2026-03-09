@@ -25,7 +25,7 @@ const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
 export const navigateTrackBackward = (player: MusicPlayerPort, bcPlayer: BcPlayerPort): void => {
   if (player.getCurrentTime() > TIME_BEFORE_RESTART) {
     player.seekTo(0);
-    logger(CPL.INFO, getString("DEBUG__PREV_TRACK__RESTARTED"));
+    logger(CPL.INFO, getString("DEBUG__TRACK__RESTARTED"));
     return;
   }
 
@@ -54,7 +54,9 @@ export const navigateTrackForward = (bcPlayer: BcPlayerPort, loopMode: LoopModeT
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   } else if (pageType === "track" && loopMode !== LOOP_MODE.NONE) {
     const musicPlayer = getMusicPlayerInstance();
-    navigateTrackBackward(musicPlayer, bcPlayer);
+    // On track pages in TRACK loop mode, treat "next" as restarting the current track.
+    musicPlayer.seekTo(0);
+    logger(CPL.INFO, getString("DEBUG__NEXT_TRACK__RESTARTED"));
   } else if (bcNextBtn) {
     bcNextBtn.click();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));

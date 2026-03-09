@@ -13,6 +13,7 @@ import { browserActions } from "../../infra/Browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
+import { getMusicPlayerInstance } from "./adapters";
 import { getBrowserInstance } from "./BrowserImpl";
 import { handleUnknownAction } from "./shared";
 
@@ -214,16 +215,6 @@ const createAppCoreInstance = (): IAppCore => {
         }
         break;
       }
-      case CORE_ACTIONS.RESET_TRANSIENT_STATE:
-        updateState("trackTitle", INITIAL_STATE.trackTitle);
-        updateState("trackNumber", INITIAL_STATE.trackNumber);
-        updateState("duration", INITIAL_STATE.duration);
-        updateState("currentTime", INITIAL_STATE.currentTime);
-        updateState("isPlaying", INITIAL_STATE.isPlaying);
-        updateState("isMuted", INITIAL_STATE.isMuted);
-        updateState("volumeBeforeMute", INITIAL_STATE.volumeBeforeMute);
-        updateState("isFullscreen", INITIAL_STATE.isFullscreen);
-        break;
       default:
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);
@@ -257,14 +248,17 @@ const createAppCoreInstance = (): IAppCore => {
 
       if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
         const loopMode = result[PLUME_CACHE_KEYS.LOOP_MODE] as LoopModeType;
+        let trueLoopMode = loopMode;
 
         if (state.pageType === "track" && loopMode === LOOP_MODE.COLLECTION) {
           // Collection loop doesn't make sense on track page - treat as TRACK loop
-          dispatch(coreActions.setLoopMode(LOOP_MODE.TRACK));
+          trueLoopMode = LOOP_MODE.TRACK;
           logger(CPL.INFO, "Loop mode loaded as COLLECTION but pageType is track - applied TRACK mode instead");
-        } else {
-          dispatch(coreActions.setLoopMode(loopMode));
         }
+        dispatch(coreActions.setLoopMode(trueLoopMode));
+
+        const musicPlayer = getMusicPlayerInstance();
+        musicPlayer.setLoop(trueLoopMode === LOOP_MODE.TRACK);
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);

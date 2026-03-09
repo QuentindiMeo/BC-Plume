@@ -146,7 +146,7 @@
   },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Botón de pista anterior presionado" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Evento de pista anterior enviado" },
-  "DEBUG__PREV_TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Pista actual reiniciada" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Botón de retroceso presionado" },
   "DEBUG__REWIND_TIME__DISPATCHED": {
     "message": "Tiempo retrocedido a: $TIME$ s",
@@ -246,10 +246,10 @@
     }
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
-  "ARIA__LOOP__OFF": { "message": "Repetición:  desactivada" },
-  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Repetición:  álbum" },
-  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Repetición:  pista" },
-  "ARIA__LOOP__ONE_TRACK": { "message": "Repetición:  activada" },
+  "ARIA__LOOP__OFF": { "message": "Repetición: desactivada" },
+  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Repetición: álbum" },
+  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Repetición: pista" },
+  "ARIA__LOOP__ONE_TRACK": { "message": "Repetición: activada" },
   "ARIA__VOLUME_SLIDER": { "message": "Deslizador de volumen" },
   "ARIA__MUTE": { "message": "Silenciar" },
   "ARIA__UNMUTE": { "message": "Activar sonido" },
