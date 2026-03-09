@@ -1,5 +1,12 @@
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
-import { LOOP_MODE, LOOP_MODE_CYCLE, PLUME_DEFAULTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
+import {
+  LOOP_MODE,
+  LOOP_MODE_CYCLE,
+  LoopModeType,
+  PLUME_DEFAULTS,
+  TIME_DISPLAY_METHOD,
+  TimeDisplayMethodType,
+} from "../../domain/plume";
 import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
 import { browserActions } from "../../infra/Browser";
@@ -197,7 +204,14 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.CYCLE_LOOP_MODE: {
         const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
         const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
-        updateState("loopMode", LOOP_MODE_CYCLE[nextIndex]);
+        const nextMode = LOOP_MODE_CYCLE[nextIndex];
+
+        // If current page is track, skip to track loop (collection loop doesn't make sense on track page)
+        if (state.pageType === "track" && nextMode === LOOP_MODE.COLLECTION) {
+          updateState("loopMode", LOOP_MODE.TRACK);
+        } else {
+          updateState("loopMode", nextMode);
+        }
         break;
       }
       case CORE_ACTIONS.RESET_TRANSIENT_STATE:
@@ -223,29 +237,32 @@ const createAppCoreInstance = (): IAppCore => {
       const result = await browserCache.get(keys);
 
       if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
-        const volume = result[PLUME_CACHE_KEYS.VOLUME];
-        if (typeof volume === "number") {
-          const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-          dispatch(coreActions.setVolume(volumeClamped));
+        const volume = result[PLUME_CACHE_KEYS.VOLUME] as number;
 
-          if (volumeClamped === 0) {
-            dispatch(coreActions.setIsMuted(true));
-          }
-          logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
+        const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
+        dispatch(coreActions.setVolume(volumeClamped));
+
+        if (volumeClamped === 0) {
+          dispatch(coreActions.setIsMuted(true));
         }
+        logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
       }
 
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
-        const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
-        if (method === "duration" || method === "remaining") {
-          dispatch(coreActions.setDurationDisplayMethod(method));
-          logger(CPL.INFO, "Time display method applied:", method);
-        }
+        const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] as TimeDisplayMethodType;
+
+        dispatch(coreActions.setDurationDisplayMethod(method));
+        logger(CPL.INFO, "Time display method applied:", method);
       }
 
       if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
-        const loopMode = result[PLUME_CACHE_KEYS.LOOP_MODE];
-        if (loopMode === LOOP_MODE.NONE || loopMode === LOOP_MODE.COLLECTION || loopMode === LOOP_MODE.TRACK) {
+        const loopMode = result[PLUME_CACHE_KEYS.LOOP_MODE] as LoopModeType;
+
+        if (state.pageType === "track" && loopMode === LOOP_MODE.COLLECTION) {
+          // Collection loop doesn't make sense on track page - treat as TRACK loop
+          dispatch(coreActions.setLoopMode(LOOP_MODE.TRACK));
+          logger(CPL.INFO, "Loop mode loaded as COLLECTION but pageType is track - applied TRACK mode instead");
+        } else {
           dispatch(coreActions.setLoopMode(loopMode));
         }
       }
