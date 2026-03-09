@@ -32,7 +32,9 @@ export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
   const bcPlayer = getBcPlayerInstance();
-  navigateTrackForward(bcPlayer);
+  const appCore = getAppCoreInstance();
+  const loopMode = appCore.getState().loopMode;
+  navigateTrackForward(bcPlayer, loopMode);
 };
 
 export const handleTimeBackward = (): void => {
