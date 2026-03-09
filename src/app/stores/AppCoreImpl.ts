@@ -39,6 +39,10 @@ const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
+const isPlumeDurationDisplayMethod = (value: any): value is TimeDisplayMethodType =>
+  Object.values(TIME_DISPLAY_METHOD).includes(value);
+const isPlumeLoopMode = (value: any): value is LoopModeType => Object.values(LOOP_MODE).includes(value);
+
 const createAppCoreInstance = (): IAppCore => {
   let state: AppCore = { ...INITIAL_STATE };
 
@@ -228,37 +232,42 @@ const createAppCoreInstance = (): IAppCore => {
       const result = await browserCache.get(keys);
 
       if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
-        const volume = result[PLUME_CACHE_KEYS.VOLUME] as number;
+        const isValidValue = typeof result[PLUME_CACHE_KEYS.VOLUME] === "number";
+        const cachedVolume = isValidValue ? result[PLUME_CACHE_KEYS.VOLUME] : PLUME_DEFAULTS.savedVolume;
 
-        const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-        dispatch(coreActions.setVolume(volumeClamped));
+        const clampedVolume = Math.max(0, Math.min(1, cachedVolume));
+        dispatch(coreActions.setVolume(clampedVolume));
 
-        if (volumeClamped === 0) {
+        if (clampedVolume === 0) {
           dispatch(coreActions.setIsMuted(true));
         }
-        logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
+        logger(CPL.INFO, "Volume loaded:", `${Math.round(clampedVolume * 100)}%`);
       }
 
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
-        const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] as TimeDisplayMethodType;
+        const isValidValue = isPlumeDurationDisplayMethod(result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]);
+        const cachedMethod = isValidValue
+          ? result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]
+          : PLUME_DEFAULTS.durationDisplayMethod;
 
-        dispatch(coreActions.setDurationDisplayMethod(method));
-        logger(CPL.INFO, "Time display method applied:", method);
+        dispatch(coreActions.setDurationDisplayMethod(cachedMethod));
+        logger(CPL.INFO, "Time display method applied:", cachedMethod);
       }
 
       if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
-        const loopMode = result[PLUME_CACHE_KEYS.LOOP_MODE] as LoopModeType;
-        let trueLoopMode = loopMode;
+        const isValidValue = isPlumeLoopMode(result[PLUME_CACHE_KEYS.LOOP_MODE]);
+        const cachedMode = isValidValue ? result[PLUME_CACHE_KEYS.LOOP_MODE] : PLUME_DEFAULTS.loopMode;
+        let inferredLoopMode = cachedMode;
 
-        if (state.pageType === "track" && loopMode === LOOP_MODE.COLLECTION) {
+        if (state.pageType === "track" && cachedMode === LOOP_MODE.COLLECTION) {
           // Collection loop doesn't make sense on track page - treat as TRACK loop
-          trueLoopMode = LOOP_MODE.TRACK;
+          inferredLoopMode = LOOP_MODE.TRACK;
           logger(CPL.INFO, "Loop mode loaded as COLLECTION but pageType is track - applied TRACK mode instead");
         }
-        dispatch(coreActions.setLoopMode(trueLoopMode));
+        dispatch(coreActions.setLoopMode(inferredLoopMode));
 
         const musicPlayer = getMusicPlayerInstance();
-        musicPlayer.setLoop(trueLoopMode === LOOP_MODE.TRACK);
+        musicPlayer.setLoop(inferredLoopMode === LOOP_MODE.TRACK);
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);
