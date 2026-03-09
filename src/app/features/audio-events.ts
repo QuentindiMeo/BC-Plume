@@ -1,9 +1,9 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
+import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
 import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
-import { getMusicPlayerInstance } from "../stores/adapters";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
 import type { CleanupCallback } from "./types";
@@ -64,6 +64,18 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     appCore.dispatch(coreActions.setIsPlaying(isPlaying));
   };
 
+  const handleEnded = () => {
+    if (appCore.getState().loopMode !== LOOP_MODE.COLLECTION) return;
+
+    const bcPlayer = getBcPlayerInstance();
+    const nextBtn = bcPlayer.getNextTrackButton();
+    if (nextBtn) {
+      nextBtn.click();
+      const prevBtn = bcPlayer.getPreviousTrackButton();
+      if (prevBtn) prevBtn.click();
+    }
+  };
+
   musicPlayer.on("timeupdate", handleTimeUpdate);
   musicPlayer.on("loadedmetadata", handleLoadedMetadata);
   musicPlayer.on("durationchange", handleDurationChange);
@@ -71,6 +83,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   musicPlayer.on("volumechange", handleVolumeChange);
   musicPlayer.on("play", handlePlayPause);
   musicPlayer.on("pause", handlePlayPause);
+  musicPlayer.on("ended", handleEnded);
 
   logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
 
@@ -82,5 +95,6 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     musicPlayer.off("volumechange", handleVolumeChange);
     musicPlayer.off("play", handlePlayPause);
     musicPlayer.off("pause", handlePlayPause);
+    musicPlayer.off("ended", handleEnded);
   };
 };

@@ -1,5 +1,5 @@
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
-import { PLUME_DEFAULTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
+import { LOOP_MODE, LOOP_MODE_CYCLE, PLUME_DEFAULTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
 import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
 import { browserActions } from "../../infra/Browser";
@@ -21,9 +21,14 @@ const INITIAL_STATE: AppCore = {
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
   isFullscreen: false,
+  loopMode: PLUME_DEFAULTS.loopMode,
 };
 
-const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>(["volume", "durationDisplayMethod"]);
+const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
+  "volume",
+  "durationDisplayMethod",
+  "loopMode",
+]);
 const PERSISTENCE_DELAY_MS = 200;
 
 const createAppCoreInstance = (): IAppCore => {
@@ -55,6 +60,8 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.VOLUME] = state.volume;
         } else if (key === "durationDisplayMethod") {
           toSave[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] = state.durationDisplayMethod;
+        } else if (key === "loopMode") {
+          toSave[PLUME_CACHE_KEYS.LOOP_MODE] = state.loopMode;
         }
       }
 
@@ -184,6 +191,15 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
+      case CORE_ACTIONS.SET_LOOP_MODE:
+        updateState("loopMode", action.payload);
+        break;
+      case CORE_ACTIONS.CYCLE_LOOP_MODE: {
+        const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
+        const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
+        updateState("loopMode", LOOP_MODE_CYCLE[nextIndex]);
+        break;
+      }
       case CORE_ACTIONS.RESET_TRANSIENT_STATE:
         updateState("trackTitle", INITIAL_STATE.trackTitle);
         updateState("trackNumber", INITIAL_STATE.trackNumber);
@@ -203,7 +219,7 @@ const createAppCoreInstance = (): IAppCore => {
   const loadPersistedStateThunk = (): Thunk<AppCore, CoreAction> => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
-      const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
+      const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, PLUME_CACHE_KEYS.LOOP_MODE];
       const result = await browserCache.get(keys);
 
       if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
@@ -224,6 +240,13 @@ const createAppCoreInstance = (): IAppCore => {
         if (method === "duration" || method === "remaining") {
           dispatch(coreActions.setDurationDisplayMethod(method));
           logger(CPL.INFO, "Time display method applied:", method);
+        }
+      }
+
+      if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
+        const loopMode = result[PLUME_CACHE_KEYS.LOOP_MODE];
+        if (loopMode === LOOP_MODE.NONE || loopMode === LOOP_MODE.COLLECTION || loopMode === LOOP_MODE.TRACK) {
+          dispatch(coreActions.setLoopMode(loopMode));
         }
       }
     } catch (error) {

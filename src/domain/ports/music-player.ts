@@ -6,13 +6,12 @@ export interface MusicPlayerPort {
   getDuration(): number;
 
   // Commands
+  seekTo(time: number): void;
+  seekAndPreservePause(time: number): void; // Seek while preserving pause state (see adapter for policy details)
   play(): void;
   pause(): void;
+  setLoop(loop: boolean): void;
   setVolume(volume: number): void;
-  seekTo(time: number): void;
-
-  // Seek while preserving pause state (see adapter for policy details)
-  seekAndPreservePause(time: number): void;
 
   // Event wiring
   on(event: string, handler: EventListener): void;
