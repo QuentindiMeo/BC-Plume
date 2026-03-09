@@ -20,6 +20,7 @@ import {
   handleTrackForward,
   setupPlayerStickiness,
 } from "./ui";
+import { handleLoopCycle } from "./ui/loop";
 
 // Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.
@@ -140,6 +141,7 @@ export const setupListeners = (handles: CleanupHandles): void => {
     handleTrackForward,
     handleMuteToggle,
     toggleFullscreenMode,
+    handleLoopCycle,
   });
 };
 

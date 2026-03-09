@@ -39,6 +39,10 @@ export class MusicPlayerAdapter implements MusicPlayerPort {
     this.audio.volume = volume;
   }
 
+  setLoop(loop: boolean): void {
+    this.audio.loop = loop;
+  }
+
   seekTo(time: number): void {
     this.audio.currentTime = time;
   }

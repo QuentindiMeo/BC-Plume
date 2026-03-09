@@ -211,8 +211,8 @@ div.name-section__titling h2 {
 }
 
 #bpe-playback-controls button {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;

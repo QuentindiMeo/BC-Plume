@@ -1,3 +1,4 @@
+export { cycleLoopMode } from "./cycle-loop-mode";
 export { navigateTrackBackward, navigateTrackForward } from "./navigate-track";
 export { seekBackward, seekForward } from "./seek-relative";
 export { seekToProgress } from "./seek-to-progress";

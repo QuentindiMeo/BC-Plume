@@ -13,6 +13,7 @@ import {
   seekForward,
   togglePlayback,
 } from "../../use-cases";
+import { applyLoopBtnState, handleLoopCycle } from "./loop";
 
 export const handlePlayPause = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
@@ -49,6 +50,7 @@ export const handleTimeForward = (): void => {
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
+  const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
   const container = document.createElement("div");
   container.id = PLUME_ELEM_SELECTORS.playbackControls.split("#")[1];
@@ -93,15 +95,29 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   trackForwardBtn.ariaLabel = getString("LABEL__TRACK_FORWARD");
   trackForwardBtn.addEventListener("click", handleTrackForward);
 
+  const loopBtn = document.createElement("button");
+  loopBtn.id = PLUME_ELEM_SELECTORS.loopBtn.split("#")[1];
+  loopBtn.type = "button";
+  loopBtn.innerHTML = PLUME_SVG.loopNone;
+  loopBtn.title = getString("ARIA__LOOP__OFF");
+  loopBtn.ariaLabel = getString("ARIA__LOOP__OFF");
+  loopBtn.ariaPressed = "false";
+  loopBtn.addEventListener("click", handleLoopCycle);
+
   container.appendChild(trackBackwardBtn);
   container.appendChild(timeBackwardBtn);
   container.appendChild(playPauseBtn);
   container.appendChild(timeForwardBtn);
   container.appendChild(trackForwardBtn);
+  container.appendChild(loopBtn);
 
   // Seed the store arrays with the main-panel buttons; fullscreen.ts appends its clones
   plumeUi.dispatch(guiActions.setPlayPauseBtns([playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([trackForwardBtn]));
+  plumeUi.dispatch(guiActions.setLoopBtns([loopBtn]));
+
+  // Apply persisted loop state immediately so button reflects loaded state
+  applyLoopBtnState(loopBtn, appCore.getState().loopMode);
 
   return container;
 };

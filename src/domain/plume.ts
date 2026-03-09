@@ -5,8 +5,17 @@ export const PLUME_CONSTANTS = {
   VOLUME_SLIDER_GRANULARITY: 100,
 } as const;
 
+export const enum LOOP_MODE {
+  NONE = "none",
+  COLLECTION = "collection",
+  TRACK = "track",
+}
+export type LoopModeType = `${LOOP_MODE}`;
+export const LOOP_MODE_CYCLE: readonly LoopModeType[] = [LOOP_MODE.NONE, LOOP_MODE.COLLECTION, LOOP_MODE.TRACK];
+
 export const PLUME_DEFAULTS = {
   savedVolume: 0.5,
+  loopMode: LOOP_MODE.NONE,
 } as const;
 
 export enum TIME_DISPLAY_METHOD {

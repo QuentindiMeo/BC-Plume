@@ -19,6 +19,7 @@ export enum PLUME_ELEM_SELECTORS {
   playPauseBtn = "button#bpe-play-pause-btn",
   timeFwdBtn = "button#bpe-time-fwd-btn",
   trackFwdBtn = "button#bpe-track-fwd-btn",
+  loopBtn = "button#bpe-loop-btn",
   fullscreenBtn = "button#bpe-fullscreen-btn",
   fullscreenBtnLabel = "span#bpe-fullscreen-btn-label",
   volumeContainer = "div#bpe-volume-container",
