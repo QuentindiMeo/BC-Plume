@@ -53,11 +53,13 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
       (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
     if (userIsTypingInInput) return; // don't trigger hotkeys when focus is on an input or textarea
 
-    const isValidHotkey = AVAILABLE_HOTKEYS.has(e.key) || DIGIT_CODES.has(e.code);
-    if (!isValidHotkey) return;
+    const isHotkey = AVAILABLE_HOTKEYS.has(e.key) || DIGIT_CODES.has(e.code);
+    if (!isHotkey) return;
+    if (!e.getModifierState("NumLock") && e.code.startsWith("Numpad")) return; // ignore numpad hotkeys when NumLock is off
 
     e.preventDefault();
     e.stopPropagation();
+
     switch (e.key) {
       case " ": {
         const focusedElement = document.activeElement as HTMLElement;
