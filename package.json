@@ -2,6 +2,7 @@
   "author": "Quentin DI MEO",
   "name": "plume",
   "license": "MIT",
+
   "version": "1.3.3",
   "description": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player.",
   "scripts": {
