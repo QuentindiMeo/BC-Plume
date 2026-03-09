@@ -1,7 +1,7 @@
 import { PLUME_CONSTANTS } from "../../../domain/plume";
 import { coreActions } from "../../../domain/ports/app-core";
+import { guiActions } from "../../../domain/ports/gui";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
-import { guiActions } from "../../../infra/Gui";
 import { getString } from "../../../shared/i18n";
 import { PLUME_SVG } from "../../../svg/icons";
 import { getMusicPlayerInstance } from "../../stores/adapters";

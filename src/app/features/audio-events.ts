@@ -1,6 +1,6 @@
 import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
-import { guiActions } from "../../infra/Gui";
+import { guiActions } from "../../domain/ports/gui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";

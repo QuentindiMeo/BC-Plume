@@ -1,6 +1,6 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
+import { guiActions } from "../../domain/ports/gui";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedTime } from "../../shared/presenters";
@@ -8,8 +8,8 @@ import { PLUME_SVG } from "../../svg/icons";
 import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
-import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { updateTrackForwardBtnState } from "./observers";
+import type { CleanupCallback, SubscriptionCallback } from "./types";
 import { syncLoopBtn } from "./ui/loop";
 import { syncMuteBtn } from "./ui/volume";
 
