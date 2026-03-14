@@ -11,6 +11,7 @@ import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
 import { setupHotkeys } from "./keyboard";
+import { loadHotkeyBindings } from "../use-cases/loadHotkeyBindings";
 import { setupStoreSubscriptions } from "./store-subscriptions";
 import { CleanupCallback } from "./types";
 import {
@@ -121,20 +122,24 @@ const applyPersistedVolume = (audio: HTMLAudioElement): void => {
 };
 
 // Registers all post-injection listeners and stores their teardown callbacks
-export const setupListeners = (handles: CleanupHandles): void => {
+export const setupListeners = async (handles: CleanupHandles): Promise<void> => {
   handles.stickiness = setupPlayerStickiness();
   rewireAudioEventListeners(handles);
   handles.storeSubscriptions = setupStoreSubscriptions();
-  handles.hotkeys = setupHotkeys({
-    handlePlayPause,
-    handleTimeBackward,
-    handleTimeForward,
-    handleTrackBackward,
-    handleTrackForward,
-    handleMuteToggle,
-    toggleFullscreenMode,
-    handleLoopCycle,
-  });
+  const hotkeyBindings = await loadHotkeyBindings();
+  handles.hotkeys = setupHotkeys(
+    {
+      handlePlayPause,
+      handleTimeBackward,
+      handleTimeForward,
+      handleTrackBackward,
+      handleTrackForward,
+      handleMuteToggle,
+      toggleFullscreenMode,
+      handleLoopCycle,
+    },
+    hotkeyBindings
+  );
 };
 
 export const createDomObserver = (handles: CleanupHandles, reinit: () => void): MutationObserver => {

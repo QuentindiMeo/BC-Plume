@@ -254,5 +254,58 @@
   "ARIA__MUTE": { "message": "Mute" },
   "ARIA__UNMUTE": { "message": "Unmute" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
-  "ARIA__COVER_ART": { "message": "Cover Art Image" }
+  "ARIA__COVER_ART": { "message": "Cover Art Image" },
+
+  "POPUPTITLE": { "message": "Plume Settings" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
+  "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Unhandled hotkey action: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Failed to persist hotkey bindings" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
+  "WARN__HOTKEYS__CONFLICT": {
+    "message": "Already assigned to: $ACTION$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      }
+    }
+  },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Play / Pause" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Forward 10 seconds" },
+  "LABEL__HOTKEY__VOLUME_UP": { "message": "Volume up" },
+  "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Volume down" },
+  "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Previous track / Rewind" },
+  "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Next track" },
+  "LABEL__HOTKEY__FULLSCREEN": { "message": "Fullscreen" },
+  "LABEL__HOTKEY__MUTE": { "message": "Mute / Unmute" },
+  "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cycle loop mode" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Seek to 0%–90% (digit keys)" },
+  "ARIA__HOTKEY_ROW__BUTTON": {
+    "message": "Remap $ACTION$ hotkey — currently $BINDING$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      },
+      "binding": {
+        "content": "$2",
+        "example": "Space"
+      }
+    }
+  },
+  "ARIA__HOTKEY_ROW__CAPTURING": {
+    "message": "Capturing key for $ACTION$ — press any key or Escape to cancel",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      }
+    }
+  }
 }

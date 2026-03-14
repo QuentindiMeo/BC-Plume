@@ -254,5 +254,58 @@
   "ARIA__MUTE": { "message": "Couper le son" },
   "ARIA__UNMUTE": { "message": "Rétablir le son" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
-  "ARIA__COVER_ART": { "message": "Image de la pochette" }
+  "ARIA__COVER_ART": { "message": "Image de la pochette" },
+
+  "POPUPTITLE": { "message": "Paramètres de Plume" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
+  "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmer" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Annuler" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Action de raccourci non gérée : $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Échec de la persistance des raccourcis" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par d\u00e9faut" },
+  "WARN__HOTKEYS__CONFLICT": {
+    "message": "Déjà assigné à : $ACTION$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Lecture / Pause"
+      }
+    }
+  },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Lecture / Pause" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
+  "LABEL__HOTKEY__VOLUME_UP": { "message": "Augmenter le volume" },
+  "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Diminuer le volume" },
+  "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Piste précédente / Recommencer" },
+  "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Piste suivante" },
+  "LABEL__HOTKEY__FULLSCREEN": { "message": "Plein écran" },
+  "LABEL__HOTKEY__MUTE": { "message": "Couper / Rétablir le son" },
+  "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Changer le mode de répétition" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0%–90% (touches numériques)" },
+  "ARIA__HOTKEY_ROW__BUTTON": {
+    "message": "Réassigner le raccourci $ACTION$ — actuellement $BINDING$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Lecture / Pause"
+      },
+      "binding": {
+        "content": "$2",
+        "example": "Space"
+      }
+    }
+  },
+  "ARIA__HOTKEY_ROW__CAPTURING": {
+    "message": "Capture de touche pour $ACTION$ — appuyez sur une touche ou Échap pour annuler",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Lecture / Pause"
+      }
+    }
+  }
 }

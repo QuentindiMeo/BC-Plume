@@ -1,20 +1,22 @@
-import { registerBcPlayer, registerMusicPlayer } from "./app/stores/adapters";
-import { getGuiInstance } from "./app/stores/GuiImpl";
-import { logDetectedBrowser } from "./shared/i18n";
 import { launchPlume } from "./app/features/lifecycle";
-import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter } from "./infra/adapters";
+import { registerBcPlayer, registerMessageReceiver, registerMusicPlayer } from "./app/stores/adapters";
+import { getGuiInstance } from "./app/stores/GuiImpl";
 import type { BcPlayerPort } from "./domain/ports/bc-player";
 import type { MusicPlayerPort } from "./domain/ports/music-player";
+import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter, createRuntimeMessageReceiver } from "./infra/adapters";
+import { logDetectedBrowser } from "./shared/i18n";
 
 (() => {
   "use strict";
 
   const audioProvider = new GuiAudioProvider(getGuiInstance);
-  const bandcampPlayer: BcPlayerPort = new BcPlayerAdapter();
-  const musicPlayer: MusicPlayerPort = new MusicPlayerAdapter(audioProvider);
+  const bandcampPlayer = new BcPlayerAdapter();
+  const musicPlayer = new MusicPlayerAdapter(audioProvider);
+  const messageReceiver = createRuntimeMessageReceiver();
 
-  registerBcPlayer(bandcampPlayer);
-  registerMusicPlayer(musicPlayer);
+  registerBcPlayer(bandcampPlayer satisfies BcPlayerPort);
+  registerMusicPlayer(musicPlayer satisfies MusicPlayerPort);
+  registerMessageReceiver(messageReceiver);
 
   logDetectedBrowser();
   launchPlume();

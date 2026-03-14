@@ -6,7 +6,18 @@ export interface IBrowserApi {
     local: {
       get: (keys: Array<string>) => Promise<any>;
       set: (items: any) => Promise<void>;
+      remove: (keys: Array<string>) => Promise<void>;
     };
+  };
+  runtime: {
+    onMessage: {
+      addListener: (handler: (message: unknown) => void) => void;
+      removeListener: (handler: (message: unknown) => void) => void;
+    };
+  };
+  tabs?: {
+    query: (queryInfo: { url: string }) => Promise<Array<{ id?: number }>>;
+    sendMessage: (tabId: number, message: any) => Promise<void>;
   };
 }
 export type IBrowserCache = IBrowserApi["storage"]["local"];
