@@ -263,6 +263,9 @@
   "POPUP__HOTKEYS__DISABLED": { "message": "Desactivado" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmar" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Cancelar" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Acción de atajo no gestionada: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Error al persistir los atajos de teclado" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Almacenamiento de atajos no disponible, usando los valores predeterminados" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Ya asignado a: $ACTION$",
     "placeholders": {
@@ -272,7 +275,7 @@
       }
     }
   },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Almacenamiento de atajos no disponible, usando los valores predeterminados" },\n  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Acci\u00f3n de atajo no gestionada: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },\n  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Reproducir / Pausar" },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Reproducir / Pausar" },
   "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Retroceder 10 segundos" },
   "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Subir volumen" },

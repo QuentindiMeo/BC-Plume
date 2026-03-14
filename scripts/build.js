@@ -47,10 +47,27 @@ const popupBuildOptions = {
   outfile: path.join(distDir, "popup.js"),
 };
 
+const popupSrcDir = path.join(__dirname, "..", "src", "popup");
+const watchPopupAssets = () => {
+  try {
+    fs.watch(popupSrcDir, (_, filename) => {
+      if (!filename) return;
+      if (filename === "popup.html" || filename === "popup.css") {
+        try {
+          copyPopupAssets();
+          console.log(`📄 Updated popup asset copied: ${filename}`);
+        } catch (err) {
+          console.error("❌ Failed to copy popup assets on change:", err);
+        }
+      }
+    });
+  } catch (err) {
+    console.error("❌ Failed to start watcher for popup assets:", err);
+  }
+};
 const copyPopupAssets = () => {
-  const srcDir = path.join(__dirname, "..", "src", "popup");
-  fs.copyFileSync(path.join(srcDir, "popup.html"), path.join(distDir, "popup.html"));
-  fs.copyFileSync(path.join(srcDir, "popup.css"), path.join(distDir, "popup.css"));
+  fs.copyFileSync(path.join(popupSrcDir, "popup.html"), path.join(distDir, "popup.html"));
+  fs.copyFileSync(path.join(popupSrcDir, "popup.css"), path.join(distDir, "popup.css"));
 };
 
 async function build() {
@@ -60,6 +77,7 @@ async function build() {
       const popupCtx = await esbuild.context(popupBuildOptions);
       await Promise.all([contentCtx.watch(), popupCtx.watch()]);
       copyPopupAssets();
+      watchPopupAssets();
       console.log("👀 Watching for changes...");
     } else {
       await Promise.all([esbuild.build(contentBuildOptions), esbuild.build(popupBuildOptions)]);

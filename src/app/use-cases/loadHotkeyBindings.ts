@@ -2,16 +2,16 @@ import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../
 import { PLUME_CACHE_KEYS } from "../../domain/browser";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
+import { inferBrowserApi } from "../../shared/browser";
 
 export const loadHotkeyBindings = async (): Promise<Record<HotkeyAction, KeyBinding>> => {
   let stored: KeyBindingMap | undefined;
 
   try {
-    const chromeApi = (globalThis as any).chrome ?? (globalThis as any).browser;
-    if (chromeApi?.storage?.local) {
-      const result = await chromeApi.storage.local.get(PLUME_CACHE_KEYS.HOTKEY_BINDINGS);
-      stored = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] as KeyBindingMap | undefined;
-    }
+    const browserApi = inferBrowserApi();
+    const result = await browserApi.storage.local.get([PLUME_CACHE_KEYS.HOTKEY_BINDINGS]);
+
+    stored = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] as KeyBindingMap | undefined;
   } catch {
     logger(CPL.WARN, getString("WARN__HOTKEYS__STORAGE_UNAVAILABLE"));
     return { ...DEFAULT_HOTKEYS };

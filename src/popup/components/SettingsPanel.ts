@@ -1,6 +1,7 @@
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
 import type { IMessageSender } from "../../domain/ports/messaging";
 import { getString } from "../../shared/i18n";
+import { CPL, logger } from "../../shared/logger";
 import { resetHotkeys } from "../use-cases/resetHotkeys";
 import { saveHotkeys } from "../use-cases/saveHotkeys";
 import { createHotkeyRow, HotkeyRowInstance } from "./HotkeyRow";
@@ -51,7 +52,12 @@ export const createSettingsPanel = (
 
   const handleBindingChange = (action: HotkeyAction, newBinding: KeyBinding): void => {
     currentBindings[action] = newBinding;
-    saveHotkeys(currentBindings, sender).catch(() => {});
+    saveHotkeys(currentBindings, sender).catch(() => {
+      logger(CPL.ERROR, getString("ERROR__HOTKEYS__PERSISTENCE"));
+      // Revert local state and UI back to previous binding on failure
+      currentBindings[action] = storedBindings?.[action] ?? DEFAULT_HOTKEYS[action];
+      rows.get(action)?.updateBinding(currentBindings[action]);
+    });
   };
 
   // Read-only informational row; digit-seek is not remappable
@@ -66,7 +72,7 @@ export const createSettingsPanel = (
     const badge = document.createElement("span");
     badge.className = "hotkey-row__badge";
     badge.textContent = "0 – 9";
-    badge.setAttribute("aria-label", getString("LABEL__HOTKEY__DIGIT_SEEK"));
+    badge.ariaLabel = getString("LABEL__HOTKEY__DIGIT_SEEK");
 
     row.appendChild(label);
     row.appendChild(badge);
@@ -77,7 +83,7 @@ export const createSettingsPanel = (
   const buildHotkeySection = (): HTMLElement => {
     const section = document.createElement("section");
     section.className = "settings__section";
-    section.setAttribute("aria-label", getString("POPUP__HOTKEYS__SECTION_TITLE"));
+    section.ariaLabel = getString("POPUP__HOTKEYS__SECTION_TITLE");
 
     const title = document.createElement("h2");
     title.className = "settings__section-title";
@@ -108,7 +114,7 @@ export const createSettingsPanel = (
     const confirmText = document.createElement("span");
     confirmText.className = "popup__reset-confirm-text";
     confirmText.hidden = true;
-    confirmText.setAttribute("aria-live", "polite");
+    confirmText.ariaLive = "polite"; // Announce conflict confirmation text to assistive technologies
 
     const cancelBtn = document.createElement("button");
     cancelBtn.className = "popup__reset-btn popup__reset-btn--cancel";

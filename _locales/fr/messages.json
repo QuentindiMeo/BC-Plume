@@ -263,6 +263,9 @@
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmer" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Annuler" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Action de raccourci non gérée : $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Échec de la persistance des raccourcis" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par d\u00e9faut" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Déjà assigné à : $ACTION$",
     "placeholders": {
@@ -272,7 +275,7 @@
       }
     }
   },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par d\u00e9faut" },\n  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Action de raccourci non g\u00e9r\u00e9e\u00a0: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },\n  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Lecture / Pause" },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Lecture / Pause" },
   "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
   "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Augmenter le volume" },

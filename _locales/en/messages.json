@@ -263,6 +263,9 @@
   "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Unhandled hotkey action: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Failed to persist hotkey bindings" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Already assigned to: $ACTION$",
     "placeholders": {
@@ -272,8 +275,6 @@
       }
     }
   },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
-  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Unhandled hotkey action: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
   "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Play / Pause" },
   "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
   "LABEL__HOTKEY__TIME_FORWARD": { "message": "Forward 10 seconds" },

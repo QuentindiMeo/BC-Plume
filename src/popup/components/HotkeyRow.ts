@@ -157,6 +157,12 @@ export const createHotkeyRow = (
     liveRegion.textContent = getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]);
 
     const onKeydown = (e: KeyboardEvent) => {
+      // Allow forbidden navigation keys (e.g. Tab, F5, F12) to cancel capture without blocking their default browser behavior.
+      if (FORBIDDEN_CODES.has(e.code) && e.code !== "Escape") {
+        cancelCapture();
+        document.removeEventListener("keydown", onKeydown, true);
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
 
