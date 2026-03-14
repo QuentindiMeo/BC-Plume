@@ -109,7 +109,7 @@ export const launchPlume = (): void => {
       return;
     }
 
-    setupListeners(handles);
+    await setupListeners(handles);
     initPlayback();
 
     // Debug: show detected controls

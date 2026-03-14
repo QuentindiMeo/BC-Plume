@@ -254,5 +254,55 @@
   "ARIA__MUTE": { "message": "Silenciar" },
   "ARIA__UNMUTE": { "message": "Activar sonido" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
-  "ARIA__COVER_ART": { "message": "Imagen de carátula" }
+  "ARIA__COVER_ART": { "message": "Imagen de carátula" },
+
+  "POPUPTITLE": { "message": "Ajustes de Plume" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
+  "POPUP__HOTKEYS__RESET_ALL": { "message": "Restablecer todo" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Pulsa una tecla..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Desactivado" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmar" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Cancelar" },
+  "WARN__HOTKEYS__CONFLICT": {
+    "message": "Ya asignado a: $ACTION$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Reproducir / Pausar"
+      }
+    }
+  },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Almacenamiento de atajos no disponible, usando los valores predeterminados" },\n  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Acci\u00f3n de atajo no gestionada: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },\n  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Reproducir / Pausar" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Retroceder 10 segundos" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
+  "LABEL__HOTKEY__VOLUME_UP": { "message": "Subir volumen" },
+  "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Bajar volumen" },
+  "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Pista anterior / Retroceder" },
+  "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Pista siguiente" },
+  "LABEL__HOTKEY__FULLSCREEN": { "message": "Pantalla completa" },
+  "LABEL__HOTKEY__MUTE": { "message": "Silenciar / Activar sonido" },
+  "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cambiar modo de repetición" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Ir al 0%–90% (teclas numéricas)" },
+  "ARIA__HOTKEY_ROW__BUTTON": {
+    "message": "Reasignar atajo de $ACTION$ — actualmente $BINDING$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Reproducir / Pausar"
+      },
+      "binding": {
+        "content": "$2",
+        "example": "Space"
+      }
+    }
+  },
+  "ARIA__HOTKEY_ROW__CAPTURING": {
+    "message": "Capturando tecla para $ACTION$ — pulsa cualquier tecla o Escape para cancelar",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Reproducir / Pausar"
+      }
+    }
+  }
 }

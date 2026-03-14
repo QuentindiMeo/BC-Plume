@@ -32,7 +32,7 @@ const deployPackage = (browser, withNewline) => {
 
   // Copy compiled JavaScript files
   const distDir = path.join(__dirname, "..", "dist");
-  const srcFiles = ["content.js"];
+  const srcFiles = ["content.js", "popup.js", "popup.html", "popup.css"];
 
   srcFiles.forEach((file) => {
     const srcPath = path.join(distDir, file);

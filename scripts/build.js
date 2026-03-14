@@ -23,29 +23,47 @@ if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
 
-const buildOptions = {
-  entryPoints: [path.join(__dirname, "..", "src", "main.ts")],
+const sharedOptions = {
   bundle: true,
-  outfile: path.join(distDir, "content.js"),
   platform: "browser",
   target: "es2022",
   sourcemap: isDev || isTest,
   minify: !isDev && !isTest,
   logLevel: "info",
-  // esbuild replaces every occurrence of the token `process.env`
   define: {
     "process.env.NODE_ENV": JSON.stringify(mode),
   },
 };
 
+const contentBuildOptions = {
+  ...sharedOptions,
+  entryPoints: [path.join(__dirname, "..", "src", "main.ts")],
+  outfile: path.join(distDir, "content.js"),
+};
+
+const popupBuildOptions = {
+  ...sharedOptions,
+  entryPoints: [path.join(__dirname, "..", "src", "popup", "popup.ts")],
+  outfile: path.join(distDir, "popup.js"),
+};
+
+const copyPopupAssets = () => {
+  const srcDir = path.join(__dirname, "..", "src", "popup");
+  fs.copyFileSync(path.join(srcDir, "popup.html"), path.join(distDir, "popup.html"));
+  fs.copyFileSync(path.join(srcDir, "popup.css"), path.join(distDir, "popup.css"));
+};
+
 async function build() {
   try {
     if (isWatch) {
-      const context = await esbuild.context(buildOptions);
-      await context.watch();
+      const contentCtx = await esbuild.context(contentBuildOptions);
+      const popupCtx = await esbuild.context(popupBuildOptions);
+      await Promise.all([contentCtx.watch(), popupCtx.watch()]);
+      copyPopupAssets();
       console.log("👀 Watching for changes...");
     } else {
-      await esbuild.build(buildOptions);
+      await Promise.all([esbuild.build(contentBuildOptions), esbuild.build(popupBuildOptions)]);
+      copyPopupAssets();
       console.log("✅ Build complete!");
     }
     console.log(); // newline for readability
