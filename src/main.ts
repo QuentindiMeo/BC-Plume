@@ -3,7 +3,7 @@ import { registerBcPlayer, registerMessageReceiver, registerMusicPlayer } from "
 import { getGuiInstance } from "./app/stores/GuiImpl";
 import type { BcPlayerPort } from "./domain/ports/bc-player";
 import type { MusicPlayerPort } from "./domain/ports/music-player";
-import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter, RuntimeMessageReceiver } from "./infra/adapters";
+import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter, createRuntimeMessageReceiver } from "./infra/adapters";
 import { logDetectedBrowser } from "./shared/i18n";
 
 (() => {
@@ -12,7 +12,7 @@ import { logDetectedBrowser } from "./shared/i18n";
   const audioProvider = new GuiAudioProvider(getGuiInstance);
   const bandcampPlayer = new BcPlayerAdapter();
   const musicPlayer = new MusicPlayerAdapter(audioProvider);
-  const messageReceiver = new RuntimeMessageReceiver();
+  const messageReceiver = createRuntimeMessageReceiver();
 
   registerBcPlayer(bandcampPlayer satisfies BcPlayerPort);
   registerMusicPlayer(musicPlayer satisfies MusicPlayerPort);

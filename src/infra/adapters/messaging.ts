@@ -2,8 +2,8 @@ import type { IMessageReceiver, IMessageSender, MessageHandler } from "../../dom
 import { inferBrowserApi } from "../../shared/browser";
 import type { PlumeMessage } from "../../shared/messages";
 
-export class RuntimeMessageReceiver implements IMessageReceiver {
-  onMessage(handler: MessageHandler): () => void {
+export const createRuntimeMessageReceiver = (): IMessageReceiver => {
+  const onMessage = (handler: MessageHandler): (() => void) => {
     const browserApi = inferBrowserApi();
     // Narrow unknown → PlumeMessage at the boundary before the app layer ever sees the value
     const listener = (message: unknown) => {
@@ -13,11 +13,12 @@ export class RuntimeMessageReceiver implements IMessageReceiver {
     };
     browserApi.runtime.onMessage.addListener(listener);
     return () => browserApi.runtime.onMessage.removeListener(listener);
-  }
-}
+  };
+  return { onMessage };
+};
 
-export class TabsMessageSender implements IMessageSender {
-  async broadcastToTabs(urlPattern: string, message: PlumeMessage): Promise<void> {
+export const createTabsMessageSender = (): IMessageSender => {
+  const broadcastToTabs = async (urlPattern: string, message: PlumeMessage): Promise<void> => {
     const browser = inferBrowserApi();
     if (!browser.tabs) return;
 
@@ -27,5 +28,6 @@ export class TabsMessageSender implements IMessageSender {
         browser.tabs.sendMessage(tab.id, message).catch(() => {});
       }
     }
-  }
-}
+  };
+  return { broadcastToTabs };
+};

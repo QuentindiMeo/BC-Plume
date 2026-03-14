@@ -1,6 +1,6 @@
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
+import type { IMessageSender } from "../../domain/ports/messaging";
 import { getString } from "../../shared/i18n";
-import { messageSender } from "../services";
 import { resetHotkeys } from "../use-cases/resetHotkeys";
 import { saveHotkeys } from "../use-cases/saveHotkeys";
 import { createHotkeyRow, HotkeyRowInstance } from "./HotkeyRow";
@@ -20,7 +20,10 @@ const ACTION_ORDER: HotkeyAction[] = [
 
 export type SettingsPanelInstance = { mount: (el: HTMLElement) => void };
 
-export const createSettingsPanel = (storedBindings: KeyBindingMap | undefined): SettingsPanelInstance => {
+export const createSettingsPanel = (
+  storedBindings: KeyBindingMap | undefined,
+  sender: IMessageSender
+): SettingsPanelInstance => {
   // Merge stored overrides on top of defaults
   const currentBindings = Object.fromEntries(
     ACTION_ORDER.map((action) => [action, storedBindings?.[action] ?? DEFAULT_HOTKEYS[action]])
@@ -48,7 +51,7 @@ export const createSettingsPanel = (storedBindings: KeyBindingMap | undefined): 
 
   const handleBindingChange = (action: HotkeyAction, newBinding: KeyBinding): void => {
     currentBindings[action] = newBinding;
-    saveHotkeys(currentBindings, messageSender).catch(() => {});
+    saveHotkeys(currentBindings, sender).catch(() => {});
   };
 
   // Read-only informational row; digit-seek is not remappable
@@ -123,7 +126,7 @@ export const createSettingsPanel = (storedBindings: KeyBindingMap | undefined): 
     confirmResetBtn.textContent = getString("POPUP__HOTKEYS__RESET_ALL");
     confirmResetBtn.hidden = true;
     confirmResetBtn.addEventListener("click", async () => {
-      await resetHotkeys(messageSender);
+      await resetHotkeys(sender);
       // Update local state and all rows to reflect defaults
       for (const action of ACTION_ORDER) {
         currentBindings[action] = DEFAULT_HOTKEYS[action];
