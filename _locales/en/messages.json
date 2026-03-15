@@ -256,6 +256,22 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
 
+  "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "New version available!" },
+  "LABEL__TOAST__VERSION": {
+    "message": "Version $VERSION$ of Plume is out.",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "v1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__VIEW_CHANGELOG": { "message": "See what's new" },
+  "INFO__TOAST__SHOWN": { "message": "Version toast shown" },
+  "INFO__TOAST__DISMISSED": { "message": "Version toast dismissed, version persisted" },
+  "ARIA__TOAST__CONTAINER": { "message": "Extension update notification" },
+  "ARIA__TOAST__DISMISS": { "message": "Dismiss update notification" },
+
   "POPUPTITLE": { "message": "Plume Settings" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },

@@ -16,6 +16,7 @@ import {
   registerUnloadCleanup,
   setupListeners,
 } from "./observers";
+import { showVersionToast } from "./toast";
 
 const initPlayback = () => {
   // BC's native play button is clicked to trigger its own internal playback bootstrap
@@ -56,6 +57,7 @@ export const launchPlume = (): void => {
     storeSubscriptions: null,
     hotkeys: null,
     stickiness: null,
+    toast: null,
   };
 
   const isInitializedRef = { value: false };
@@ -108,6 +110,9 @@ export const launchPlume = (): void => {
       isInitializing = false;
       return;
     }
+
+    // if (await shouldShowVersionToast()) showVersionToast();
+    showVersionToast();
 
     await setupListeners(handles);
     initPlayback();

@@ -256,6 +256,22 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 
+  "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "Nouvelle version disponible !" },
+  "LABEL__TOAST__VERSION": {
+    "message": "La version $VERSION$ de Plume est disponible.",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "v1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__VIEW_CHANGELOG": { "message": "Voir les nouveautés" },
+  "INFO__TOAST__SHOWN": { "message": "Notification de version affichée" },
+  "INFO__TOAST__DISMISSED": { "message": "Notification ignorée, version enregistrée" },
+  "ARIA__TOAST__CONTAINER": { "message": "Notification de mise à jour de l'extension" },
+  "ARIA__TOAST__DISMISS": { "message": "Fermer la notification de mise à jour" },
+
   "POPUPTITLE": { "message": "Paramètres de Plume" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
@@ -265,7 +281,7 @@
   "POPUP__HOTKEYS__CANCEL": { "message": "Annuler" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Action de raccourci non gérée : $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Échec de la persistance des raccourcis" },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par d\u00e9faut" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par défaut" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Déjà assigné à : $ACTION$",
     "placeholders": {
