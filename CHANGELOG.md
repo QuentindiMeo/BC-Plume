@@ -1,12 +1,17 @@
 <div align="center" id="top">
   <img src="https://raw.githubusercontent.com/QuentindiMeo/BC-Plume/main/icons/logo.svg" alt="BC-Plume Logo" width="256px" />
-  <h2>:card_file_box: Full-Fleshed Changelog :card_file_box:</h2>
+  <h2>🗃️ Full-Fleshed Changelog 🗃️</h2>
 </div>
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
-  - _**[1.3.3]** ..._: ...  
-  The project's SEO is enhanced with a [promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8), reddit posts ([1](https://www.reddit.com/r/chrome_extensions/comments/1rh0onk/i_revamped_bandcamps_audio_player_ux_ui), [2](https://www.reddit.com/r/extensions/comments/1rh0ngh/i_revamped_bandcamps_audio_player_ux_ui)), and a [Twitter/X account](https://x.com/PlumeBandcamp) to reach a wider audience and keep users updated on new features and releases. The extension is also submitted to the Product Hunt and AlternativeTo.
+  - _**[1.3.3]** Mar 15 2026_: Digit Hotkeys, Loop Mode, Hexagon, Hotkey Customization & Release Toast [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106)  
+  The project's SEO is enhanced with a [promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8), reddit posts ([1](https://www.reddit.com/r/chrome_extensions/comments/1rh0onk/i_revamped_bandcamps_audio_player_ux_ui), [2](https://www.reddit.com/r/extensions/comments/1rh0ngh/i_revamped_bandcamps_audio_player_ux_ui)), and a [Twitter/X account](https://x.com/PlumeBandcamp) to reach a wider audience and keep users updated on new features and releases. The extension is also submitted to the [Product Hunt](https://www.producthunt.com/products/plume-5) and [AlternativeTo](https://alternativeto.net/software/bc-plume).  
+  Hotkeys for track seeking are introduced, using digit keys (`0` to `9`) for quick access to specific percentages of the track's duration (e.g. `5` for 50%).  
+  A looping mechanism is added, allowing users to cycle through loop modes (none → collection → track → none) with a dedicated button.  
+  The extension popup is introduced, allowing users to customize Plume hotkeys.  
+  A toast notification system is added—it is used to present new Plume releases to the user.  
+  Adjustments are made to match hexagonal architecture principles, following the implementation of Clean Architecture guidelines in the previous release.
 
     - _**[1.3.2.1]** Feb 24 2026_: Oops! The new architecture broke the Firefox version, let's hotfix it... 🤣 [#094](https://github.com/QuentindiMeo/BC-Plume/pull/94)  
     Invalid value types, invalid SVG properties, wrong gecko ID... I did do an oopsie.
