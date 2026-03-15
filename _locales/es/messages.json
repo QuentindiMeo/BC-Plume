@@ -256,6 +256,36 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" },
 
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "¡Una actualización ha sido lanzada!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "La versión $RELEASE$ de Plume ya está disponible.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "Ver las novedades" },
+  "META__TOAST__RELEASE": { "message": "actualización de versión" },
+  "INFO__TOAST__SHOWN": {
+    "message": "Notificación mostrada ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Notificación descartada ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+  "INFO__RELEASE__PERSISTED": { "message": "Lanzamiento guardado en el almacenamiento" },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Notificación de $LABEL$ de la extensión",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Cerrar notificación de $LABEL$",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+
   "POPUPTITLE": { "message": "Ajustes de Plume" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Restablecer todo" },

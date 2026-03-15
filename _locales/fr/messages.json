@@ -256,6 +256,36 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ est maintenant disponible.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "Voir les nouveautés" },
+  "INFO__TOAST__SHOWN": {
+    "message": "Notification affichée ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Notification ignorée ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+  "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
+  "META__TOAST__RELEASE": { "message": "mise à jour de version" },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Notification de $LABEL$ de l'extension",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Fermer la notification de $LABEL$",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+
   "POPUPTITLE": { "message": "Paramètres de Plume" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
@@ -265,7 +295,7 @@
   "POPUP__HOTKEYS__CANCEL": { "message": "Annuler" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Action de raccourci non gérée : $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Échec de la persistance des raccourcis" },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par d\u00e9faut" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par défaut" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Déjà assigné à : $ACTION$",
     "placeholders": {

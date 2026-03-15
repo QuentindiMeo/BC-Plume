@@ -256,6 +256,36 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
 
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ is now available.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
+  "META__TOAST__RELEASE": { "message": "release update" },
+  "INFO__TOAST__SHOWN": {
+    "message": "Toast shown ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Toast dismissed ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__RELEASE__PERSISTED": { "message": "Last release observation was persisted to storage" },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Extension $LABEL$ notification",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Dismiss $LABEL$ notification",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+
   "POPUPTITLE": { "message": "Plume Settings" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },

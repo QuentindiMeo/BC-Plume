@@ -10,6 +10,7 @@ import { isLastTrackOfAlbumPlaying } from "../use-cases/navigate-track";
 import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
+import { cleanupReleaseToast } from "./toast";
 import { setupHotkeys } from "./keyboard";
 import { loadHotkeyBindings } from "../use-cases/loadHotkeyBindings";
 import { setupStoreSubscriptions } from "./store-subscriptions";
@@ -92,6 +93,7 @@ export interface CleanupHandles {
   storeSubscriptions: CleanupCallback | null;
   hotkeys: CleanupCallback | null;
   stickiness: CleanupCallback | null;
+  toast: CleanupCallback | null;
 }
 
 // Wires audio event listeners and updates handles in-place. This avoids leaking listeners of the old element.
@@ -194,6 +196,7 @@ export const createSpaNavigationObserver = (
     logger(CPL.LOG, getString("LOG__NAVIGATION_DETECTED"));
 
     cleanupFullscreenMode();
+    cleanupReleaseToast();
 
     isInitializedRef.value = false;
     setTimeout(() => {
@@ -217,6 +220,7 @@ export const registerUnloadCleanup = (
     spaNavigationObserver.disconnect();
 
     cleanupFullscreenMode();
+    cleanupReleaseToast();
 
     if (handles.stickiness) {
       handles.stickiness();

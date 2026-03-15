@@ -6,3 +6,4 @@ export { setVolume } from "./set-volume";
 export { toggleDurationDisplay } from "./toggle-duration-display";
 export { togglePlayback } from "./toggle-playback";
 export { updateTrackMetadata } from "./update-track-metadata";
+export { shouldShowReleaseToast } from "./check-release-toast";
