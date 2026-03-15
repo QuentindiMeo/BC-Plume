@@ -1,3 +1,5 @@
+export { buildToastElement } from "./toast";
+export type { ToastConfig, ToastCta } from "./toast";
 export { createFullscreenButtonSection } from "./fullscreen-button";
 export {
   createPlaybackControlPanel,

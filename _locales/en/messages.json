@@ -267,8 +267,9 @@
     }
   },
   "LABEL__TOAST__VIEW_CHANGELOG": { "message": "See what's new" },
-  "INFO__TOAST__SHOWN": { "message": "Version toast shown" },
-  "INFO__TOAST__DISMISSED": { "message": "Version toast dismissed, version persisted" },
+  "INFO__TOAST__SHOWN": { "message": "Toast shown" },
+  "INFO__TOAST__DISMISSED": { "message": "Toast dismissed" },
+  "INFO__VERSION__PERSISTED": { "message": "Last version observation was persisted to storage" },
   "ARIA__TOAST__CONTAINER": { "message": "Extension update notification" },
   "ARIA__TOAST__DISMISS": { "message": "Dismiss update notification" },
 

@@ -267,8 +267,9 @@
     }
   },
   "LABEL__TOAST__VIEW_CHANGELOG": { "message": "Ver las novedades" },
-  "INFO__TOAST__SHOWN": { "message": "Notificación de versión mostrada" },
-  "INFO__TOAST__DISMISSED": { "message": "Notificación descartada, versión guardada" },
+  "INFO__TOAST__SHOWN": { "message": "Notificación mostrada" },
+  "INFO__TOAST__DISMISSED": { "message": "Notificación descartada" },
+  "INFO__VERSION__PERSISTED": { "message": "Versión guardada en el almacenamiento" },
   "ARIA__TOAST__CONTAINER": { "message": "Notificación de actualización de la extensión" },
   "ARIA__TOAST__DISMISS": { "message": "Cerrar notificación de actualización" },
 

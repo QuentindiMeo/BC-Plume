@@ -267,8 +267,9 @@
     }
   },
   "LABEL__TOAST__VIEW_CHANGELOG": { "message": "Voir les nouveautés" },
-  "INFO__TOAST__SHOWN": { "message": "Notification de version affichée" },
-  "INFO__TOAST__DISMISSED": { "message": "Notification ignorée, version enregistrée" },
+  "INFO__TOAST__SHOWN": { "message": "Notification affichée" },
+  "INFO__TOAST__DISMISSED": { "message": "Notification ignorée" },
+  "INFO__VERSION__PERSISTED": { "message": "Observation de la dernière version enregistrée dans le stockage" },
   "ARIA__TOAST__CONTAINER": { "message": "Notification de mise à jour de l'extension" },
   "ARIA__TOAST__DISMISS": { "message": "Fermer la notification de mise à jour" },
 
