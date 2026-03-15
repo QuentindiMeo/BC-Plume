@@ -256,9 +256,9 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" },
 
-  "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "¡Nuevo lanzamiento disponible!" },
-  "LABEL__TOAST__RELEASE": {
-    "message": "El lanzamiento $RELEASE$ de Plume ha sido publicado.",
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "¡Una actualización ha sido lanzada!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "La versión $RELEASE$ de Plume ya está disponible.",
     "placeholders": {
       "release": {
         "content": "$1",
@@ -266,12 +266,25 @@
       }
     }
   },
-  "LABEL__TOAST__VIEW_CHANGELOG": { "message": "Ver las novedades" },
-  "INFO__TOAST__SHOWN": { "message": "Notificación mostrada" },
-  "INFO__TOAST__DISMISSED": { "message": "Notificación descartada" },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "Ver las novedades" },
+  "META__TOAST__RELEASE": { "message": "actualización de versión" },
+  "INFO__TOAST__SHOWN": {
+    "message": "Notificación mostrada ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Notificación descartada ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
   "INFO__RELEASE__PERSISTED": { "message": "Lanzamiento guardado en el almacenamiento" },
-  "ARIA__TOAST__CONTAINER": { "message": "Notificación de actualización de la extensión" },
-  "ARIA__TOAST__DISMISS": { "message": "Cerrar notificación de actualización" },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Notificación de $LABEL$ de la extensión",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Cerrar notificación de $LABEL$",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
 
   "POPUPTITLE": { "message": "Ajustes de Plume" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },

@@ -14,15 +14,13 @@ export const showReleaseToast = (): void => {
   if (releaseToastHandle) return;
 
   releaseToastHandle = createToast({
-    ariaLabel: getString("ARIA__TOAST__CONTAINER"),
+    label: getString("META__TOAST__RELEASE"),
     iconSvg: PLUME_SVG.logo,
-    title: getString("LABEL__TOAST__UPDATE_AVAILABLE"),
-    message: getString("LABEL__TOAST__RELEASE", [APP_VERSION.slice(1)]),
-    cta: { href: PLUME_CHANGELOG_URL, label: getString("LABEL__TOAST__VIEW_CHANGELOG") },
-    dismissAriaLabel: getString("ARIA__TOAST__DISMISS"),
+    title: getString("LABEL__TOAST__RELEASE__TITLE"),
+    description: getString("LABEL__TOAST__RELEASE__DESCRIPTION", [APP_VERSION.slice(1)]),
+    cta: { href: PLUME_CHANGELOG_URL, label: getString("LABEL__TOAST__RELEASE__CTA") },
     onDismissed: () => {
       releaseToastHandle = null;
-      logger(CPL.INFO, getString("INFO__TOAST__DISMISSED"));
 
       // Write APP_VERSION so the toast won't reappear until the next release
       const browser = getBrowserInstance();
@@ -31,8 +29,6 @@ export const showReleaseToast = (): void => {
     },
     duration: PLUME_CONSTANTS.TOAST_AUTO_DISMISS,
   });
-
-  logger(CPL.INFO, getString("INFO__TOAST__SHOWN"));
 };
 
 // Called on SPA navigation or page unload. Removes the node without persisting

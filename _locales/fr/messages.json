@@ -256,9 +256,9 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 
-  "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "Nouvelle version disponible !" },
-  "LABEL__TOAST__RELEASE": {
-    "message": "La version $RELEASE$ de Plume a été publiée.",
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ est maintenant disponible.",
     "placeholders": {
       "release": {
         "content": "$1",
@@ -266,12 +266,25 @@
       }
     }
   },
-  "LABEL__TOAST__VIEW_CHANGELOG": { "message": "Voir les nouveautés" },
-  "INFO__TOAST__SHOWN": { "message": "Notification affichée" },
-  "INFO__TOAST__DISMISSED": { "message": "Notification ignorée" },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "Voir les nouveautés" },
+  "INFO__TOAST__SHOWN": {
+    "message": "Notification affichée ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Notification ignorée ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
   "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
-  "ARIA__TOAST__CONTAINER": { "message": "Notification de mise à jour de l'extension" },
-  "ARIA__TOAST__DISMISS": { "message": "Fermer la notification de mise à jour" },
+  "META__TOAST__RELEASE": { "message": "mise à jour de version" },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Notification de $LABEL$ de l'extension",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Fermer la notification de $LABEL$",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
 
   "POPUPTITLE": { "message": "Paramètres de Plume" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },

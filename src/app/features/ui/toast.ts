@@ -1,15 +1,17 @@
+import { getString } from "../../../shared/i18n";
+import { CPL, logger } from "../../../shared/logger";
+
 export interface ToastCta {
   href: string;
   label: string;
 }
 
 export interface ToastConfig {
-  ariaLabel: string;
+  label: string; // short identifier used for ARIA construction and logging
   iconSvg: string;
   title: string;
-  message?: string;
+  description?: string;
   cta?: ToastCta;
-  dismissAriaLabel: string;
   onDismissed?: () => void; // side-effect callback, called after the toast is dismissed
   duration: number; // in seconds
 }
@@ -33,7 +35,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   const toast = document.createElement("div");
   toast.className = "bpe-toast";
   toast.role = "status";
-  toast.ariaLabel = config.ariaLabel;
+  toast.ariaLabel = getString("ARIA__TOAST__CONTAINER", [config.label]);
   toast.ariaLive = "polite";
 
   const icon = document.createElement("div");
@@ -49,17 +51,17 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   title.textContent = config.title;
   body.appendChild(title);
 
-  if (config.message) {
+  if (config.description) {
     const message = document.createElement("p");
-    message.className = "bpe-toast__message";
-    message.textContent = config.message;
+    message.className = "bpe-toast__description";
+    message.textContent = config.description;
     body.appendChild(message);
   }
 
   const dismiss = document.createElement("button");
   dismiss.className = "bpe-toast__dismiss";
   dismiss.type = "button";
-  dismiss.ariaLabel = config.dismissAriaLabel;
+  dismiss.ariaLabel = getString("ARIA__TOAST__DISMISS", [config.label]);
   dismiss.textContent = "×";
   dismiss.addEventListener("click", onDismissClick);
 
@@ -116,6 +118,7 @@ export const createToast = (config: ToastConfig): ToastHandle => {
       },
       { once: true }
     );
+    logger(CPL.INFO, getString("INFO__TOAST__DISMISSED", [config.label]));
     config.onDismissed?.();
   };
 
@@ -129,6 +132,7 @@ export const createToast = (config: ToastConfig): ToastHandle => {
 
   const el = buildToastElement(config, dismiss);
   container.appendChild(el);
+  logger(CPL.INFO, getString("INFO__TOAST__SHOWN", [config.label]));
 
   timerId = setTimeout(() => dismiss(), remaining);
 
