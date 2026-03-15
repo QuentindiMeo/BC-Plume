@@ -603,6 +603,11 @@ div.name-section__titling h2 {
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+@keyframes bpe-toast-timer-drain {
+  from { width: var(--timer-start-width, 100%); }
+  to   { width: 0%; }
+}
+
 .bpe-toast {
   position: fixed;
   top: 1.25rem;
@@ -614,7 +619,6 @@ div.name-section__titling h2 {
 
   display: flex;
   align-items: flex-start;
-  gap: 1rem; /* follows horizontal padding */
 
   background: rgba(15, 15, 20, 0.92);
   backdrop-filter: blur(8px);
@@ -626,6 +630,7 @@ div.name-section__titling h2 {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   animation: bpe-toast-enter 0.3s ease-out;
+  overflow: hidden;
 }
 .bpe-toast:hover {
   background: rgba(10, 10, 15, 0.96);
@@ -641,7 +646,7 @@ div.name-section__titling h2 {
   width: 10%;
   height: unset;
   place-self: center;
-  margin-top: -0.25rem;
+  margin-top: -0.5rem;
 }
 
 .bpe-toast__body {
@@ -650,6 +655,7 @@ div.name-section__titling h2 {
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
+  margin-left: 1rem;
 }
 
 .bpe-toast__title {
@@ -707,6 +713,21 @@ div.name-section__titling h2 {
   color: #ffffff;
 }
 
+.bpe-toast__timer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--progbar-fill-bg-left), var(--progbar-fill-bg-right));
+  animation: bpe-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
+  pointer-events: none;
+}
+
+.bpe-toast--paused .bpe-toast__timer {
+  animation-play-state: paused;
+}
+
 @media (max-width: 480px) {
   .bpe-toast {
     top: auto;
@@ -724,7 +745,8 @@ div.name-section__titling h2 {
 
 @media (prefers-reduced-motion: reduce) {
   .bpe-toast,
-  .bpe-toast--exiting {
+  .bpe-toast--exiting,
+  .bpe-toast__timer {
     animation-duration: 0.01ms !important;
   }
 }

@@ -258,7 +258,7 @@
 
   "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "Nueva versión disponible!" },
   "LABEL__TOAST__VERSION": {
-    "message": "La versión $VERSION$ de Plume ya está disponible.",
+    "message": "La versión $VERSION$ de Plume a sido publicada.",
     "placeholders": {
       "version": {
         "content": "$1",

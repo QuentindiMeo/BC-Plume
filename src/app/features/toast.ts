@@ -1,11 +1,11 @@
-import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { PLUME_CACHE_KEYS } from "../../domain/browser";
+import { APP_VERSION, PLUME_CHANGELOG_URL } from "../../domain/meta";
+import { PLUME_CONSTANTS } from "../../domain/plume";
+import { browserActions } from "../../domain/ports/browser";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
 import { getBrowserInstance } from "../stores/BrowserImpl";
-import { browserActions } from "../../domain/ports/browser";
-import { PLUME_CONSTANTS } from "../../domain/plume";
 
 let toastElement: HTMLElement | null = null;
 let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -21,7 +21,7 @@ const startAutoTimer = (remaining: number): void => {
   timeoutId = setTimeout(() => dismissVersionToast(), remaining);
 };
 
-const buildToastElement = (): HTMLElement => {
+const buildToastElement = (duration: number = PLUME_CONSTANTS.TOAST_AUTO_DISMISS): HTMLElement => {
   const toast = document.createElement("div");
   toast.className = "bpe-toast";
   toast.role = "status";
@@ -42,14 +42,14 @@ const buildToastElement = (): HTMLElement => {
 
   const message = document.createElement("p");
   message.className = "bpe-toast__message";
-  message.textContent = getString("LABEL__TOAST__VERSION", [APP_VERSION]);
+  message.textContent = getString("LABEL__TOAST__VERSION", [APP_VERSION.slice(1)]);
 
   body.appendChild(title);
   body.appendChild(message);
 
   const cta = document.createElement("a");
   cta.className = "bpe-toast__cta";
-  cta.href = PLUME_KO_FI_URL;
+  cta.href = PLUME_CHANGELOG_URL;
   cta.target = "_blank";
   cta.rel = "noopener noreferrer";
   cta.textContent = getString("LABEL__TOAST__VIEW_CHANGELOG");
@@ -61,10 +61,16 @@ const buildToastElement = (): HTMLElement => {
   dismiss.textContent = "×";
   dismiss.addEventListener("click", () => dismissVersionToast());
 
+  const timer = document.createElement("div");
+  timer.className = "bpe-toast__timer";
+  timer.setAttribute("aria-hidden", "true");
+  timer.style.setProperty("--toast-timer-duration", `${duration}s`);
+
   toast.appendChild(icon);
   toast.appendChild(body);
   toast.appendChild(cta);
   toast.appendChild(dismiss);
+  toast.appendChild(timer);
 
   return toast;
 };
@@ -76,22 +82,32 @@ export const showVersionToast = (): void => {
   document.body.appendChild(toastElement);
   logger(CPL.INFO, getString("INFO__TOAST__SHOWN"));
 
-  let remaining: number = PLUME_CONSTANTS.TOAST_AUTO_DISMISS_MS;
-  let hoverStart = 0;
+  const totalDurationMs = PLUME_CONSTANTS.TOAST_AUTO_DISMISS * 1000;
+  let remaining: number = totalDurationMs;
+  let segmentStart = Date.now();
 
   startAutoTimer(remaining);
 
   toastElement.addEventListener("mouseenter", () => {
+    remaining = Math.max(0, remaining - (Date.now() - segmentStart));
     clearAutoTimer();
-    hoverStart = Date.now();
     toastElement?.classList.add("bpe-toast--paused");
   });
 
   toastElement.addEventListener("mouseleave", () => {
-    const elapsed = Date.now() - hoverStart;
-    remaining = Math.max(0, remaining - elapsed);
+    segmentStart = Date.now();
     toastElement?.classList.remove("bpe-toast--paused");
     startAutoTimer(remaining);
+
+    const timer = toastElement?.querySelector(".bpe-toast__timer") as HTMLElement | null;
+    if (timer) {
+      const pct = (remaining / totalDurationMs) * 100;
+      timer.style.setProperty("--timer-start-width", `${pct}%`);
+      timer.style.setProperty("--toast-timer-duration", `${remaining / 1000}s`);
+      timer.style.animation = "none";
+      void timer.offsetHeight; // force reflow to restart animation
+      timer.style.animation = "";
+    }
   });
 };
 
@@ -105,7 +121,8 @@ export const dismissVersionToast = (): void => {
 
   el.addEventListener(
     "animationend",
-    () => {
+    (e: AnimationEvent) => {
+      if (e.animationName !== "bpe-toast-exit") return;
       el.remove();
       if (toastElement === el) toastElement = null;
     },

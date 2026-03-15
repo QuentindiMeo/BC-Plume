@@ -5,6 +5,7 @@ import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
+import { shouldShowVersionToast } from "../use-cases";
 import { checkBandcampElements } from "./bc-diagnostic";
 import { debugBandcampControls } from "./debug";
 import { injectEnhancements } from "./injection";
@@ -111,8 +112,7 @@ export const launchPlume = (): void => {
       return;
     }
 
-    // if (await shouldShowVersionToast()) showVersionToast();
-    showVersionToast();
+    if (await shouldShowVersionToast()) showVersionToast();
 
     await setupListeners(handles);
     initPlayback();

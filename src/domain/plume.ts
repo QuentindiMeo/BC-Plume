@@ -3,7 +3,7 @@ export const PLUME_CONSTANTS = {
   TIME_STEP_DURATION: 10, // seconds to skip forward/backward
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
   VOLUME_SLIDER_GRANULARITY: 100,
-  TOAST_AUTO_DISMISS_MS: 600_000,
+  TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
 } as const;
 
 export enum LOOP_MODE {

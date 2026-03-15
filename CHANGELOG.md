@@ -3,11 +3,11 @@
   <h2>:card_file_box: Full-Fleshed Changelog :card_file_box:</h2>
 </div>
 
-- later releases to come with new releases!! Know more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues)
+- Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
   - _**[1.3.3]** ..._: ...
 
-    - _**[1.3.2.1]** Feb 24 2026_: Oops! The new architecture broke the Firefox version, let's hotfix it... :'\) [#94](https://github.com/QuentindiMeo/BC-Plume/pull/94)
+    - _**[1.3.2.1]** Feb 24 2026_: Oops! The new architecture broke the Firefox version, let's hotfix it... 🤣 [#94](https://github.com/QuentindiMeo/BC-Plume/pull/94)
 
   - _**[1.3.2]** Feb 23 2026_: Software architecture is hauled, new muting mechanism, SEO is revamped. [#81](https://github.com/QuentindiMeo/BC-Plume/pull/81)
   - _**[1.3.1]** Feb 01 2026_: Fullscreen mode is improved, album runtime is displayed, hotkeys are added. [#76](https://github.com/QuentindiMeo/BC-Plume/pull/76)
