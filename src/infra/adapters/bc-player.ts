@@ -57,6 +57,12 @@ export class BcPlayerAdapter implements BcPlayerPort {
     return audio?.volume ?? 0;
   }
 
+  getTrackRows(): HTMLTableRowElement[] {
+    const trackList = this.query<HTMLTableElement>(BC_ELEM_SELECTORS.trackList);
+    if (!trackList) return [];
+    return Array.from(trackList.querySelectorAll<HTMLTableRowElement>(BC_ELEM_SELECTORS.trackRow));
+  }
+
   getTrackRowTitles(): string[] {
     const trackList = this.query<HTMLTableElement>(BC_ELEM_SELECTORS.trackList);
     if (!trackList) return [];

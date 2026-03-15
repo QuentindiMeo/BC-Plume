@@ -1,12 +1,16 @@
+import { HotkeyAction, KeyBinding } from "../../domain/hotkeys";
 import { PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
+import { PLUME_MESSAGE_TYPE } from "../../shared/messages";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { NoArgFunction } from "../../shared/types";
+import { getMusicPlayerInstance, getMessageReceiverInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { seekToProgress } from "../use-cases/seek-to-progress";
 import type { CleanupCallback } from "./types";
 
-const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+const { VOLUME_SLIDER_GRANULARITY, PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 interface KeyboardHandlers {
   handlePlayPause: NoArgFunction;
@@ -16,22 +20,29 @@ interface KeyboardHandlers {
   handleTrackForward: NoArgFunction;
   handleMuteToggle: NoArgFunction;
   toggleFullscreenMode: NoArgFunction;
+  handleLoopCycle: NoArgFunction;
 }
 
-const AVAILABLE_HOTKEYS = new Set<string>([
-  " ",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "ArrowDown",
-  "PageUp",
-  "PageDown",
-  "f",
-  "m",
-]);
+// e.code values for both digit row and numpad
+const DIGIT_CODES = new Set<string>(Array.from({ length: 10 }, (_, i) => [`Digit${i}`, `Numpad${i}`]).flat());
 
-export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
+// Maps a KeyBinding's code to a HotkeyAction for fast reverse lookup
+const buildCodeToActionMap = (bindings: Record<HotkeyAction, KeyBinding>): Map<string, HotkeyAction> => {
+  const map = new Map<string, HotkeyAction>();
+  for (const [action, binding] of Object.entries(bindings)) {
+    map.set(binding.code, action as HotkeyAction);
+  }
+  return map;
+};
+
+export const setupHotkeys = (
+  handlers: KeyboardHandlers,
+  initialBindings: Record<HotkeyAction, KeyBinding>
+): CleanupCallback => {
   const appCore = getAppCoreInstance();
+
+  let currentBindings = { ...initialBindings };
+  let codeToAction = buildCodeToActionMap(currentBindings);
 
   const handleAdjustVolume = (delta: number) => {
     if (delta === 0) logger(CPL.WARN, getString("WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA"));
@@ -46,55 +57,85 @@ export const setupHotkeys = (handlers: KeyboardHandlers): CleanupCallback => {
   const handleKeydown = (e: KeyboardEvent) => {
     const userIsTypingInInput =
       (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
-    if (userIsTypingInInput) return; // don't trigger hotkeys when user is typing in an input or textarea
+    if (userIsTypingInInput) return;
 
-    const isValidHotkey = AVAILABLE_HOTKEYS.has(e.key);
-    if (!isValidHotkey) return;
+    if (DIGIT_CODES.has(e.code)) {
+      if (!e.getModifierState("NumLock") && e.code.startsWith("Numpad")) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const musicPlayer = getMusicPlayerInstance();
+      const pressedKey = e.code.replace("Digit", "").replace("Numpad", "");
+      const digit = parseInt(pressedKey, 10);
+      seekToProgress(digit * 0.1 * PROGRESS_SLIDER_GRANULARITY, appCore, musicPlayer);
+
+      return;
+    }
+
+    const action = codeToAction.get(e.code);
+    if (!action) return;
 
     e.preventDefault();
     e.stopPropagation();
-    switch (e.key) {
-      case " ": {
+
+    switch (action) {
+      case HotkeyAction.PLAY_PAUSE: {
         const focusedElement = document.activeElement as HTMLElement;
-        const isSpaceTriggeringButton = focusedElement.tagName === "BUTTON";
-        if (isSpaceTriggeringButton) {
+        if (focusedElement.tagName === "BUTTON") {
           focusedElement.click();
           return;
         }
         handlers.handlePlayPause();
         break;
       }
-      case "ArrowLeft":
+      case HotkeyAction.TIME_BACKWARD:
         handlers.handleTimeBackward();
         break;
-      case "ArrowRight":
+      case HotkeyAction.TIME_FORWARD:
         handlers.handleTimeForward();
         break;
-      case "ArrowUp":
+      case HotkeyAction.VOLUME_UP:
         handleAdjustVolume(5);
         break;
-      case "ArrowDown":
+      case HotkeyAction.VOLUME_DOWN:
         handleAdjustVolume(-5);
         break;
-      case "PageUp":
+      case HotkeyAction.TRACK_BACKWARD:
         handlers.handleTrackBackward();
         break;
-      case "PageDown":
+      case HotkeyAction.TRACK_FORWARD:
         handlers.handleTrackForward();
         break;
-      case "f":
+      case HotkeyAction.FULLSCREEN:
         handlers.toggleFullscreenMode();
         break;
-      case "m":
+      case HotkeyAction.MUTE:
         handlers.handleMuteToggle();
         break;
+      case HotkeyAction.LOOP_CYCLE:
+        handlers.handleLoopCycle();
+        break;
+      default:
+        action satisfies never; // Ensure all cases are handled
+        logger(CPL.ERROR, getString("ERROR__HOTKEYS__UNHANDLED_ACTION", [action as string]));
     }
   };
 
   document.addEventListener("keydown", handleKeydown);
+
+  const messageReceiver = getMessageReceiverInstance();
+  const unsubscribeMessages = messageReceiver.onMessage((message) => {
+    if (message.type === PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED) {
+      currentBindings = { ...message.bindings };
+      codeToAction = buildCodeToActionMap(currentBindings);
+    }
+  });
+
   logger(CPL.INFO, getString("INFO__HOTKEYS__REGISTERED"));
 
   return () => {
     document.removeEventListener("keydown", handleKeydown);
+    unsubscribeMessages();
   };
 };

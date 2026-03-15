@@ -1,14 +1,18 @@
+import { LOOP_MODE } from "../../domain/plume";
+import { guiActions } from "../../domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
+import { isLastTrackOfAlbumPlaying } from "../use-cases/navigate-track";
 import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
+import { cleanupReleaseToast } from "./toast";
 import { setupHotkeys } from "./keyboard";
+import { loadHotkeyBindings } from "../use-cases/loadHotkeyBindings";
 import { setupStoreSubscriptions } from "./store-subscriptions";
 import { CleanupCallback } from "./types";
 import {
@@ -20,31 +24,22 @@ import {
   handleTrackForward,
   setupPlayerStickiness,
 } from "./ui";
+import { handleLoopCycle } from "./ui/loop";
 
 // Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.
 export const isPlumeInjected = (): boolean => !!document.querySelector(PLUME_ELEM_SELECTORS.plumeContainer);
 
-const isLastTrackOfAlbumPlaying = () => {
+export const updateTrackForwardBtnState = () => {
   const bcPlayer = getBcPlayerInstance();
-  const trackRowTitles = bcPlayer.getTrackRowTitles();
-  if (trackRowTitles.length === 0) return false;
-
-  const lastTrackTitle = trackRowTitles.at(-1);
-  const currentTrackTitle = bcPlayer.getTrackTitle("album");
-  if (!currentTrackTitle) return false;
-
-  return lastTrackTitle === currentTrackTitle;
-};
-
-const updateTrackForwardBtnState = () => {
   const appCore = getAppCoreInstance();
   const plume = getGuiInstance().getState();
   const trackFwdBtns = plume.trackFwdBtns;
   if (trackFwdBtns.length === 0) return;
 
-  const isAlbumPage = appCore.getState().pageType === "album";
-  const shouldDisable = !isAlbumPage || isLastTrackOfAlbumPlaying();
+  const isNotLooping = appCore.getState().loopMode === LOOP_MODE.NONE;
+  const pageType = appCore.getState().pageType;
+  const shouldDisable = isNotLooping && (isLastTrackOfAlbumPlaying(bcPlayer) || pageType === "track");
   trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
 };
 
@@ -98,6 +93,7 @@ export interface CleanupHandles {
   storeSubscriptions: CleanupCallback | null;
   hotkeys: CleanupCallback | null;
   stickiness: CleanupCallback | null;
+  toast: CleanupCallback | null;
 }
 
 // Wires audio event listeners and updates handles in-place. This avoids leaking listeners of the old element.
@@ -128,19 +124,24 @@ const applyPersistedVolume = (audio: HTMLAudioElement): void => {
 };
 
 // Registers all post-injection listeners and stores their teardown callbacks
-export const setupListeners = (handles: CleanupHandles): void => {
+export const setupListeners = async (handles: CleanupHandles): Promise<void> => {
   handles.stickiness = setupPlayerStickiness();
   rewireAudioEventListeners(handles);
   handles.storeSubscriptions = setupStoreSubscriptions();
-  handles.hotkeys = setupHotkeys({
-    handlePlayPause,
-    handleTimeBackward,
-    handleTimeForward,
-    handleTrackBackward,
-    handleTrackForward,
-    handleMuteToggle,
-    toggleFullscreenMode,
-  });
+  const hotkeyBindings = await loadHotkeyBindings();
+  handles.hotkeys = setupHotkeys(
+    {
+      handlePlayPause,
+      handleTimeBackward,
+      handleTimeForward,
+      handleTrackBackward,
+      handleTrackForward,
+      handleMuteToggle,
+      toggleFullscreenMode,
+      handleLoopCycle,
+    },
+    hotkeyBindings
+  );
 };
 
 export const createDomObserver = (handles: CleanupHandles, reinit: () => void): MutationObserver => {
@@ -195,6 +196,7 @@ export const createSpaNavigationObserver = (
     logger(CPL.LOG, getString("LOG__NAVIGATION_DETECTED"));
 
     cleanupFullscreenMode();
+    cleanupReleaseToast();
 
     isInitializedRef.value = false;
     setTimeout(() => {
@@ -218,6 +220,7 @@ export const registerUnloadCleanup = (
     spaNavigationObserver.disconnect();
 
     cleanupFullscreenMode();
+    cleanupReleaseToast();
 
     if (handles.stickiness) {
       handles.stickiness();

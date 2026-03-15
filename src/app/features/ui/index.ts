@@ -9,4 +9,6 @@ export {
 } from "./playback";
 export { setupPlayerStickiness } from "./player-stickiness";
 export { createProgressBar, dispatchAudioProgressToStore as syncProgressToStore } from "./progress";
+export { createToast } from "./toast";
+export type { ToastConfig, ToastCta, ToastHandle } from "./toast";
 export { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "./volume";

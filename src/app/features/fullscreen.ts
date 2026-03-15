@@ -1,8 +1,8 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { PLUME_CONSTANTS } from "../../domain/plume";
+import { LoopModeType, PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
+import { guiActions } from "../../domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { PLUME_SVG } from "../../svg/icons";
@@ -11,6 +11,7 @@ import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
 import { seekToProgress, setVolume, toggleDurationDisplay } from "../use-cases";
 import { CleanupCallback, SubscriptionCallback } from "./types";
+import { applyLoopBtnState, handleLoopCycle } from "./ui/loop";
 import {
   handlePlayPause,
   handleTimeBackward,
@@ -35,6 +36,7 @@ interface FullscreenElements {
   timeBackwardBtn: HTMLButtonElement;
   timeForwardBtn: HTMLButtonElement;
   trackForwardBtn: HTMLButtonElement;
+  loopBtn: HTMLButtonElement;
 }
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
@@ -61,6 +63,7 @@ const exitFullscreenMode = (): void => {
   plumeUi.dispatch(
     guiActions.setTrackFwdBtns(plume.trackFwdBtns.filter((btn) => existingOverlay.contains(btn) === false))
   );
+  plumeUi.dispatch(guiActions.setLoopBtns(plume.loopBtns.filter((btn) => existingOverlay.contains(btn) === false)));
   plumeUi.dispatch(guiActions.setFullscreenOverlay(null));
   existingOverlay.remove();
   document.body.style.overflow = "auto";
@@ -84,9 +87,10 @@ const renderMuteButton = (elements: FullscreenElements, isMuted: boolean): void 
     return;
   }
 
+  const muteBtnString = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   elements.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
-  elements.muteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-  elements.muteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
+  elements.muteBtn.title = muteBtnString;
+  elements.muteBtn.ariaLabel = muteBtnString;
   elements.muteBtn.ariaPressed = isMuted.toString();
   elements.muteBtn.classList.toggle("muted", isMuted);
 };
@@ -176,7 +180,16 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     timeBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeBwdBtn) as HTMLButtonElement,
     timeForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeFwdBtn) as HTMLButtonElement,
     trackForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackFwdBtn) as HTMLButtonElement,
+    loopBtn: clone.querySelector(PLUME_ELEM_SELECTORS.loopBtn) as HTMLButtonElement,
   };
+};
+
+const renderLoopButton = (elements: FullscreenElements, loopMode: LoopModeType): void => {
+  if (!elements.loopBtn) {
+    logger(CPL.ERROR, getString("ERROR__LOOP_BUTTON__NOT_FOUND"));
+    return;
+  }
+  applyLoopBtnState(elements.loopBtn, loopMode);
 };
 
 // Setup store subscriptions for fullscreen UI to keep it in sync with state
@@ -214,6 +227,12 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     }),
     appCore.subscribe("trackNumber", (trackNumber) => {
       renderTrackNumber(elements, trackNumber);
+    }),
+    appCore.subscribe("loopMode", (loopMode) => {
+      renderLoopButton(elements, loopMode);
+    }),
+    appCore.subscribe("pageType", () => {
+      renderLoopButton(elements, appCore.getState().loopMode);
     })
   );
 
@@ -241,6 +260,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.trackForwardBtn.addEventListener("click", handleTrackForward);
   elements.volumeSlider.addEventListener("input", handleVolumeInput);
   elements.muteBtn.addEventListener("click", handleMuteToggle);
+  elements.loopBtn.addEventListener("click", handleLoopCycle);
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
@@ -257,6 +277,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderMuteButton(elements, state.isMuted);
   renderTrackTitle(elements, state.trackTitle);
   renderTrackNumber(elements, state.trackNumber);
+  renderLoopButton(elements, state.loopMode);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
@@ -429,6 +450,7 @@ export const toggleFullscreenMode = (): void => {
   const fsElements = getFullscreenElements(plumeClone);
   plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));
+  plumeUi.dispatch(guiActions.setLoopBtns([...plume.loopBtns, fsElements.loopBtn]));
 
   // Mount overlay to DOM and record it in the store
   document.body.appendChild(overlay);

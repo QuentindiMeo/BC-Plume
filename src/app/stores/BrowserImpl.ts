@@ -1,20 +1,12 @@
 import { PlumeCacheKey } from "../../domain/browser";
-import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "../../infra/Browser";
+import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "../../domain/ports/browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
+import { inferBrowserApi } from "../../shared/browser";
 import { CPL, logger } from "../../shared/logger";
-
-const assertBrowserApi = (): IBrowserApi => {
-  if (!(globalThis as any).browser && !(globalThis as any).chrome)
-    throw new Error(
-      "No compatible browser API found. This extension requires a Chromium-based or Firefox-based browser."
-    );
-
-  return (globalThis as any).browser ?? (globalThis as any).chrome;
-};
 
 let unifiedBrowserApi: IBrowserApi | null = null;
 const getBrowserApi = (): IBrowserApi => {
-  unifiedBrowserApi ??= assertBrowserApi();
+  unifiedBrowserApi ??= inferBrowserApi();
   return unifiedBrowserApi;
 };
 const browserApi: IBrowserApi = new Proxy({} as IBrowserApi, {

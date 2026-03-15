@@ -1,4 +1,4 @@
-import { IAction, IStore } from "../domain/store";
+import { IAction, IStore } from "../store";
 
 export interface Gui {
   // Plume's own UI elements registered after injection
@@ -12,6 +12,7 @@ export interface Gui {
   // Arrays for elements that exist in both main and fullscreen views
   playPauseBtns: HTMLButtonElement[];
   trackFwdBtns: HTMLButtonElement[];
+  loopBtns: HTMLButtonElement[];
   volumeSlider: HTMLInputElement | null;
   muteBtn: HTMLButtonElement | null;
 
@@ -34,6 +35,7 @@ export interface DefinedGui {
   durationDisplay: HTMLSpanElement;
   playPauseBtns: HTMLButtonElement[];
   trackFwdBtns: HTMLButtonElement[];
+  loopBtns: HTMLButtonElement[];
   volumeSlider: HTMLInputElement;
   muteBtn: HTMLButtonElement;
 
@@ -53,6 +55,7 @@ export enum GUI_ACTIONS {
   SET_DURATION_DISPLAY = "setDurationDisplay",
   SET_PLAY_PAUSE_BTNS = "setPlayPauseBtns",
   SET_TRACK_FWD_BTNS = "setTrackFwdBtns",
+  SET_LOOP_BTNS = "setLoopBtns",
   SET_VOLUME_SLIDER = "setVolumeSlider",
   SET_MUTE_BTN = "setMuteBtn",
   SET_FULLSCREEN_OVERLAY = "setFullscreenOverlay",
@@ -70,6 +73,7 @@ export type GuiAction =
   | IAction<GUI_ACTIONS.SET_DURATION_DISPLAY, HTMLSpanElement | null>
   | IAction<GUI_ACTIONS.SET_PLAY_PAUSE_BTNS, HTMLButtonElement[]>
   | IAction<GUI_ACTIONS.SET_TRACK_FWD_BTNS, HTMLButtonElement[]>
+  | IAction<GUI_ACTIONS.SET_LOOP_BTNS, HTMLButtonElement[]>
   | IAction<GUI_ACTIONS.SET_VOLUME_SLIDER, HTMLInputElement | null>
   | IAction<GUI_ACTIONS.SET_MUTE_BTN, HTMLButtonElement | null>
   | IAction<GUI_ACTIONS.SET_FULLSCREEN_OVERLAY, HTMLDivElement | null>
@@ -86,6 +90,7 @@ interface IGuiActions {
   setDurationDisplay: (element: HTMLSpanElement | null) => GuiAction;
   setPlayPauseBtns: (buttons: HTMLButtonElement[]) => GuiAction;
   setTrackFwdBtns: (buttons: HTMLButtonElement[]) => GuiAction;
+  setLoopBtns: (buttons: HTMLButtonElement[]) => GuiAction;
   setVolumeSlider: (element: HTMLInputElement | null) => GuiAction;
   setMuteBtn: (element: HTMLButtonElement | null) => GuiAction;
   setFullscreenOverlay: (element: HTMLDivElement | null) => GuiAction;
@@ -130,6 +135,10 @@ export const guiActions: IGuiActions = {
   }),
   setTrackFwdBtns: (buttons: HTMLButtonElement[]): GuiAction => ({
     type: GUI_ACTIONS.SET_TRACK_FWD_BTNS,
+    payload: buttons,
+  }),
+  setLoopBtns: (buttons: HTMLButtonElement[]): GuiAction => ({
+    type: GUI_ACTIONS.SET_LOOP_BTNS,
     payload: buttons,
   }),
   setVolumeSlider: (element: HTMLInputElement | null): GuiAction => ({

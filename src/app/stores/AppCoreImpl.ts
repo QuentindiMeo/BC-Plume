@@ -1,11 +1,19 @@
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
-import { PLUME_DEFAULTS, TIME_DISPLAY_METHOD } from "../../domain/plume";
+import {
+  LOOP_MODE,
+  LOOP_MODE_CYCLE,
+  LoopModeType,
+  PLUME_DEFAULTS,
+  TIME_DISPLAY_METHOD,
+  TimeDisplayMethodType,
+} from "../../domain/plume";
 import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
+import { browserActions } from "../../domain/ports/browser";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
-import { browserActions } from "../../infra/Browser";
 import { meta, PROCESS_ENV } from "../../infra/node";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
+import { getMusicPlayerInstance } from "./adapters";
 import { getBrowserInstance } from "./BrowserImpl";
 import { handleUnknownAction } from "./shared";
 
@@ -21,10 +29,19 @@ const INITIAL_STATE: AppCore = {
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
   isFullscreen: false,
+  loopMode: PLUME_DEFAULTS.loopMode,
 };
 
-const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>(["volume", "durationDisplayMethod"]);
+const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
+  "volume",
+  "durationDisplayMethod",
+  "loopMode",
+]);
 const PERSISTENCE_DELAY_MS = 200;
+
+const isPlumeDurationDisplayMethod = (value: any): value is TimeDisplayMethodType =>
+  Object.values(TIME_DISPLAY_METHOD).includes(value);
+const isPlumeLoopMode = (value: any): value is LoopModeType => Object.values(LOOP_MODE).includes(value);
 
 const createAppCoreInstance = (): IAppCore => {
   let state: AppCore = { ...INITIAL_STATE };
@@ -55,6 +72,8 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.VOLUME] = state.volume;
         } else if (key === "durationDisplayMethod") {
           toSave[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] = state.durationDisplayMethod;
+        } else if (key === "loopMode") {
+          toSave[PLUME_CACHE_KEYS.LOOP_MODE] = state.loopMode;
         }
       }
 
@@ -184,16 +203,22 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
-      case CORE_ACTIONS.RESET_TRANSIENT_STATE:
-        updateState("trackTitle", INITIAL_STATE.trackTitle);
-        updateState("trackNumber", INITIAL_STATE.trackNumber);
-        updateState("duration", INITIAL_STATE.duration);
-        updateState("currentTime", INITIAL_STATE.currentTime);
-        updateState("isPlaying", INITIAL_STATE.isPlaying);
-        updateState("isMuted", INITIAL_STATE.isMuted);
-        updateState("volumeBeforeMute", INITIAL_STATE.volumeBeforeMute);
-        updateState("isFullscreen", INITIAL_STATE.isFullscreen);
+      case CORE_ACTIONS.SET_LOOP_MODE:
+        updateState("loopMode", action.payload);
         break;
+      case CORE_ACTIONS.CYCLE_LOOP_MODE: {
+        const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
+        const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
+        const nextMode = LOOP_MODE_CYCLE[nextIndex];
+
+        // If current page is track, skip to track loop (collection loop doesn't make sense on track page)
+        if (state.pageType === "track" && nextMode === LOOP_MODE.COLLECTION) {
+          updateState("loopMode", LOOP_MODE.TRACK);
+        } else {
+          updateState("loopMode", nextMode);
+        }
+        break;
+      }
       default:
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);
@@ -203,28 +228,46 @@ const createAppCoreInstance = (): IAppCore => {
   const loadPersistedStateThunk = (): Thunk<AppCore, CoreAction> => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
-      const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
+      const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, PLUME_CACHE_KEYS.LOOP_MODE];
       const result = await browserCache.get(keys);
 
       if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
-        const volume = result[PLUME_CACHE_KEYS.VOLUME];
-        if (typeof volume === "number") {
-          const volumeClamped = Math.max(0, Math.min(1, volume)); // Ensure volume is between 0 and 1
-          dispatch(coreActions.setVolume(volumeClamped));
+        const isValidValue = typeof result[PLUME_CACHE_KEYS.VOLUME] === "number";
+        const cachedVolume = isValidValue ? result[PLUME_CACHE_KEYS.VOLUME] : PLUME_DEFAULTS.savedVolume;
 
-          if (volumeClamped === 0) {
-            dispatch(coreActions.setIsMuted(true));
-          }
-          logger(CPL.INFO, "Volume loaded:", `${Math.round(volumeClamped * 100)}%`);
+        const clampedVolume = Math.max(0, Math.min(1, cachedVolume));
+        dispatch(coreActions.setVolume(clampedVolume));
+
+        if (clampedVolume === 0) {
+          dispatch(coreActions.setIsMuted(true));
         }
+        logger(CPL.INFO, "Volume loaded:", `${Math.round(clampedVolume * 100)}%`);
       }
 
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
-        const method = result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD];
-        if (method === "duration" || method === "remaining") {
-          dispatch(coreActions.setDurationDisplayMethod(method));
-          logger(CPL.INFO, "Time display method applied:", method);
+        const isValidValue = isPlumeDurationDisplayMethod(result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]);
+        const cachedMethod = isValidValue
+          ? result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]
+          : PLUME_DEFAULTS.durationDisplayMethod;
+
+        dispatch(coreActions.setDurationDisplayMethod(cachedMethod));
+        logger(CPL.INFO, "Time display method applied:", cachedMethod);
+      }
+
+      if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
+        const isValidValue = isPlumeLoopMode(result[PLUME_CACHE_KEYS.LOOP_MODE]);
+        const cachedMode = isValidValue ? result[PLUME_CACHE_KEYS.LOOP_MODE] : PLUME_DEFAULTS.loopMode;
+        let inferredLoopMode = cachedMode;
+
+        if (state.pageType === "track" && cachedMode === LOOP_MODE.COLLECTION) {
+          // Collection loop doesn't make sense on track page - treat as TRACK loop
+          inferredLoopMode = LOOP_MODE.TRACK;
+          logger(CPL.INFO, "Loop mode loaded as COLLECTION but pageType is track - applied TRACK mode instead");
         }
+        dispatch(coreActions.setLoopMode(inferredLoopMode));
+
+        const musicPlayer = getMusicPlayerInstance();
+        musicPlayer.setLoop(inferredLoopMode === LOOP_MODE.TRACK);
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);

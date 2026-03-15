@@ -1,9 +1,9 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
+import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
-import { guiActions } from "../../infra/Gui";
+import { guiActions } from "../../domain/ports/plume-ui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
-import { getMusicPlayerInstance } from "../stores/adapters";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
 import type { CleanupCallback } from "./types";
@@ -64,6 +64,19 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     appCore.dispatch(coreActions.setIsPlaying(isPlaying));
   };
 
+  const handleEnded = () => {
+    const pageType = appCore.getState().pageType;
+    const loopMode = appCore.getState().loopMode;
+    if (pageType === "album" && loopMode !== LOOP_MODE.COLLECTION) return;
+
+    // Band-aid solution for the fact that BC locks the player when "ended" is emitted.
+    const bcPlayer = getBcPlayerInstance();
+    const nextBtn = bcPlayer.getNextTrackButton();
+    const prevBtn = bcPlayer.getPreviousTrackButton();
+    nextBtn?.click();
+    prevBtn?.click();
+  };
+
   musicPlayer.on("timeupdate", handleTimeUpdate);
   musicPlayer.on("loadedmetadata", handleLoadedMetadata);
   musicPlayer.on("durationchange", handleDurationChange);
@@ -71,6 +84,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   musicPlayer.on("volumechange", handleVolumeChange);
   musicPlayer.on("play", handlePlayPause);
   musicPlayer.on("pause", handlePlayPause);
+  musicPlayer.on("ended", handleEnded);
 
   logger(CPL.INFO, getString("INFO__AUDIO_EVENT_LISTENERS__SET_UP"));
 
@@ -82,5 +96,6 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     musicPlayer.off("volumechange", handleVolumeChange);
     musicPlayer.off("play", handlePlayPause);
     musicPlayer.off("pause", handlePlayPause);
+    musicPlayer.off("ended", handleEnded);
   };
 };

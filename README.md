@@ -14,7 +14,7 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.3.2.1-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.3.3-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
@@ -59,9 +59,14 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Time navigation**: Click and drag to seek within the track seamlessly
   - **Time display mode**: Switch between track duration and remaining time (remembered across pages)
 - **Custom playback controls**: Play/Pause buttons, skip back/forward 10 seconds with a modern design
+- **Loop mode**: Cycle through no loop, track loop, and collection loop (remembered across pages)
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
+- **Keyboard shortcuts**: Control playback, volume, seeking, and more without touching the mouse
+  - **Customizable hotkeys**: Remap every shortcut to your liking via the extension popup
+  - Digit row (0–9), Numpad (0–9 with NumLock), and letter keys all supported
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
+- **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
 - **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more on demand!)
 
 ## 🚀 Installation
@@ -107,11 +112,12 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
-- _**[1.3.0]** Jan 18 2026_: **Pedal To The Metal** — Fullscreen mode, playback bugfixes and Spanish language support. [#67](https://github.com/QuentindiMeo/BC-Plume/pull/67)
+- _**[1.3.3]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106)
+- _**[1.3.0]** Jan 18 2026_: **Pedal To The Metal** [#067](https://github.com/QuentindiMeo/BC-Plume/pull/67)
 - _**[1.2.5]** Sep 08 2025_: official release — Word is spread on Reddit, Plume is ready for use. [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48)
-- _**[1.2.0]** Jul 30 2025_: **Pretty Boy** — Plume gets a logo & UI rework. [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
-- _**[1.1.0]** Jul 28 2025_: **First Release** — The original Bandcamp player is fully replaced by Plume. [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18)
-- _**[1.0.0]** Jul 28 2025_: **Hello World!** — The project is drafted, under the name _MBAPPE_.
+- _**[1.2.0]** Jul 30 2025_: **Pretty Boy** [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
+- _**[1.1.0]** Jul 28 2025_: **First Release** [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18)
+- _**[1.0.0]** Jul 28 2025_: **Hello World!**
 
 ### 🔮 Possible future improvements
 

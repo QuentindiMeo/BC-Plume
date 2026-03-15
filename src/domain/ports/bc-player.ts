@@ -13,6 +13,7 @@ export interface BcPlayerPort {
   getVolume(): number;
 
   // Track list data — data-centric access to album track table
+  getTrackRows(): HTMLTableRowElement[];
   getTrackRowTitles(): string[];
   getTrackRowDurations(): (string | null)[];
 

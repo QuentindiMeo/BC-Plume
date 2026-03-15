@@ -1,6 +1,6 @@
 import { PLUME_CONSTANTS } from "../../domain/plume";
+import { guiActions } from "../../domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { guiActions } from "../../infra/Gui";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedTime } from "../../shared/presenters";
@@ -8,7 +8,9 @@ import { PLUME_SVG } from "../../svg/icons";
 import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { getGuiInstance } from "../stores/GuiImpl";
+import { updateTrackForwardBtnState } from "./observers";
 import type { CleanupCallback, SubscriptionCallback } from "./types";
+import { syncLoopBtn } from "./ui/loop";
 import { syncMuteBtn } from "./ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
@@ -24,7 +26,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
   ) as HTMLDivElement | null;
 
   storeSubscriptions.push(
-    // Subscribe to currentTime changes to update main progress slider
     appCore.subscribe("currentTime", () => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
@@ -46,7 +47,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
       plume.durationDisplay.textContent = appCore.computed.formattedDuration();
     }),
-    // Subscribe to volume changes to update audio element, slider, and display
     appCore.subscribe("volume", (volume) => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
@@ -62,14 +62,12 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       }
       plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
     }),
-    // Subscribe to duration display method changes to update display
     appCore.subscribe("durationDisplayMethod", () => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
 
       plume.durationDisplay.textContent = appCore.computed.formattedDuration();
     }),
-    // Subscribe to mute state changes
     appCore.subscribe("isMuted", (isMuted) => {
       const plumeUi = getGuiInstance();
       const plume = plumeUi.getState();
@@ -88,7 +86,13 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const musicPlayer = getMusicPlayerInstance();
       musicPlayer.setVolume(appCore.getState().volume);
     }),
-    // Subscribe to playing state changes
+    appCore.subscribe("loopMode", (loopMode) => {
+      syncLoopBtn(loopMode);
+      updateTrackForwardBtnState();
+    }),
+    appCore.subscribe("pageType", () => {
+      syncLoopBtn(appCore.getState().loopMode);
+    }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       const musicPlayer = getMusicPlayerInstance();
       if (isPlaying && musicPlayer.isPaused()) musicPlayer.play();
@@ -103,7 +107,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
   logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
 
-  // Return cleanup function
   return () => {
     storeSubscriptions.forEach((unsubscribe) => unsubscribe());
   };

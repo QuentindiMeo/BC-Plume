@@ -35,6 +35,7 @@
   "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Duration display element not found" },
   "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elapsed display element not found" },
   "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Play/Pause button not found" },
+  "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Loop button not found" },
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
   "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
@@ -121,6 +122,19 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Potential controls found:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== END DEBUG ===" },
   "DEBUG__STATE__PERSISTED": { "message": "State persisted to storage:" },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Current track number: $TRACK_NUMBER$, Total tracks: $TOTAL_TRACKS$",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
   "DEBUG__PROGRESS_SLIDER__INPUT": {
     "message": "Progress slider moved: $VALUE$ s",
     "placeholders": {
@@ -132,7 +146,7 @@
   },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Previous track button clicked" },
   "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Previous track event dispatched" },
-  "DEBUG__PREV_TRACK__RESTARTED": { "message": "Current track restarted" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Current track restarted" },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Rewind button clicked" },
   "DEBUG__REWIND_TIME__DISPATCHED": {
     "message": "Time rewound to: $TIME$ s",
@@ -156,19 +170,7 @@
   },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Next track button clicked" },
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
-  "DEBUG__TRACK__QUANTIFIERS": {
-    "message": "Current track number: $TRACK_NUMBER$, Total tracks: $TOTAL_TRACKS$",
-    "placeholders": {
-      "track_number": {
-        "content": "$1",
-        "example": "3"
-      },
-      "total_tracks": {
-        "content": "$2",
-        "example": "10"
-      }
-    }
-  },
+  "DEBUG__LOOP__CYCLED": { "message": "Loop mode cycled" },
   "LABEL__RUNTIME": {
     "message": "$MINUTES$ min $SECONDS$ s",
     "placeholders": {
@@ -199,6 +201,7 @@
   "LABEL__PLAY_PAUSE": { "message": "Play/Pause" },
   "LABEL__TIME_FORWARD": { "message": "Forward 10 seconds" },
   "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
+  "LABEL__LOOP": { "message": "Repeat" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
   "META__PERCENTAGE": { "message": "%" },
   "ARIA__RUNTIME__LABEL": {
@@ -243,9 +246,96 @@
     }
   },
   "ARIA__PROGRESS_SLIDER": { "message": "Audio progress slider" },
+  "ARIA__LOOP__OFF": { "message": "Repeat: off" },
+  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Repeat: album" },
+  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Repeat: track" },
+  "ARIA__LOOP__ONE_TRACK": { "message": "Repeat: on" },
   "ARIA__VOLUME_SLIDER": { "message": "Volume slider" },
   "ARIA__MUTE": { "message": "Mute" },
   "ARIA__UNMUTE": { "message": "Unmute" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
-  "ARIA__COVER_ART": { "message": "Cover Art Image" }
+  "ARIA__COVER_ART": { "message": "Cover Art Image" },
+
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ is now available.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
+  "META__TOAST__RELEASE": { "message": "release update" },
+  "INFO__TOAST__SHOWN": {
+    "message": "Toast shown ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Toast dismissed ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__RELEASE__PERSISTED": { "message": "Last release observation was persisted to storage" },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Extension $LABEL$ notification",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Dismiss $LABEL$ notification",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+
+  "POPUPTITLE": { "message": "Plume Settings" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
+  "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Unhandled hotkey action: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Failed to persist hotkey bindings" },
+  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
+  "WARN__HOTKEYS__CONFLICT": {
+    "message": "Already assigned to: $ACTION$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      }
+    }
+  },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Play / Pause" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Forward 10 seconds" },
+  "LABEL__HOTKEY__VOLUME_UP": { "message": "Volume up" },
+  "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Volume down" },
+  "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Previous track / Rewind" },
+  "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Next track" },
+  "LABEL__HOTKEY__FULLSCREEN": { "message": "Fullscreen" },
+  "LABEL__HOTKEY__MUTE": { "message": "Mute / Unmute" },
+  "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cycle loop mode" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Seek to 0%–90% (digit keys)" },
+  "ARIA__HOTKEY_ROW__BUTTON": {
+    "message": "Remap $ACTION$ hotkey — currently $BINDING$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      },
+      "binding": {
+        "content": "$2",
+        "example": "Space"
+      }
+    }
+  },
+  "ARIA__HOTKEY_ROW__CAPTURING": {
+    "message": "Capturing key for $ACTION$ — press any key or Escape to cancel",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      }
+    }
+  }
 }

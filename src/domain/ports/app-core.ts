@@ -1,10 +1,11 @@
-import { TimeDisplayMethodType } from "../plume";
-import { BcPageType } from "./bc-player";
+import { LoopModeType, TimeDisplayMethodType } from "../plume";
 import { IAction, IScenarioView, IStore } from "../store";
+import { BcPageType } from "./bc-player";
 
 export interface AppPersistedState {
   volume: number;
   durationDisplayMethod: TimeDisplayMethodType;
+  loopMode: LoopModeType;
 }
 
 export interface AppTransientState {
@@ -29,9 +30,11 @@ export enum CORE_ACTIONS {
   SET_CURRENT_TIME = "SET_CURRENT_TIME",
   SET_IS_PLAYING = "SET_IS_PLAYING",
   SET_DURATION_DISPLAY_METHOD = "SET_DURATION_DISPLAY_METHOD",
-  SET_VOLUME = "SET_VOLUME",
+  SET_LOOP_MODE = "SET_LOOP_MODE",
+  CYCLE_LOOP_MODE = "CYCLE_LOOP_MODE",
   SET_IS_MUTED = "SET_IS_MUTED",
   TOGGLE_MUTE = "TOGGLE_MUTE",
+  SET_VOLUME = "SET_VOLUME",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
   RESET_TRANSIENT_STATE = "RESET_TRANSIENT_STATE",
 }
@@ -44,11 +47,12 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_CURRENT_TIME, number>
   | IAction<CORE_ACTIONS.SET_IS_PLAYING, boolean>
   | IAction<CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
-  | IAction<CORE_ACTIONS.SET_VOLUME, number>
+  | IAction<CORE_ACTIONS.SET_LOOP_MODE, LoopModeType>
+  | IAction<CORE_ACTIONS.CYCLE_LOOP_MODE>
   | IAction<CORE_ACTIONS.SET_IS_MUTED, boolean>
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
-  | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
-  | IAction<CORE_ACTIONS.RESET_TRANSIENT_STATE>;
+  | IAction<CORE_ACTIONS.SET_VOLUME, number>
+  | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>;
 
 interface ICoreActions {
   setPageType: (pageType: BcPageType | null) => CoreAction;
@@ -58,11 +62,12 @@ interface ICoreActions {
   setCurrentTime: (time: number) => CoreAction;
   setIsPlaying: (isPlaying: boolean) => CoreAction;
   setDurationDisplayMethod: (method: TimeDisplayMethodType) => CoreAction;
-  setVolume: (volume: number) => CoreAction;
+  setLoopMode: (mode: LoopModeType) => CoreAction;
+  cycleLoopMode: () => CoreAction;
   setIsMuted: (isMuted: boolean) => CoreAction;
   toggleMute: () => CoreAction;
+  setVolume: (volume: number) => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
-  resetTransientState: () => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -76,14 +81,18 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
     payload: method,
   }),
-  setVolume: (volume: number): CoreAction => ({ type: CORE_ACTIONS.SET_VOLUME, payload: volume }),
+  setLoopMode: (mode: LoopModeType): CoreAction => ({
+    type: CORE_ACTIONS.SET_LOOP_MODE,
+    payload: mode,
+  }),
+  cycleLoopMode: (): CoreAction => ({ type: CORE_ACTIONS.CYCLE_LOOP_MODE }),
   setIsMuted: (isMuted: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_MUTED, payload: isMuted }),
   toggleMute: (): CoreAction => ({ type: CORE_ACTIONS.TOGGLE_MUTE }),
+  setVolume: (volume: number): CoreAction => ({ type: CORE_ACTIONS.SET_VOLUME, payload: volume }),
   setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
     type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
   }),
-  resetTransientState: (): CoreAction => ({ type: CORE_ACTIONS.RESET_TRANSIENT_STATE }),
 } as const;
 
 export type AppCoreListener<AppCoreProp extends keyof AppCore = keyof AppCore> = (

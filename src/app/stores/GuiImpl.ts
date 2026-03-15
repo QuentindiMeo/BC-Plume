@@ -1,4 +1,4 @@
-import { DefinedGui, Gui, GUI_ACTIONS, GuiAction, IGui } from "../../infra/Gui";
+import { DefinedGui, Gui, GUI_ACTIONS, GuiAction, IGui } from "../../domain/ports/plume-ui";
 import { handleUnknownAction } from "./shared";
 
 const INITIAL_STATE: Gui = {
@@ -11,6 +11,7 @@ const INITIAL_STATE: Gui = {
   durationDisplay: null,
   playPauseBtns: [],
   trackFwdBtns: [],
+  loopBtns: [],
   volumeSlider: null,
   muteBtn: null,
   fullscreenOverlay: null,
@@ -40,6 +41,7 @@ const createGuiInstance = (): IGui => {
         updateState("durationDisplay", null);
         updateState("playPauseBtns", []);
         updateState("trackFwdBtns", []);
+        updateState("loopBtns", []);
         updateState("volumeSlider", null);
         updateState("muteBtn", null);
         updateState("fullscreenOverlay", null);
@@ -71,6 +73,9 @@ const createGuiInstance = (): IGui => {
         break;
       case GUI_ACTIONS.SET_TRACK_FWD_BTNS:
         updateState("trackFwdBtns", action.payload);
+        break;
+      case GUI_ACTIONS.SET_LOOP_BTNS:
+        updateState("loopBtns", action.payload);
         break;
       case GUI_ACTIONS.SET_VOLUME_SLIDER:
         updateState("volumeSlider", action.payload);
