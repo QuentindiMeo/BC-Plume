@@ -58,6 +58,16 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
     body.appendChild(message);
   }
 
+  if (config.cta) {
+    const cta = document.createElement("a");
+    cta.className = "bpe-toast__cta";
+    cta.href = config.cta.href;
+    cta.target = "_blank";
+    cta.rel = "noopener noreferrer";
+    cta.textContent = config.cta.label;
+    body.appendChild(cta);
+  }
+
   const dismiss = document.createElement("button");
   dismiss.className = "bpe-toast__dismiss";
   dismiss.type = "button";
@@ -72,16 +82,6 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 
   toast.appendChild(icon);
   toast.appendChild(body);
-
-  if (config.cta) {
-    const cta = document.createElement("a");
-    cta.className = "bpe-toast__cta";
-    cta.href = config.cta.href;
-    cta.target = "_blank";
-    cta.rel = "noopener noreferrer";
-    cta.textContent = config.cta.label;
-    toast.appendChild(cta);
-  }
 
   toast.appendChild(dismiss);
   toast.appendChild(timer);
