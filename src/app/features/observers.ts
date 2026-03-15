@@ -10,7 +10,7 @@ import { isLastTrackOfAlbumPlaying } from "../use-cases/navigate-track";
 import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
-import { cleanupVersionToast } from "./toast";
+import { cleanupReleaseToast } from "./toast";
 import { setupHotkeys } from "./keyboard";
 import { loadHotkeyBindings } from "../use-cases/loadHotkeyBindings";
 import { setupStoreSubscriptions } from "./store-subscriptions";
@@ -196,7 +196,7 @@ export const createSpaNavigationObserver = (
     logger(CPL.LOG, getString("LOG__NAVIGATION_DETECTED"));
 
     cleanupFullscreenMode();
-    cleanupVersionToast();
+    cleanupReleaseToast();
 
     isInitializedRef.value = false;
     setTimeout(() => {
@@ -220,7 +220,7 @@ export const registerUnloadCleanup = (
     spaNavigationObserver.disconnect();
 
     cleanupFullscreenMode();
-    cleanupVersionToast();
+    cleanupReleaseToast();
 
     if (handles.stickiness) {
       handles.stickiness();

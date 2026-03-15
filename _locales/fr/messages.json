@@ -257,19 +257,19 @@
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 
   "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "Nouvelle version disponible !" },
-  "LABEL__TOAST__VERSION": {
-    "message": "La version $VERSION$ de Plume a été publiée.",
+  "LABEL__TOAST__RELEASE": {
+    "message": "La version $RELEASE$ de Plume a été publiée.",
     "placeholders": {
-      "version": {
+      "release": {
         "content": "$1",
-        "example": "v1.3.3"
+        "example": "1.3.3"
       }
     }
   },
   "LABEL__TOAST__VIEW_CHANGELOG": { "message": "Voir les nouveautés" },
   "INFO__TOAST__SHOWN": { "message": "Notification affichée" },
   "INFO__TOAST__DISMISSED": { "message": "Notification ignorée" },
-  "INFO__VERSION__PERSISTED": { "message": "Observation de la dernière version enregistrée dans le stockage" },
+  "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
   "ARIA__TOAST__CONTAINER": { "message": "Notification de mise à jour de l'extension" },
   "ARIA__TOAST__DISMISS": { "message": "Fermer la notification de mise à jour" },
 

@@ -8,26 +8,26 @@ import { PLUME_SVG } from "../../svg/icons";
 import { getBrowserInstance } from "../stores/BrowserImpl";
 import { createToast, ToastHandle } from "./ui/toast";
 
-let versionToastHandle: ToastHandle | null = null;
+let releaseToastHandle: ToastHandle | null = null;
 
-export const showVersionToast = (): void => {
-  if (versionToastHandle) return;
+export const showReleaseToast = (): void => {
+  if (releaseToastHandle) return;
 
-  versionToastHandle = createToast({
+  releaseToastHandle = createToast({
     ariaLabel: getString("ARIA__TOAST__CONTAINER"),
     iconSvg: PLUME_SVG.logo,
     title: getString("LABEL__TOAST__UPDATE_AVAILABLE"),
-    message: getString("LABEL__TOAST__VERSION", [APP_VERSION.slice(1)]),
+    message: getString("LABEL__TOAST__RELEASE", [APP_VERSION.slice(1)]),
     cta: { href: PLUME_CHANGELOG_URL, label: getString("LABEL__TOAST__VIEW_CHANGELOG") },
     dismissAriaLabel: getString("ARIA__TOAST__DISMISS"),
     onDismissed: () => {
-      versionToastHandle = null;
+      releaseToastHandle = null;
       logger(CPL.INFO, getString("INFO__TOAST__DISMISSED"));
 
-      // Write APP_VERSION so the toast won't reappear until the next update
+      // Write APP_VERSION so the toast won't reappear until the next release
       const browser = getBrowserInstance();
-      browser.dispatch(browserActions.setCacheValues([PLUME_CACHE_KEYS.LAST_SEEN_VERSION], [APP_VERSION]));
-      logger(CPL.INFO, getString("INFO__VERSION__PERSISTED"));
+      browser.dispatch(browserActions.setCacheValues([PLUME_CACHE_KEYS.LAST_SEEN_RELEASE], [APP_VERSION]));
+      logger(CPL.INFO, getString("INFO__RELEASE__PERSISTED"));
     },
     duration: PLUME_CONSTANTS.TOAST_AUTO_DISMISS,
   });
@@ -36,7 +36,7 @@ export const showVersionToast = (): void => {
 };
 
 // Called on SPA navigation or page unload. Removes the node without persisting
-export const cleanupVersionToast = (): void => {
-  versionToastHandle?.cleanup();
-  versionToastHandle = null;
+export const cleanupReleaseToast = (): void => {
+  releaseToastHandle?.cleanup();
+  releaseToastHandle = null;
 };

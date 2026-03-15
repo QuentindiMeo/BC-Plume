@@ -256,20 +256,20 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
 
-  "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "New version available!" },
-  "LABEL__TOAST__VERSION": {
-    "message": "Version $VERSION$ of Plume is out.",
+  "LABEL__TOAST__UPDATE_AVAILABLE": { "message": "New release available!" },
+  "LABEL__TOAST__RELEASE": {
+    "message": "Release $RELEASE$ of Plume is out.",
     "placeholders": {
-      "version": {
+      "release": {
         "content": "$1",
-        "example": "v1.3.3"
+        "example": "1.3.3"
       }
     }
   },
   "LABEL__TOAST__VIEW_CHANGELOG": { "message": "See what's new" },
   "INFO__TOAST__SHOWN": { "message": "Toast shown" },
   "INFO__TOAST__DISMISSED": { "message": "Toast dismissed" },
-  "INFO__VERSION__PERSISTED": { "message": "Last version observation was persisted to storage" },
+  "INFO__RELEASE__PERSISTED": { "message": "Last release observation was persisted to storage" },
   "ARIA__TOAST__CONTAINER": { "message": "Extension update notification" },
   "ARIA__TOAST__DISMISS": { "message": "Dismiss update notification" },
 
