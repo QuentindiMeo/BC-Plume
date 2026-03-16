@@ -1,6 +1,6 @@
 {
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
-  "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player." },
+  "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player." },
 
   "ALERT__BC_HEALTH_CHECK__FAILED": {
     "message": "Bandcamp health check failed: $MISSING_REQUIRED$ required elements missing.\nPlume won't be able to function properly. Please check the console for details.",

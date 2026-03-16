@@ -1,6 +1,6 @@
 {
   "APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
-  "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, avance/retroceso de 10s, pantalla completa y atajos de teclado." },
+  "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, modos de repetición, pantalla completa y atajos de teclado." },
 
   "ALERT__BC_HEALTH_CHECK__FAILED": {
     "message": "¡La verificación de salud de Bandcamp ha fallado! Faltan $REQUIRED_COUNT$ elementos requeridos. Consulta la consola para más detalles.",

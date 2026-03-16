@@ -1,6 +1,6 @@
 {
   "APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
-  "APP_DESCRIPTION": { "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, avance/recul de 10s, mode plein écran et raccourcis clavier." },
+  "APP_DESCRIPTION": { "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, modes de répétition, mode plein écran et raccourcis clavier." },
 
   "ALERT__BC_HEALTH_CHECK__FAILED": {
     "message": "La vérification de santé de Bandcamp a échoué : $MISSING_REQUIRED$ éléments requis manquants.\nPlume ne pourra pas fonctionner correctement. Veuillez vérifier la console pour plus de détails.",
