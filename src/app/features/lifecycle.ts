@@ -31,16 +31,10 @@ const initPlayback = () => {
 };
 
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
-  const appCore = getAppCoreInstance();
   const bcPlayer = getBcPlayerInstance();
   const audio = bcPlayer.getAudioElement();
   if (!audio) return null;
   logger(CPL.INFO, getString("INFO__AUDIO__FOUND"), audio);
-
-  // Load and immediately apply saved volume from store
-  const volume = appCore.getState().volume;
-  audio.volume = volume;
-  logger(CPL.INFO, getString("INFO__VOLUME__FOUND", [String(Math.round(volume * 100)), getString("META__PERCENTAGE")]));
 
   return audio;
 };
@@ -87,12 +81,17 @@ export const launchPlume = (): void => {
     }
     checkBandcampElements();
 
+    // Make audio element available before loading persisted state so that MusicPlayerAdapter calls (e.g. setLoop) inside the thunk don't throw.
+    plumeUi.dispatch(guiActions.setAudioElement(audioElement));
+
     // Load persisted state into store
     await appCore.loadPersistedState();
 
-    const isAlbumPage = globalThis.location.pathname.includes("/album/");
+    // Apply the persisted volume to the audio element after the state has been loaded.
+    audioElement.volume = appCore.getState().volume;
+
+    const isAlbumPage = globalThis.location.pathname.startsWith("/album/");
     appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
-    plumeUi.dispatch(guiActions.setAudioElement(audioElement));
 
     const plumeIsAlreadyInjected = isPlumeInjected();
     if (plumeIsAlreadyInjected) {
