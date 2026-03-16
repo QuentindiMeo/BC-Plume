@@ -1,11 +1,13 @@
+import { HotkeyAction, KeyBinding } from "../hotkeys";
 import { LoopModeType, TimeDisplayMethodType } from "../plume";
 import { IAction, IScenarioView, IStore } from "../store";
 import { BcPageType } from "./bc-player";
 
 export interface AppPersistedState {
-  volume: number;
   durationDisplayMethod: TimeDisplayMethodType;
   loopMode: LoopModeType;
+  volume: number;
+  hotkeyBindings: Record<HotkeyAction, KeyBinding>;
 }
 
 export interface AppTransientState {
@@ -37,6 +39,7 @@ export enum CORE_ACTIONS {
   SET_VOLUME = "SET_VOLUME",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
   RESET_TRANSIENT_STATE = "RESET_TRANSIENT_STATE",
+  SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
 }
 
 export type CoreAction =
@@ -52,7 +55,8 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_IS_MUTED, boolean>
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
-  | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>;
+  | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
+  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>;
 
 interface ICoreActions {
   setPageType: (pageType: BcPageType | null) => CoreAction;
@@ -68,6 +72,7 @@ interface ICoreActions {
   toggleMute: () => CoreAction;
   setVolume: (volume: number) => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
+  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -92,6 +97,10 @@ export const coreActions: ICoreActions = {
   setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
     type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
+  }),
+  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
+    type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
+    payload: bindings,
   }),
 } as const;
 
