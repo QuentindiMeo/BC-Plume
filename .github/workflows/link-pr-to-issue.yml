@@ -1,0 +1,24 @@
+name: Link PR to issue
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  link-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const match = branch.match(/\/(\d+)[_-]/);
+            if (!match) return;
+            const issue = match[1];
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `Closes #${issue}`,
+            });
