@@ -12,7 +12,6 @@ import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
 import { cleanupReleaseToast } from "./toast";
 import { setupHotkeys } from "./keyboard";
-import { loadHotkeyBindings } from "../use-cases/loadHotkeyBindings";
 import { setupStoreSubscriptions } from "./store-subscriptions";
 import { CleanupCallback } from "./types";
 import {
@@ -124,11 +123,11 @@ const applyPersistedVolume = (audio: HTMLAudioElement): void => {
 };
 
 // Registers all post-injection listeners and stores their teardown callbacks
-export const setupListeners = async (handles: CleanupHandles): Promise<void> => {
+export const setupListeners = (handles: CleanupHandles) => {
   handles.stickiness = setupPlayerStickiness();
   rewireAudioEventListeners(handles);
   handles.storeSubscriptions = setupStoreSubscriptions();
-  const hotkeyBindings = await loadHotkeyBindings();
+  const hotkeyBindings = getAppCoreInstance().getState().hotkeyBindings;
   handles.hotkeys = setupHotkeys(
     {
       handlePlayPause,

@@ -296,6 +296,7 @@
   "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Acción de atajo no gestionada: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Error al persistir los atajos de teclado" },
   "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Almacenamiento de atajos no disponible, usando los valores predeterminados" },
+  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": { "message": "La entrada de caché de atajos de teclado no es válida, usando valores predeterminados" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Ya asignado a: $ACTION$",
     "placeholders": {

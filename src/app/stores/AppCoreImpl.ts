@@ -1,4 +1,5 @@
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
+import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
 import {
   LOOP_MODE,
   LOOP_MODE_CYCLE,
@@ -11,6 +12,7 @@ import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCo
 import { browserActions } from "../../domain/ports/browser";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
 import { meta, PROCESS_ENV } from "../../infra/node";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
 import { getMusicPlayerInstance } from "./adapters";
@@ -25,20 +27,24 @@ const INITIAL_STATE: AppCore = {
   currentTime: 0,
   isPlaying: false,
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+  loopMode: PLUME_DEFAULTS.loopMode,
   volume: PLUME_DEFAULTS.savedVolume,
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
   isFullscreen: false,
-  loopMode: PLUME_DEFAULTS.loopMode,
+  hotkeyBindings: { ...DEFAULT_HOTKEYS },
 };
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
-  "volume",
   "durationDisplayMethod",
   "loopMode",
+  "volume",
+  "hotkeyBindings",
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
+const areCachedHotkeyBindingsInvalid = (value: any): boolean =>
+  value !== undefined && (typeof value !== "object" || value === null || Array.isArray(value));
 const isPlumeDurationDisplayMethod = (value: any): value is TimeDisplayMethodType =>
   Object.values(TIME_DISPLAY_METHOD).includes(value);
 const isPlumeLoopMode = (value: any): value is LoopModeType => Object.values(LOOP_MODE).includes(value);
@@ -74,6 +80,8 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] = state.durationDisplayMethod;
         } else if (key === "loopMode") {
           toSave[PLUME_CACHE_KEYS.LOOP_MODE] = state.loopMode;
+        } else if (key === "hotkeyBindings") {
+          toSave[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = state.hotkeyBindings;
         }
       }
 
@@ -203,6 +211,9 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
         break;
+      case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
+        updateState("hotkeyBindings", action.payload);
+        break;
       case CORE_ACTIONS.SET_LOOP_MODE:
         updateState("loopMode", action.payload);
         break;
@@ -228,7 +239,12 @@ const createAppCoreInstance = (): IAppCore => {
   const loadPersistedStateThunk = (): Thunk<AppCore, CoreAction> => async (dispatch) => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
-      const keys = [PLUME_CACHE_KEYS.VOLUME, PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD, PLUME_CACHE_KEYS.LOOP_MODE];
+      const keys = [
+        PLUME_CACHE_KEYS.LOOP_MODE,
+        PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD,
+        PLUME_CACHE_KEYS.VOLUME,
+        PLUME_CACHE_KEYS.HOTKEY_BINDINGS,
+      ];
       const result = await browserCache.get(keys);
 
       if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
@@ -268,6 +284,27 @@ const createAppCoreInstance = (): IAppCore => {
 
         const musicPlayer = getMusicPlayerInstance();
         musicPlayer.setLoop(inferredLoopMode === LOOP_MODE.TRACK);
+      }
+
+      const rawBindings = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS];
+      if (areCachedHotkeyBindingsInvalid(rawBindings)) {
+        logger(CPL.WARN, getString("WARN__HOTKEY_BINDINGS__INVALID_CACHE"));
+        // Overwrite invalid cached bindings with defaults so future loads see a valid value
+        const defaultBindings = { ...DEFAULT_HOTKEYS };
+        await browserCache.set({ [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: defaultBindings });
+        dispatch(coreActions.setHotkeyBindings(defaultBindings));
+      } else {
+        const storedBindings = rawBindings as KeyBindingMap | undefined;
+        if (storedBindings) {
+          // Stored bindings override defaults; actions absent from storage keep their default binding
+          const resolved = Object.fromEntries(
+            (Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]).map((action) => [
+              action,
+              storedBindings[action] ?? DEFAULT_HOTKEYS[action],
+            ])
+          ) as Record<HotkeyAction, KeyBinding>;
+          dispatch(coreActions.setHotkeyBindings(resolved));
+        }
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);
@@ -320,8 +357,7 @@ const createAppCoreInstance = (): IAppCore => {
     },
 
     loadPersistedState: async function (): Promise<void> {
-      // Use the thunk pattern for async state loading
-      this.dispatch(loadPersistedStateThunk());
+      await loadPersistedStateThunk()(this.dispatch.bind(this), this.getState.bind(this));
     },
 
     computed: {
