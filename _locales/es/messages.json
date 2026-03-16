@@ -256,6 +256,11 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" },
 
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Error al analizar el SVG del icono del toast" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "SVG del icono del toast inválido para la etiqueta '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "¡Una actualización ha sido lanzada!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "La versión $RELEASE$ de Plume ya está disponible.",

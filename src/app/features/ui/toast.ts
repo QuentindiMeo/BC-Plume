@@ -6,9 +6,14 @@ export interface ToastCta {
   label: string;
 }
 
+/**
+ * Branded type for SVG markup that has been vetted to be safe for use in toasts.
+ * SECURITY NOTE: Callers should only create values of this type from hardcoded compile-time constants.
+ */
+export type SafeSvgMarkup = string & { __brand: "SafeSvgMarkup" };
 export interface ToastConfig {
   label: string; // short identifier used for ARIA construction and logging
-  iconSvg: string;
+  iconSvg: SafeSvgMarkup | SVGElement;
   title: string;
   description?: string;
   cta?: ToastCta;
@@ -30,6 +35,53 @@ const getToastContainer = (): HTMLElement => {
   document.body.appendChild(container);
   return container;
 };
+const createSafeSvgElement = (svgMarkup: SafeSvgMarkup): SVGElement | null => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgMarkup, "image/svg+xml");
+    const root = doc.documentElement;
+    if (!(root instanceof SVGElement) || root.nodeName.toLowerCase() !== "svg") {
+      return null;
+    }
+
+    // Remove potentially dangerous elements:
+    // - script/foreignObject: obvious injection vectors
+    // - a: makes content clickable with arbitrary href
+    // - animate/set/animateMotion/animateTransform: can dynamically rewrite href attributes
+    // - style: can contain @import or url(...) pointing to external resources
+    root
+      .querySelectorAll("script,foreignObject,a,animate,set,animateMotion,animateTransform,style")
+      .forEach((el) => el.remove());
+
+    // Strip inline event handlers (on*) and restrict hrefs to safe fragment refs.
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+
+    let current = walker.currentNode as Element | null;
+    while (current) {
+      Array.from(current.attributes).forEach((attr) => {
+        const name = attr.name.toLowerCase();
+        if (name.startsWith("on")) {
+          current!.removeAttribute(attr.name);
+        } else if (name === "href" || name === "xlink:href") {
+          const attrValue = attr.value.trim();
+          // For icon SVGs, only allow internal fragment references (e.g. "#symbol-id"). This also prevents protocol-relative URLs, other schemes, and whitespace bypasses.
+          if (!attrValue.startsWith("#")) {
+            current!.removeAttribute(attr.name);
+          } else if (attrValue !== attr.value) {
+            // Normalize the attribute to the trimmed value.
+            current!.setAttribute(attr.name, attrValue);
+          }
+        }
+      });
+      if (!walker.nextNode()) break;
+      current = walker.currentNode as Element | null;
+    }
+    return root;
+  } catch (e) {
+    logger(CPL.WARN, getString("WARN__TOAST__SVG_PARSE_FAILED"), e);
+    return null;
+  }
+};
 
 const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTMLElement => {
   const toast = document.createElement("div");
@@ -40,8 +92,13 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 
   const icon = document.createElement("div");
   icon.className = "bpe-toast__icon";
-  // SECURITY NOTE: iconSvg must be a hardcoded compile-time constant — see svg/icons.ts
-  icon.innerHTML = config.iconSvg;
+  if (config.iconSvg instanceof SVGElement) {
+    icon.appendChild(config.iconSvg.cloneNode(true));
+  } else {
+    const svgElement = createSafeSvgElement(config.iconSvg);
+    if (svgElement) icon.appendChild(svgElement);
+    else logger(CPL.WARN, getString("WARN__TOAST__ICON_SVG_INVALID", [config.label]));
+  }
 
   const body = document.createElement("div");
   body.className = "bpe-toast__body";

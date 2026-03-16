@@ -256,6 +256,11 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
 
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Failed to parse toast icon SVG" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "Invalid toast icon SVG provided for label '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ is now available.",

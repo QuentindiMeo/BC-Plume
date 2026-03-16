@@ -41,9 +41,6 @@
   <a href="https://ko-fi.com/quentindimeo">
     <img alt="ko-fi tip button" src="https://storage.ko-fi.com/cdn/brandasset/v2/support_me_on_kofi_blue.png" height="40px" />
   </a>
-  <!-- <a href="https://www.paypal.com/donate/?hosted_button_id=LQCF9J9X4EDZL">
-    <img alt="PayPal donate button" src="https://i.imgur.com/abmsLLY.png" height="40px" />
-  </a> -->
 </div>
 
 &#xa0;

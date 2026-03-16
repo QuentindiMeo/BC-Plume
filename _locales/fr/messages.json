@@ -256,6 +256,11 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Échec de l'analyse du SVG de l'icône du toast" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "SVG de l'icône du toast invalide pour l'étiquette '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ est maintenant disponible.",
