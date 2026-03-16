@@ -29,7 +29,7 @@
 &#xa0;
 
 <div id="demo" align="center">
-  <a href="#memo-description"><img alt="BC-Plume Bandcamp player enhancer demo — volume slider, seek bar, fullscreen mode; demo gif of v1.3.2" src="https://github.com/user-attachments/assets/8d0e543d-5b12-4b37-920e-24db729241f8" width="800px" /></a>
+  <a href="https://www.youtube.com/watch?v=rsXqvNrXYn8"><img alt="BC-Plume Bandcamp player enhancer demo — volume slider, seek bar, fullscreen mode; demo gif of v1.3.2" src="https://github.com/user-attachments/assets/8d0e543d-5b12-4b37-920e-24db729241f8" width="800px" /></a>
 </div>
 
 <div id="details" align="center">
