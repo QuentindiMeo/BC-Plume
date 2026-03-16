@@ -6,7 +6,7 @@
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
 - _**[1.10.0]** XXX XX 2026_: **???**  
-The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.10.0` corresponds to the old `1.3.4` (detail [here](#detailing-semver-changes--1100)).  
+The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.10.0` corresponds to the old `1.3.4` ([click for details](#detailing-semver-changes--1100)).  
 The CHANGELOG is fully fleshed with detailed descriptions of each release.
 
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106)  
@@ -97,10 +97,11 @@ The project is drafted under the name _MBAPPE_, for "Multimedia Bandcamp Pluripo
 | 1.3.2              | 1.8.0              |
 | 1.3.1              | 1.7.0              |
 | 1.3.0              | 1.6.0              |
-| 1.2.5              | 1.5.0              |
-| 1.2.4              | 1.4.0              |
-| 1.2.3              | 1.3.0              |
-| 1.2.2              | 1.2.0              |
+| 1.2.6              | 1.5.0              |
+| 1.2.5              | 1.4.0              |
+| 1.2.4              | 1.3.0              |
+| 1.2.3              | 1.2.0              |
+| 1.2.2              | 1.1.1              |
 | 1.2.1              | — (absorbed)       |
 | 1.2.0              | 1.1.0              |
 | 1.1.0              | 1.0.0              |
