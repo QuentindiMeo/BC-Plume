@@ -296,6 +296,7 @@
   "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Unhandled hotkey action: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Failed to persist hotkey bindings" },
   "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
+  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": { "message": "Hotkey bindings cache entry is invalid, falling back to defaults" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Already assigned to: $ACTION$",
     "placeholders": {

@@ -296,6 +296,7 @@
   "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Action de raccourci non gérée : $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Échec de la persistance des raccourcis" },
   "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Stockage des raccourcis indisponible, utilisation des valeurs par défaut" },
+  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": { "message": "L'entrée de cache des raccourcis clavier est invalide, utilisation des valeurs par défaut" },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Déjà assigné à : $ACTION$",
     "placeholders": {

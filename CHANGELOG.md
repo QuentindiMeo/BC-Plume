@@ -5,9 +5,9 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
-- _**[1.10.0]** XXX XX 2026_: **???**  
-The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.10.0` corresponds to the old `1.3.4` ([click for details](#detailing-semver-changes--1100)).  
-The CHANGELOG is fully fleshed with detailed descriptions of each release.
+  - _**[1.9.1]** Mar 16 2026_: [#??](https://github.com/QuentindiMeo/BC-Plume/pull/??)
+  The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.9.1` corresponds to the old `1.3.4` ([click for details](#detailing-semver-changes--191)).  
+  The CHANGELOG is fully fleshed with detailed descriptions of each release.
 
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106)  
 The project's SEO is enhanced with a [promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8), reddit posts ([1](https://www.reddit.com/r/chrome_extensions/comments/1rh0onk/i_revamped_bandcamps_audio_player_ux_ui), [2](https://www.reddit.com/r/extensions/comments/1rh0ngh/i_revamped_bandcamps_audio_player_ux_ui)), and a [Twitter/X account](https://x.com/PlumeBandcamp) to reach a wider audience and keep users updated on new features and releases. The extension is also submitted to the [Product Hunt](https://www.producthunt.com/products/plume-5) and [AlternativeTo](https://alternativeto.net/software/bc-plume).  
@@ -87,11 +87,11 @@ The project is drafted under the name _MBAPPE_, for "Multimedia Bandcamp Pluripo
 
 ---
 
-### Detailing semver changes (< 1.10.0)
+### Detailing semver changes (< 1.9.1)
 
 | Old version number | New version number |
 | ------------------ | ------------------ |
-| (1.3.4)            | 1.10.0             |
+| (1.3.4)            | 1.9.1              |
 | 1.3.3              | 1.9.0              |
 | 1.3.2.1            | 1.8.1              |
 | 1.3.2              | 1.8.0              |

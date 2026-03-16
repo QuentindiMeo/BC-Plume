@@ -12,6 +12,7 @@ import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCo
 import { browserActions } from "../../domain/ports/browser";
 import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
 import { meta, PROCESS_ENV } from "../../infra/node";
+import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
 import { getMusicPlayerInstance } from "./adapters";
@@ -42,6 +43,8 @@ const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
+const areCachedHotkeyBindingsInvalid = (value: any): boolean =>
+  value !== undefined && (typeof value !== "object" || value === null || Array.isArray(value));
 const isPlumeDurationDisplayMethod = (value: any): value is TimeDisplayMethodType =>
   Object.values(TIME_DISPLAY_METHOD).includes(value);
 const isPlumeLoopMode = (value: any): value is LoopModeType => Object.values(LOOP_MODE).includes(value);
@@ -283,16 +286,21 @@ const createAppCoreInstance = (): IAppCore => {
         musicPlayer.setLoop(inferredLoopMode === LOOP_MODE.TRACK);
       }
 
-      const storedBindings = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] as KeyBindingMap | undefined;
-      if (storedBindings) {
-        // Stored bindings override defaults; actions absent from storage keep their default binding
-        const resolved = Object.fromEntries(
-          (Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]).map((action) => [
-            action,
-            storedBindings[action] ?? DEFAULT_HOTKEYS[action],
-          ])
-        ) as Record<HotkeyAction, KeyBinding>;
-        dispatch(coreActions.setHotkeyBindings(resolved));
+      const rawBindings = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS];
+      if (areCachedHotkeyBindingsInvalid(rawBindings)) {
+        logger(CPL.WARN, getString("WARN__HOTKEY_BINDINGS__INVALID_CACHE"));
+      } else {
+        const storedBindings = rawBindings as KeyBindingMap | undefined;
+        if (storedBindings) {
+          // Stored bindings override defaults; actions absent from storage keep their default binding
+          const resolved = Object.fromEntries(
+            (Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]).map((action) => [
+              action,
+              storedBindings[action] ?? DEFAULT_HOTKEYS[action],
+            ])
+          ) as Record<HotkeyAction, KeyBinding>;
+          dispatch(coreActions.setHotkeyBindings(resolved));
+        }
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);
@@ -345,8 +353,7 @@ const createAppCoreInstance = (): IAppCore => {
     },
 
     loadPersistedState: async function (): Promise<void> {
-      // Use the thunk pattern for async state loading
-      this.dispatch(loadPersistedStateThunk());
+      await loadPersistedStateThunk()(this.dispatch.bind(this), this.getState.bind(this));
     },
 
     computed: {
