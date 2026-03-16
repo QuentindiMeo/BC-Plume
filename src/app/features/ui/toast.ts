@@ -8,7 +8,7 @@ export interface ToastCta {
 
 export interface ToastConfig {
   label: string; // short identifier used for ARIA construction and logging
-  iconSvg: string;
+  iconSvg: string | SVGElement; // SECURITY NOTE: must be a hardcoded compile-time constant — see svg/icons.ts
   title: string;
   description?: string;
   cta?: ToastCta;
@@ -30,6 +30,36 @@ const getToastContainer = (): HTMLElement => {
   document.body.appendChild(container);
   return container;
 };
+const createSafeSvgElement = (svgMarkup: string): SVGElement | null => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgMarkup, "image/svg+xml");
+    const root = doc.documentElement;
+    if (!(root instanceof SVGElement) || root.nodeName.toLowerCase() !== "svg") {
+      return null;
+    }
+
+    // Remove potentially dangerous elements.
+    root.querySelectorAll("script,foreignObject").forEach((el) => el.remove());
+
+    // Strip inline event handlers (on*) from all elements in the SVG.
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+
+    let current = walker.currentNode as Element | null;
+    while (current) {
+      Array.from(current.attributes).forEach((attr) => {
+        if (attr.name.toLowerCase().startsWith("on")) current!.removeAttribute(attr.name);
+      });
+      if (!walker.nextNode()) break;
+      current = walker.currentNode as Element | null;
+    }
+    return root;
+  } catch (e) {
+    // TODO make this logging follow the same pattern as the rest of the app (with i18n support)
+    logger(CPL.WARN, "Failed to parse toast iconSvg: %o", e);
+    return null;
+  }
+};
 
 const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTMLElement => {
   const toast = document.createElement("div");
@@ -40,8 +70,14 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 
   const icon = document.createElement("div");
   icon.className = "bpe-toast__icon";
-  // SECURITY NOTE: iconSvg must be a hardcoded compile-time constant — see svg/icons.ts
-  icon.innerHTML = config.iconSvg;
+  if (config.iconSvg instanceof SVGElement) {
+    icon.appendChild(config.iconSvg);
+  } else {
+    const svgElement = createSafeSvgElement(config.iconSvg);
+    if (svgElement) icon.appendChild(svgElement);
+    else logger(CPL.WARN, "Invalid toast iconSvg provided for label %s", config.label);
+    // TODO make this logging follow the same pattern as the rest of the app (with i18n support)
+  }
 
   const body = document.createElement("div");
   body.className = "bpe-toast__body";
