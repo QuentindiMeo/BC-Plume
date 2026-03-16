@@ -123,7 +123,7 @@ const applyPersistedVolume = (audio: HTMLAudioElement): void => {
 };
 
 // Registers all post-injection listeners and stores their teardown callbacks
-export const setupListeners = (handles: CleanupHandles): void => {
+export const setupListeners = (handles: CleanupHandles) => {
   handles.stickiness = setupPlayerStickiness();
   rewireAudioEventListeners(handles);
   handles.storeSubscriptions = setupStoreSubscriptions();

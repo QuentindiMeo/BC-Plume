@@ -113,7 +113,7 @@ export const launchPlume = (): void => {
 
     if (await shouldShowReleaseToast()) showReleaseToast();
 
-    await setupListeners(handles);
+    setupListeners(handles);
     initPlayback();
 
     // Debug: show detected controls

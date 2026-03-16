@@ -5,7 +5,7 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
-  - _**[1.9.1]** Mar 16 2026_: Hotfixing the persistence logic [#??](https://github.com/QuentindiMeo/BC-Plume/pull/??)
+  - _**[1.9.1]** Mar 16 2026_: Hotfixing the persistence logic [#111](https://github.com/QuentindiMeo/BC-Plume/pull/111)
   The persistence logic was somehow broken by the modifications in the latest when adding new core actions—it's fixed now.
   The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.9.1` corresponds to the old `1.3.4` ([click for details](#detailing-semver-changes--191)).  
   The CHANGELOG is fully fleshed with detailed descriptions of each release.

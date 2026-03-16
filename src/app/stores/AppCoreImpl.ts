@@ -290,8 +290,9 @@ const createAppCoreInstance = (): IAppCore => {
       if (areCachedHotkeyBindingsInvalid(rawBindings)) {
         logger(CPL.WARN, getString("WARN__HOTKEY_BINDINGS__INVALID_CACHE"));
         // Overwrite invalid cached bindings with defaults so future loads see a valid value
-        await browserCache.set({ [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: DEFAULT_HOTKEYS });
-        dispatch(coreActions.setHotkeyBindings(DEFAULT_HOTKEYS));
+        const defaultBindings = { ...DEFAULT_HOTKEYS };
+        await browserCache.set({ [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: defaultBindings });
+        dispatch(coreActions.setHotkeyBindings(defaultBindings));
       } else {
         const storedBindings = rawBindings as KeyBindingMap | undefined;
         if (storedBindings) {
