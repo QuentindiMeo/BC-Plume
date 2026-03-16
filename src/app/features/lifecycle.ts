@@ -87,7 +87,7 @@ export const launchPlume = (): void => {
     // Load persisted state into store
     await appCore.loadPersistedState();
 
-    // Apply the loaded volume to the audio element (findAudioElement used the default store value before loadPersistedState ran).
+    // Apply the persisted volume to the audio element after the state has been loaded.
     audioElement.volume = appCore.getState().volume;
 
     const isAlbumPage = globalThis.location.pathname.startsWith("/album/");

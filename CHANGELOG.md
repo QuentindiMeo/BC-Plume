@@ -5,7 +5,8 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
-  - _**[1.9.1]** Mar 16 2026_: [#??](https://github.com/QuentindiMeo/BC-Plume/pull/??)
+  - _**[1.9.1]** Mar 16 2026_: Hotfixing the persistence logic [#??](https://github.com/QuentindiMeo/BC-Plume/pull/??)
+  The persistence logic was somehow broken by the modifications in the latest when adding new core actions—it's fixed now.
   The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.9.1` corresponds to the old `1.3.4` ([click for details](#detailing-semver-changes--191)).  
   The CHANGELOG is fully fleshed with detailed descriptions of each release.
 
@@ -17,7 +18,7 @@ The extension popup is introduced, allowing users to customize Plume hotkeys.
 A toast notification system is added—it is used to present new Plume releases to the user.  
 Adjustments are made to match hexagonal architecture principles, following the implementation of Clean Architecture guidelines in the previous release.
 
-  - _**[1.8.1]** Feb 24 2026_: Oops! The new architecture broke the Firefox version, let's hotfix it... 🤣 [#094](https://github.com/QuentindiMeo/BC-Plume/pull/94)  
+  - _**[1.8.1]** Feb 24 2026_: Hotfixing the Firefox version... 🤣 [#094](https://github.com/QuentindiMeo/BC-Plume/pull/94)  
   Invalid value types, invalid SVG properties, wrong gecko ID... That's an oopsie.
 
 - _**[1.8.0]** Feb 23 2026_: **Silent Robert, Spread The Word!** [#081](https://github.com/QuentindiMeo/BC-Plume/pull/81)  
