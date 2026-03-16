@@ -39,24 +39,34 @@ const createSafeSvgElement = (svgMarkup: string): SVGElement | null => {
       return null;
     }
 
-    // Remove potentially dangerous elements.
-    root.querySelectorAll("script,foreignObject").forEach((el) => el.remove());
+    // Remove potentially dangerous elements:
+    // - script/foreignObject: obvious injection vectors
+    // - a: makes content clickable with arbitrary href
+    // - animate/set/animateMotion/animateTransform: can dynamically rewrite href attributes
+    root
+      .querySelectorAll("script,foreignObject,a,animate,set,animateMotion,animateTransform")
+      .forEach((el) => el.remove());
 
-    // Strip inline event handlers (on*) from all elements in the SVG.
+    // Strip inline event handlers (on*) and external resource references from all elements.
+    const UNSAFE_HREF_RE = /^(javascript:|data:|https?:\/\/)/i;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
 
     let current = walker.currentNode as Element | null;
     while (current) {
       Array.from(current.attributes).forEach((attr) => {
-        if (attr.name.toLowerCase().startsWith("on")) current!.removeAttribute(attr.name);
+        const name = attr.name.toLowerCase();
+        if (name.startsWith("on")) {
+          current!.removeAttribute(attr.name);
+        } else if (name === "href" || name === "xlink:href") {
+          if (UNSAFE_HREF_RE.test(attr.value)) current!.removeAttribute(attr.name);
+        }
       });
       if (!walker.nextNode()) break;
       current = walker.currentNode as Element | null;
     }
     return root;
   } catch (e) {
-    // TODO make this logging follow the same pattern as the rest of the app (with i18n support)
-    logger(CPL.WARN, "Failed to parse toast iconSvg: %o", e);
+    logger(CPL.WARN, getString("WARN__TOAST__SVG_PARSE_FAILED"), e);
     return null;
   }
 };
@@ -75,8 +85,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   } else {
     const svgElement = createSafeSvgElement(config.iconSvg);
     if (svgElement) icon.appendChild(svgElement);
-    else logger(CPL.WARN, "Invalid toast iconSvg provided for label %s", config.label);
-    // TODO make this logging follow the same pattern as the rest of the app (with i18n support)
+    else logger(CPL.WARN, getString("WARN__TOAST__ICON_SVG_INVALID", [config.label]));
   }
 
   const body = document.createElement("div");
