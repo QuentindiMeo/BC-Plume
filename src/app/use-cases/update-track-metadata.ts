@@ -1,6 +1,7 @@
 import { coreActions, IAppCore } from "../../domain/ports/app-core";
 import type { BcPlayerPort } from "../../domain/ports/bc-player";
 import { getString } from "../../shared/i18n";
+import { getTrackQuantifiers } from "../features/track-quantifiers";
 
 export interface TrackMetadataResult {
   trackTitle: string;
@@ -16,10 +17,7 @@ export const updateTrackMetadata = (appCore: IAppCore, bcPlayer: BcPlayerPort): 
   const trackTitle = bcPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
   appCore.dispatch(coreActions.setTrackTitle(trackTitle));
 
-  const trackRowTitles = bcPlayer.getTrackRowTitles();
-  const currentIndex = trackRowTitles.indexOf(trackTitle);
-  const current = currentIndex + 1;
-  const total = trackRowTitles.length;
+  const { current, total } = getTrackQuantifiers(trackTitle);
 
   const trackNumberText = isAlbumPage
     ? getString("LABEL__TRACK_CURRENT", [`${current}/${total}`])

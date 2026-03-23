@@ -9,13 +9,17 @@ export interface TrackQuantifiers {
 
 export const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
   const bcPlayer = getBcPlayerInstance();
-  const trackRowTitles = bcPlayer.getTrackRowTitles();
-  if (trackRowTitles.length === 0) return { current: 0, total: 0 };
+  const playableTitles = bcPlayer.getTrackRowTitles();
+  if (playableTitles.length === 0) return { current: 0, total: 0 };
 
-  const currentTrackNumber = trackRowTitles.indexOf(trackName) + 1;
-  logger(
-    CPL.DEBUG,
-    getString("DEBUG__TRACK__QUANTIFIERS", [String(currentTrackNumber), String(trackRowTitles.length)])
-  );
-  return { current: currentTrackNumber, total: trackRowTitles.length };
+  const playableTitlesIt = playableTitles[Symbol.iterator]();
+  const trackRows = bcPlayer.getTrackRows();
+  const rowsMarked = trackRows.map((row) => {
+    const isPlayable = row.classList.contains("linked");
+    return { isPlayable, title: isPlayable ? playableTitlesIt.next().value : undefined };
+  });
+  const currentTrackNumber = rowsMarked.findIndex((row) => row.title === trackName) + 1;
+
+  logger(CPL.DEBUG, getString("DEBUG__TRACK__QUANTIFIERS", [String(currentTrackNumber), String(trackRows.length)]));
+  return { current: currentTrackNumber, total: trackRows.length };
 };

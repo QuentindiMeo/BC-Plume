@@ -67,7 +67,7 @@
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tous les éléments Bandcamp trouvés" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
-  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée : " },
+  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Méthode d'affichage de la durée appliquée : $METHOD$",

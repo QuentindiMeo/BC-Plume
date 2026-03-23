@@ -151,6 +151,7 @@ div.name-section__titling h2 {
 
   cursor: pointer;
   position: relative;
+  -webkit-user-drag: none;
 
   appearance: none;
   -webkit-appearance: none;
