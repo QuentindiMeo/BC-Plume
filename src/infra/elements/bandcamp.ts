@@ -15,7 +15,7 @@ export enum BC_ELEM_SELECTORS {
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
-  unplayableTrackTitle = "div.title",
+  unplayableTrackTitle = "tr.track_row_view div.title",
   trackDuration = "span.time",
   coverArt = "div#tralbumArt img",
 }

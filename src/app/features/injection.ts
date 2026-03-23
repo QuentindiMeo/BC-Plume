@@ -35,19 +35,33 @@ interface PlumeView {
 const notifyUnplayableTracks = () => {
   const bcPlayer = getBcPlayerInstance();
   const trackRows = bcPlayer.getTrackRows();
+  const unplayableTracks: { nb: number; title: string }[] = [];
 
   trackRows.forEach((row, idx) => {
     if (row.classList.contains("linked")) return;
 
-    const titleEl = row.querySelector<HTMLSpanElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
+    const titleEl = row.querySelector<HTMLDivElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
     const title = titleEl?.textContent?.trim() ?? `#${idx + 1}`;
+    unplayableTracks.push({ nb: idx + 1, title });
+  });
 
+  if (unplayableTracks.length === 0) return;
+  if (unplayableTracks.length === 1) {
+    const { nb, title } = unplayableTracks[0];
     createToast({
       label: getString("META__TOAST__UNPLAYABLE_TRACK"),
-      title: getString("LABEL__TOAST__UNPLAYABLE_TRACK__TITLE", [String(idx + 1)]),
+      title: getString("LABEL__TOAST__UNPLAYABLE_TRACK__TITLE", [String(nb)]),
       description: getString("LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION", [title]),
       borderType: "warning",
     });
+    return;
+  }
+  const titlesList = unplayableTracks.map((t) => t.nb).join(", ");
+  createToast({
+    label: getString("META__TOAST__UNPLAYABLE_TRACKS"),
+    title: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE", [String(unplayableTracks.length)]),
+    description: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION", [titlesList]),
+    borderType: "warning",
   });
 };
 
@@ -76,8 +90,9 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   headerLogo.title = getString("ARIA__LOGO_LINK");
   headerContainer.appendChild(headerLogo);
 
+  const bcPlayer = getBcPlayerInstance();
   const initialTrackTitle = getCurrentTrackTitle(isAlbumPage);
-  const initialTq = getTrackQuantifiers(initialTrackTitle);
+  const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
   currentTitleSection.tabIndex = 0; // make it focusable for screen readers

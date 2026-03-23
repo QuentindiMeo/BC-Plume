@@ -265,6 +265,14 @@
     "message": "« $TRACK_TITLE$ » ne peut pas être jouée. Elle sera ignorée lors de la lecture.",
     "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
   },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ pistes ne sont pas lisibles",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "Les pistes suivantes ne sont pas lisibles : $TITLES_LIST$. Elles seront ignorées lors de la lecture.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ est maintenant disponible.",
@@ -287,6 +295,7 @@
   "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
   "META__TOAST__HEALTH_CHECK": { "message": "vérification de santé" },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "piste non lisible" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" },
   "META__TOAST__RELEASE": { "message": "mise à jour de version" },
   "ARIA__TOAST__CONTAINER": {
     "message": "Notification de $LABEL$ de l'extension",

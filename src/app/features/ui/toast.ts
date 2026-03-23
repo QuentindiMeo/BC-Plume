@@ -3,7 +3,7 @@ import { getString } from "../../../shared/i18n";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
 
-interface ToastCta {
+export interface ToastCta {
   href: string;
   label: string;
 }
@@ -21,7 +21,7 @@ const getToastBorderColor = (borderType: ToastBorderType): string => {
       return borderType; // allow custom CSS color values
   }
 };
-type ToastBorderType = "default" | "warning" | "error"; // string allows custom CSS color values
+export type ToastBorderType = "default" | "warning" | "error"; // string allows custom CSS color values
 
 /**
  * Branded type for SVG markup that has been vetted to be safe for use in toasts.

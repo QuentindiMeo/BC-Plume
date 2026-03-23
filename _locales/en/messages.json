@@ -265,6 +265,14 @@
     "message": "\"$TRACK_TITLE$\" can't be streamed. It will be skipped during playback.",
     "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
   },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ tracks are not playable",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "The following tracks are not playable: $TITLES_LIST$. They will be skipped during playback.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ is now available.",
@@ -278,6 +286,7 @@
   "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
   "META__TOAST__HEALTH_CHECK": { "message": "health check" },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" },
   "META__TOAST__RELEASE": { "message": "release update" },
   "INFO__TOAST__SHOWN": {
     "message": "Toast shown ($LABEL$)",

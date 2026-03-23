@@ -17,7 +17,7 @@ export const updateTrackMetadata = (appCore: IAppCore, bcPlayer: BcPlayerPort): 
   const trackTitle = bcPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
   appCore.dispatch(coreActions.setTrackTitle(trackTitle));
 
-  const { current, total } = getTrackQuantifiers(trackTitle);
+  const { current, total } = getTrackQuantifiers(trackTitle, bcPlayer);
 
   const trackNumberText = isAlbumPage
     ? getString("LABEL__TRACK_CURRENT", [`${current}/${total}`])
