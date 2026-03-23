@@ -1,6 +1,7 @@
 import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
+import { createToast } from "./ui/toast";
 
 export interface BcHealthCheckResult {
   allRequiredFound: boolean;
@@ -28,10 +29,10 @@ export const checkBandcampElements = (): BcHealthCheckResult => {
   const checks = (Object.keys(BC_ELEM_SELECTORS) as Array<keyof typeof BC_ELEM_SELECTORS>).map((key) => {
     const selector = BC_ELEM_SELECTORS[key];
 
-    // Optional when the selector belongs to a page type that does not match the current page,
-    // or when fromAlbum may legitimately be absent on standalone track pages.
+    // Check is optional when the selector belongs to a page type that does not match the current page.
     const isOptional =
-      (isAlbumPage && (TRACK_ONLY_KEYS.has(key) || TRACK_WITH_ALBUM_ONLY_KEYS.has(key))) ||
+      TRACK_WITH_ALBUM_ONLY_KEYS.has(key) ||
+      (isAlbumPage && TRACK_ONLY_KEYS.has(key)) ||
       (!isAlbumPage && ALBUM_ONLY_KEYS.has(key));
 
     return { key, selector, required: !isOptional };
@@ -53,7 +54,12 @@ export const checkBandcampElements = (): BcHealthCheckResult => {
   if (missingRequired.length === 0) {
     logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__ALL_FOUND"));
   } else {
-    alert(getString("ALERT__BC_HEALTH_CHECK__FAILED", [String(missingRequired.length)]));
+    createToast({
+      label: getString("META__TOAST__HEALTH_CHECK"),
+      title: getString("LABEL__TOAST__HEALTH_CHECK__TITLE", [String(missingRequired.length)]),
+      description: getString("LABEL__TOAST__HEALTH_CHECK__DESCRIPTION"),
+      borderColor: "#c00",
+    });
   }
   return {
     allRequiredFound: missingRequired.length === 0,
