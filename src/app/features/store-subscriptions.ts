@@ -36,11 +36,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       if (Number.isNaN(elapsed) || Number.isNaN(duration) || duration === 0) return;
 
-      const songProgressPercentage = (elapsed / duration) * 100;
-      const bgPercent = songProgressPercentage < 50 ? songProgressPercentage + 1 : songProgressPercentage - 1;
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      const progressPercentage = (elapsed / duration) * 100;
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
 
-      plume.progressSlider.value = `${songProgressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
+      plume.progressSlider.value = `${progressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
       plume.progressSlider.style.backgroundImage = bgImg;
 
       // Update time displays

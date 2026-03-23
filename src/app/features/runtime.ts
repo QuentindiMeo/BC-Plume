@@ -1,4 +1,4 @@
-import { measureContrastRatioWCAG } from "../../shared/colors";
+import { measureContrastRatioWCAG, WCAG_CONTRAST_LARGE } from "../../shared/colors";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { getBcPlayerInstance } from "../stores/adapters";
@@ -81,7 +81,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
   const r = Number.parseInt(bgColorAsRGB![1], 10);
   const g = Number.parseInt(bgColorAsRGB![2], 10);
   const b = Number.parseInt(bgColorAsRGB![3], 10);
-  const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= 3 ? "#0000007f" : "#ffffff7f";
+  const runtimeTextColor = measureContrastRatioWCAG([r, g, b]) >= WCAG_CONTRAST_LARGE ? "#0000007f" : "#ffffff7f";
 
   const runtimeSpan = document.createElement("span");
   runtimeSpan.className = "runtime";

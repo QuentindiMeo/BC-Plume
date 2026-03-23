@@ -1,4 +1,4 @@
-import { PLUME_CONSTANTS } from "../../../domain/plume";
+import { INITIAL_TIME_DISPLAY, PLUME_CONSTANTS } from "../../../domain/plume";
 import { coreActions } from "../../../domain/ports/app-core";
 import { guiActions } from "../../../domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
@@ -43,11 +43,11 @@ export const createProgressBar = (): HTMLDivElement => {
 
   const elapsed = document.createElement("span");
   elapsed.id = PLUME_ELEM_SELECTORS.elapsedDisplay.split("#")[1];
-  elapsed.textContent = "0:00";
+  elapsed.textContent = INITIAL_TIME_DISPLAY;
 
   const duration = document.createElement("span");
   duration.id = PLUME_ELEM_SELECTORS.durationDisplay.split("#")[1];
-  duration.textContent = "0:00";
+  duration.textContent = INITIAL_TIME_DISPLAY;
   duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
 
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {

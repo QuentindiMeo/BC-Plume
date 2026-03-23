@@ -1,3 +1,4 @@
+import { PLUME_CONSTANTS } from "../../domain/plume";
 import type { AudioProviderPort } from "../../domain/ports/audio-provider";
 import type { MusicPlayerPort } from "../../domain/ports/music-player";
 
@@ -68,8 +69,11 @@ export class MusicPlayerAdapter implements MusicPlayerPort {
       };
 
       audio.addEventListener("play", () => audio.pause(), { signal: controller.signal });
-      // Prevent playing for 100ms while seeking (especially useful when drag-seeking)
-      audio.addEventListener("seeked", () => setTimeout(cleanup, 100), { once: true, signal: controller.signal });
+      // Prevent playing briefly while seeking (especially useful when drag-seeking)
+      audio.addEventListener("seeked", () => setTimeout(cleanup, PLUME_CONSTANTS.SEEK_PAUSE_GUARD_MS), {
+        once: true,
+        signal: controller.signal,
+      });
     }
   }
 

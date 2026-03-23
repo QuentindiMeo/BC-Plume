@@ -1,8 +1,8 @@
-import { TIME_DISPLAY_METHOD, TimeState } from "../domain/plume";
+import { INITIAL_TIME_DISPLAY, TIME_DISPLAY_METHOD, TimeState } from "../domain/plume";
 
 // Internal helper: Format time as MM:SS
 export const presentFormattedTime = (seconds: number): string => {
-  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  if (!Number.isFinite(seconds) || seconds < 0) return INITIAL_TIME_DISPLAY;
 
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);

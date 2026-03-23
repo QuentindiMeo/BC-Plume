@@ -38,7 +38,7 @@ const notifyUnplayableTracks = () => {
   const unplayableTracks: { nb: number; title: string }[] = [];
 
   trackRows.forEach((row, idx) => {
-    if (row.classList.contains("linked")) return;
+    if (row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1])) return;
 
     const titleEl = row.querySelector<HTMLDivElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
     const title = titleEl?.textContent?.trim() ?? `#${idx + 1}`;

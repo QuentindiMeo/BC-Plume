@@ -2,7 +2,7 @@ import { PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions, IAppCore } from "../../domain/ports/app-core";
 import type { MusicPlayerPort } from "../../domain/ports/music-player";
 
-const { TIME_STEP_DURATION } = PLUME_CONSTANTS;
+const { PLAYBACK_STEP_DURATION_SECONDS: TIME_STEP_DURATION } = PLUME_CONSTANTS;
 
 // Seeks backward by TIME_STEP_DURATION seconds, clamped to 0
 export const seekBackward = (appCore: IAppCore, player: MusicPlayerPort): void => {

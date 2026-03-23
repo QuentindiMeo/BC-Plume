@@ -1,5 +1,6 @@
-import { LOOP_MODE } from "../../domain/plume";
+import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
 import { guiActions } from "../../domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
@@ -10,9 +11,9 @@ import { isLastTrackOfAlbumPlaying } from "../use-cases/navigate-track";
 import { updateTrackMetadata } from "../use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "./audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
-import { cleanupReleaseToast } from "./toast";
 import { setupHotkeys } from "./keyboard";
 import { setupStoreSubscriptions } from "./store-subscriptions";
+import { cleanupReleaseToast } from "./toast";
 import { CleanupCallback } from "./types";
 import {
   handleMuteToggle,
@@ -60,16 +61,13 @@ const updateTrackDisplay = () => {
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
 
     // Cache offsetHeight to avoid multiple layout recalculations
-    const LOGO_DEFAULT_VERTICAL_PADDING = 1; // in rem, from `styles.css`
-    // Expected single-line height for Latin characters in px. Used as baseline to calculate additional padding needed when title wraps to multiple lines or uses taller character sets.
-    const LATIN_CHAR_HEIGHT = 19;
     const titleHeight = titleText.offsetHeight;
-    if (titleHeight !== LATIN_CHAR_HEIGHT) {
+    if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
       const logo = plume.headerLogo;
       if (logo) {
-        const deltaPaddingPx = titleHeight - LATIN_CHAR_HEIGHT;
-        const deltaPaddingRem = deltaPaddingPx / 16; // 16px = 1rem
-        logo.style.paddingTop = `${LOGO_DEFAULT_VERTICAL_PADDING + deltaPaddingRem}rem`;
+        const deltaPaddingPx = titleHeight - PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX;
+        const deltaPaddingRem = deltaPaddingPx / PLUME_CONSTANTS.PX_PER_REM;
+        logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM + deltaPaddingRem}rem`;
       }
     }
   }
@@ -163,13 +161,15 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
           // Re-setup audio event listeners: cleanup old → update store → attach new
           rewireAudioEventListeners(handles, newAudio);
 
-          if (!isPlumeInjected()) setTimeout(reinit, 500);
+          if (!isPlumeInjected()) setTimeout(reinit, PLUME_CONSTANTS.TRACK_DISPLAY_UPDATE_DELAY_MS);
         }
 
+        const titleLinkSelector = BC_ELEM_SELECTORS.albumPageCurrentTrackTitle;
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&
-          (mutation.target.classList.contains("title_link") || mutation.target.querySelector("a.title_link"))
+          (mutation.target.classList.contains(titleLinkSelector.split(".")[1]) ||
+            mutation.target.querySelector(titleLinkSelector))
         ) {
           updateTrackDisplay();
         }
@@ -201,8 +201,8 @@ export const createSpaNavigationObserver = (
     setTimeout(() => {
       reinit();
       // slight delay to ensure track display is updated after navigation reinit
-      setTimeout(updateTrackDisplay, 500);
-    }, 1000);
+      setTimeout(updateTrackDisplay, PLUME_CONSTANTS.TRACK_DISPLAY_UPDATE_DELAY_MS);
+    }, PLUME_CONSTANTS.SPA_REINIT_DELAY_MS);
   });
 
   observer.observe(document, { childList: true, subtree: true });

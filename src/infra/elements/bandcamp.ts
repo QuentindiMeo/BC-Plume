@@ -14,6 +14,7 @@ export enum BC_ELEM_SELECTORS {
   nextTrack = "div.nextbutton",
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
+  playableTrack = ".linked",
   trackTitle = "span.track-title",
   unplayableTrackTitle = "tr.track_row_view div.title",
   trackDuration = "span.time",

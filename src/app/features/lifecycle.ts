@@ -1,3 +1,4 @@
+import { PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
 import { guiActions } from "../../domain/ports/plume-ui";
 import { getString } from "../../shared/i18n";
@@ -79,7 +80,7 @@ export const launchPlume = (): void => {
     if (!audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
       isInitializing = false;
-      setTimeout(init, 1000); // retry after 1 second
+      setTimeout(init, PLUME_CONSTANTS.AUDIO_RETRY_MS);
       return;
     }
 

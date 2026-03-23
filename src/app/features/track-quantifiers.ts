@@ -1,4 +1,5 @@
 import { BcPlayerPort } from "../../domain/ports/bc-player";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 
@@ -14,7 +15,7 @@ export const getTrackQuantifiers = (trackName: string, bcPlayer: BcPlayerPort): 
   const playableTitles = bcPlayer.getTrackRowTitles();
   const playableTitlesIt = playableTitles[Symbol.iterator]();
   const rowsMarked = trackRows.map((row) => {
-    const isPlayable = row.classList.contains("linked");
+    const isPlayable = row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1]);
     return { isPlayable, title: isPlayable ? playableTitlesIt.next().value : undefined };
   });
   const currentTrackNumber = rowsMarked.findIndex((row) => row.title === trackName) + 1;
