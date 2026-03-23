@@ -29,7 +29,9 @@ export class BcPlayerAdapter implements BcPlayerPort {
 
   getArtworkUrl(): string | null {
     const img = this.query<HTMLImageElement>(BC_ELEM_SELECTORS.coverArt);
-    return img?.src ?? null;
+    if (!img?.src) return null;
+    // Bandcamp suffixes: _2 = 350px, _5 = 700px. Upgrade for fullscreen use.
+    return img.src.replace(/_\d+\.jpg$/, "_5.jpg");
   }
 
   getTrackDuration(): number | null {
