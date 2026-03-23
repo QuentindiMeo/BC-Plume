@@ -72,6 +72,9 @@ export const launchPlume = (): void => {
       return;
     }
 
+    const plumeCanBuild = checkBandcampElements().allRequiredFound;
+    if (!plumeCanBuild) return;
+
     const audioElement = await findAudioElement();
     if (!audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
@@ -79,7 +82,6 @@ export const launchPlume = (): void => {
       setTimeout(init, 1000); // retry after 1 second
       return;
     }
-    checkBandcampElements();
 
     // Make audio element available before loading persisted state so that MusicPlayerAdapter calls (e.g. setLoop) inside the thunk don't throw.
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));

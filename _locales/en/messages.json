@@ -2,15 +2,12 @@
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
   "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player." },
 
-  "ALERT__BC_HEALTH_CHECK__FAILED": {
-    "message": "Bandcamp health check failed: $MISSING_REQUIRED$ required elements missing.\nPlume won't be able to function properly. Please check the console for details.",
-    "placeholders": {
-      "missing_required": {
-        "content": "$1",
-        "example": "3"
-      }
-    }
+  "META__TOAST__HEALTH_CHECK": { "message": "health check" },
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
   },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume won't be able to function properly. Please check the console for details." },
   "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
     "message": "Bandcamp element not found (required): $SELECTOR$",
