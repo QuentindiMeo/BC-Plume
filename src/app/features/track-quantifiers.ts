@@ -9,11 +9,11 @@ export interface TrackQuantifiers {
 
 export const getTrackQuantifiers = (trackName: string): TrackQuantifiers => {
   const bcPlayer = getBcPlayerInstance();
-  const playableTitles = bcPlayer.getTrackRowTitles();
-  if (playableTitles.length === 0) return { current: 0, total: 0 };
-
-  const playableTitlesIt = playableTitles[Symbol.iterator]();
   const trackRows = bcPlayer.getTrackRows();
+  if (trackRows.length === 0) return { current: 0, total: 0 };
+
+  const playableTitles = bcPlayer.getTrackRowTitles();
+  const playableTitlesIt = playableTitles[Symbol.iterator]();
   const rowsMarked = trackRows.map((row) => {
     const isPlayable = row.classList.contains("linked");
     return { isPlayable, title: isPlayable ? playableTitlesIt.next().value : undefined };

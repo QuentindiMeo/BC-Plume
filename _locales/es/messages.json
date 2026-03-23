@@ -257,6 +257,14 @@
     "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
   },
   "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume no podrá funcionar correctamente. Consulta la consola para más detalles." },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "La pista $TRACK_NUMBER$ no es reproducible",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "\"$TRACK_TITLE$\" no se puede transmitir. Se omitirá durante la reproducción.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "¡Una actualización ha sido lanzada!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "La versión $RELEASE$ de Plume ya está disponible.",
@@ -269,6 +277,7 @@
   },
   "LABEL__TOAST__RELEASE__CTA": { "message": "Ver las novedades" },
   "META__TOAST__HEALTH_CHECK": { "message": "verificación de salud" },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "pista no reproducible" },
   "META__TOAST__RELEASE": { "message": "actualización de versión" },
   "INFO__TOAST__SHOWN": {
     "message": "Notificación mostrada ($LABEL$)",

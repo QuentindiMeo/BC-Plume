@@ -2,12 +2,6 @@
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
   "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player." },
 
-  "META__TOAST__HEALTH_CHECK": { "message": "health check" },
-  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
-    "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
-    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
-  },
-  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume won't be able to function properly. Please check the console for details." },
   "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
     "message": "Bandcamp element not found (required): $SELECTOR$",
@@ -258,6 +252,19 @@
     "message": "Invalid toast icon SVG provided for label '$LABEL$'",
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume won't be able to function properly. Please check the console for details." },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "Track $TRACK_NUMBER$ is not playable",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "\"$TRACK_TITLE$\" can't be streamed. It will be skipped during playback.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ is now available.",
@@ -269,6 +276,8 @@
     }
   },
   "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
+  "META__TOAST__HEALTH_CHECK": { "message": "health check" },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
   "META__TOAST__RELEASE": { "message": "release update" },
   "INFO__TOAST__SHOWN": {
     "message": "Toast shown ($LABEL$)",

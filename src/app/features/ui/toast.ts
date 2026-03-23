@@ -3,10 +3,25 @@ import { getString } from "../../../shared/i18n";
 import { CPL, logger } from "../../../shared/logger";
 import { PLUME_SVG } from "../../../svg/icons";
 
-export interface ToastCta {
+interface ToastCta {
   href: string;
   label: string;
 }
+
+const getToastBorderColor = (borderType: ToastBorderType): string => {
+  switch (borderType) {
+    case "default":
+      return "var(--plume)";
+    case "warning":
+      return "var(--plume-warning)";
+    case "error":
+      return "var(--plume-error)";
+    default:
+      borderType satisfies never; // exhaustiveness check
+      return borderType; // allow custom CSS color values
+  }
+};
+type ToastBorderType = "default" | "warning" | "error"; // string allows custom CSS color values
 
 /**
  * Branded type for SVG markup that has been vetted to be safe for use in toasts.
@@ -21,7 +36,7 @@ export interface ToastConfig {
   duration?: number; // in seconds, defaults to PLUME_CONSTANTS.TOAST_AUTO_DISMISS
   cta?: ToastCta;
   onDismissed?: () => void; // side-effect callback, called after the toast is dismissed
-  borderColor?: string; // CSS color for the left border, defaults to var(--plume)
+  borderType?: ToastBorderType; // CSS color for the left border, defaults to var(--plume)
 }
 
 export interface ToastHandle {
@@ -92,9 +107,10 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   toast.role = "status";
   toast.ariaLabel = getString("ARIA__TOAST__CONTAINER", [config.label]);
   toast.ariaLive = "polite";
+  const toastBorderColor = getToastBorderColor(config.borderType ?? "default");
   toast.style.setProperty("border-left-width", "4px");
   toast.style.setProperty("border-left-style", "solid");
-  toast.style.setProperty("border-left-color", config.borderColor ?? "var(--plume)");
+  toast.style.setProperty("border-left-color", toastBorderColor);
 
   const icon = document.createElement("div");
   icon.className = "bpe-toast__icon";

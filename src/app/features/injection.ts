@@ -1,6 +1,7 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { coreActions, IAppCore } from "../../domain/ports/app-core";
 import { guiActions, IGui } from "../../domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
@@ -19,6 +20,7 @@ import {
   createProgressBar,
   createVolumeControlSection,
 } from "./ui";
+import { createToast } from "./ui/toast";
 
 interface PlumeView {
   plumeContainer: HTMLDivElement;
@@ -30,10 +32,30 @@ interface PlumeView {
   initialTrackNumberText: string;
 }
 
+const notifyUnplayableTracks = () => {
+  const bcPlayer = getBcPlayerInstance();
+  const trackRows = bcPlayer.getTrackRows();
+
+  trackRows.forEach((row, idx) => {
+    if (row.classList.contains("linked")) return;
+
+    const titleEl = row.querySelector<HTMLSpanElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
+    const title = titleEl?.textContent?.trim() ?? `#${idx + 1}`;
+
+    createToast({
+      label: getString("META__TOAST__UNPLAYABLE_TRACK"),
+      title: getString("LABEL__TOAST__UNPLAYABLE_TRACK__TITLE", [String(idx + 1)]),
+      description: getString("LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION", [title]),
+      borderType: "warning",
+    });
+  });
+};
+
 const addRuntime = () => {
   const bcPlayer = getBcPlayerInstance();
   const trackView = bcPlayer.getTrackView();
   if (!trackView) return;
+
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
@@ -133,6 +155,9 @@ export const injectEnhancements = async (): Promise<boolean> => {
 
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
-  if (isAlbumPage) addRuntime();
+  if (isAlbumPage) {
+    addRuntime();
+    notifyUnplayableTracks();
+  }
   return true;
 };
