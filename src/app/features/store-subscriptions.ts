@@ -4,6 +4,7 @@ import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedTime } from "../../shared/presenters";
+import { setSvgContent } from "../../shared/svg";
 import { PLUME_SVG } from "../../svg/icons";
 import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -99,7 +100,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       const plume = getGuiInstance().getState();
       plume.playPauseBtns.forEach((btn) => {
-        btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+        setSvgContent(btn, isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay);
       });
     })
   );

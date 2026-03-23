@@ -1,9 +1,7 @@
-// SECURITY NOTE: PLUME_SVG contains hardcoded SVG markup that is safely used with innerHTML. All values are static constants defined at compile time with no user input or dynamic content.
-// While innerHTML is generally discouraged, it's acceptable here because:
-//    1. Content is 100% controlled (no user input, no external data)
-//    2. SVG is verbose to create via DOM methods (createElementNS for each element)
-//    3. Content scripts run in isolated context
-// Note to developers: do not introduce any dynamic content or user input into PLUME_SVG, as that would create security risks. Always sanitize any new content if you must add it.
+// PLUME_SVG contains hardcoded SVG markup as static constants (no user input, no external data).
+// All SVG injection goes through createSafeSvgElement() / setSvgContent() in shared/svg.ts,
+// which sanitizes markup via DOMParser before inserting it into the DOM.
+// Do not introduce any dynamic content or user input into PLUME_SVG values.
 export enum PLUME_SVG {
   logo = `
     <svg

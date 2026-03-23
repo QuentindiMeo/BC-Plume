@@ -19,6 +19,7 @@ import {
   handleTrackBackward,
   handleTrackForward,
 } from "./ui/playback";
+import { createSafeSvgElement, setSvgContent } from "../../shared/svg";
 import { handleMuteToggle } from "./ui/volume";
 
 const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
@@ -88,7 +89,7 @@ const renderMuteButton = (elements: FullscreenElements, isMuted: boolean): void 
   }
 
   const muteBtnString = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
-  elements.muteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+  setSvgContent(elements.muteBtn, isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn);
   elements.muteBtn.title = muteBtnString;
   elements.muteBtn.ariaLabel = muteBtnString;
   elements.muteBtn.ariaPressed = isMuted.toString();
@@ -101,7 +102,7 @@ const renderPlayPauseButton = (elements: FullscreenElements, isPlaying: boolean)
     return;
   }
 
-  elements.playPauseBtn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+  setSvgContent(elements.playPauseBtn, isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay);
 };
 
 const renderElapsedDisplay = (elements: FullscreenElements, formattedElapsed: string): void => {
@@ -264,8 +265,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
 
-  // Safe use of innerHTML to clone DOM content from controlled element
-  elements.headerContainer.innerHTML = plume.titleDisplay.innerHTML;
+  // Clone child nodes from controlled element instead of innerHTML
+  elements.headerContainer.textContent = "";
+  Array.from(plume.titleDisplay.childNodes).forEach((node) => {
+    elements.headerContainer.appendChild(node.cloneNode(true));
+  });
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
   renderProgressSlider(elements, appCore.computed.progressPercentage());
@@ -344,7 +348,12 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   const fullscreenLogo = document.createElement("a");
   fullscreenLogo.id = PLUME_ELEM_SELECTORS.headerLogo.split("#")[1];
-  fullscreenLogo.innerHTML = PLUME_SVG.logo + `<p id="${fullscreenLogo.id}__version">${APP_VERSION}</p>`;
+  const logoSvg = createSafeSvgElement(PLUME_SVG.logo);
+  if (logoSvg) fullscreenLogo.appendChild(logoSvg);
+  const versionTag = document.createElement("p");
+  versionTag.id = `${fullscreenLogo.id}__version`;
+  versionTag.textContent = APP_VERSION;
+  fullscreenLogo.appendChild(versionTag);
   fullscreenLogo.href = PLUME_KO_FI_URL;
   fullscreenLogo.target = "_blank";
   fullscreenLogo.rel = "noopener noreferrer";
@@ -366,7 +375,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const exitBtn = document.createElement("button");
   exitBtn.id = PLUME_ELEM_SELECTORS.fullscreenExitBtn.split("#")[1];
   exitBtn.type = "button";
-  exitBtn.innerHTML = PLUME_SVG.fullscreenExit;
+  setSvgContent(exitBtn, PLUME_SVG.fullscreenExit);
   exitBtn.title = getString("ARIA__EXIT_FULLSCREEN_BTN");
   exitBtn.ariaLabel = getString("ARIA__EXIT_FULLSCREEN_BTN");
   exitBtn.addEventListener("click", toggleFullscreenMode);

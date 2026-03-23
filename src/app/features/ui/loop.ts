@@ -1,6 +1,7 @@
 import { LOOP_MODE, LoopModeType } from "../../../domain/plume";
 import { getString } from "../../../shared/i18n";
 import { CPL, logger } from "../../../shared/logger";
+import { setSvgContent } from "../../../shared/svg";
 import { PLUME_SVG } from "../../../svg/icons";
 import { getMusicPlayerInstance } from "../../stores/adapters";
 import { getAppCoreInstance } from "../../stores/AppCoreImpl";
@@ -13,7 +14,7 @@ export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType
   switch (loopMode) {
     case LOOP_MODE.NONE:
       const btnStringNone = getString("ARIA__LOOP__OFF");
-      btn.innerHTML = PLUME_SVG.loopNone;
+      setSvgContent(btn, PLUME_SVG.loopNone);
       btn.ariaPressed = "false";
       btn.ariaLabel = btnStringNone;
       btn.title = btnStringNone;
@@ -22,7 +23,7 @@ export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType
       const btnStringCollection = isAlbumPage
         ? getString("ARIA__LOOP__COLLECTION_ALBUM")
         : getString("ARIA__LOOP__COLLECTION_TRACK");
-      btn.innerHTML = PLUME_SVG.loopCollection;
+      setSvgContent(btn, PLUME_SVG.loopCollection);
       btn.ariaPressed = "true";
       btn.ariaLabel = btnStringCollection;
       btn.title = btnStringCollection;
@@ -30,7 +31,7 @@ export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType
     }
     case LOOP_MODE.TRACK:
       const btnStringTrack = getString("ARIA__LOOP__ONE_TRACK");
-      btn.innerHTML = PLUME_SVG.loopTrack;
+      setSvgContent(btn, PLUME_SVG.loopTrack);
       btn.ariaPressed = "true";
       btn.ariaLabel = btnStringTrack;
       btn.title = btnStringTrack;

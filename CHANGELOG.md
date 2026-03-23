@@ -5,6 +5,14 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+  - _**[1.9.2]** Mar 24 2026_: Health Check Fix, Unavailable Tracks, SVGs Security [#116](https://github.com/QuentindiMeo/BC-Plume/pull/116)  
+  Loop mode bugs are fixed: the penultimate track of an album no longer gets stuck repeating, and collection loop mode is no longer available on single track pages.  
+  Unplayable tracks in a collection are now detected and surfaced to the user via toast notifications.  
+  The health check diagnostic replaces its `alert()` with the toast system and correctly handles standalone single track pages.  
+  The progress seek bar no longer shows a not-allowed cursor when dragging.  
+  SVG injection is hardened: a sanitizer strips dangerous elements and unsafe attributes.  
+  Magic numbers and strings are extracted into named constants.
+
   - _**[1.9.1]** Mar 16 2026_: Hotfixing the persistence logic [#111](https://github.com/QuentindiMeo/BC-Plume/pull/111)  
   The persistence logic was somehow broken by the modifications in the latest when adding new core actions—it's fixed now.  
   The semantic version is fixed to follow the `MAJOR.MINOR.PATCH` format: release `1.9.1` corresponds to the old `1.3.4` ([click for details](#detailing-semver-changes--191)).  

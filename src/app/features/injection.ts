@@ -5,6 +5,7 @@ import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
+import { createSafeSvgElement } from "../../shared/svg";
 import { PLUME_SVG } from "../../svg/icons";
 import { getBcPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -82,7 +83,12 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   const headerLogo = document.createElement("a");
   headerLogo.id = PLUME_ELEM_SELECTORS.headerLogo.split("#")[1];
-  headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}__version">${APP_VERSION}</p>`;
+  const logoSvg = createSafeSvgElement(PLUME_SVG.logo);
+  if (logoSvg) headerLogo.appendChild(logoSvg);
+  const versionTag = document.createElement("p");
+  versionTag.id = `${headerLogo.id}__version`;
+  versionTag.textContent = APP_VERSION;
+  headerLogo.appendChild(versionTag);
   headerLogo.href = PLUME_KO_FI_URL;
   headerLogo.target = "_blank";
   headerLogo.rel = "noopener noreferrer";
