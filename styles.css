@@ -3,6 +3,8 @@
 /* declare variables */
 :root {
   --plume: #20a0c3;
+  --plume-warning: #ffc107;
+  --plume-error: #dc3545;
   --progbar-bg: rgba(0, 0, 0, 0.85);
   --progbar-fill-bg-left: #2bb8db;
   --progbar-fill-bg-right: #1da0c3;
@@ -151,6 +153,7 @@ div.name-section__titling h2 {
 
   cursor: pointer;
   position: relative;
+  -webkit-user-drag: none;
 
   appearance: none;
   -webkit-appearance: none;

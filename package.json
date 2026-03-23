@@ -3,7 +3,7 @@
   "name": "plume",
   "license": "MIT",
 
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player.",
   "scripts": {
     "build": "node scripts/build.js --dev",

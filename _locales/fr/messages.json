@@ -67,7 +67,7 @@
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tous les éléments Bandcamp trouvés" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
-  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée : " },
+  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Méthode d'affichage de la durée appliquée : $METHOD$",
@@ -257,6 +257,22 @@
     "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
   },
   "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume ne pourra pas fonctionner correctement. Veuillez vérifier la console pour plus de détails." },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "La piste $TRACK_NUMBER$ n'est pas lisible",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "« $TRACK_TITLE$ » ne peut pas être jouée. Elle sera ignorée lors de la lecture.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ pistes ne sont pas lisibles",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "Les pistes suivantes ne sont pas lisibles : $TITLES_LIST$. Elles seront ignorées lors de la lecture.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ est maintenant disponible.",
@@ -278,6 +294,8 @@
   },
   "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
   "META__TOAST__HEALTH_CHECK": { "message": "vérification de santé" },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "piste non lisible" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" },
   "META__TOAST__RELEASE": { "message": "mise à jour de version" },
   "ARIA__TOAST__CONTAINER": {
     "message": "Notification de $LABEL$ de l'extension",

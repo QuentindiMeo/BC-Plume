@@ -69,12 +69,11 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     const loopMode = appCore.getState().loopMode;
     if (pageType === "album" && loopMode !== LOOP_MODE.COLLECTION) return;
 
-    // Band-aid solution for the fact that BC locks the player when "ended" is emitted.
     const bcPlayer = getBcPlayerInstance();
-    const nextBtn = bcPlayer.getNextTrackButton();
-    const prevBtn = bcPlayer.getPreviousTrackButton();
-    nextBtn?.click();
-    prevBtn?.click();
+    if (!bcPlayer.isPlaying()) {
+      bcPlayer.getNextTrackButton()?.click();
+      bcPlayer.getPreviousTrackButton()?.click();
+    }
   };
 
   musicPlayer.on("timeupdate", handleTimeUpdate);

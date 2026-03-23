@@ -15,9 +15,11 @@ export enum BC_ELEM_SELECTORS {
   trackList = "table#track_table",
   trackRow = "tr.track_row_view",
   trackTitle = "span.track-title",
+  unplayableTrackTitle = "tr.track_row_view div.title",
   trackDuration = "span.time",
   coverArt = "div#tralbumArt img",
 }
+export type BcElementKey = keyof typeof BC_ELEM_SELECTORS;
 
 export const BC_PLAYER_SELECTORS = new Set<string>([
   "div.inline_player",
@@ -26,3 +28,4 @@ export const BC_PLAYER_SELECTORS = new Set<string>([
   ".track_play_hilite",
   ".track_play_area",
 ]);
+export type BcPlayerSelector = typeof BC_PLAYER_SELECTORS extends Set<infer T> ? T : never;
