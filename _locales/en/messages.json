@@ -1,16 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
-  "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, 10s skip, fullscreen mode & hotkey for the player." },
+  "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player." },
 
-  "ALERT__BC_HEALTH_CHECK__FAILED": {
-    "message": "Bandcamp health check failed: $MISSING_REQUIRED$ required elements missing.\nPlume won't be able to function properly. Please check the console for details.",
-    "placeholders": {
-      "missing_required": {
-        "content": "$1",
-        "example": "3"
-      }
-    }
-  },
   "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
     "message": "Bandcamp element not found (required): $SELECTOR$",
@@ -256,6 +247,32 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
 
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Failed to parse toast icon SVG" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "Invalid toast icon SVG provided for label '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume won't be able to function properly. Please check the console for details." },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "Track $TRACK_NUMBER$ is not playable",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "\"$TRACK_TITLE$\" can't be streamed. It will be skipped during playback.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ tracks are not playable",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "The following tracks are not playable: $TITLES_LIST$. They will be skipped during playback.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ is now available.",
@@ -267,6 +284,9 @@
     }
   },
   "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
+  "META__TOAST__HEALTH_CHECK": { "message": "health check" },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" },
   "META__TOAST__RELEASE": { "message": "release update" },
   "INFO__TOAST__SHOWN": {
     "message": "Toast shown ($LABEL$)",

@@ -4,6 +4,7 @@ import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
 import { presentFormattedTime } from "../../shared/presenters";
+import { setSvgContent } from "../../shared/svg";
 import { PLUME_SVG } from "../../svg/icons";
 import { getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -36,11 +37,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       if (Number.isNaN(elapsed) || Number.isNaN(duration) || duration === 0) return;
 
-      const songProgressPercentage = (elapsed / duration) * 100;
-      const bgPercent = songProgressPercentage < 50 ? songProgressPercentage + 1 : songProgressPercentage - 1;
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${bgPercent.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      const progressPercentage = (elapsed / duration) * 100;
+      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
 
-      plume.progressSlider.value = `${songProgressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
+      plume.progressSlider.value = `${progressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
       plume.progressSlider.style.backgroundImage = bgImg;
 
       // Update time displays
@@ -100,7 +100,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       const plume = getGuiInstance().getState();
       plume.playPauseBtns.forEach((btn) => {
-        btn.innerHTML = isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay;
+        setSvgContent(btn, isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay);
       });
     })
   );

@@ -1,16 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
-  "APP_DESCRIPTION": { "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, avance/recul de 10s, mode plein écran et raccourcis clavier." },
+  "APP_DESCRIPTION": { "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, modes de répétition, mode plein écran et raccourcis clavier." },
 
-  "ALERT__BC_HEALTH_CHECK__FAILED": {
-    "message": "La vérification de santé de Bandcamp a échoué : $MISSING_REQUIRED$ éléments requis manquants.\nPlume ne pourra pas fonctionner correctement. Veuillez vérifier la console pour plus de détails.",
-    "placeholders": {
-      "missing_required": {
-        "content": "$1",
-        "example": "3"
-      }
-    }
-  },
   "ERROR__NO_BROWSER_API": { "message": "Aucune API de navigateur détectée" },
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
     "message": "Élément Bandcamp non trouvé (requis) : $SELECTOR$",
@@ -76,7 +67,7 @@
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tous les éléments Bandcamp trouvés" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
-  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée : " },
+  "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Méthode d'affichage de la durée appliquée : $METHOD$",
@@ -256,6 +247,32 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Échec de l'analyse du SVG de l'icône du toast" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "SVG de l'icône du toast invalide pour l'étiquette '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Diagnostic : $MISSING_REQUIRED$ élément(s) requis manquant(s)",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume ne pourra pas fonctionner correctement. Veuillez vérifier la console pour plus de détails." },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "La piste $TRACK_NUMBER$ n'est pas lisible",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "« $TRACK_TITLE$ » ne peut pas être jouée. Elle sera ignorée lors de la lecture.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ pistes ne sont pas lisibles",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "Les pistes suivantes ne sont pas lisibles : $TITLES_LIST$. Elles seront ignorées lors de la lecture.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ est maintenant disponible.",
@@ -276,6 +293,9 @@
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
   },
   "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
+  "META__TOAST__HEALTH_CHECK": { "message": "vérification de santé" },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "piste non lisible" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" },
   "META__TOAST__RELEASE": { "message": "mise à jour de version" },
   "ARIA__TOAST__CONTAINER": {
     "message": "Notification de $LABEL$ de l'extension",

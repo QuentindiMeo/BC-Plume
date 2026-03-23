@@ -3,6 +3,8 @@
 /* declare variables */
 :root {
   --plume: #20a0c3;
+  --plume-warning: #ffc107;
+  --plume-error: #dc3545;
   --progbar-bg: rgba(0, 0, 0, 0.85);
   --progbar-fill-bg-left: #2bb8db;
   --progbar-fill-bg-right: #1da0c3;
@@ -151,6 +153,7 @@ div.name-section__titling h2 {
 
   cursor: pointer;
   position: relative;
+  -webkit-user-drag: none;
 
   appearance: none;
   -webkit-appearance: none;
@@ -448,6 +451,7 @@ div.name-section__titling h2 {
   color: #ffffff;
 }
 #bpe-fullscreen-cover-art {
+  min-width: 25vw;
   max-width: 30vw;
   max-height: 60vh;
 
@@ -631,7 +635,6 @@ div.name-section__titling h2 {
   background: rgba(15, 15, 20, 0.8);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(32, 160, 195, 0.35);
-  border-left: 3px solid var(--plume);
   border-radius: 0.5rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(32, 160, 195, 0.15);
 
@@ -701,7 +704,6 @@ div.name-section__titling h2 {
 
 .bpe-toast__dismiss {
   flex-shrink: 0;
-  /* 44×44px tap target as per WCAG 2.5.5 */
   width: 2.75rem;
   height: 2.75rem;
   margin: -0.75rem -0.75rem 0 0;

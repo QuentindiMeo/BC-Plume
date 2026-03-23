@@ -1,4 +1,5 @@
 export const WCAG_CONTRAST_NORMAL = 4.5; // Normal text AA standard
+export const WCAG_CONTRAST_LARGE = 3; // Large text / UI component AA standard
 export const FALLBACK_GRAY_RGB_STR = "rgb(127, 127, 127)";
 const CONTRAST_ADJUSTMENT_STEP = 0.05;
 
@@ -10,8 +11,11 @@ const getLuminance = (rgb: [number, number, number]): number => {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
 
+// Assumed dark background for WCAG contrast calculations (Bandcamp's page background).
+const ASSUMED_BG_RGB: [number, number, number] = [18, 18, 18];
+
 export const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
-  const bgRgb: [number, number, number] = [18, 18, 18];
+  const bgRgb = ASSUMED_BG_RGB;
 
   const L1 = getLuminance(rgb);
   const L2 = getLuminance(bgRgb);

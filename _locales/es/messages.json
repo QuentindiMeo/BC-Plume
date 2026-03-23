@@ -1,19 +1,10 @@
 {
   "APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
-  "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, avance/retroceso de 10s, pantalla completa y atajos de teclado." },
+  "APP_DESCRIPTION": { "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, modos de repetición, pantalla completa y atajos de teclado." },
 
-  "ALERT__BC_HEALTH_CHECK__FAILED": {
-    "message": "¡La verificación de salud de Bandcamp ha fallado! Faltan $REQUIRED_COUNT$ elementos requeridos. Consulta la consola para más detalles.",
-    "placeholders": {
-      "required_count": {
-        "content": "$1",
-        "example": "3"
-      }
-    }
-  },
   "ERROR__NO_BROWSER_API": { "message": "No se detectó API del navegador" },
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
-    "message": "La respuesta de verificación de salud de Bandcamp no contiene el campo requerido: $SELECTOR$",
+    "message": "La respuesta de verificación de salud de Bandcamp no contiene el elemento requerido: $SELECTOR$",
     "placeholders": {
       "selector": {
         "content": "$1",
@@ -76,7 +67,7 @@
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Todos los elementos de Bandcamp encontrados" },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Suscripciones de almacén inicializadas" },
   "INFO__HOTKEYS__REGISTERED": { "message": "Atajos de teclado registrados" },
-  "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado: " },
+  "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
   "INFO__TIME_DISPLAY_METHOD__APPLIED": {
     "message": "Método de visualización de tiempo aplicado: $METHOD$",
@@ -256,6 +247,32 @@
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" },
 
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Error al analizar el SVG del icono del toast" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "SVG del icono del toast inválido para la etiqueta '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Diagnóstico: faltan $MISSING_REQUIRED$ elemento(s) requerido(s)",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume no podrá funcionar correctamente. Consulta la consola para más detalles." },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "La pista $TRACK_NUMBER$ no es reproducible",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "\"$TRACK_TITLE$\" no se puede transmitir. Se omitirá durante la reproducción.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ pistas no son reproducibles",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "Las siguientes pistas no son reproducibles: $TITLES_LIST$. Se omitirán durante la reproducción.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "¡Una actualización ha sido lanzada!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "La versión $RELEASE$ de Plume ya está disponible.",
@@ -267,6 +284,9 @@
     }
   },
   "LABEL__TOAST__RELEASE__CTA": { "message": "Ver las novedades" },
+  "META__TOAST__HEALTH_CHECK": { "message": "verificación de salud" },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "pista no reproducible" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistas no reproducibles" },
   "META__TOAST__RELEASE": { "message": "actualización de versión" },
   "INFO__TOAST__SHOWN": {
     "message": "Notificación mostrada ($LABEL$)",

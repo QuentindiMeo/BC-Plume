@@ -14,7 +14,7 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.9.1-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.9.2-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
@@ -29,7 +29,7 @@
 &#xa0;
 
 <div id="demo" align="center">
-  <a href="#memo-description"><img alt="BC-Plume Bandcamp player enhancer demo — volume slider, seek bar, fullscreen mode; demo gif of v1.3.2" src="https://github.com/user-attachments/assets/3f72cfa0-7c42-4aa5-8e9c-4a67b617ce17" width="800px" /></a>
+  <a href="https://www.youtube.com/watch?v=rsXqvNrXYn8"><img alt="BC-Plume Bandcamp player enhancer demo — volume slider, seek bar, fullscreen mode; demo gif of v1.3.2" src="https://github.com/user-attachments/assets/8d0e543d-5b12-4b37-920e-24db729241f8" width="800px" /></a>
 </div>
 
 <div id="details" align="center">
@@ -41,9 +41,6 @@
   <a href="https://ko-fi.com/quentindimeo">
     <img alt="ko-fi tip button" src="https://storage.ko-fi.com/cdn/brandasset/v2/support_me_on_kofi_blue.png" height="40px" />
   </a>
-  <!-- <a href="https://www.paypal.com/donate/?hosted_button_id=LQCF9J9X4EDZL">
-    <img alt="PayPal donate button" src="https://i.imgur.com/abmsLLY.png" height="40px" />
-  </a> -->
 </div>
 
 &#xa0;

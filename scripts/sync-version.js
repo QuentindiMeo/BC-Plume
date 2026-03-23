@@ -13,9 +13,7 @@ console.log(`🔄 Synchronizing version across manifest files: ${packageVersion}
 const rootManifestPath = path.join(__dirname, "..", "manifest.json");
 if (fs.existsSync(rootManifestPath)) {
   const rootManifest = JSON.parse(fs.readFileSync(rootManifestPath, "utf8"));
-  if (rootManifest.version === packageVersion) {
-    console.log("✓ Root manifest.json already up to date");
-  } else {
+  if (rootManifest.version !== packageVersion) {
     rootManifest.version = packageVersion;
     fs.writeFileSync(rootManifestPath, JSON.stringify(rootManifest, null, 2) + "\n");
     console.log(`✅ Updated root manifest.json: ${packageVersion}`);
@@ -25,9 +23,7 @@ if (fs.existsSync(rootManifestPath)) {
 const chromeManifestPath = path.join(__dirname, "..", "build", "chrome", "manifest.json");
 if (fs.existsSync(chromeManifestPath)) {
   const chromeManifest = JSON.parse(fs.readFileSync(chromeManifestPath, "utf8"));
-  if (chromeManifest.version === packageVersion) {
-    console.log("✓ Chrome manifest already up to date");
-  } else {
+  if (chromeManifest.version !== packageVersion) {
     chromeManifest.version = packageVersion;
     fs.writeFileSync(chromeManifestPath, JSON.stringify(chromeManifest, null, 2) + "\n");
     console.log(`✅ Updated build/chrome/manifest.json: ${packageVersion}`);
@@ -38,9 +34,7 @@ if (fs.existsSync(chromeManifestPath)) {
 const firefoxManifestPath = path.join(__dirname, "..", "build", "firefox", "manifest.json");
 if (fs.existsSync(firefoxManifestPath)) {
   const firefoxManifest = JSON.parse(fs.readFileSync(firefoxManifestPath, "utf8"));
-  if (firefoxManifest.version === packageVersion) {
-    console.log("✓ Firefox manifest already up to date");
-  } else {
+  if (firefoxManifest.version !== packageVersion) {
     firefoxManifest.version = packageVersion;
     fs.writeFileSync(firefoxManifestPath, JSON.stringify(firefoxManifest, null, 2) + "\n");
     console.log(`✅ Updated build/firefox/manifest.json: ${packageVersion}`);
@@ -53,7 +47,6 @@ if (fs.existsSync(readmePath)) {
   const versionRegex = /release-v(\d+\.\d+\.\d+)/;
   const readmeVersionMatch = readmeContent.match(versionRegex);
   if (readmeVersionMatch && readmeVersionMatch[1] === packageVersion) {
-    console.log("✓ README.md version already up to date");
   } else if (versionRegex.test(readmeContent)) {
     readmeContent = readmeContent.replace(versionRegex, `release-v${packageVersion}`);
     fs.writeFileSync(readmePath, readmeContent);

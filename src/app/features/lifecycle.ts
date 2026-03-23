@@ -1,3 +1,4 @@
+import { PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
 import { guiActions } from "../../domain/ports/plume-ui";
 import { getString } from "../../shared/i18n";
@@ -72,26 +73,29 @@ export const launchPlume = (): void => {
       return;
     }
 
+    const plumeCanBuild = checkBandcampElements().allRequiredFound;
+    if (!plumeCanBuild) return;
+
     const audioElement = await findAudioElement();
     if (!audioElement) {
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
       isInitializing = false;
-      setTimeout(init, 1000); // retry after 1 second
+      setTimeout(init, PLUME_CONSTANTS.AUDIO_RETRY_MS);
       return;
     }
-    checkBandcampElements();
 
     // Make audio element available before loading persisted state so that MusicPlayerAdapter calls (e.g. setLoop) inside the thunk don't throw.
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
+
+    // Set pageType before loading persisted state so the COLLECTION→TRACK guard in loadPersistedState works on track/single pages.
+    const isAlbumPage = globalThis.location.pathname.startsWith("/album/");
+    appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
 
     // Load persisted state into store
     await appCore.loadPersistedState();
 
     // Apply the persisted volume to the audio element after the state has been loaded.
     audioElement.volume = appCore.getState().volume;
-
-    const isAlbumPage = globalThis.location.pathname.startsWith("/album/");
-    appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
 
     const plumeIsAlreadyInjected = isPlumeInjected();
     if (plumeIsAlreadyInjected) {

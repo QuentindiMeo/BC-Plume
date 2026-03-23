@@ -1,19 +1,38 @@
+import { PLUME_CONSTANTS } from "../../../domain/plume";
 import { getString } from "../../../shared/i18n";
 import { CPL, logger } from "../../../shared/logger";
+import { createSafeSvgElement } from "../../../shared/svg";
+import { PLUME_SVG } from "../../../svg/icons";
 
 export interface ToastCta {
   href: string;
   label: string;
 }
 
+const getToastBorderColor = (borderType: ToastBorderType): string => {
+  switch (borderType) {
+    case "default":
+      return "var(--plume)";
+    case "warning":
+      return "var(--plume-warning)";
+    case "error":
+      return "var(--plume-error)";
+    default:
+      borderType satisfies never; // exhaustiveness check
+      return borderType; // allow custom CSS color values
+  }
+};
+export type ToastBorderType = "default" | "warning" | "error"; // string allows custom CSS color values
+
 export interface ToastConfig {
   label: string; // short identifier used for ARIA construction and logging
-  iconSvg: string;
   title: string;
   description?: string;
+  iconSvg?: SVGElement | PLUME_SVG;
+  duration?: number; // in seconds, defaults to PLUME_CONSTANTS.TOAST_AUTO_DISMISS
   cta?: ToastCta;
   onDismissed?: () => void; // side-effect callback, called after the toast is dismissed
-  duration: number; // in seconds
+  borderType?: ToastBorderType; // CSS color for the left border, defaults to var(--plume)
 }
 
 export interface ToastHandle {
@@ -30,18 +49,29 @@ const getToastContainer = (): HTMLElement => {
   document.body.appendChild(container);
   return container;
 };
-
 const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTMLElement => {
   const toast = document.createElement("div");
   toast.className = "bpe-toast";
   toast.role = "status";
   toast.ariaLabel = getString("ARIA__TOAST__CONTAINER", [config.label]);
   toast.ariaLive = "polite";
+  const toastBorderColor = getToastBorderColor(config.borderType ?? "default");
+  toast.style.setProperty("border-left-width", "4px");
+  toast.style.setProperty("border-left-style", "solid");
+  toast.style.setProperty("border-left-color", toastBorderColor);
 
   const icon = document.createElement("div");
   icon.className = "bpe-toast__icon";
-  // SECURITY NOTE: iconSvg must be a hardcoded compile-time constant — see svg/icons.ts
-  icon.innerHTML = config.iconSvg;
+  if (config.iconSvg instanceof SVGElement) {
+    icon.appendChild(config.iconSvg.cloneNode(true));
+  } else if (config.iconSvg !== undefined) {
+    const svgElement = createSafeSvgElement(config.iconSvg);
+    if (svgElement) icon.appendChild(svgElement);
+    else logger(CPL.WARN, getString("WARN__TOAST__ICON_SVG_INVALID", [config.label]));
+  } else {
+    const svgElement = createSafeSvgElement(PLUME_SVG.logo);
+    if (svgElement) icon.appendChild(svgElement);
+  }
 
   const body = document.createElement("div");
   body.className = "bpe-toast__body";
@@ -78,7 +108,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   const timer = document.createElement("div");
   timer.className = "bpe-toast__timer";
   timer.setAttribute("aria-hidden", "true");
-  timer.style.setProperty("--toast-timer-duration", `${config.duration}s`);
+  timer.style.setProperty("--toast-timer-duration", `${config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS}s`);
 
   toast.appendChild(icon);
   toast.appendChild(body);
@@ -91,7 +121,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 
 export const createToast = (config: ToastConfig): ToastHandle => {
   const container = getToastContainer();
-  const durationMs = config.duration * 1000;
+  const durationMs = (config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS) * 1000;
   let remaining = durationMs;
   let segmentStart = Date.now();
   let timerId: ReturnType<typeof setTimeout> | null = null;

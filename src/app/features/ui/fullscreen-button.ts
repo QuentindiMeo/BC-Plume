@@ -1,5 +1,6 @@
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { getString } from "../../../shared/i18n";
+import { createSafeSvgElement } from "../../../shared/svg";
 import { NoArgFunction } from "../../../shared/types";
 import { PLUME_SVG } from "../../../svg/icons";
 
@@ -10,7 +11,12 @@ const createFullscreenButton = (onToggle: NoArgFunction): HTMLButtonElement => {
   const fullscreenBtn: HTMLButtonElement = document.createElement("button");
   fullscreenBtn.id = PLUME_ELEM_SELECTORS.fullscreenBtn.split("#")[1];
   fullscreenBtn.type = "button";
-  fullscreenBtn.innerHTML = `<span id="${fullscreenBtnId}">${fullscreenBtnLabel}</span>${PLUME_SVG.fullscreen}`;
+  const labelSpan = document.createElement("span");
+  labelSpan.id = fullscreenBtnId;
+  labelSpan.textContent = fullscreenBtnLabel;
+  fullscreenBtn.appendChild(labelSpan);
+  const svgEl = createSafeSvgElement(PLUME_SVG.fullscreen);
+  if (svgEl) fullscreenBtn.appendChild(svgEl);
   fullscreenBtn.ariaLabel = fullscreenBtnLabel;
   fullscreenBtn.addEventListener("click", onToggle);
 

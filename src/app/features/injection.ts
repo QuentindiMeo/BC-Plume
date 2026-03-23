@@ -1,9 +1,11 @@
 import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
 import { coreActions, IAppCore } from "../../domain/ports/app-core";
 import { guiActions, IGui } from "../../domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
+import { createSafeSvgElement } from "../../shared/svg";
 import { PLUME_SVG } from "../../svg/icons";
 import { getBcPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
@@ -19,6 +21,7 @@ import {
   createProgressBar,
   createVolumeControlSection,
 } from "./ui";
+import { createToast } from "./ui/toast";
 
 interface PlumeView {
   plumeContainer: HTMLDivElement;
@@ -30,10 +33,44 @@ interface PlumeView {
   initialTrackNumberText: string;
 }
 
+const notifyUnplayableTracks = () => {
+  const bcPlayer = getBcPlayerInstance();
+  const trackRows = bcPlayer.getTrackRows();
+  const unplayableTracks: { nb: number; title: string }[] = [];
+
+  trackRows.forEach((row, idx) => {
+    if (row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1])) return;
+
+    const titleEl = row.querySelector<HTMLDivElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
+    const title = titleEl?.textContent?.trim() ?? `#${idx + 1}`;
+    unplayableTracks.push({ nb: idx + 1, title });
+  });
+
+  if (unplayableTracks.length === 0) return;
+  if (unplayableTracks.length === 1) {
+    const { nb, title } = unplayableTracks[0];
+    createToast({
+      label: getString("META__TOAST__UNPLAYABLE_TRACK"),
+      title: getString("LABEL__TOAST__UNPLAYABLE_TRACK__TITLE", [String(nb)]),
+      description: getString("LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION", [title]),
+      borderType: "warning",
+    });
+    return;
+  }
+  const titlesList = unplayableTracks.map((t) => t.nb).join(", ");
+  createToast({
+    label: getString("META__TOAST__UNPLAYABLE_TRACKS"),
+    title: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE", [String(unplayableTracks.length)]),
+    description: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION", [titlesList]),
+    borderType: "warning",
+  });
+};
+
 const addRuntime = () => {
   const bcPlayer = getBcPlayerInstance();
   const trackView = bcPlayer.getTrackView();
   if (!trackView) return;
+
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
@@ -46,7 +83,12 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   const headerLogo = document.createElement("a");
   headerLogo.id = PLUME_ELEM_SELECTORS.headerLogo.split("#")[1];
-  headerLogo.innerHTML = PLUME_SVG.logo + `<p id="${headerLogo.id}__version">${APP_VERSION}</p>`;
+  const logoSvg = createSafeSvgElement(PLUME_SVG.logo);
+  if (logoSvg) headerLogo.appendChild(logoSvg);
+  const versionTag = document.createElement("p");
+  versionTag.id = `${headerLogo.id}__version`;
+  versionTag.textContent = APP_VERSION;
+  headerLogo.appendChild(versionTag);
   headerLogo.href = PLUME_KO_FI_URL;
   headerLogo.target = "_blank";
   headerLogo.rel = "noopener noreferrer";
@@ -54,8 +96,9 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   headerLogo.title = getString("ARIA__LOGO_LINK");
   headerContainer.appendChild(headerLogo);
 
+  const bcPlayer = getBcPlayerInstance();
   const initialTrackTitle = getCurrentTrackTitle(isAlbumPage);
-  const initialTq = getTrackQuantifiers(initialTrackTitle);
+  const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
   currentTitleSection.tabIndex = 0; // make it focusable for screen readers
@@ -133,6 +176,9 @@ export const injectEnhancements = async (): Promise<boolean> => {
 
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
-  if (isAlbumPage) addRuntime();
+  if (isAlbumPage) {
+    addRuntime();
+    notifyUnplayableTracks();
+  }
   return true;
 };

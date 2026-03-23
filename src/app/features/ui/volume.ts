@@ -3,6 +3,7 @@ import { coreActions } from "../../../domain/ports/app-core";
 import { guiActions } from "../../../domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
 import { getString } from "../../../shared/i18n";
+import { setSvgContent } from "../../../shared/svg";
 import { PLUME_SVG } from "../../../svg/icons";
 import { getMusicPlayerInstance } from "../../stores/adapters";
 import { getAppCoreInstance } from "../../stores/AppCoreImpl";
@@ -16,7 +17,7 @@ export const syncMuteBtn = (isMuted: boolean): void => {
   const plume = plumeUi.getState();
   const newMuteBtn = plume.muteBtn;
 
-  newMuteBtn.innerHTML = isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn;
+  setSvgContent(newMuteBtn, isMuted ? PLUME_SVG.volumeMuted : PLUME_SVG.volumeOn);
   newMuteBtn.title = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   newMuteBtn.ariaLabel = isMuted ? getString("ARIA__UNMUTE") : getString("ARIA__MUTE");
   newMuteBtn.ariaPressed = isMuted.toString();
@@ -45,7 +46,7 @@ export const createVolumeControlSection = async (): Promise<HTMLDivElement | nul
   muteBtn.title = getString("ARIA__MUTE");
   muteBtn.ariaLabel = getString("ARIA__MUTE");
   muteBtn.ariaPressed = "false";
-  muteBtn.innerHTML = PLUME_SVG.volumeOn;
+  setSvgContent(muteBtn, PLUME_SVG.volumeOn);
 
   const volumeSlider = document.createElement("input");
   volumeSlider.id = PLUME_ELEM_SELECTORS.volumeSlider.split("#")[1];
