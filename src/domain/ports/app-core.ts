@@ -85,7 +85,7 @@ interface ICoreActions {
 
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setSeekJumpDuration: (duration: number) => CoreAction;
-  setVolumeStep: (step: number) => CoreAction;
+  setVolumeHotkeyStep: (step: number) => CoreAction;
   setTrackRestartThreshold: (threshold: number) => CoreAction;
 }
 
@@ -121,7 +121,7 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_SEEK_JUMP_DURATION,
     payload: duration,
   }),
-  setVolumeStep: (step: number): CoreAction => ({
+  setVolumeHotkeyStep: (step: number): CoreAction => ({
     type: CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP,
     payload: step,
   }),

@@ -366,42 +366,39 @@ const createAppCoreInstance = (): IAppCore => {
         const value = result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION];
         try {
           assertBoundedInteger(value, SEEK_JUMP_DURATION_MIN, SEEK_JUMP_DURATION_MAX);
+          dispatch(coreActions.setSeekJumpDuration(value));
+          logger(CPL.INFO, getString("INFO__SEEK_JUMP_DURATION__LOADED"), `${value}s`);
         } catch {
           logger(CPL.WARN, getString("WARN__SEEK_JUMP_DURATION__INVALID_VALUE"));
           const defaultSeekJumpDuration = PLUME_DEFAULTS.seekJumpDuration;
           dispatch(coreActions.setSeekJumpDuration(defaultSeekJumpDuration));
-          return;
         }
-        dispatch(coreActions.setSeekJumpDuration(value));
-        logger(CPL.INFO, getString("INFO__SEEK_JUMP_DURATION__LOADED"), `${value}s`);
       }
 
       if (result[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP] !== undefined) {
         const value = result[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP];
         try {
           assertBoundedInteger(value, VOLUME_HOTKEY_STEP_MIN, VOLUME_HOTKEY_STEP_MAX);
+          dispatch(coreActions.setVolumeHotkeyStep(value));
+          logger(CPL.INFO, getString("INFO__VOLUME_HOTKEY_STEP__LOADED"), `${value}%`);
         } catch {
           logger(CPL.WARN, getString("WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE"));
           const defaultVolumeStep = PLUME_DEFAULTS.volumeHotkeyStep;
-          dispatch(coreActions.setVolumeStep(defaultVolumeStep));
-          return;
+          dispatch(coreActions.setVolumeHotkeyStep(defaultVolumeStep));
         }
-        dispatch(coreActions.setVolumeStep(value));
-        logger(CPL.INFO, getString("INFO__VOLUME_HOTKEY_STEP__LOADED"), `${value}%`);
       }
 
       if (result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] !== undefined) {
         const value = result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD];
         try {
           assertBoundedInteger(value, TRACK_RESTART_THRESHOLD_MIN, TRACK_RESTART_THRESHOLD_MAX);
+          dispatch(coreActions.setTrackRestartThreshold(value));
+          logger(CPL.INFO, getString("INFO__TRACK_RESTART_THRESHOLD__LOADED"), `${value}s`);
         } catch {
           logger(CPL.WARN, getString("WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE"));
           const defaultThreshold = PLUME_DEFAULTS.trackRestartThreshold;
           dispatch(coreActions.setTrackRestartThreshold(defaultThreshold));
-          return;
         }
-        dispatch(coreActions.setTrackRestartThreshold(value));
-        logger(CPL.INFO, getString("INFO__TRACK_RESTART_THRESHOLD__LOADED"), `${value}s`);
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);

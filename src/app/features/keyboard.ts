@@ -136,7 +136,7 @@ export const setupHotkeys = (
     } else if (message.type === PLUME_MESSAGE_TYPE.SEEK_JUMP_DURATION_UPDATED) {
       appCore.dispatch(coreActions.setSeekJumpDuration(message.seekJumpDuration));
     } else if (message.type === PLUME_MESSAGE_TYPE.VOLUME_HOTKEY_STEP_UPDATED) {
-      appCore.dispatch(coreActions.setVolumeStep(message.volumeHotkeyStep));
+      appCore.dispatch(coreActions.setVolumeHotkeyStep(message.volumeHotkeyStep));
     } else if (message.type === PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED) {
       appCore.dispatch(coreActions.setTrackRestartThreshold(message.trackRestartThreshold));
     }

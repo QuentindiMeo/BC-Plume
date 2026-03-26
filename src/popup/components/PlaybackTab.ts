@@ -91,7 +91,7 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   resetBtn.hidden = currentValue === defaultValue;
 
   const validate = (raw: string): { valid: true; value: WholeNumber } | { valid: false; error: string } => {
-    const num = Number(raw);
+    const num = raw ? Number(raw) : NaN;
     try {
       assertWholeNumber(num);
     } catch {
