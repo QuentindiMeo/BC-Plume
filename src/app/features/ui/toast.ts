@@ -107,7 +107,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 
   const timer = document.createElement("div");
   timer.className = "bpe-toast__timer";
-  timer.setAttribute("aria-hidden", "true");
+  timer.ariaHidden = "true";
   timer.style.setProperty("--toast-timer-duration", `${config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS}s`);
 
   toast.appendChild(icon);

@@ -307,7 +307,9 @@
   },
 
   "POPUPTITLE": { "message": "Plume Settings" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
+  "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },

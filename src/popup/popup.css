@@ -50,6 +50,52 @@ body {
   letter-spacing: 0.01em;
 }
 
+.popup__tablist {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.popup__tab {
+  flex: 1;
+  padding: 8px 16px;
+
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; /* overlap container border so active underline replaces it */
+
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-align: center;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    border-bottom-color 0.15s;
+}
+.popup__tab:hover:not(.active) {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+.popup__tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+  cursor: default;
+}
+.popup__tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.popup__tab-panel[hidden] {
+  display: none;
+}
+
 .settings__section {
   padding: 10px 16px 0;
 }
