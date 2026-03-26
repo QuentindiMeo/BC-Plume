@@ -1,11 +1,11 @@
 import { HotkeyAction, KeyBinding } from "../../domain/hotkeys";
 import { PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
-import { PLUME_MESSAGE_TYPE } from "../../shared/messages";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
+import { PLUME_MESSAGE_TYPE } from "../../shared/messages";
 import { NoArgFunction } from "../../shared/types";
-import { getMusicPlayerInstance, getMessageReceiverInstance } from "../stores/adapters";
+import { getMessageReceiverInstance, getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
 import { seekToProgress } from "../use-cases/seek-to-progress";
 import type { CleanupCallback } from "./types";
@@ -95,12 +95,16 @@ export const setupHotkeys = (
       case HotkeyAction.TIME_FORWARD:
         handlers.handleTimeForward();
         break;
-      case HotkeyAction.VOLUME_UP:
-        handleAdjustVolume(5);
+      case HotkeyAction.VOLUME_UP: {
+        const volumeHotkeyStep = appCore.getState().volumeHotkeyStep;
+        handleAdjustVolume(volumeHotkeyStep);
         break;
-      case HotkeyAction.VOLUME_DOWN:
-        handleAdjustVolume(-5);
+      }
+      case HotkeyAction.VOLUME_DOWN: {
+        const volumeHotkeyStep = appCore.getState().volumeHotkeyStep * -1;
+        handleAdjustVolume(volumeHotkeyStep);
         break;
+      }
       case HotkeyAction.TRACK_BACKWARD:
         handlers.handleTrackBackward();
         break;
@@ -129,8 +133,12 @@ export const setupHotkeys = (
     if (message.type === PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED) {
       currentBindings = { ...message.bindings };
       codeToAction = buildCodeToActionMap(currentBindings);
-    } else if (message.type === PLUME_MESSAGE_TYPE.SEEK_DURATION_UPDATED) {
-      appCore.dispatch(coreActions.setSeekDuration(message.seekDuration));
+    } else if (message.type === PLUME_MESSAGE_TYPE.SEEK_JUMP_DURATION_UPDATED) {
+      appCore.dispatch(coreActions.setSeekJumpDuration(message.seekJumpDuration));
+    } else if (message.type === PLUME_MESSAGE_TYPE.VOLUME_HOTKEY_STEP_UPDATED) {
+      appCore.dispatch(coreActions.setVolumeStep(message.volumeHotkeyStep));
+    } else if (message.type === PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED) {
+      appCore.dispatch(coreActions.setTrackRestartThreshold(message.trackRestartThreshold));
     }
   });
 

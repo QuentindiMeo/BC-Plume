@@ -1,5 +1,5 @@
 import type { LoopModeType } from "../../domain/plume";
-import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
+import { LOOP_MODE } from "../../domain/plume";
 import type { BcPlayerPort } from "../../domain/ports/bc-player";
 import type { MusicPlayerPort } from "../../domain/ports/music-player";
 import { getString } from "../../shared/i18n";
@@ -18,12 +18,11 @@ export const isLastTrackOfAlbumPlaying = (bcPlayer: BcPlayerPort): boolean => {
   return lastTrackTitle === currentTrackTitle;
 };
 
-const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
-
-// Restarts the current track if past TIME_BEFORE_RESTART seconds, otherwise goes to the previous track.
-// navigateTrackForward needs no player arg because it only delegates to the BC button with no seek fallback.
+// Restarts the current track if past trackRestartThreshold seconds, otherwise goes to the previous track.
 export const navigateTrackBackward = (player: MusicPlayerPort, bcPlayer: BcPlayerPort): void => {
-  if (player.getCurrentTime() > TIME_BEFORE_RESTART) {
+  const trackRestartThreshold = getAppCoreInstance().getState().trackRestartThreshold;
+
+  if (player.getCurrentTime() > trackRestartThreshold) {
     player.seekTo(0);
     logger(CPL.INFO, getString("DEBUG__TRACK__RESTARTED"));
     return;

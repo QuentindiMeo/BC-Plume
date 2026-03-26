@@ -9,7 +9,9 @@ export interface AppPersistedState {
   volume: number;
 
   hotkeyBindings: Record<HotkeyAction, KeyBinding>;
-  seekDuration: number;
+  seekJumpDuration: number;
+  volumeHotkeyStep: number;
+  trackRestartThreshold: number;
 }
 
 export interface AppTransientState {
@@ -42,7 +44,9 @@ export enum CORE_ACTIONS {
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
 
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
-  SET_SEEK_DURATION = "SET_SEEK_DURATION",
+  SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
+  SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
+  SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
 }
 
 export type CoreAction =
@@ -60,7 +64,9 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
   | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
-  | IAction<CORE_ACTIONS.SET_SEEK_DURATION, number>;
+  | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
+  | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
+  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>;
 
 interface ICoreActions {
   setPageType: (pageType: BcPageType | null) => CoreAction;
@@ -78,7 +84,9 @@ interface ICoreActions {
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
-  setSeekDuration: (duration: number) => CoreAction;
+  setSeekJumpDuration: (duration: number) => CoreAction;
+  setVolumeStep: (step: number) => CoreAction;
+  setTrackRestartThreshold: (threshold: number) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -109,9 +117,17 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
     payload: bindings,
   }),
-  setSeekDuration: (duration: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_SEEK_DURATION,
+  setSeekJumpDuration: (duration: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_SEEK_JUMP_DURATION,
     payload: duration,
+  }),
+  setVolumeStep: (step: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP,
+    payload: step,
+  }),
+  setTrackRestartThreshold: (threshold: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
+    payload: threshold,
   }),
 } as const;
 

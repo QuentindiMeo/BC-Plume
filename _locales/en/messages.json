@@ -307,9 +307,10 @@
   },
 
   "POPUP_TITLE": { "message": "Settings Panel" },
+  "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
+
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
-  "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
@@ -363,13 +364,30 @@
   },
 
   "POPUP__PLAYBACK__TAB_LABEL": { "message": "Playback" },
-  "LABEL__PLAYBACK__SEEK_DURATION": { "message": "Seek step duration" },
-  "LABEL__PLAYBACK__SEEK_DURATION_RESET": { "message": "Reset to default" },
+  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Must be a whole number" },
+  "LABEL__PLAYBACK__RESET": { "message": "Reset" },
   "META__SECONDS_UNIT": { "message": "s" },
-  "ARIA__PLAYBACK__SEEK_DURATION_INPUT": { "message": "Seek step duration in seconds" },
-  "ERROR__SEEK_DURATION__PERSISTENCE": { "message": "Failed to save seek duration" },
-  "ERROR__SEEK_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
-  "ERROR__SEEK_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },
-  "WARN__SEEK_DURATION__INVALID_VALUE": { "message": "Invalid seek duration value, using default" },
-  "INFO__SEEK_DURATION__LOADED": { "message": "Seek duration loaded:" }
+  "META__PERCENT_UNIT": { "message": "%" },
+
+  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Seek buttons step" },
+  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Seek buttons step duration in seconds" },
+  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Failed to save seek duration" },
+  "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
+  "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Invalid seek duration value, using default" },
+  "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Seek duration loaded:" },
+
+  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Volume hotkey step" },
+  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Volume step percentage per hotkey press" },
+  "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Must be between 1 and 20" },
+  "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Failed to save volume step" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Invalid volume step value, using default" },
+  "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Volume step loaded:" },
+
+  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Track restart threshold" },
+  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": { "message": "Seconds within which the previous track button restarts the current track instead" },
+  "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Must be between 0 and 10" },
+  "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Failed to save track restart threshold" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Invalid track restart threshold value, using default" },
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Track restart threshold loaded:" }
 }
