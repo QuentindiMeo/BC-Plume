@@ -307,9 +307,10 @@
   },
 
   "POPUP_TITLE": { "message": "Panel de configuración" },
+  "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },
+
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
-  "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Restablecer todo" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Pulsa una tecla..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Desactivado" },
@@ -363,13 +364,30 @@
   },
 
   "POPUP__PLAYBACK__TAB_LABEL": { "message": "Reproducción" },
-  "LABEL__PLAYBACK__SEEK_DURATION": { "message": "Duración del salto" },
-  "LABEL__PLAYBACK__SEEK_DURATION_RESET": { "message": "Restablecer" },
+  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Debe ser un número entero" },
+  "LABEL__PLAYBACK__RESET": { "message": "Restablecer" },
   "META__SECONDS_UNIT": { "message": "s" },
-  "ARIA__PLAYBACK__SEEK_DURATION_INPUT": { "message": "Duración del salto en segundos" },
-  "ERROR__SEEK_DURATION__PERSISTENCE": { "message": "Error al guardar la duración del salto" },
-  "ERROR__SEEK_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
-  "ERROR__SEEK_DURATION__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 300" },
-  "WARN__SEEK_DURATION__INVALID_VALUE": { "message": "Valor de duración de salto inválido, usando el predeterminado" },
-  "INFO__SEEK_DURATION__LOADED": { "message": "Duración del salto cargada:" }
+  "META__PERCENT_UNIT": { "message": "%" },
+
+  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Duración del salto de búsqueda" },
+  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Duración del salto de búsqueda en segundos para los botones" },
+  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Error al guardar la duración del salto" },
+  "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
+  "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 300" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Valor de duración de salto inválido, usando el predeterminado" },
+  "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Duración del salto cargada:" },
+
+  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Paso de volumen de atajo" },
+  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Porcentaje de paso de volumen por pulsación de atajo" },
+  "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 20" },
+  "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Error al guardar el paso de volumen" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Valor de paso de volumen inválido, usando el predeterminado" },
+  "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Paso de volumen cargado:" },
+
+  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Umbral de reinicio de pista" },
+  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": { "message": "Segundos dentro de los cuales el botón de pista anterior reinicia la pista actual" },
+  "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Debe estar entre 0 y 10" },
+  "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Error al guardar el umbral de reinicio de pista" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valor de umbral de reinicio de pista inválido, usando el predeterminado" },
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Umbral de reinicio de pista cargado:" }
 }

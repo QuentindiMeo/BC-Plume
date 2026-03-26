@@ -32,8 +32,8 @@ export const createHotkeyRow = (
   label.className = "hotkey-row__label";
   label.textContent = getString(`LABEL__HOTKEY__${action}`);
 
-  const right = document.createElement("div");
-  right.className = "hotkey-row__right";
+  const value = document.createElement("div");
+  value.className = "hotkey-row__value";
 
   const btn = document.createElement("button");
   btn.className = "hotkey-row__btn";
@@ -186,11 +186,11 @@ export const createHotkeyRow = (
   refreshBtn();
   btn.addEventListener("click", () => startCapture());
 
-  right.appendChild(btn);
-  right.appendChild(conflictContainer);
+  value.appendChild(btn);
+  value.appendChild(conflictContainer);
 
   root.appendChild(label);
-  root.appendChild(right);
+  root.appendChild(value);
   root.appendChild(liveRegion);
 
   const updateBinding = (newBinding: KeyBinding): void => {
