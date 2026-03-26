@@ -5,7 +5,7 @@ import { CPL, logger } from "../../shared/logger";
 import { resetHotkeys } from "../use-cases/resetHotkeys";
 import { saveHotkeys } from "../use-cases/saveHotkeys";
 import { createHotkeyRow, HotkeyRowInstance } from "./HotkeyRow";
-import { TabDefinition } from "./TabBar";
+import type { TabDefinition } from "./TabBar";
 
 const ACTION_ORDER: HotkeyAction[] = [
   HotkeyAction.PLAY_PAUSE,

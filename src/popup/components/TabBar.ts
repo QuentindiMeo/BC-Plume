@@ -37,6 +37,7 @@ export const createTabBar = (tabs: TabDefinition[]): TabBarInstance => {
 
   for (const tab of tabs) {
     const btn = document.createElement("button");
+    btn.type = "button";
     btn.role = "tab";
     btn.className = "popup__tab";
     btn.id = `tab-${tab.id}`;

@@ -5,6 +5,8 @@ import {
   LOOP_MODE_CYCLE,
   LoopModeType,
   PLUME_DEFAULTS,
+  SEEK_DURATION_MAX,
+  SEEK_DURATION_MIN,
   TIME_DISPLAY_METHOD,
   TimeDisplayMethodType,
 } from "../../domain/plume";
@@ -221,8 +223,14 @@ const createAppCoreInstance = (): IAppCore => {
         updateState("hotkeyBindings", action.payload);
         break;
       case CORE_ACTIONS.SET_SEEK_DURATION:
-        if (!Number.isInteger(action.payload) || action.payload < 1 || action.payload > 300) {
+        if (
+          !Number.isInteger(action.payload) ||
+          action.payload < SEEK_DURATION_MIN ||
+          action.payload > SEEK_DURATION_MAX
+        ) {
           logger(CPL.WARN, getString("WARN__SEEK_DURATION__INVALID_VALUE"));
+          const defaultSeekDuration = PLUME_DEFAULTS.seekDuration;
+          updateState("seekDuration", defaultSeekDuration);
           return;
         }
         updateState("seekDuration", action.payload);

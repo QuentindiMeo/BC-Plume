@@ -1,3 +1,4 @@
+import { ValidSeekDuration } from "../../domain/plume";
 import type { IMessageSender } from "../../domain/ports/messaging";
 import { getString } from "../../shared/i18n";
 import { createSafeSvgElement } from "../../shared/svg";
@@ -10,7 +11,7 @@ export type SettingsPanelInstance = { mount: (el: HTMLElement) => void };
 
 export interface StoredSettings {
   hotkeyBindings: Parameters<typeof createHotkeyTab>[0];
-  seekDuration: number | undefined;
+  seekDuration: ValidSeekDuration | undefined;
 }
 
 export const createSettingsPanel = (stored: StoredSettings, sender: IMessageSender): SettingsPanelInstance => {
