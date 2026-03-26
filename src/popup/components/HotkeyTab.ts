@@ -5,6 +5,7 @@ import { CPL, logger } from "../../shared/logger";
 import { resetHotkeys } from "../use-cases/resetHotkeys";
 import { saveHotkeys } from "../use-cases/saveHotkeys";
 import { createHotkeyRow, HotkeyRowInstance } from "./HotkeyRow";
+import { TabDefinition } from "./TabBar";
 
 const ACTION_ORDER: HotkeyAction[] = [
   HotkeyAction.PLAY_PAUSE,
@@ -26,7 +27,7 @@ const ACTION_ORDER: HotkeyAction[] = [
 export const createHotkeyTab = (
   storedBindings: KeyBindingMap | undefined,
   sender: IMessageSender
-): (() => HTMLElement) => {
+): TabDefinition["buildPanel"] => {
   const currentBindings = Object.fromEntries(
     ACTION_ORDER.map((action) => [action, storedBindings?.[action] ?? DEFAULT_HOTKEYS[action]])
   ) as Record<HotkeyAction, KeyBinding>;
@@ -145,7 +146,7 @@ export const createHotkeyTab = (
     return footer;
   };
 
-  return (): HTMLElement => {
+  return (): HTMLDivElement => {
     const wrapper = document.createElement("div");
     wrapper.appendChild(buildSection());
     wrapper.appendChild(buildFooter());

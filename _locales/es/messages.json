@@ -188,9 +188,9 @@
   "LABEL__TRACK_UNKNOWN": { "message": "pista desconocida" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Cambiar a visualización restante/duración" },
   "LABEL__TRACK_BACKWARD": { "message": "Reiniciar pista/Ir a pista anterior" },
-  "LABEL__TIME_BACKWARD": { "message": "Retroceder 10 segundos" },
+  "LABEL__TIME_BACKWARD": { "message": "Retroceder" },
   "LABEL__PLAY_PAUSE": { "message": "Reproducir/Pausar" },
-  "LABEL__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
+  "LABEL__TIME_FORWARD": { "message": "Avanzar" },
   "LABEL__TRACK_FORWARD": { "message": "Ir a pista siguiente" },
   "LABEL__LOOP": { "message": "Repetición" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
@@ -329,8 +329,8 @@
     }
   },
   "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Reproducir / Pausar" },
-  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Retroceder 10 segundos" },
-  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avanzar 10 segundos" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Retroceder" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avanzar" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Subir volumen" },
   "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Bajar volumen" },
   "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Pista anterior / Retroceder" },
@@ -360,5 +360,16 @@
         "example": "Reproducir / Pausar"
       }
     }
-  }
+  },
+
+  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Reproducción" },
+  "LABEL__PLAYBACK__SEEK_DURATION": { "message": "Duración del salto" },
+  "LABEL__PLAYBACK__SEEK_DURATION_RESET": { "message": "Restablecer" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "ARIA__PLAYBACK__SEEK_DURATION_INPUT": { "message": "Duración del salto en segundos" },
+  "ERROR__SEEK_DURATION__PERSISTENCE": { "message": "Error al guardar la duración del salto" },
+  "ERROR__SEEK_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
+  "ERROR__SEEK_DURATION__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 300" },
+  "WARN__SEEK_DURATION__INVALID_VALUE": { "message": "Valor de duración de salto inválido, usando el predeterminado" },
+  "INFO__SEEK_DURATION__LOADED": { "message": "Duración del salto cargada:" }
 }

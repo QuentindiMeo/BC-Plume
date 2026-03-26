@@ -3,11 +3,11 @@ import { getString } from "../../shared/i18n";
 export interface TabDefinition {
   id: string;
   label: string;
-  buildPanel: () => HTMLElement;
+  buildPanel: () => HTMLDivElement;
 }
 
 interface TabBarInstance {
-  el: HTMLElement;
+  el: HTMLDivElement;
   activate: (id: string) => void;
 }
 
@@ -21,7 +21,7 @@ export const createTabBar = (tabs: TabDefinition[]): TabBarInstance => {
   wrapper.appendChild(tablist);
 
   const tabBtns = new Map<string, HTMLButtonElement>();
-  const tabPanels = new Map<string, HTMLElement>();
+  const tabPanels = new Map<string, HTMLDivElement>();
 
   const toggleTab = (id: string): void => {
     for (const [tabId, btn] of tabBtns) {

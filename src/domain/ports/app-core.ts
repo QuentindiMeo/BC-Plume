@@ -7,7 +7,9 @@ export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;
   loopMode: LoopModeType;
   volume: number;
+
   hotkeyBindings: Record<HotkeyAction, KeyBinding>;
+  seekDuration: number;
 }
 
 export interface AppTransientState {
@@ -38,7 +40,9 @@ export enum CORE_ACTIONS {
   TOGGLE_MUTE = "TOGGLE_MUTE",
   SET_VOLUME = "SET_VOLUME",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
+
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
+  SET_SEEK_DURATION = "SET_SEEK_DURATION",
 }
 
 export type CoreAction =
@@ -55,7 +59,8 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
-  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>;
+  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
+  | IAction<CORE_ACTIONS.SET_SEEK_DURATION, number>;
 
 interface ICoreActions {
   setPageType: (pageType: BcPageType | null) => CoreAction;
@@ -71,7 +76,9 @@ interface ICoreActions {
   toggleMute: () => CoreAction;
   setVolume: (volume: number) => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
+
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
+  setSeekDuration: (duration: number) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -97,9 +104,14 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
   }),
+
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
     type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
     payload: bindings,
+  }),
+  setSeekDuration: (duration: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_SEEK_DURATION,
+    payload: duration,
   }),
 } as const;
 

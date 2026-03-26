@@ -31,6 +31,7 @@ export const INITIAL_TIME_DISPLAY = "0:00";
 
 export const PLUME_DEFAULTS = {
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+  seekDuration: 10,
   loopMode: LOOP_MODE.NONE,
   savedVolume: 0.5,
 } as const;
