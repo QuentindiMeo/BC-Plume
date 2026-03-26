@@ -306,7 +306,7 @@
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
 
-  "POPUPTITLE": { "message": "Plume Settings" },
+  "POPUP_TITLE": { "message": "Settings Panel" },
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },

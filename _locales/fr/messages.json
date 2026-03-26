@@ -306,7 +306,7 @@
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
   },
 
-  "POPUPTITLE": { "message": "Paramètres de Plume" },
+  "POPUP_TITLE": { "message": "Panneau de configuration" },
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
   "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },

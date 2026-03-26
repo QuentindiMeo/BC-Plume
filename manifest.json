@@ -6,7 +6,7 @@
   "default_locale": "en",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "__MSG_POPUPTITLE__"
+    "default_title": "__MSG_POPUP_TITLE__"
   },
   "permissions": [
     "storage",

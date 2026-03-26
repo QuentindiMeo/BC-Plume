@@ -306,7 +306,7 @@
     "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
   },
 
-  "POPUPTITLE": { "message": "Ajustes de Plume" },
+  "POPUP_TITLE": { "message": "Panel de configuración" },
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
   "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },

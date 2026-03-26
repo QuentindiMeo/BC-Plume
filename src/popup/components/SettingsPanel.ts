@@ -1,5 +1,7 @@
 import type { IMessageSender } from "../../domain/ports/messaging";
 import { getString } from "../../shared/i18n";
+import { createSafeSvgElement } from "../../shared/svg";
+import { PLUME_SVG } from "../../svg/icons";
 import { createHotkeyTab } from "./HotkeyTab";
 import { createPlaybackTab } from "./PlaybackTab";
 import { createTabBar, TabDefinition } from "./TabBar";
@@ -16,10 +18,20 @@ export const createSettingsPanel = (stored: StoredSettings, sender: IMessageSend
     const header = document.createElement("header");
     header.className = "popup__header";
 
+    const logoWrap = document.createElement("span");
+    logoWrap.className = "popup__header-logo";
+    logoWrap.ariaHidden = "true";
+    const logoSvg = createSafeSvgElement(PLUME_SVG.logo);
+    if (logoSvg) logoWrap.appendChild(logoSvg);
+    header.appendChild(logoWrap);
+
     const h1 = document.createElement("h1");
-    h1.textContent = getString("POPUPTITLE");
+    h1.textContent = getString("POPUP_TITLE");
     header.appendChild(h1);
 
+    const logoWrap2 = logoWrap.cloneNode(true) as HTMLElement; // duplicate for symmetrical design
+    logoWrap2.style.visibility = "hidden"; // hide the second logo while keeping space for alignment
+    header.appendChild(logoWrap2);
     return header;
   };
 

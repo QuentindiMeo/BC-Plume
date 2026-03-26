@@ -64,7 +64,6 @@ if (fs.existsSync(logoVersionConstantPath)) {
   const versionConstRegex = /APP_VERSION = ['"]v(\d+\.\d+\.\d+)['"]/;
   const versionConstMatch = constantsContent.match(versionConstRegex);
   if (versionConstMatch && versionConstMatch[1] === packageVersion) {
-    console.log("✓ APP_VERSION constant already up to date");
   } else if (versionConstRegex.test(constantsContent)) {
     constantsContent = constantsContent.replace(versionConstRegex, `APP_VERSION = 'v${packageVersion}'`);
     fs.writeFileSync(logoVersionConstantPath, constantsContent);
