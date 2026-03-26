@@ -29,8 +29,13 @@ export type TimeDisplayMethodType = `${TIME_DISPLAY_METHOD}`;
 
 export const INITIAL_TIME_DISPLAY = "0:00";
 
+export const SEEK_DURATION_MIN = 1;
+export const SEEK_DURATION_MAX = 300;
+export type ValidSeekDuration = Exclude<number, typeof NaN | typeof Infinity>;
+
 export const PLUME_DEFAULTS = {
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+  seekDuration: 10 as ValidSeekDuration,
   loopMode: LOOP_MODE.NONE,
   savedVolume: 0.5,
 } as const;

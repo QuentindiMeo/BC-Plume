@@ -129,6 +129,8 @@ export const setupHotkeys = (
     if (message.type === PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED) {
       currentBindings = { ...message.bindings };
       codeToAction = buildCodeToActionMap(currentBindings);
+    } else if (message.type === PLUME_MESSAGE_TYPE.SEEK_DURATION_UPDATED) {
+      appCore.dispatch(coreActions.setSeekDuration(message.seekDuration));
     }
   });
 

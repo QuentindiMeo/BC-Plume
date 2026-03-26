@@ -26,7 +26,7 @@ export const createHotkeyRow = (
 
   const root = document.createElement("div");
   root.className = "hotkey-row";
-  root.setAttribute("role", "group");
+  root.role = "group";
 
   const label = document.createElement("span");
   label.className = "hotkey-row__label";
@@ -43,15 +43,15 @@ export const createHotkeyRow = (
 
   const liveRegion = document.createElement("span");
   liveRegion.className = "sr-live";
-  liveRegion.setAttribute("aria-live", "assertive");
-  liveRegion.setAttribute("aria-atomic", "true");
+  liveRegion.ariaLive = "assertive";
+  liveRegion.ariaAtomic = "true";
 
   const refreshBtn = (): void => {
     btn.textContent = currentBinding.label;
-    btn.setAttribute(
-      "aria-label",
-      getString("ARIA__HOTKEY_ROW__BUTTON", [getString(`LABEL__HOTKEY__${action}`), currentBinding.label])
-    );
+    btn.ariaLabel = getString("ARIA__HOTKEY_ROW__BUTTON", [
+      getString(`LABEL__HOTKEY__${action}`),
+      currentBinding.label,
+    ]);
   };
 
   const cancelCapture = (): void => {
@@ -153,7 +153,7 @@ export const createHotkeyRow = (
 
     btn.classList.add("hotkey-row__btn--capturing");
     btn.textContent = getString("POPUP__HOTKEYS__PRESS_KEY");
-    btn.setAttribute("aria-label", getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]));
+    btn.ariaLabel = getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]);
     liveRegion.textContent = getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]);
 
     const onKeydown = (e: KeyboardEvent) => {

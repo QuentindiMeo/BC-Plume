@@ -188,9 +188,9 @@
   "LABEL__TRACK_UNKNOWN": { "message": "unknown track" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "LABEL__TRACK_BACKWARD": { "message": "Restart track / Go to previous track" },
-  "LABEL__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
+  "LABEL__TIME_BACKWARD": { "message": "Rewind" },
   "LABEL__PLAY_PAUSE": { "message": "Play/Pause" },
-  "LABEL__TIME_FORWARD": { "message": "Forward 10 seconds" },
+  "LABEL__TIME_FORWARD": { "message": "Fast forward" },
   "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
   "LABEL__LOOP": { "message": "Repeat" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
@@ -306,8 +306,10 @@
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
 
-  "POPUPTITLE": { "message": "Plume Settings" },
+  "POPUP_TITLE": { "message": "Settings Panel" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
+  "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
@@ -327,8 +329,8 @@
     }
   },
   "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Play / Pause" },
-  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Rewind 10 seconds" },
-  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Forward 10 seconds" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Seek backward" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Seek forward" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Volume up" },
   "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Volume down" },
   "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Previous track / Rewind" },
@@ -358,5 +360,16 @@
         "example": "Play / Pause"
       }
     }
-  }
+  },
+
+  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Playback" },
+  "LABEL__PLAYBACK__SEEK_DURATION": { "message": "Seek step duration" },
+  "LABEL__PLAYBACK__SEEK_DURATION_RESET": { "message": "Reset to default" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "ARIA__PLAYBACK__SEEK_DURATION_INPUT": { "message": "Seek step duration in seconds" },
+  "ERROR__SEEK_DURATION__PERSISTENCE": { "message": "Failed to save seek duration" },
+  "ERROR__SEEK_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
+  "ERROR__SEEK_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },
+  "WARN__SEEK_DURATION__INVALID_VALUE": { "message": "Invalid seek duration value, using default" },
+  "INFO__SEEK_DURATION__LOADED": { "message": "Seek duration loaded:" }
 }

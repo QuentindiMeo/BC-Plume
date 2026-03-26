@@ -188,9 +188,9 @@
   "LABEL__TRACK_UNKNOWN": { "message": "titre inconnu" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "LABEL__TRACK_BACKWARD": { "message": "Recommencer / Aller à la piste précédente" },
-  "LABEL__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
+  "LABEL__TIME_BACKWARD": { "message": "Reculer" },
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
-  "LABEL__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
+  "LABEL__TIME_FORWARD": { "message": "Avancer" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__LOOP": { "message": "Répétition" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
@@ -306,8 +306,10 @@
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
   },
 
-  "POPUPTITLE": { "message": "Paramètres de Plume" },
+  "POPUP_TITLE": { "message": "Panneau de configuration" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
+  "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
@@ -327,8 +329,8 @@
     }
   },
   "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Lecture / Pause" },
-  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
-  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Reculer" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avancer" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Augmenter le volume" },
   "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Diminuer le volume" },
   "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Piste précédente / Recommencer" },
@@ -358,5 +360,16 @@
         "example": "Lecture / Pause"
       }
     }
-  }
+  },
+
+  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Lecture" },
+  "LABEL__PLAYBACK__SEEK_DURATION": { "message": "Durée du saut" },
+  "LABEL__PLAYBACK__SEEK_DURATION_RESET": { "message": "Réinitialiser" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "ARIA__PLAYBACK__SEEK_DURATION_INPUT": { "message": "Durée du saut en secondes" },
+  "ERROR__SEEK_DURATION__PERSISTENCE": { "message": "Échec de la sauvegarde de la durée du saut" },
+  "ERROR__SEEK_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
+  "ERROR__SEEK_DURATION__OUT_OF_RANGE": { "message": "Doit être compris entre 1 et 300" },
+  "WARN__SEEK_DURATION__INVALID_VALUE": { "message": "Valeur de durée de saut invalide, utilisation de la valeur par défaut" },
+  "INFO__SEEK_DURATION__LOADED": { "message": "Durée du saut chargée :" }
 }

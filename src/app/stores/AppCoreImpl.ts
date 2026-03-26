@@ -5,6 +5,8 @@ import {
   LOOP_MODE_CYCLE,
   LoopModeType,
   PLUME_DEFAULTS,
+  SEEK_DURATION_MAX,
+  SEEK_DURATION_MIN,
   TIME_DISPLAY_METHOD,
   TimeDisplayMethodType,
 } from "../../domain/plume";
@@ -32,14 +34,18 @@ const INITIAL_STATE: AppCore = {
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
   isFullscreen: false,
+
   hotkeyBindings: { ...DEFAULT_HOTKEYS },
+  seekDuration: PLUME_DEFAULTS.seekDuration,
 };
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
   "durationDisplayMethod",
   "loopMode",
   "volume",
+
   "hotkeyBindings",
+  "seekDuration",
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
@@ -82,6 +88,8 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.LOOP_MODE] = state.loopMode;
         } else if (key === "hotkeyBindings") {
           toSave[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = state.hotkeyBindings;
+        } else if (key === "seekDuration") {
+          toSave[PLUME_CACHE_KEYS.SEEK_DURATION] = state.seekDuration;
         }
       }
 
@@ -214,6 +222,19 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
         updateState("hotkeyBindings", action.payload);
         break;
+      case CORE_ACTIONS.SET_SEEK_DURATION:
+        if (
+          !Number.isInteger(action.payload) ||
+          action.payload < SEEK_DURATION_MIN ||
+          action.payload > SEEK_DURATION_MAX
+        ) {
+          logger(CPL.WARN, getString("WARN__SEEK_DURATION__INVALID_VALUE"));
+          const defaultSeekDuration = PLUME_DEFAULTS.seekDuration;
+          updateState("seekDuration", defaultSeekDuration);
+          return;
+        }
+        updateState("seekDuration", action.payload);
+        break;
       case CORE_ACTIONS.SET_LOOP_MODE:
         updateState("loopMode", action.payload);
         break;
@@ -244,6 +265,7 @@ const createAppCoreInstance = (): IAppCore => {
         PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD,
         PLUME_CACHE_KEYS.VOLUME,
         PLUME_CACHE_KEYS.HOTKEY_BINDINGS,
+        PLUME_CACHE_KEYS.SEEK_DURATION,
       ];
       const result = await browserCache.get(keys);
 
@@ -305,6 +327,13 @@ const createAppCoreInstance = (): IAppCore => {
           ) as Record<HotkeyAction, KeyBinding>;
           dispatch(coreActions.setHotkeyBindings(resolved));
         }
+      }
+      if (result[PLUME_CACHE_KEYS.SEEK_DURATION] !== undefined) {
+        const raw = result[PLUME_CACHE_KEYS.SEEK_DURATION];
+        const isValid = typeof raw === "number" && Number.isInteger(raw) && raw >= 1 && raw <= 300;
+        const duration = isValid ? raw : PLUME_DEFAULTS.seekDuration;
+        dispatch(coreActions.setSeekDuration(duration));
+        logger(CPL.INFO, getString("INFO__SEEK_DURATION__LOADED"), `${duration}s`);
       }
     } catch (error) {
       logger(CPL.ERROR, "Failed to load persisted state", error);

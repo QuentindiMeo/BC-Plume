@@ -18,7 +18,9 @@ import { applyLoopBtnState, handleLoopCycle } from "./loop";
 
 export const handlePlayPause = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
-  togglePlayback(getAppCoreInstance());
+
+  const appCore = getAppCoreInstance();
+  togglePlayback(appCore);
 };
 
 export const handleTrackBackward = (): void => {
@@ -41,15 +43,17 @@ export const handleTrackForward = (): void => {
 export const handleTimeBackward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
+  const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
-  seekBackward(getAppCoreInstance(), musicPlayer);
+  seekBackward(appCore, musicPlayer);
 };
 
 export const handleTimeForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
+  const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
-  seekForward(getAppCoreInstance(), musicPlayer);
+  seekForward(appCore, musicPlayer);
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
