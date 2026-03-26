@@ -623,6 +623,10 @@ div.name-section__titling h2 {
   gap: 0.75rem;
 }
 
+#bpe-toast-container:empty {
+  pointer-events: none;
+}
+
 .bpe-toast {
   position: relative;
   display: flex;
