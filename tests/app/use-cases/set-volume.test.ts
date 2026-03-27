@@ -1,6 +1,6 @@
 import { setVolume } from "@/src/app/use-cases/set-volume";
+import { FakeAppCore } from "@/tests/fakes/FakeAppCore";
 import { describe, expect, it } from "vitest";
-import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 describe("setVolume", () => {
   it("normalizes raw slider value to [0..1]", () => {

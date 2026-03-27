@@ -1,11 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { isLastTrackOfAlbumPlaying, navigateTrackBackward, navigateTrackForward } from "@/src/app/use-cases/navigate-track";
 import { LOOP_MODE } from "@/src/domain/plume";
 import { coreActions } from "@/src/domain/ports/app-core";
 import type { BcPlayerPort } from "@/src/domain/ports/bc-player";
-import { isLastTrackOfAlbumPlaying, navigateTrackBackward, navigateTrackForward } from "@/src/app/use-cases/navigate-track";
-import { FakeAppCore } from "../../fakes/FakeAppCore";
-import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
-
+import { FakeAppCore } from "@/tests/fakes/FakeAppCore";
+import { FakeMusicPlayer } from "@/tests/fakes/FakeMusicPlayer";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Minimal BcPlayerPort fake — only the methods called by navigate-track
 const makeFakeBcPlayer = (overrides: Partial<BcPlayerPort> = {}): BcPlayerPort =>
