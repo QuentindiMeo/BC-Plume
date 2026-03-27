@@ -258,7 +258,7 @@ body {
 }
 
 .popup__footer {
-  padding: 1.25rem 2rem 0.5rem;
+  padding: 1.25rem 1rem 0.5rem;
   display: flex;
   justify-content: flex-end;
   align-items: center;

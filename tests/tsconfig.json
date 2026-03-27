@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./*"],
+      "vitest": ["node_modules/vitest/dist/index.d.ts"],
+      "vitest/*": ["node_modules/vitest/*"]
+    },
+    "noEmit": true
+  },
+  "include": ["./**/*.ts", "./**/*.d.ts"]
+}
