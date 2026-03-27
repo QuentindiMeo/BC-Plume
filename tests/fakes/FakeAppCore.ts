@@ -56,6 +56,12 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         this.state = { ...this.state, durationDisplayMethod: action.payload };
         break;
+      case CORE_ACTIONS.SET_PAGE_TYPE:
+        this.state = { ...this.state, pageType: action.payload };
+        break;
+      case CORE_ACTIONS.SET_LOOP_MODE:
+        this.state = { ...this.state, loopMode: action.payload };
+        break;
     }
   }
 

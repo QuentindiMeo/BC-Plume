@@ -26,18 +26,19 @@ export const handlePlayPause = (): void => {
 export const handleTrackBackward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
 
+  const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
   const bcPlayer = getBcPlayerInstance();
-  navigateTrackBackward(musicPlayer, bcPlayer);
+  navigateTrackBackward(appCore, musicPlayer, bcPlayer);
 };
 
 export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
-  const bcPlayer = getBcPlayerInstance();
   const appCore = getAppCoreInstance();
-  const loopMode = appCore.getState().loopMode;
-  navigateTrackForward(bcPlayer, loopMode);
+  const musicPlayer = getMusicPlayerInstance();
+  const bcPlayer = getBcPlayerInstance();
+  navigateTrackForward(appCore, musicPlayer, bcPlayer);
 };
 
 export const handleTimeBackward = (): void => {

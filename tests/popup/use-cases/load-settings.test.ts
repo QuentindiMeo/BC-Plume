@@ -83,9 +83,12 @@ describe("loadVolumeHotkeyStep", () => {
     expect(await loadVolumeHotkeyStep()).toBeUndefined();
   });
 
-  it("accepts boundary values (1 and 20)", async () => {
+  it("accepts MIN boundary (1)", async () => {
     mockGet.mockResolvedValue({ [PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP]: 1 });
     expect(await loadVolumeHotkeyStep()).toBe(1);
+  });
+
+  it("accepts MAX boundary (20)", async () => {
     mockGet.mockResolvedValue({ [PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP]: 20 });
     expect(await loadVolumeHotkeyStep()).toBe(20);
   });

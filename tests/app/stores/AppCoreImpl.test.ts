@@ -195,11 +195,10 @@ describe("AppCoreImpl reducer", () => {
     });
 
     it("unmuting when volumeBeforeMute is 0 falls back to savedVolume default", () => {
-      // Simulate a state where volumeBeforeMute ended up at 0
+      // Mute while volume is 0 — this stores 0 into volumeBeforeMute
       appCore.dispatch(coreActions.setVolume(0));
-      appCore.dispatch(coreActions.setIsMuted(true));
-      // Manually produce the muted-at-zero edge: dispatch toggleMute while isMuted=true
-      appCore.dispatch(coreActions.toggleMute()); // unmute path: volumeBeforeMute = 0
+      appCore.dispatch(coreActions.toggleMute()); // mute: saves volumeBeforeMute = 0
+      appCore.dispatch(coreActions.toggleMute()); // unmute: volumeBeforeMute = 0 → fallback
 
       const state = appCore.getState();
       expect(state.isMuted).toBe(false);
@@ -236,11 +235,11 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.getState().loopMode).toBe(LOOP_MODE.TRACK);
     });
 
-    it("stays at TRACK on track page when COLLECTION would be next", () => {
+    it("wraps from TRACK back to NONE on a track page", () => {
       appCore.dispatch(coreActions.setPageType("track"));
       appCore.dispatch(coreActions.setLoopMode(LOOP_MODE.NONE));
       appCore.dispatch(coreActions.cycleLoopMode()); // NONE → TRACK (skipped COLLECTION)
-      appCore.dispatch(coreActions.cycleLoopMode()); // TRACK(idx 2) → NONE
+      appCore.dispatch(coreActions.cycleLoopMode()); // TRACK (idx 2) → NONE (wraps)
       expect(appCore.getState().loopMode).toBe(LOOP_MODE.NONE);
     });
 
