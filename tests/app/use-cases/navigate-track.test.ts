@@ -1,12 +1,11 @@
-import { isLastTrackOfAlbumPlaying, navigateTrackBackward, navigateTrackForward } from "@/src/app/use-cases/navigate-track";
-import { LOOP_MODE } from "@/src/domain/plume";
-import { coreActions } from "@/src/domain/ports/app-core";
-import type { BcPlayerPort } from "@/src/domain/ports/bc-player";
-import { FakeAppCore } from "@/tests/fakes/FakeAppCore";
-import { FakeMusicPlayer } from "@/tests/fakes/FakeMusicPlayer";
+import { isLastTrackOfAlbumPlaying, navigateTrackBackward, navigateTrackForward } from "@/app/use-cases/navigate-track";
+import { LOOP_MODE } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import type { BcPlayerPort } from "@/domain/ports/bc-player";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
+import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Minimal BcPlayerPort fake — only the methods called by navigate-track
 const makeFakeBcPlayer = (overrides: Partial<BcPlayerPort> = {}): BcPlayerPort =>
   ({
     getTrackRowTitles: vi.fn(() => []),
@@ -32,8 +31,6 @@ const makeFakeBcPlayer = (overrides: Partial<BcPlayerPort> = {}): BcPlayerPort =
     getPlayPauseButton: vi.fn(() => null),
     ...overrides,
   }) as BcPlayerPort;
-
-// ─── isLastTrackOfAlbumPlaying ────────────────────────────────────────────────
 
 describe("isLastTrackOfAlbumPlaying", () => {
   it("returns false when there are no track rows", () => {
@@ -65,8 +62,6 @@ describe("isLastTrackOfAlbumPlaying", () => {
     expect(isLastTrackOfAlbumPlaying(bcPlayer)).toBe(false);
   });
 });
-
-// ─── navigateTrackBackward ────────────────────────────────────────────────────
 
 describe("navigateTrackBackward", () => {
   let appCore: FakeAppCore;
@@ -125,8 +120,6 @@ describe("navigateTrackBackward", () => {
     expect(prevBtn.click).toHaveBeenCalledOnce();
   });
 });
-
-// ─── navigateTrackForward ─────────────────────────────────────────────────────
 
 describe("navigateTrackForward", () => {
   let appCore: FakeAppCore;

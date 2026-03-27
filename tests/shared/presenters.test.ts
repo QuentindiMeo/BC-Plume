@@ -1,10 +1,10 @@
-import { TIME_DISPLAY_METHOD } from "@/src/domain/plume";
+import { TIME_DISPLAY_METHOD } from "@/domain/plume";
 import {
     presentFormattedDuration,
     presentFormattedElapsed,
     presentFormattedTime,
     presentProgressPercentage,
-} from "@/src/shared/presenters";
+} from "@/shared/presenters";
 import { describe, expect, it } from "vitest";
 
 describe("presentFormattedTime", () => {

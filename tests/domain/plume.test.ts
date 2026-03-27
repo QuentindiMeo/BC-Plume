@@ -12,7 +12,7 @@ import {
     VOLUME_HOTKEY_STEP_MAX,
     VOLUME_HOTKEY_STEP_MIN,
     type WholeNumber,
-} from "@/src/domain/plume";
+} from "@/domain/plume";
 import { describe, expect, it } from "vitest";
 
 // ---------------------------------------------------------------------------

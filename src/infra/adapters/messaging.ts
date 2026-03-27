@@ -1,6 +1,6 @@
-import type { PlumeMessage } from "../../domain/messages";
-import type { IMessageReceiver, IMessageSender, MessageHandler } from "../../domain/ports/messaging";
-import { inferBrowserApi } from "../../shared/browser";
+import type { PlumeMessage } from "@/domain/messages";
+import type { IMessageReceiver, IMessageSender, MessageHandler } from "@/domain/ports/messaging";
+import { inferBrowserApi } from "@/shared/browser";
 
 export const createRuntimeMessageReceiver = (): IMessageReceiver => {
   const onMessage = (handler: MessageHandler): (() => void) => {

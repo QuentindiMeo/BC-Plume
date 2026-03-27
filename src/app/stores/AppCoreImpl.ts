@@ -1,5 +1,5 @@
-import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
-import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
+import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "@/domain/browser";
+import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
 import {
   assertBoundedInteger,
   LOOP_MODE,
@@ -14,17 +14,17 @@ import {
   TRACK_RESTART_THRESHOLD_MIN,
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
-} from "../../domain/plume";
-import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
-import { browserActions } from "../../domain/ports/browser";
-import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
-import { meta, PROCESS_ENV } from "../../infra/node";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
-import { getMusicPlayerInstance } from "./adapters";
-import { getBrowserInstance } from "./BrowserImpl";
-import { handleUnknownAction } from "./shared";
+} from "@/domain/plume";
+import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "@/domain/ports/app-core";
+import { browserActions } from "@/domain/ports/browser";
+import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "@/domain/store";
+import { meta, PROCESS_ENV } from "@/infra/node";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "@/shared/presenters";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { handleUnknownAction } from "@/app/stores/shared";
 
 const INITIAL_STATE: AppCore = {
   pageType: null,

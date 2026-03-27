@@ -1,11 +1,11 @@
-import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
-import type { IMessageSender } from "../../domain/ports/messaging";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { resetHotkeys } from "../use-cases/resetHotkeys";
-import { saveHotkeys } from "../use-cases/saveHotkeys";
-import { createHotkeyRow, HotkeyRowInstance } from "./HotkeyRow";
-import type { TabDefinition } from "./TabBar";
+import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
+import type { IMessageSender } from "@/domain/ports/messaging";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { resetHotkeys } from "@/popup/use-cases/resetHotkeys";
+import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
+import { createHotkeyRow, HotkeyRowInstance } from "@/popup/components/HotkeyRow";
+import type { TabDefinition } from "@/popup/components/TabBar";
 
 const ACTION_ORDER: HotkeyAction[] = [
   HotkeyAction.PLAY_PAUSE,

@@ -1,11 +1,11 @@
-import { PLUME_CACHE_KEYS } from "@/src/domain/browser";
-import { loadSeekJumpDuration } from "@/src/popup/use-cases/loadSeekJumpDuration";
-import { loadTrackRestartThreshold } from "@/src/popup/use-cases/loadTrackRestartThreshold";
-import { loadVolumeHotkeyStep } from "@/src/popup/use-cases/loadVolumeHotkeyStep";
-import { inferBrowserApi } from "@/src/shared/browser";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
+import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
+import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
+import { inferBrowserApi } from "@/shared/browser";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/src/shared/browser", () => ({ inferBrowserApi: vi.fn() }));
+vi.mock("@/shared/browser", () => ({ inferBrowserApi: vi.fn() }));
 
 let mockGet: ReturnType<typeof vi.fn>;
 

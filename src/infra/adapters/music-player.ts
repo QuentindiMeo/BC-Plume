@@ -1,6 +1,6 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import type { AudioProviderPort } from "../../domain/ports/audio-provider";
-import type { MusicPlayerPort } from "../../domain/ports/music-player";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import type { AudioProviderPort } from "@/domain/ports/audio-provider";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
 
 // WeakMap key is the underlying HTMLAudioElement so entries are GC'd when the element is replaced.
 const pendingSeekPause = new WeakMap<HTMLAudioElement, AbortController>();

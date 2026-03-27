@@ -1,9 +1,9 @@
-import { guiActions } from "../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getBcPlayerInstance } from "../stores/adapters";
-import { getGuiInstance } from "../stores/GuiImpl";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
 
 export const hideOriginalPlayerElements = (): void => {
   const plumeUi = getGuiInstance();

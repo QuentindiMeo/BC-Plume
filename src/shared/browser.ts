@@ -1,4 +1,4 @@
-import { IBrowserApi } from "../domain/ports/browser";
+import { IBrowserApi } from "@/domain/ports/browser";
 
 export const inferBrowserApi = (): IBrowserApi => {
   if (!(globalThis as any).browser && !(globalThis as any).chrome)

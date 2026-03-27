@@ -1,5 +1,5 @@
-import { coreActions, IAppCore } from "../../domain/ports/app-core";
-import type { MusicPlayerPort } from "../../domain/ports/music-player";
+import { coreActions, IAppCore } from "@/domain/ports/app-core";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
 
 // Seeks backward by seekJumpDuration seconds, clamped to 0
 export const seekBackward = (appCore: IAppCore, player: MusicPlayerPort): void => {

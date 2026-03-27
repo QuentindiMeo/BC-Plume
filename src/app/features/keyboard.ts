@@ -1,14 +1,14 @@
-import { HotkeyAction, KeyBinding } from "../../domain/hotkeys";
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions } from "../../domain/ports/app-core";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { PLUME_MESSAGE_TYPE } from "../../domain/messages";
-import { NoArgFunction } from "../../shared/types";
-import { getMessageReceiverInstance, getMusicPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { seekToProgress } from "../use-cases/seek-to-progress";
-import type { CleanupCallback } from "./types";
+import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
+import { NoArgFunction } from "@/shared/types";
+import { getMessageReceiverInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { seekToProgress } from "@/app/use-cases/seek-to-progress";
+import type { CleanupCallback } from "@/app/features/types";
 
 const { VOLUME_SLIDER_GRANULARITY, PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

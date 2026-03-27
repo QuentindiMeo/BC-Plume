@@ -1,20 +1,20 @@
-import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
-import { guiActions } from "../../domain/ports/plume-ui";
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getBcPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
-import { isLastTrackOfAlbumPlaying } from "../use-cases/navigate-track";
-import { updateTrackMetadata } from "../use-cases/update-track-metadata";
-import { setupAudioEventListeners } from "./audio-events";
-import { cleanupFullscreenMode, toggleFullscreenMode } from "./fullscreen";
-import { setupHotkeys } from "./keyboard";
-import { setupStoreSubscriptions } from "./store-subscriptions";
-import { cleanupReleaseToast } from "./toast";
-import { CleanupCallback } from "./types";
+import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { isLastTrackOfAlbumPlaying } from "@/app/use-cases/navigate-track";
+import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
+import { setupAudioEventListeners } from "@/app/features/audio-events";
+import { cleanupFullscreenMode, toggleFullscreenMode } from "@/app/features/fullscreen";
+import { setupHotkeys } from "@/app/features/keyboard";
+import { setupStoreSubscriptions } from "@/app/features/store-subscriptions";
+import { cleanupReleaseToast } from "@/app/features/toast";
+import { CleanupCallback } from "@/app/features/types";
 import {
   handleMuteToggle,
   handlePlayPause,
@@ -23,8 +23,8 @@ import {
   handleTrackBackward,
   handleTrackForward,
   setupPlayerStickiness,
-} from "./ui";
-import { handleLoopCycle } from "./ui/loop";
+} from "@/app/features/ui";
+import { handleLoopCycle } from "@/app/features/ui/loop";
 
 // Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.

@@ -1,7 +1,7 @@
-import { HotkeyAction, KeyBinding } from "../hotkeys";
-import { LoopModeType, TimeDisplayMethodType } from "../plume";
-import { IAction, IScenarioView, IStore } from "../store";
-import { BcPageType } from "./bc-player";
+import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
+import { LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
+import { IAction, IScenarioView, IStore } from "@/domain/store";
+import { BcPageType } from "@/domain/ports/bc-player";
 
 export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;

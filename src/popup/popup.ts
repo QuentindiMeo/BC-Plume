@@ -1,9 +1,9 @@
-import { createTabsMessageSender } from "../infra/adapters";
-import { createSettingsPanel } from "./components/SettingsPanel";
-import { loadHotkeys } from "./use-cases/loadHotkeys";
-import { loadSeekJumpDuration } from "./use-cases/loadSeekJumpDuration";
-import { loadTrackRestartThreshold } from "./use-cases/loadTrackRestartThreshold";
-import { loadVolumeHotkeyStep } from "./use-cases/loadVolumeHotkeyStep";
+import { createTabsMessageSender } from "@/infra/adapters";
+import { createSettingsPanel } from "@/popup/components/SettingsPanel";
+import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
+import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
+import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
+import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
 
 (async () => {
   const [hotkeyBindings, seekJumpDuration, volumeHotkeyStep, trackRestartThreshold] = await Promise.all([

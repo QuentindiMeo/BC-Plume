@@ -1,5 +1,5 @@
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 interface DebugControl {
   index: number;

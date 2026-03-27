@@ -1,8 +1,8 @@
-import { PlumeCacheKey } from "../../domain/browser";
-import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "../../domain/ports/browser";
-import { meta, PROCESS_ENV } from "../../infra/node";
-import { inferBrowserApi } from "../../shared/browser";
-import { CPL, logger } from "../../shared/logger";
+import { PlumeCacheKey } from "@/domain/browser";
+import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "@/domain/ports/browser";
+import { meta, PROCESS_ENV } from "@/infra/node";
+import { inferBrowserApi } from "@/shared/browser";
+import { CPL, logger } from "@/shared/logger";
 
 let unifiedBrowserApi: IBrowserApi | null = null;
 const getBrowserApi = (): IBrowserApi => {

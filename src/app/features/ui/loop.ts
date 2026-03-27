@@ -1,12 +1,12 @@
-import { LOOP_MODE, LoopModeType } from "../../../domain/plume";
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { setSvgContent } from "../../../shared/svg";
-import { PLUME_SVG } from "../../../svg/icons";
-import { getMusicPlayerInstance } from "../../stores/adapters";
-import { getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance } from "../../stores/GuiImpl";
-import { cycleLoopMode } from "../../use-cases/cycle-loop-mode";
+import { LOOP_MODE, LoopModeType } from "@/domain/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { cycleLoopMode } from "@/app/use-cases/cycle-loop-mode";
 
 export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType): void => {
   const appCore = getAppCoreInstance();

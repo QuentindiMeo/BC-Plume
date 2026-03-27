@@ -1,20 +1,20 @@
-import { guiActions } from "../../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { setSvgContent } from "../../../shared/svg";
-import { PLUME_SVG } from "../../../svg/icons";
-import { getBcPlayerInstance, getMusicPlayerInstance } from "../../stores/adapters";
-import { getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance } from "../../stores/GuiImpl";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
 import {
   navigateTrackBackward,
   navigateTrackForward,
   seekBackward,
   seekForward,
   togglePlayback,
-} from "../../use-cases";
-import { applyLoopBtnState, handleLoopCycle } from "./loop";
+} from "@/app/use-cases";
+import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 
 export const handlePlayPause = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));

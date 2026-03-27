@@ -1,4 +1,4 @@
-import { DEFAULT_HOTKEYS, HotkeyAction } from "@/src/domain/hotkeys";
+import { DEFAULT_HOTKEYS, HotkeyAction } from "@/domain/hotkeys";
 import { describe, expect, it } from "vitest";
 
 describe("HotkeyAction", () => {

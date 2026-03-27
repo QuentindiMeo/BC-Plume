@@ -1,13 +1,13 @@
-import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions } from "../../domain/ports/app-core";
-import { guiActions } from "../../domain/ports/plume-ui";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
-import type { CleanupCallback } from "./types";
-import { syncProgressToStore } from "./ui";
+import type { CleanupCallback } from "@/app/features/types";
+import { syncProgressToStore } from "@/app/features/ui";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

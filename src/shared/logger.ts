@@ -1,4 +1,4 @@
-import { APP_VERSION } from "../domain/meta";
+import { APP_VERSION } from "@/domain/meta";
 
 export enum CPL {
   DEBUG = "debug",

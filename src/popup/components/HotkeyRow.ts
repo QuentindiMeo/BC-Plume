@@ -1,5 +1,5 @@
-import { HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
-import { getString } from "../../shared/i18n";
+import { HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
+import { getString } from "@/shared/i18n";
 
 // Codes that must never be captured as hotkeys
 const FORBIDDEN_CODES = new Set(["Tab", "Escape", "F5", "F12"]);

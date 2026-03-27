@@ -1,5 +1,5 @@
-import { togglePlayback } from "@/src/app/use-cases/toggle-playback";
-import { FakeAppCore } from "@/tests/fakes/FakeAppCore";
+import { togglePlayback } from "@/app/use-cases/toggle-playback";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { describe, expect, it } from "vitest";
 
 describe("togglePlayback", () => {

@@ -1,6 +1,6 @@
-import { getString } from "./i18n";
-import { CPL, logger } from "./logger";
-import { PLUME_SVG } from "../svg/icons";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { PLUME_SVG } from "@/svg/icons";
 
 /**
  * Parses SVG markup and returns a sanitized SVGElement, stripping dangerous content.

@@ -1,6 +1,6 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions, IAppCore } from "../../domain/ports/app-core";
-import type { MusicPlayerPort } from "../../domain/ports/music-player";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions, IAppCore } from "@/domain/ports/app-core";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

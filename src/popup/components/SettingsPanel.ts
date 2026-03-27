@@ -1,11 +1,11 @@
-import { WholeNumber } from "../../domain/plume";
-import type { IMessageSender } from "../../domain/ports/messaging";
-import { getString } from "../../shared/i18n";
-import { createSafeSvgElement } from "../../shared/svg";
-import { PLUME_SVG } from "../../svg/icons";
-import { createHotkeyTab } from "./HotkeyTab";
-import { createPlaybackTab } from "./PlaybackTab";
-import { createTabBar, TabDefinition } from "./TabBar";
+import { WholeNumber } from "@/domain/plume";
+import type { IMessageSender } from "@/domain/ports/messaging";
+import { getString } from "@/shared/i18n";
+import { createSafeSvgElement } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { createHotkeyTab } from "@/popup/components/HotkeyTab";
+import { createPlaybackTab } from "@/popup/components/PlaybackTab";
+import { createTabBar, TabDefinition } from "@/popup/components/TabBar";
 
 export type SettingsPanelInstance = { mount: (el: HTMLElement) => void };
 

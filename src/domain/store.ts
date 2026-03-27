@@ -1,4 +1,4 @@
-import { NoArgFunction } from "../shared/types";
+import { NoArgFunction } from "@/shared/types";
 
 export type IAction<ActionId = string, Payload = undefined> = Payload extends undefined
   ? { type: ActionId }

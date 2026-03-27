@@ -1,18 +1,18 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { guiActions } from "../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { presentFormattedTime } from "../../shared/presenters";
-import { setSvgContent } from "../../shared/svg";
-import { PLUME_SVG } from "../../svg/icons";
-import { getMusicPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
-import { updateTrackForwardBtnState } from "./observers";
-import type { CleanupCallback, SubscriptionCallback } from "./types";
-import { syncLoopBtn } from "./ui/loop";
-import { syncMuteBtn } from "./ui/volume";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { presentFormattedTime } from "@/shared/presenters";
+import { setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { updateTrackForwardBtnState } from "@/app/features/observers";
+import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncLoopBtn } from "@/app/features/ui/loop";
+import { syncMuteBtn } from "@/app/features/ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

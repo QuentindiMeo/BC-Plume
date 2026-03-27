@@ -1,14 +1,14 @@
-import { PLUME_CACHE_KEYS } from "@/src/domain/browser";
-import { PLUME_MESSAGE_TYPE } from "@/src/domain/messages";
-import type { WholeNumber } from "@/src/domain/plume";
-import type { IMessageSender } from "@/src/domain/ports/messaging";
-import { saveSeekJumpDuration } from "@/src/popup/use-cases/saveSeekJumpDuration";
-import { saveTrackRestartThreshold } from "@/src/popup/use-cases/saveTrackRestartThreshold";
-import { saveVolumeHotkeyStep } from "@/src/popup/use-cases/saveVolumeHotkeyStep";
-import { inferBrowserApi } from "@/src/shared/browser";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
+import type { WholeNumber } from "@/domain/plume";
+import type { IMessageSender } from "@/domain/ports/messaging";
+import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
+import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
+import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
+import { inferBrowserApi } from "@/shared/browser";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/src/shared/browser", () => ({ inferBrowserApi: vi.fn() }));
+vi.mock("@/shared/browser", () => ({ inferBrowserApi: vi.fn() }));
 
 let mockSet: ReturnType<typeof vi.fn>;
 let sender: IMessageSender;

@@ -1,5 +1,5 @@
-import { setVolume } from "@/src/app/use-cases/set-volume";
-import { FakeAppCore } from "@/tests/fakes/FakeAppCore";
+import { setVolume } from "@/app/use-cases/set-volume";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { describe, expect, it } from "vitest";
 
 describe("setVolume", () => {

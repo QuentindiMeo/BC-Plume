@@ -1,6 +1,6 @@
-import { toggleDurationDisplay } from "@/src/app/use-cases/toggle-duration-display";
-import { TIME_DISPLAY_METHOD } from "@/src/domain/plume";
-import { FakeAppCore } from "@/tests/fakes/FakeAppCore";
+import { toggleDurationDisplay } from "@/app/use-cases/toggle-duration-display";
+import { TIME_DISPLAY_METHOD } from "@/domain/plume";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { describe, expect, it } from "vitest";
 
 describe("toggleDurationDisplay", () => {

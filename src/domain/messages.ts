@@ -1,4 +1,4 @@
-import { HotkeyAction, KeyBinding } from "./hotkeys";
+import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
 
 export enum PLUME_MESSAGE_TYPE {
   HOTKEYS_UPDATED = "HOTKEYS_UPDATED",

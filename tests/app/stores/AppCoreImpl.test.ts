@@ -1,8 +1,8 @@
-import { LOOP_MODE, LOOP_MODE_CYCLE, PLUME_DEFAULTS, SEEK_JUMP_DURATION_MAX, SEEK_JUMP_DURATION_MIN, TIME_DISPLAY_METHOD, TRACK_RESTART_THRESHOLD_MAX, VOLUME_HOTKEY_STEP_MAX, VOLUME_HOTKEY_STEP_MIN } from "@/src/domain/plume";
-import { coreActions, type IAppCore } from "@/src/domain/ports/app-core";
+import { LOOP_MODE, LOOP_MODE_CYCLE, PLUME_DEFAULTS, SEEK_JUMP_DURATION_MAX, SEEK_JUMP_DURATION_MIN, TIME_DISPLAY_METHOD, TRACK_RESTART_THRESHOLD_MAX, VOLUME_HOTKEY_STEP_MAX, VOLUME_HOTKEY_STEP_MIN } from "@/domain/plume";
+import { coreActions, type IAppCore } from "@/domain/ports/app-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/src/app/stores/BrowserImpl", () => ({
+vi.mock("@/app/stores/BrowserImpl", () => ({
   getBrowserInstance: vi.fn(() => ({
     dispatch: vi.fn(),
     getState: vi.fn(() => ({
@@ -14,7 +14,7 @@ vi.mock("@/src/app/stores/BrowserImpl", () => ({
   })),
 }));
 
-vi.mock("@/src/app/stores/adapters", () => ({
+vi.mock("@/app/stores/adapters", () => ({
   getMusicPlayerInstance: vi.fn(() => ({
     setLoop: vi.fn(),
     getCurrentTime: vi.fn(() => 0),
@@ -31,13 +31,13 @@ vi.mock("@/src/app/stores/adapters", () => ({
   })),
 }));
 
-vi.mock("@/src/infra/node", () => ({
+vi.mock("@/infra/node", () => ({
   PROCESS_ENV: { PRODUCTION: "production", DEVELOPMENT: "development", TESTING: "testing" },
   meta: { env: "development", version: "0.0.0" },
 }));
 
 // Import after mocks are hoisted
-const { createAppCoreInstance } = await import("@/src/app/stores/AppCoreImpl");
+const { createAppCoreInstance } = await import("@/app/stores/AppCoreImpl");
 
 describe("AppCoreImpl reducer", () => {
   let appCore: IAppCore;
@@ -140,8 +140,6 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-  // ─── SET_VOLUME ───────────────────────────────────────────────────────────
-
   describe("SET_VOLUME", () => {
     it("accepts a valid mid-range value", () => {
       appCore.dispatch(coreActions.setVolume(0.75));
@@ -170,8 +168,6 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.getState().volume).toBe(before);
     });
   });
-
-  // ─── TOGGLE_MUTE ─────────────────────────────────────────────────────────
 
   describe("TOGGLE_MUTE", () => {
     it("muting saves current volume, sets volume to 0, and sets isMuted", () => {
@@ -206,16 +202,12 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-  // ─── SET_LOOP_MODE ───────────────────────────────────────────────────────
-
   describe("SET_LOOP_MODE", () => {
     it("sets loopMode directly", () => {
       appCore.dispatch(coreActions.setLoopMode(LOOP_MODE.TRACK));
       expect(appCore.getState().loopMode).toBe(LOOP_MODE.TRACK);
     });
   });
-
-  // ─── CYCLE_LOOP_MODE ─────────────────────────────────────────────────────
 
   describe("CYCLE_LOOP_MODE", () => {
     it("cycles through all modes on a non-track page", () => {
@@ -250,8 +242,6 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.getState().loopMode).toBe(LOOP_MODE.NONE);
     });
   });
-
-  // ─── Bounded integer settings ─────────────────────────────────────────────
 
   describe("SET_SEEK_JUMP_DURATION", () => {
     it("accepts a valid value", () => {
@@ -344,7 +334,6 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-  // ─── Subscriptions ───────────────────────────────────────────────────────
 
   describe("subscribe", () => {
     it("calls listener when subscribed key changes", () => {
@@ -395,7 +384,6 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-  // ─── Thunk dispatch ──────────────────────────────────────────────────────
 
   describe("dispatch thunk", () => {
     it("invokes thunk with dispatch and getState", () => {
@@ -407,7 +395,6 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-  // ─── Computed ────────────────────────────────────────────────────────────
 
   describe("computed", () => {
     it("formattedElapsed returns a time string", () => {

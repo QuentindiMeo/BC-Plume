@@ -1,6 +1,6 @@
-import type { BcPlayerPort } from "../../domain/ports/bc-player";
-import type { MusicPlayerPort } from "../../domain/ports/music-player";
-import type { IMessageReceiver } from "../../domain/ports/messaging";
+import type { BcPlayerPort } from "@/domain/ports/bc-player";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
+import type { IMessageReceiver } from "@/domain/ports/messaging";
 
 // Populated once at the composition root (main.ts), before launchPlume() runs
 let bcPlayerInstance: BcPlayerPort | null = null;

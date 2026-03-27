@@ -55,12 +55,14 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Unified player**: Completely replaces the Bandcamp player with an enhanced version
 - **Time navigation**: Click and drag to seek within the track seamlessly
   - **Time display mode**: Switch between track duration and remaining time (remembered across pages)
-- **Custom playback controls**: Play/Pause buttons, skip back/forward 10 seconds with a modern design
+- **Playback controls**: Play/Pause button, previous/next track, and seek backward/forward in a track
+  - **... with fine-tuning in popup**: Configure seek jump duration, volume hotkey step, and track restart threshold
 - **Loop mode**: Cycle through no loop, track loop, and collection loop (remembered across pages)
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
 - **Keyboard shortcuts**: Control playback, volume, seeking, and more without touching the mouse
   - **Customizable hotkeys**: Remap every shortcut to your liking via the extension popup
   - Digit row (0–9), Numpad (0–9 with NumLock), and letter keys all supported
+- **Sticky player behavior**: Player sticks visually while scrolling for quicker access
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
@@ -85,9 +87,10 @@ This extension uses:
 - **Cross-Browser API**: Automatic Chromium/Firefox detection
 - **Content Scripts**: To interact with Bandcamp pages
 - **Storage API & localStorage**: Saves preferences in browser cache
-- **Vanilla TypeScript**: No external dependencies
+- **Vanilla TypeScript**: No runtime framework dependency in the injected player
 
-The code is fully commented and structured for understanding, easy contribution and modification.
+The code is fully commented and structured for understanding, easy contribution and modification.  
+Plume includes a Vitest-based unit test suite for core logic and use-cases.
 
 ## 🐛 Troubleshooting
 

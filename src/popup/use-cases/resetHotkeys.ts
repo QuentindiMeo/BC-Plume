@@ -1,8 +1,8 @@
-import { PLUME_CACHE_KEYS } from "../../domain/browser";
-import { DEFAULT_HOTKEYS } from "../../domain/hotkeys";
-import type { IMessageSender } from "../../domain/ports/messaging";
-import { inferBrowserApi } from "../../shared/browser";
-import { PLUME_MESSAGE_TYPE } from "../../domain/messages";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import type { IMessageSender } from "@/domain/ports/messaging";
+import { inferBrowserApi } from "@/shared/browser";
+import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
 
 export const resetHotkeys = async (sender: IMessageSender): Promise<void> => {
   const browserApi = inferBrowserApi();

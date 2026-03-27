@@ -1,27 +1,27 @@
-import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { coreActions, IAppCore } from "../../domain/ports/app-core";
-import { guiActions, IGui } from "../../domain/ports/plume-ui";
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { createSafeSvgElement } from "../../shared/svg";
-import { PLUME_SVG } from "../../svg/icons";
-import { getBcPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
-import { toggleFullscreenMode } from "./fullscreen";
-import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "./original-player";
-import { getInfoSectionWithRuntime } from "./runtime";
-import { getTrackQuantifiers } from "./track-quantifiers";
-import { getAppropriatePretextColor, getCurrentTrackTitle } from "./track-title";
+import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
+import { coreActions, IAppCore } from "@/domain/ports/app-core";
+import { guiActions, IGui } from "@/domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { createSafeSvgElement } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { toggleFullscreenMode } from "@/app/features/fullscreen";
+import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/features/original-player";
+import { getInfoSectionWithRuntime } from "@/app/features/runtime";
+import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
+import { getAppropriatePretextColor, getCurrentTrackTitle } from "@/app/features/track-title";
 import {
   createFullscreenButtonSection,
   createPlaybackControlPanel,
   createProgressBar,
   createVolumeControlSection,
-} from "./ui";
-import { createToast } from "./ui/toast";
+} from "@/app/features/ui";
+import { createToast } from "@/app/features/ui/toast";
 
 interface PlumeView {
   plumeContainer: HTMLDivElement;

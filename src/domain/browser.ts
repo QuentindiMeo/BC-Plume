@@ -1,5 +1,5 @@
-import { KeyBindingMap } from "./hotkeys";
-import { LoopModeType, TimeDisplayMethodType } from "./plume";
+import { KeyBindingMap } from "@/domain/hotkeys";
+import { LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
 
 export enum PLUME_CACHE_KEYS {
   DURATION_DISPLAY_METHOD = "plume_duration_display_method",

@@ -1,7 +1,7 @@
-import { measureContrastRatioWCAG, WCAG_CONTRAST_LARGE } from "../../shared/colors";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getBcPlayerInstance } from "../stores/adapters";
+import { measureContrastRatioWCAG, WCAG_CONTRAST_LARGE } from "@/shared/colors";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
 
 interface RuntimeInfo {
   totalRuntime: number;

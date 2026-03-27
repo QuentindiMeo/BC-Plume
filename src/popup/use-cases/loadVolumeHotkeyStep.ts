@@ -1,6 +1,6 @@
-import { PLUME_CACHE_KEYS } from "../../domain/browser";
-import { assertBoundedInteger, VOLUME_HOTKEY_STEP_MAX, VOLUME_HOTKEY_STEP_MIN, WholeNumber } from "../../domain/plume";
-import { inferBrowserApi } from "../../shared/browser";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { assertBoundedInteger, VOLUME_HOTKEY_STEP_MAX, VOLUME_HOTKEY_STEP_MIN, WholeNumber } from "@/domain/plume";
+import { inferBrowserApi } from "@/shared/browser";
 
 export const loadVolumeHotkeyStep = async (): Promise<WholeNumber | undefined> => {
   const browserApi = inferBrowserApi();

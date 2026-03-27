@@ -4,7 +4,7 @@ import {
     adjustColorContrast,
     isGrayscale,
     measureContrastRatioWCAG,
-} from "@/src/shared/colors";
+} from "@/shared/colors";
 import { describe, expect, it } from "vitest";
 
 describe("measureContrastRatioWCAG", () => {

@@ -1,8 +1,8 @@
-import { DEFAULT_HOTKEYS } from "@/src/domain/hotkeys";
-import { PLUME_DEFAULTS } from "@/src/domain/plume";
-import type { AppCore, AppCoreListener, CoreAction, IAppCore } from "@/src/domain/ports/app-core";
-import { CORE_ACTIONS } from "@/src/domain/ports/app-core";
-import type { Thunk } from "@/src/domain/store";
+import { DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import { PLUME_DEFAULTS } from "@/domain/plume";
+import type { AppCore, AppCoreListener, CoreAction, IAppCore } from "@/domain/ports/app-core";
+import { CORE_ACTIONS } from "@/domain/ports/app-core";
+import type { Thunk } from "@/domain/store";
 
 const DEFAULT_STATE: AppCore = {
   durationDisplayMethod: PLUME_DEFAULTS.durationDisplayMethod,

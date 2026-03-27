@@ -9,14 +9,14 @@ import {
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
   WholeNumber,
-} from "../../domain/plume";
-import type { IMessageSender } from "../../domain/ports/messaging";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { saveSeekJumpDuration } from "../use-cases/saveSeekJumpDuration";
-import { saveTrackRestartThreshold } from "../use-cases/saveTrackRestartThreshold";
-import { saveVolumeHotkeyStep } from "../use-cases/saveVolumeHotkeyStep";
-import type { TabDefinition } from "./TabBar";
+} from "@/domain/plume";
+import type { IMessageSender } from "@/domain/ports/messaging";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
+import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
+import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
+import type { TabDefinition } from "@/popup/components/TabBar";
 
 interface NumericRowConfig {
   labelKey: string;

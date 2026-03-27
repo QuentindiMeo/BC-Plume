@@ -1,4 +1,4 @@
-import { getString } from "../../shared/i18n";
+import { getString } from "@/shared/i18n";
 
 export interface TabDefinition {
   id: string;

@@ -1,6 +1,6 @@
-import { PLUME_CACHE_KEYS } from "../../domain/browser";
-import { assertBoundedInteger, SEEK_JUMP_DURATION_MAX, SEEK_JUMP_DURATION_MIN, WholeNumber } from "../../domain/plume";
-import { inferBrowserApi } from "../../shared/browser";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { assertBoundedInteger, SEEK_JUMP_DURATION_MAX, SEEK_JUMP_DURATION_MIN, WholeNumber } from "@/domain/plume";
+import { inferBrowserApi } from "@/shared/browser";
 
 export const loadSeekJumpDuration = async (): Promise<WholeNumber | undefined> => {
   const browserApi = inferBrowserApi();

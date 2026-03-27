@@ -1,7 +1,7 @@
-import { cycleLoopMode } from "@/src/app/use-cases/cycle-loop-mode";
-import { LOOP_MODE } from "@/src/domain/plume";
-import { CORE_ACTIONS, type AppCore, type IAppCore } from "@/src/domain/ports/app-core";
-import type { MusicPlayerPort } from "@/src/domain/ports/music-player";
+import { cycleLoopMode } from "@/app/use-cases/cycle-loop-mode";
+import { LOOP_MODE } from "@/domain/plume";
+import { CORE_ACTIONS, type AppCore, type IAppCore } from "@/domain/ports/app-core";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import { describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------

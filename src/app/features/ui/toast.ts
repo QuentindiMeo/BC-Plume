@@ -1,8 +1,8 @@
-import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { createSafeSvgElement } from "../../../shared/svg";
-import { PLUME_SVG } from "../../../svg/icons";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { createSafeSvgElement } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
 
 export interface ToastCta {
   href: string;

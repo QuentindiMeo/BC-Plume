@@ -1,4 +1,4 @@
-import { createScenarioRecorder, IScenarioControls } from "@/src/domain/store";
+import { createScenarioRecorder, IScenarioControls } from "@/domain/store";
 import { beforeEach, describe, expect, it } from "vitest";
 
 type State = { value: number };

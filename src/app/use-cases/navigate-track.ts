@@ -1,9 +1,9 @@
-import { LOOP_MODE } from "../../domain/plume";
-import type { IAppCore } from "../../domain/ports/app-core";
-import type { BcPlayerPort } from "../../domain/ports/bc-player";
-import type { MusicPlayerPort } from "../../domain/ports/music-player";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
+import { LOOP_MODE } from "@/domain/plume";
+import type { IAppCore } from "@/domain/ports/app-core";
+import type { BcPlayerPort } from "@/domain/ports/bc-player";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 export const isLastTrackOfAlbumPlaying = (bcPlayer: BcPlayerPort): boolean => {
   const trackRowTitles = bcPlayer.getTrackRowTitles();

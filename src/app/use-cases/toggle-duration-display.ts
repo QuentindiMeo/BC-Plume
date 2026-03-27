@@ -1,5 +1,5 @@
-import { TIME_DISPLAY_METHOD } from "../../domain/plume";
-import { coreActions, IAppCore } from "../../domain/ports/app-core";
+import { TIME_DISPLAY_METHOD } from "@/domain/plume";
+import { coreActions, IAppCore } from "@/domain/ports/app-core";
 
 // Cycles the duration display between DURATION and REMAINING
 export const toggleDurationDisplay = (appCore: IAppCore): void => {

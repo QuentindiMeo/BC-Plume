@@ -1,4 +1,4 @@
-import type { MusicPlayerPort } from "@/src/domain/ports/music-player";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
 
 /**
  * In-memory MusicPlayerPort for tests. Exposes currentTime and loop as
