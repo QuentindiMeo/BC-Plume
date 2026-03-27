@@ -530,6 +530,8 @@ const createAppCoreInstance = (): IAppCore => {
   };
 };
 
+export { createAppCoreInstance };
+
 let appCoreInstance: IAppCore | null = null;
 export const getAppCoreInstance = (): IAppCore => {
   appCoreInstance ??= createAppCoreInstance();

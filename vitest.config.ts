@@ -1,0 +1,19 @@
+import { resolve } from "path";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@/src": resolve(__dirname, "src"),
+    },
+  },
+  test: {
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/domain/**", "src/shared/**", "src/app/use-cases/**", "src/popup/use-cases/**"],
+      exclude: ["src/infra/**", "src/app/features/**", "src/app/stores/**"],
+    },
+  },
+});
