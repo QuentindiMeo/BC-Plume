@@ -7,7 +7,7 @@ import {
 } from "../../domain/plume";
 import type { IMessageSender } from "../../domain/ports/messaging";
 import { inferBrowserApi } from "../../shared/browser";
-import { PLUME_MESSAGE_TYPE } from "../../shared/messages";
+import { PLUME_MESSAGE_TYPE } from "../../domain/messages";
 
 export const saveTrackRestartThreshold = async (threshold: WholeNumber, sender: IMessageSender): Promise<void> => {
   assertBoundedInteger(threshold, TRACK_RESTART_THRESHOLD_MIN, TRACK_RESTART_THRESHOLD_MAX);

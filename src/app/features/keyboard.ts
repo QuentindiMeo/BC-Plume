@@ -3,7 +3,7 @@ import { PLUME_CONSTANTS } from "../../domain/plume";
 import { coreActions } from "../../domain/ports/app-core";
 import { getString } from "../../shared/i18n";
 import { CPL, logger } from "../../shared/logger";
-import { PLUME_MESSAGE_TYPE } from "../../shared/messages";
+import { PLUME_MESSAGE_TYPE } from "../../domain/messages";
 import { NoArgFunction } from "../../shared/types";
 import { getMessageReceiverInstance, getMusicPlayerInstance } from "../stores/adapters";
 import { getAppCoreInstance } from "../stores/AppCoreImpl";
