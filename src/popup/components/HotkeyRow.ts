@@ -23,6 +23,9 @@ const ARROW_SYMBOLS: Record<string, string> = {
   ArrowRight: "→",
 };
 
+const getDisplayLabel = (binding: KeyBinding) =>
+  Object.entries(ARROW_SYMBOLS).reduce((label, [code, sym]) => label.replace(code, sym), binding.label);
+
 /** Builds a full hotkey label by prepending active modifier names to the key label. */
 export const buildLabel = (ctrl: boolean, shift: boolean, alt: boolean, keyLabel: string): string => {
   const parts: string[] = [];
@@ -90,7 +93,7 @@ export const createHotkeyRow = (
   liveRegion.ariaAtomic = "true";
 
   const refreshBtn = (): void => {
-    const displayLabel = ARROW_SYMBOLS[currentBinding.label] ?? currentBinding.label;
+    const displayLabel = getDisplayLabel(currentBinding);
     btn.textContent = displayLabel;
     btn.ariaLabel = getString("ARIA__HOTKEY_ROW__BUTTON", [getString(`LABEL__HOTKEY__${action}`), displayLabel]);
   };
@@ -113,9 +116,9 @@ export const createHotkeyRow = (
     const newBinding: KeyBinding = {
       code: capturedCode!,
       label: buildLabel(capturedCtrl, capturedShift, capturedAlt, capturedLabel!),
-      ...(capturedCtrl && { ctrl: true }),
-      ...(capturedShift && { shift: true }),
-      ...(capturedAlt && { alt: true }),
+      ...(capturedCtrl ? { ctrl: true } : {}),
+      ...(capturedShift ? { shift: true } : {}),
+      ...(capturedAlt ? { alt: true } : {}),
     };
     currentBinding = newBinding;
     isCapturing = false;
