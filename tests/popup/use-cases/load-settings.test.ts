@@ -1,4 +1,6 @@
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
@@ -125,5 +127,21 @@ describe("loadTrackRestartThreshold", () => {
   it("returns undefined for a float", async () => {
     mockGet.mockResolvedValue({ [PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD]: 1.5 });
     expect(await loadTrackRestartThreshold()).toBeUndefined();
+  });
+});
+
+describe("loadHotkeys", () => {
+  it("returns the stored KeyBindingMap when key is present", async () => {
+    const additionalHotkeys = {
+      playPause: "KeyP",
+      nextTrack: "KeyN",
+    };
+    mockGet.mockResolvedValue({ [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: { ...DEFAULT_HOTKEYS, ...additionalHotkeys } });
+    expect(await loadHotkeys()).toEqual({ ...DEFAULT_HOTKEYS, ...additionalHotkeys });
+  });
+
+  it("returns undefined when key is absent", async () => {
+    mockGet.mockResolvedValue({});
+    expect(await loadHotkeys()).toBeUndefined();
   });
 });

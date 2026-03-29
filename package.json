@@ -23,7 +23,8 @@
 
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:cov": "vitest run --coverage",
+    "test:cov:report": "vitest run --coverage --reporter=verbose"
   },
   "keywords": [
     "bandcamp",
