@@ -5,8 +5,8 @@ import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
 import { inferBrowserApi } from "@/shared/browser";
-import { FakeBrowserLocalStorage } from "@tests/fakes/FakeBrowserLocalStorage";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { FakeBrowserLocalStorage } from "../../fakes/FakeBrowserLocalStorage";
 
 vi.mock("@/shared/browser", () => ({ inferBrowserApi: vi.fn() }));
 

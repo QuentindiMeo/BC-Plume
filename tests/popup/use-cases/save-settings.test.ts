@@ -8,9 +8,9 @@ import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
 import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
 import { inferBrowserApi } from "@/shared/browser";
-import { FakeBrowserLocalStorage } from "@tests/fakes/FakeBrowserLocalStorage";
-import { FakeMessageSender } from "@tests/fakes/FakeMessageSender";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { FakeBrowserLocalStorage } from "../../fakes/FakeBrowserLocalStorage";
+import { FakeMessageSender } from "../../fakes/FakeMessageSender";
 
 vi.mock("@/shared/browser", () => ({ inferBrowserApi: vi.fn() }));
 

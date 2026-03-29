@@ -1,7 +1,7 @@
 import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
-import { FakeAppCore } from "@tests/fakes/FakeAppCore";
-import { fakeBcPlayer } from "@tests/fakes/FakeBcPlayer";
 import { describe, expect, it } from "vitest";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
+import { fakeBcPlayer } from "../../fakes/FakeBcPlayer";
 
 describe("updateTrackMetadata", () => {
   it("album page: stores track title and current/total pattern in state", () => {
