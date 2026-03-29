@@ -26,11 +26,18 @@ interface KeyboardHandlers {
 // e.code values for both digit row and numpad
 const DIGIT_CODES = new Set<string>(Array.from({ length: 10 }, (_, i) => [`Digit${i}`, `Numpad${i}`]).flat());
 
-// Maps a KeyBinding's code to a HotkeyAction for fast reverse lookup
+// Produces a canonical composite key encoding modifiers + physical key code
+export const bindingKey = (b: KeyBinding): string =>
+  `${b.ctrl ? "ctrl:" : ""}${b.shift ? "shift:" : ""}${b.alt ? "alt:" : ""}${b.code}`;
+
+const eventKey = (e: KeyboardEvent): string =>
+  `${e.ctrlKey ? "ctrl:" : ""}${e.shiftKey ? "shift:" : ""}${e.altKey ? "alt:" : ""}${e.code}`;
+
+// Maps a binding's composite key to a HotkeyAction for fast reverse lookup
 const buildCodeToActionMap = (bindings: Record<HotkeyAction, KeyBinding>): Map<string, HotkeyAction> => {
   const map = new Map<string, HotkeyAction>();
   for (const [action, binding] of Object.entries(bindings)) {
-    map.set(binding.code, action as HotkeyAction);
+    map.set(bindingKey(binding), action as HotkeyAction);
   }
   return map;
 };
@@ -59,7 +66,8 @@ export const setupHotkeys = (
       (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
     if (userIsTypingInInput) return;
 
-    if (DIGIT_CODES.has(e.code)) {
+    const isModifierKey = e.ctrlKey || e.shiftKey || e.altKey;
+    if (DIGIT_CODES.has(e.code) && !isModifierKey) {
       if (!e.getModifierState("NumLock") && e.code.startsWith("Numpad")) return;
 
       e.preventDefault();
@@ -73,7 +81,7 @@ export const setupHotkeys = (
       return;
     }
 
-    const action = codeToAction.get(e.code);
+    const action = codeToAction.get(eventKey(e));
     if (!action) return;
 
     e.preventDefault();
