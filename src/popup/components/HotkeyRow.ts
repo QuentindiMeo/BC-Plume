@@ -4,6 +4,18 @@ import { getString } from "@/shared/i18n";
 // Codes that must never be captured as hotkeys
 const FORBIDDEN_CODES = new Set(["Tab", "Escape", "F5", "F12"]);
 
+// Pure modifier key codes — silently ignored during capture; modifiers are read from the final key event
+const MODIFIER_CODES = new Set([
+  "ControlLeft",
+  "ControlRight",
+  "ShiftLeft",
+  "ShiftRight",
+  "AltLeft",
+  "AltRight",
+  "MetaLeft",
+  "MetaRight",
+]);
+
 const ARROW_SYMBOLS: Record<string, string> = {
   ArrowUp: "↑",
   ArrowDown: "↓",
@@ -11,7 +23,17 @@ const ARROW_SYMBOLS: Record<string, string> = {
   ArrowRight: "→",
 };
 
-/** Maps a KeyboardEvent to a human-readable single-key label. */
+/** Builds a full hotkey label by prepending active modifier names to the key label. */
+export const buildLabel = (ctrl: boolean, shift: boolean, alt: boolean, keyLabel: string): string => {
+  const parts: string[] = [];
+  if (ctrl) parts.push("Ctrl");
+  if (shift) parts.push("Shift");
+  if (alt) parts.push("Alt");
+  parts.push(keyLabel);
+  return parts.join("+");
+};
+
+/** Maps a KeyboardEvent to a human-readable single-key label (no modifier prefix). */
 export const labelForKeyEvent = (e: Pick<KeyboardEvent, "code" | "key">): string => {
   if (ARROW_SYMBOLS[e.code]) return ARROW_SYMBOLS[e.code]!;
   if (e.key && e.key.length === 1 && e.key !== " ") return e.key.toUpperCase();
@@ -41,6 +63,9 @@ export const createHotkeyRow = (
   let isCapturing = false;
   let capturedCode: string | null = null;
   let capturedLabel: string | null = null;
+  let capturedCtrl = false;
+  let capturedShift = false;
+  let capturedAlt = false;
 
   const root = document.createElement("div");
   root.className = "hotkey-row";
@@ -74,6 +99,9 @@ export const createHotkeyRow = (
     isCapturing = false;
     capturedCode = null;
     capturedLabel = null;
+    capturedCtrl = false;
+    capturedShift = false;
+    capturedAlt = false;
     btn.classList.remove("hotkey-row__btn--capturing");
     conflictContainer.hidden = true;
     conflictContainer.innerHTML = "";
@@ -84,12 +112,18 @@ export const createHotkeyRow = (
   const applyCapture = (): void => {
     const newBinding: KeyBinding = {
       code: capturedCode!,
-      label: capturedLabel!,
+      label: buildLabel(capturedCtrl, capturedShift, capturedAlt, capturedLabel!),
+      ...(capturedCtrl && { ctrl: true }),
+      ...(capturedShift && { shift: true }),
+      ...(capturedAlt && { alt: true }),
     };
     currentBinding = newBinding;
     isCapturing = false;
     capturedCode = null;
     capturedLabel = null;
+    capturedCtrl = false;
+    capturedShift = false;
+    capturedAlt = false;
     conflictContainer.hidden = true;
     conflictContainer.innerHTML = "";
     btn.classList.remove("hotkey-row__btn--capturing");
@@ -141,7 +175,12 @@ export const createHotkeyRow = (
 
     const bindings = allBindings();
     const conflictingAction = (Object.keys(bindings) as HotkeyAction[]).find(
-      (a) => a !== action && bindings[a]?.code === capturedCode
+      (a) =>
+        a !== action &&
+        bindings[a]?.code === capturedCode &&
+        !!bindings[a]?.ctrl === capturedCtrl &&
+        !!bindings[a]?.shift === capturedShift &&
+        !!bindings[a]?.alt === capturedAlt
     );
 
     if (conflictingAction) {
@@ -163,7 +202,10 @@ export const createHotkeyRow = (
     liveRegion.textContent = getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]);
 
     const onKeydown = (e: KeyboardEvent) => {
-      // Allow forbidden navigation keys (e.g. Tab, F5, F12) to cancel capture without blocking their default browser behavior.
+      // Pure modifier key — wait for the actual key; modifiers will be read from its event.
+      if (MODIFIER_CODES.has(e.code)) return;
+
+      // Forbidden navigation keys (e.g. Tab, F5, F12) cancel capture without blocking their default browser behavior.
       if (FORBIDDEN_CODES.has(e.code) && e.code !== "Escape") {
         cancelCapture();
         document.removeEventListener("keydown", onKeydown, true);
@@ -180,6 +222,9 @@ export const createHotkeyRow = (
 
       if (FORBIDDEN_CODES.has(e.code)) return;
 
+      capturedCtrl = e.ctrlKey;
+      capturedShift = e.shiftKey;
+      capturedAlt = e.altKey;
       capturedCode = e.code;
       capturedLabel = labelForKeyEvent(e);
       document.removeEventListener("keydown", onKeydown, true);

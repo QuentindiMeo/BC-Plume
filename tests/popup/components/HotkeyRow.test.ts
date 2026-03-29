@@ -1,5 +1,5 @@
-import { labelForKeyEvent } from "@/popup/components/HotkeyRow";
-import { describe, it, expect } from "vitest";
+import { buildLabel, labelForKeyEvent } from "@/popup/components/HotkeyRow";
+import { describe, expect, it } from "vitest";
 
 const key = (code: string, key: string) => ({ code, key });
 
@@ -38,5 +38,31 @@ describe("labelForKeyEvent", () => {
 
   it("falls back to code for unrecognised keys", () => {
     expect(labelForKeyEvent(key("PageUp", "PageUp"))).toBe("PageUp");
+  });
+});
+
+describe("buildLabel", () => {
+  it("returns the key label alone when no modifiers are active", () => {
+    expect(buildLabel(false, false, false, "A")).toBe("A");
+  });
+
+  it.each([
+    [true,  false, false, "A", "Ctrl+A"],
+    [false, true,  false, "A", "Shift+A"],
+    [false, false, true,  "A", "Alt+A"],
+    [true,  true,  false, "A", "Ctrl+Shift+A"],
+    [true,  false, true,  "A", "Ctrl+Alt+A"],
+    [false, true,  true,  "A", "Shift+Alt+A"],
+    [true,  true,  true,  "A", "Ctrl+Shift+Alt+A"],
+  ])("ctrl=%s shift=%s alt=%s key=%s → %s", (ctrl: boolean, shift: boolean, alt: boolean, k: string, expected: string) => {
+    expect(buildLabel(ctrl, shift, alt, k)).toBe(expected);
+  });
+
+  it("works with arrow symbols as the key label", () => {
+    expect(buildLabel(true, false, false, "↑")).toBe("Ctrl+↑");
+  });
+
+  it("works with multi-char key labels", () => {
+    expect(buildLabel(false, true, false, "Space")).toBe("Shift+Space");
   });
 });

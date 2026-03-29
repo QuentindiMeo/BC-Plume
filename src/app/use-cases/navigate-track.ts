@@ -52,7 +52,7 @@ export const navigateTrackForward = (appCore: IAppCore, musicPlayer: MusicPlayer
   } else if (pageType === "track" && loopMode !== LOOP_MODE.NONE) {
     // On track pages in TRACK loop mode, treat "next" as restarting the current track.
     musicPlayer.seekTo(0);
-    logger(CPL.INFO, getString("DEBUG__NEXT_TRACK__RESTARTED"));
+    logger(CPL.INFO, getString("DEBUG__TRACK__RESTARTED"));
   } else if (bcNextBtn) {
     bcNextBtn.click();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
