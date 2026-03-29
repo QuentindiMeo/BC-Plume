@@ -1,23 +1,19 @@
 import {
-    assertBoundedInteger,
-    assertWholeNumber,
-    LOOP_MODE,
-    LOOP_MODE_CYCLE,
-    PLUME_DEFAULTS,
-    SEEK_JUMP_DURATION_MAX,
-    SEEK_JUMP_DURATION_MIN,
-    TIME_DISPLAY_METHOD,
-    TRACK_RESTART_THRESHOLD_MAX,
-    TRACK_RESTART_THRESHOLD_MIN,
-    VOLUME_HOTKEY_STEP_MAX,
-    VOLUME_HOTKEY_STEP_MIN,
-    type WholeNumber,
+  assertBoundedInteger,
+  assertWholeNumber,
+  LOOP_MODE,
+  LOOP_MODE_CYCLE,
+  PLUME_DEFAULTS,
+  SEEK_JUMP_DURATION_MAX,
+  SEEK_JUMP_DURATION_MIN,
+  TIME_DISPLAY_METHOD,
+  TRACK_RESTART_THRESHOLD_MAX,
+  TRACK_RESTART_THRESHOLD_MIN,
+  VOLUME_HOTKEY_STEP_MAX,
+  VOLUME_HOTKEY_STEP_MIN,
+  type WholeNumber,
 } from "@/domain/plume";
 import { describe, expect, it } from "vitest";
-
-// ---------------------------------------------------------------------------
-// assertWholeNumber
-// ---------------------------------------------------------------------------
 
 describe("assertWholeNumber", () => {
   it("accepts 0", () => {
@@ -45,10 +41,6 @@ describe("assertWholeNumber", () => {
     expect(() => assertWholeNumber(Infinity)).toThrow(RangeError);
   });
 });
-
-// ---------------------------------------------------------------------------
-// assertBoundedInteger
-// ---------------------------------------------------------------------------
 
 describe("assertBoundedInteger", () => {
   const MIN = 2 as WholeNumber;
@@ -79,10 +71,6 @@ describe("assertBoundedInteger", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// LOOP_MODE_CYCLE
-// ---------------------------------------------------------------------------
-
 describe("LOOP_MODE_CYCLE", () => {
   it("contains exactly 3 elements", () => {
     expect(LOOP_MODE_CYCLE).toHaveLength(3);
@@ -94,10 +82,6 @@ describe("LOOP_MODE_CYCLE", () => {
     expect(LOOP_MODE_CYCLE[2]).toBe(LOOP_MODE.TRACK);
   });
 });
-
-// ---------------------------------------------------------------------------
-// PLUME_DEFAULTS
-// ---------------------------------------------------------------------------
 
 describe("PLUME_DEFAULTS", () => {
   it("has the expected durationDisplayMethod", () => {
@@ -124,10 +108,6 @@ describe("PLUME_DEFAULTS", () => {
     expect(PLUME_DEFAULTS.volumeHotkeyStep).toBe(5);
   });
 });
-
-// ---------------------------------------------------------------------------
-// Bound constants
-// ---------------------------------------------------------------------------
 
 describe("bound constants", () => {
   it("SEEK_JUMP_DURATION_MIN is 1", () => {

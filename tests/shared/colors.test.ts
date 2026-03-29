@@ -1,9 +1,9 @@
 import {
-    RGBToHSL,
-    WCAG_CONTRAST_NORMAL,
-    adjustColorContrast,
-    isGrayscale,
-    measureContrastRatioWCAG,
+  RGBToHSL,
+  WCAG_CONTRAST_NORMAL,
+  adjustColorContrast,
+  isGrayscale,
+  measureContrastRatioWCAG,
 } from "@/shared/colors";
 import { describe, expect, it } from "vitest";
 

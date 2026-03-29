@@ -16,8 +16,8 @@
     "lint": "pnpm prettier && pnpm eslint",
     "eslint": "eslint src/**/*.ts",
     "eslint:fix": "eslint src/**/*.ts --fix",
-    "prettier": "prettier --check 'src/**/*.{ts,js,json,css,html}'",
-    "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}'",
+    "prettier": "prettier --check 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
+    "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
     "format": "pnpm prettier:fix && pnpm eslint:fix",
     "prepare": "tsc --noEmit && husky",
 

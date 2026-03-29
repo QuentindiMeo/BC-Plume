@@ -1,5 +1,5 @@
 import { getString } from "@/shared/i18n";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 describe("getString", () => {
   it("resolves placeholders using the substitutions array", () => {
