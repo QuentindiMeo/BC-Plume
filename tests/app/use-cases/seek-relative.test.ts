@@ -1,6 +1,6 @@
 import { seekBackward, seekForward } from "@/app/use-cases/seek-relative";
-import { FakeAppCore } from "../../fakes/FakeAppCore";
-import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
+import { FakeAppCore } from "@tests/fakes/FakeAppCore";
+import { FakeMusicPlayer } from "@tests/fakes/FakeMusicPlayer";
 import { describe, expect, it } from "vitest";
 
 describe("seekBackward", () => {

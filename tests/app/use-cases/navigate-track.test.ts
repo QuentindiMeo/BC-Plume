@@ -2,8 +2,8 @@ import { isLastTrackOfAlbumPlaying, navigateTrackBackward, navigateTrackForward 
 import { LOOP_MODE } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import type { BcPlayerPort } from "@/domain/ports/bc-player";
-import { FakeAppCore } from "../../fakes/FakeAppCore";
-import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
+import { FakeAppCore } from "@tests/fakes/FakeAppCore";
+import { FakeMusicPlayer } from "@tests/fakes/FakeMusicPlayer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const makeFakeBcPlayer = (overrides: Partial<BcPlayerPort> = {}): BcPlayerPort =>
