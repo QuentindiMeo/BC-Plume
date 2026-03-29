@@ -4,13 +4,7 @@ import { CORE_ACTIONS, type AppCore, type IAppCore } from "@/domain/ports/app-co
 import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import { describe, expect, it, vi } from "vitest";
 
-// ---------------------------------------------------------------------------
-// Mock factories
-// ---------------------------------------------------------------------------
-
-const makeAppCore = (
-  loopMode: string,
-): { appCore: IAppCore; dispatch: ReturnType<typeof vi.fn> } => {
+const makeAppCore = (loopMode: string): { appCore: IAppCore; dispatch: ReturnType<typeof vi.fn> } => {
   const dispatch = vi.fn();
   return {
     appCore: {
@@ -25,10 +19,6 @@ const makePlayer = (): { player: MusicPlayerPort; setLoop: ReturnType<typeof vi.
   const setLoop = vi.fn();
   return { player: { setLoop } as unknown as MusicPlayerPort, setLoop };
 };
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("cycleLoopMode", () => {
   it("always dispatches the CYCLE_LOOP_MODE action with no payload", () => {

@@ -1,9 +1,9 @@
 import { TIME_DISPLAY_METHOD } from "@/domain/plume";
 import {
-    presentFormattedDuration,
-    presentFormattedElapsed,
-    presentFormattedTime,
-    presentProgressPercentage,
+  presentFormattedDuration,
+  presentFormattedElapsed,
+  presentFormattedTime,
+  presentProgressPercentage,
 } from "@/shared/presenters";
 import { describe, expect, it } from "vitest";
 
@@ -110,18 +110,30 @@ describe("presentFormattedDuration", () => {
 
 describe("presentProgressPercentage", () => {
   it("returns 0 when duration is 0", () => {
-    expect(presentProgressPercentage({ currentTime: 0, duration: 0, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })).toBe(0);
+    expect(
+      presentProgressPercentage({ currentTime: 0, duration: 0, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })
+    ).toBe(0);
   });
 
   it("returns 50 at the midpoint (50/100)", () => {
-    expect(presentProgressPercentage({ currentTime: 50, duration: 100, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })).toBe(50);
+    expect(
+      presentProgressPercentage({ currentTime: 50, duration: 100, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })
+    ).toBe(50);
   });
 
   it("returns 100 at the end (100/100)", () => {
-    expect(presentProgressPercentage({ currentTime: 100, duration: 100, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })).toBe(100);
+    expect(
+      presentProgressPercentage({
+        currentTime: 100,
+        duration: 100,
+        durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+      })
+    ).toBe(100);
   });
 
   it("returns 0 at the start (0/120)", () => {
-    expect(presentProgressPercentage({ currentTime: 0, duration: 120, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })).toBe(0);
+    expect(
+      presentProgressPercentage({ currentTime: 0, duration: 120, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })
+    ).toBe(0);
   });
 });

@@ -1,9 +1,9 @@
 import {
-    RGBToHSL,
-    WCAG_CONTRAST_NORMAL,
-    adjustColorContrast,
-    isGrayscale,
-    measureContrastRatioWCAG,
+  RGBToHSL,
+  WCAG_CONTRAST_NORMAL,
+  adjustColorContrast,
+  isGrayscale,
+  measureContrastRatioWCAG,
 } from "@/shared/colors";
 import { describe, expect, it } from "vitest";
 
@@ -39,6 +39,27 @@ describe("RGBToHSL", () => {
     const [, s, l] = RGBToHSL(0, 0, 0);
     expect(s).toBeCloseTo(0, 0);
     expect(l).toBeCloseTo(0, 0);
+  });
+
+  it("converts green-dominant [0,255,128] via case g: to hue≈150, saturation=100, lightness≈50", () => {
+    const [h, s, l] = RGBToHSL(0, 255, 128);
+    expect(h).toBeCloseTo(150, 0);
+    expect(s).toBeCloseTo(100, 0);
+    expect(l).toBeCloseTo(50, 0);
+  });
+
+  it("uses d/(2-max-min) saturation formula when lightness>50% [255,200,200]", () => {
+    const [h, s, l] = RGBToHSL(255, 200, 200);
+    expect(l).toBeGreaterThan(50);
+    expect(s).toBeCloseTo(100, 0);
+    expect(h).toBeCloseTo(0, 0);
+  });
+
+  it("wraps hue by +6 when red is dominant and g<b [255,0,200]", () => {
+    const [h, s, l] = RGBToHSL(255, 0, 200);
+    expect(h).toBeCloseTo(313, 0);
+    expect(s).toBeCloseTo(100, 0);
+    expect(l).toBeCloseTo(50, 0);
   });
 });
 

@@ -1,4 +1,5 @@
 import { DEFAULT_HOTKEYS, HotkeyAction } from "@/domain/hotkeys";
+import { CORE_ACTIONS, coreActions } from "@/domain/ports/app-core";
 import { describe, expect, it } from "vitest";
 
 describe("HotkeyAction", () => {
@@ -64,5 +65,19 @@ describe("DEFAULT_HOTKEYS", () => {
     const codes = actions.map((action) => DEFAULT_HOTKEYS[action].code);
     const uniqueCodes = new Set(codes);
     expect(uniqueCodes.size).toBe(codes.length);
+  });
+});
+
+describe("coreActions.setHotkeyBindings", () => {
+  it("returns the correct action shape", () => {
+    const hotkeyBindings = {
+      ...DEFAULT_HOTKEYS,
+      [HotkeyAction.PLAY_PAUSE]: { code: "KeyP", label: "P" },
+    };
+
+    expect(coreActions.setHotkeyBindings(hotkeyBindings)).toEqual({
+      type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
+      payload: hotkeyBindings,
+    });
   });
 });

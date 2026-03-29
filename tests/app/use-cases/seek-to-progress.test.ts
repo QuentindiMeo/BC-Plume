@@ -1,7 +1,7 @@
 import { seekToProgress } from "@/app/use-cases/seek-to-progress";
+import { describe, expect, it } from "vitest";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
-import { describe, expect, it } from "vitest";
 
 describe("seekToProgress", () => {
   it("seeks to correct time for a mid-track slider value", () => {

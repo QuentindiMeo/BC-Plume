@@ -16,14 +16,15 @@
     "lint": "pnpm prettier && pnpm eslint",
     "eslint": "eslint src/**/*.ts",
     "eslint:fix": "eslint src/**/*.ts --fix",
-    "prettier": "prettier --check 'src/**/*.{ts,js,json,css,html}'",
-    "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}'",
+    "prettier": "prettier --check 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
+    "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
     "format": "pnpm prettier:fix && pnpm eslint:fix",
     "prepare": "tsc --noEmit && husky",
 
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:cov": "vitest run --coverage --coverage.skipFull",
+    "test:cov:report": "vitest run --coverage --reporter=verbose"
   },
   "keywords": [
     "bandcamp",
@@ -65,6 +66,9 @@
   },
   "lint-staged": {
     "src/**/*.{ts,js,json,css,html}": [
+      "prettier --write"
+    ],
+    "tests/**/*.ts": [
       "prettier --write"
     ]
   }

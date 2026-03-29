@@ -1,4 +1,14 @@
-import { LOOP_MODE, LOOP_MODE_CYCLE, PLUME_DEFAULTS, SEEK_JUMP_DURATION_MAX, SEEK_JUMP_DURATION_MIN, TIME_DISPLAY_METHOD, TRACK_RESTART_THRESHOLD_MAX, VOLUME_HOTKEY_STEP_MAX, VOLUME_HOTKEY_STEP_MIN } from "@/domain/plume";
+import {
+  LOOP_MODE,
+  LOOP_MODE_CYCLE,
+  PLUME_DEFAULTS,
+  SEEK_JUMP_DURATION_MAX,
+  SEEK_JUMP_DURATION_MIN,
+  TIME_DISPLAY_METHOD,
+  TRACK_RESTART_THRESHOLD_MAX,
+  VOLUME_HOTKEY_STEP_MAX,
+  VOLUME_HOTKEY_STEP_MIN,
+} from "@/domain/plume";
 import { coreActions, type IAppCore } from "@/domain/ports/app-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -50,8 +60,6 @@ describe("AppCoreImpl reducer", () => {
   afterEach(() => {
     vi.useRealTimers();
   });
-
-  // ─── Basic transient state updates ───────────────────────────────────────
 
   describe("SET_PAGE_TYPE", () => {
     it("updates pageType", () => {
@@ -334,7 +342,6 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-
   describe("subscribe", () => {
     it("calls listener when subscribed key changes", () => {
       const listener = vi.fn();
@@ -384,7 +391,6 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
-
   describe("dispatch thunk", () => {
     it("invokes thunk with dispatch and getState", () => {
       const thunk = vi.fn((_dispatch: unknown, getState: () => unknown) => {
@@ -394,7 +400,6 @@ describe("AppCoreImpl reducer", () => {
       expect(thunk).toHaveBeenCalled();
     });
   });
-
 
   describe("computed", () => {
     it("formattedElapsed returns a time string", () => {

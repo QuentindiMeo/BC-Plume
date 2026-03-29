@@ -1,6 +1,8 @@
 import { KeyBindingMap } from "@/domain/hotkeys";
 import { LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
 
+export const BANDCAMP_TAB_PATTERN = "*://*.bandcamp.com/*";
+
 export enum PLUME_CACHE_KEYS {
   DURATION_DISPLAY_METHOD = "plume_duration_display_method",
   VOLUME = "plume_volume",

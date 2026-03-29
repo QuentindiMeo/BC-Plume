@@ -5,9 +5,9 @@ const key = (code: string, key: string) => ({ code, key });
 
 describe("labelForKeyEvent", () => {
   it.each([
-    ["ArrowUp",    "ArrowUp",    "↑"],
-    ["ArrowDown",  "ArrowDown",  "↓"],
-    ["ArrowLeft",  "ArrowLeft",  "←"],
+    ["ArrowUp", "ArrowUp", "↑"],
+    ["ArrowDown", "ArrowDown", "↓"],
+    ["ArrowLeft", "ArrowLeft", "←"],
     ["ArrowRight", "ArrowRight", "→"],
   ])("%s → %s", (code: string, k: string, expected: string) => {
     expect(labelForKeyEvent(key(code, k))).toBe(expected);
@@ -47,16 +47,19 @@ describe("buildLabel", () => {
   });
 
   it.each([
-    [true,  false, false, "A", "Ctrl+A"],
-    [false, true,  false, "A", "Shift+A"],
-    [false, false, true,  "A", "Alt+A"],
-    [true,  true,  false, "A", "Ctrl+Shift+A"],
-    [true,  false, true,  "A", "Ctrl+Alt+A"],
-    [false, true,  true,  "A", "Shift+Alt+A"],
-    [true,  true,  true,  "A", "Ctrl+Shift+Alt+A"],
-  ])("ctrl=%s shift=%s alt=%s key=%s → %s", (ctrl: boolean, shift: boolean, alt: boolean, k: string, expected: string) => {
-    expect(buildLabel(ctrl, shift, alt, k)).toBe(expected);
-  });
+    [true, false, false, "A", "Ctrl+A"],
+    [false, true, false, "A", "Shift+A"],
+    [false, false, true, "A", "Alt+A"],
+    [true, true, false, "A", "Ctrl+Shift+A"],
+    [true, false, true, "A", "Ctrl+Alt+A"],
+    [false, true, true, "A", "Shift+Alt+A"],
+    [true, true, true, "A", "Ctrl+Shift+Alt+A"],
+  ])(
+    "ctrl=%s shift=%s alt=%s key=%s → %s",
+    (ctrl: boolean, shift: boolean, alt: boolean, k: string, expected: string) => {
+      expect(buildLabel(ctrl, shift, alt, k)).toBe(expected);
+    }
+  );
 
   it("works with arrow symbols as the key label", () => {
     expect(buildLabel(true, false, false, "↑")).toBe("Ctrl+↑");

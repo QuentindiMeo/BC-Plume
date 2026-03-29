@@ -14,12 +14,12 @@ describe("bindingKey", () => {
   });
 
   it.each([
-    [{ ctrl: true  as const },               "ctrl:KeyA"],
-    [{ shift: true as const },               "shift:KeyA"],
-    [{ alt: true   as const },               "alt:KeyA"],
-    [{ ctrl: true, shift: true } as const,   "ctrl:shift:KeyA"],
-    [{ ctrl: true, alt: true   } as const,   "ctrl:alt:KeyA"],
-    [{ shift: true, alt: true  } as const,   "shift:alt:KeyA"],
+    [{ ctrl: true as const }, "ctrl:KeyA"],
+    [{ shift: true as const }, "shift:KeyA"],
+    [{ alt: true as const }, "alt:KeyA"],
+    [{ ctrl: true, shift: true } as const, "ctrl:shift:KeyA"],
+    [{ ctrl: true, alt: true } as const, "ctrl:alt:KeyA"],
+    [{ shift: true, alt: true } as const, "shift:alt:KeyA"],
     [{ ctrl: true, shift: true, alt: true } as const, "ctrl:shift:alt:KeyA"],
   ])("modifiers %o → %s", (opts: Pick<KeyBinding, "ctrl" | "shift" | "alt">, expected: string) => {
     expect(bindingKey(binding("KeyA", opts))).toBe(expected);
@@ -31,8 +31,6 @@ describe("bindingKey", () => {
 
   it("two bindings with same code but different modifiers produce distinct keys", () => {
     expect(bindingKey(binding("KeyA"))).not.toBe(bindingKey(binding("KeyA", { ctrl: true })));
-    expect(bindingKey(binding("KeyA", { ctrl: true }))).not.toBe(
-      bindingKey(binding("KeyA", { shift: true }))
-    );
+    expect(bindingKey(binding("KeyA", { ctrl: true }))).not.toBe(bindingKey(binding("KeyA", { shift: true })));
   });
 });

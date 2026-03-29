@@ -62,6 +62,12 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.SET_LOOP_MODE:
         this.state = { ...this.state, loopMode: action.payload };
         break;
+      case CORE_ACTIONS.SET_TRACK_TITLE:
+        this.state = { ...this.state, trackTitle: action.payload };
+        break;
+      case CORE_ACTIONS.SET_TRACK_NUMBER:
+        this.state = { ...this.state, trackNumber: action.payload };
+        break;
     }
   }
 

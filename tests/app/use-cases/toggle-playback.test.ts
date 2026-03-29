@@ -1,6 +1,6 @@
 import { togglePlayback } from "@/app/use-cases/toggle-playback";
-import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { describe, expect, it } from "vitest";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 describe("togglePlayback", () => {
   it("starts playback when paused", () => {
