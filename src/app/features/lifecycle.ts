@@ -5,6 +5,7 @@ import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { shouldShowReleaseToast } from "@/app/use-cases";
 import { checkBandcampElements } from "@/app/features/bc-diagnostic";
@@ -115,7 +116,8 @@ export const launchPlume = (): void => {
       return;
     }
 
-    if (await shouldShowReleaseToast()) showReleaseToast();
+    const browserCache = getBrowserInstance().getState().cache;
+    if (await shouldShowReleaseToast(browserCache)) showReleaseToast();
 
     setupListeners(handles);
     initPlayback();
