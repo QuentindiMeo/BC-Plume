@@ -24,7 +24,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage --coverage.skipFull",
-    "test:cov:report": "vitest run --coverage --reporter=verbose"
+    "test:cov:report": "vitest run --coverage --reporter=verbose",
+
+    "zip": "node scripts/zip-sources.js"
   },
   "keywords": [
     "bandcamp",
