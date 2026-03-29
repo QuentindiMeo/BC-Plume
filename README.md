@@ -14,7 +14,7 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.9.2-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.10.0-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
@@ -112,6 +112,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
+- _**[1.10.0]** Mar 30 2026_: latest — **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106) | [Promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8) release.
 - _**[1.6.0]** Jan 18 2026_: **Pedal To The Metal** [#067](https://github.com/QuentindiMeo/BC-Plume/pull/67)
 - _**[1.4.0]** Sep 08 2025_: **Sticky Sherlock** [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48) | Word is spread on Reddit: Plume is ready for use.
