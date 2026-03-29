@@ -40,6 +40,13 @@ describe("RGBToHSL", () => {
     expect(s).toBeCloseTo(0, 0);
     expect(l).toBeCloseTo(0, 0);
   });
+
+  it("converts green-dominant [0,255,128] via case g: to hue≈150, saturation=100, lightness≈50", () => {
+    const [h, s, l] = RGBToHSL(0, 255, 128);
+    expect(h).toBeCloseTo(150, 0);
+    expect(s).toBeCloseTo(100, 0);
+    expect(l).toBeCloseTo(50, 0);
+  });
 });
 
 describe("isGrayscale", () => {
