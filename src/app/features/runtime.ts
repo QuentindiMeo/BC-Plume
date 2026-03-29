@@ -28,11 +28,9 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
       return errorDiv;
     }
 
-    trackRowDurations.forEach((durationText, idx) => {
-      if (durationText === null) {
-        logger(CPL.WARN, getString("WARN__DURATION_CELL__NOT_FOUND"), [idx]);
-        return;
-      }
+    trackRowDurations.forEach((durationText) => {
+      if (durationText === null) return;
+
       const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
       let seconds = 0;
       if (parts.length === 2) {
@@ -46,9 +44,11 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
     });
     const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
     const seconds = runtimeInfo.totalRuntime % 60;
+    const collectionHasUnplayableTracks = trackRowDurations.some((duration) => duration === null);
     runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
       String(minutes),
       seconds < 10 ? "0" + seconds : seconds.toString(),
+      collectionHasUnplayableTracks ? getString("LABEL__RUNTIME__PLAYABLE") : "",
     ]);
     runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [
       String(Math.floor(runtimeInfo.totalRuntime / 60)),

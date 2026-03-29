@@ -43,7 +43,6 @@
   "WARN__VOLUME__NOT_LOADED": { "message": "No se pudo cargar el volumen: " },
   "WARN__VOLUME__NOT_SAVED": { "message": "No se pudo guardar el volumen: " },
   "WARN__COVER_ART__NOT_FOUND": { "message": "Portada no encontrada" },
-  "WARN__DURATION_CELL__NOT_FOUND": { "message": "Celda de duración no encontrada para pista" },
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Sección de información no encontrada para modo de pantalla completa" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Contenedor de Plume no encontrado para modo de pantalla completa" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista de pistas no encontrada,  omitiendo cálculo del tiempo total" },
@@ -163,7 +162,7 @@
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Evento de pista siguiente enviado" },
   "DEBUG__LOOP__CYCLED": { "message": "Modo de repetición cambiado" },
   "LABEL__RUNTIME": {
-    "message": "$MINUTOS$ min $SEGUNDOS$ s",
+    "message": "$MINUTOS$ min $SEGUNDOS$ s$REPRODUCIBLE$",
     "placeholders": {
       "minutos": {
         "content": "$1",
@@ -172,9 +171,14 @@
       "segundos": {
         "content": "$2",
         "example": "30"
+      },
+      "reproducible": {
+        "content": "$3",
+        "example": " reproducible"
       }
     }
   },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " reproducible" },
   "LABEL__TRACK": { "message": "reproduciendo ahora: " },
   "LABEL__TRACK_CURRENT": {
     "message": "reproduciendo ahora ($NUMERACION$):",

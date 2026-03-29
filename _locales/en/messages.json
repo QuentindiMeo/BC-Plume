@@ -43,7 +43,6 @@
   "WARN__VOLUME__NOT_LOADED": { "message": "Unable to load volume:" },
   "WARN__VOLUME__NOT_SAVED": { "message": "Unable to save volume:" },
   "WARN__COVER_ART__NOT_FOUND": { "message": "Cover art not found" },
-  "WARN__DURATION_CELL__NOT_FOUND": { "message": "Duration cell not found for track" },
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Info section not found for fullscreen mode" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Plume container not found for fullscreen mode" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Track list not found, skipping runtime calculation" },
@@ -163,7 +162,7 @@
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
   "DEBUG__LOOP__CYCLED": { "message": "Loop mode cycled" },
   "LABEL__RUNTIME": {
-    "message": "$MINUTES$ min $SECONDS$ s",
+    "message": "$MINUTES$ min $SECONDS$ s$PLAYABLE$",
     "placeholders": {
       "minutes": {
         "content": "$1",
@@ -172,9 +171,14 @@
       "seconds": {
         "content": "$2",
         "example": "30"
+      },
+      "playable": {
+        "content": "$3",
+        "example": " playable"
       }
     }
   },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " playable" },
   "LABEL__TRACK": { "message": "currently playing:" },
   "LABEL__TRACK_CURRENT": {
     "message": "currently playing ($NUMBERING$):",
