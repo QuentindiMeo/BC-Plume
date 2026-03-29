@@ -4,6 +4,24 @@ import { getString } from "@/shared/i18n";
 // Codes that must never be captured as hotkeys
 const FORBIDDEN_CODES = new Set(["Tab", "Escape", "F5", "F12"]);
 
+const ARROW_SYMBOLS: Record<string, string> = {
+  ArrowUp: "↑",
+  ArrowDown: "↓",
+  ArrowLeft: "←",
+  ArrowRight: "→",
+};
+
+/** Maps a KeyboardEvent to a human-readable single-key label. */
+export const labelForKeyEvent = (e: Pick<KeyboardEvent, "code" | "key">): string => {
+  if (ARROW_SYMBOLS[e.code]) return ARROW_SYMBOLS[e.code]!;
+  if (e.key && e.key.length === 1 && e.key !== " ") return e.key.toUpperCase();
+  if (e.code === "Space") return "Space";
+  if (e.code.startsWith("Key")) return e.code.slice(3);
+  if (e.code.startsWith("Digit")) return e.code.slice(5);
+  if (e.code.startsWith("Numpad")) return `Num ${e.code.slice(6)}`;
+  return e.code;
+};
+
 export type BindingChangeHandler = (action: HotkeyAction, newBinding: KeyBinding) => void;
 export type ConflictClearHandler = (conflictingAction: HotkeyAction) => void;
 
@@ -47,11 +65,9 @@ export const createHotkeyRow = (
   liveRegion.ariaAtomic = "true";
 
   const refreshBtn = (): void => {
-    btn.textContent = currentBinding.label;
-    btn.ariaLabel = getString("ARIA__HOTKEY_ROW__BUTTON", [
-      getString(`LABEL__HOTKEY__${action}`),
-      currentBinding.label,
-    ]);
+    const displayLabel = ARROW_SYMBOLS[currentBinding.label] ?? currentBinding.label;
+    btn.textContent = displayLabel;
+    btn.ariaLabel = getString("ARIA__HOTKEY_ROW__BUTTON", [getString(`LABEL__HOTKEY__${action}`), displayLabel]);
   };
 
   const cancelCapture = (): void => {
@@ -120,16 +136,6 @@ export const createHotkeyRow = (
     refreshBtn();
   };
 
-  // Prefer a readable single character; fall back to the code itself
-  const deriveLabel = (e: KeyboardEvent): string => {
-    if (e.key && e.key.length === 1 && e.key !== " ") return e.key.toUpperCase();
-    if (e.code === "Space") return "Space";
-    if (e.code.startsWith("Key")) return e.code.slice(3);
-    if (e.code.startsWith("Digit")) return e.code.slice(5);
-    if (e.code.startsWith("Numpad")) return `Num ${e.code.slice(6)}`;
-    return e.code;
-  };
-
   const evaluateCapture = (): void => {
     if (!capturedCode || !capturedLabel) return;
 
@@ -175,7 +181,7 @@ export const createHotkeyRow = (
       if (FORBIDDEN_CODES.has(e.code)) return;
 
       capturedCode = e.code;
-      capturedLabel = deriveLabel(e);
+      capturedLabel = labelForKeyEvent(e);
       document.removeEventListener("keydown", onKeydown, true);
       evaluateCapture();
     };
