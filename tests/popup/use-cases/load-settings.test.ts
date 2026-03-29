@@ -1,5 +1,5 @@
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
-import { DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding } from "@/domain/hotkeys";
 import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
@@ -18,8 +18,6 @@ beforeEach(() => {
     storage: { local: fakeStorage },
   } as unknown as ReturnType<typeof inferBrowserApi>);
 });
-
-// ---------------------------------------------------------------------------
 
 describe("loadSeekJumpDuration", () => {
   it("returns the stored value when valid", async () => {
@@ -57,8 +55,6 @@ describe("loadSeekJumpDuration", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-
 describe("loadVolumeHotkeyStep", () => {
   it("returns the stored value when valid", async () => {
     fakeStorage.store[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP] = 5;
@@ -95,8 +91,6 @@ describe("loadVolumeHotkeyStep", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-
 describe("loadTrackRestartThreshold", () => {
   it("returns the stored value when valid", async () => {
     fakeStorage.store[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] = 5;
@@ -128,13 +122,15 @@ describe("loadTrackRestartThreshold", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-
 describe("loadHotkeys", () => {
   it("returns the stored KeyBindingMap when key is present", async () => {
-    const additionalHotkeys = { playPause: "KeyP", nextTrack: "KeyN" };
-    fakeStorage.store[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = { ...DEFAULT_HOTKEYS, ...additionalHotkeys };
-    expect(await loadHotkeys()).toEqual({ ...DEFAULT_HOTKEYS, ...additionalHotkeys });
+    const overloadedHotkeys: Record<HotkeyAction, KeyBinding> = {
+      ...DEFAULT_HOTKEYS,
+      [HotkeyAction.FULLSCREEN]: { code: "KeyN", label: "N", ctrl: true },
+    };
+    fakeStorage.store[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = overloadedHotkeys;
+
+    expect(await loadHotkeys()).toEqual(overloadedHotkeys);
   });
 
   it("returns undefined when key is absent", async () => {

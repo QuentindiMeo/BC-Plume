@@ -12,8 +12,8 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     coverage: {
       provider: "v8",
-      include: ["src/domain/", "src/shared/", "src/app/use-cases/", "src/popup/use-cases/", "src/popup/components/"],
-      exclude: ["src/infra/", "src/app/features/", "src/app/stores/", "src/popup/components/", "**/svg.ts"],
+      include: ["src/domain/**", "src/shared/**", "src/app/use-cases/**", "src/popup/use-cases/**", "src/popup/components/**"],
+      exclude: ["src/infra/**", "src/app/features/**", "src/app/stores/**", "src/popup/components/**", "**/svg.ts"],
     },
   },
 });

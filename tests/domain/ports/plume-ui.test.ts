@@ -146,7 +146,10 @@ describe("guiActions.setDurationDisplay", () => {
 
 describe("guiActions.setPlayPauseBtns", () => {
   it("returns the correct action shape with an array of button elements", () => {
-    const buttons = [{ tagName: "BUTTON" } as unknown as HTMLButtonElement, { tagName: "BUTTON" } as unknown as HTMLButtonElement];
+    const buttons = [
+      { tagName: "BUTTON" } as unknown as HTMLButtonElement,
+      { tagName: "BUTTON" } as unknown as HTMLButtonElement,
+    ];
     expect(guiActions.setPlayPauseBtns(buttons)).toEqual({
       type: GUI_ACTIONS.SET_PLAY_PAUSE_BTNS,
       payload: buttons,
@@ -163,7 +166,10 @@ describe("guiActions.setPlayPauseBtns", () => {
 
 describe("guiActions.setTrackFwdBtns", () => {
   it("returns the correct action shape with an array of button elements", () => {
-    const buttons = [{ tagName: "BUTTON" } as unknown as HTMLButtonElement, { tagName: "BUTTON" } as unknown as HTMLButtonElement];
+    const buttons = [
+      { tagName: "BUTTON" } as unknown as HTMLButtonElement,
+      { tagName: "BUTTON" } as unknown as HTMLButtonElement,
+    ];
     expect(guiActions.setTrackFwdBtns(buttons)).toEqual({
       type: GUI_ACTIONS.SET_TRACK_FWD_BTNS,
       payload: buttons,
@@ -180,7 +186,10 @@ describe("guiActions.setTrackFwdBtns", () => {
 
 describe("guiActions.setLoopBtns", () => {
   it("returns the correct action shape with an array of button elements", () => {
-    const buttons = [{ tagName: "BUTTON" } as unknown as HTMLButtonElement, { tagName: "BUTTON" } as unknown as HTMLButtonElement];
+    const buttons = [
+      { tagName: "BUTTON" } as unknown as HTMLButtonElement,
+      { tagName: "BUTTON" } as unknown as HTMLButtonElement,
+    ];
     expect(guiActions.setLoopBtns(buttons)).toEqual({
       type: GUI_ACTIONS.SET_LOOP_BTNS,
       payload: buttons,

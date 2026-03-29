@@ -67,6 +67,9 @@
   "lint-staged": {
     "src/**/*.{ts,js,json,css,html}": [
       "prettier --write"
+    ],
+    "tests/**/*.ts": [
+      "prettier --write"
     ]
   }
 }

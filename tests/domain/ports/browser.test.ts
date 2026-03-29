@@ -4,9 +4,7 @@ import { describe, expect, it } from "vitest";
 
 describe("browserActions.setCacheValues", () => {
   it("returns the correct action shape", () => {
-    expect(
-      browserActions.setCacheValues([PLUME_CACHE_KEYS.VOLUME], [80]),
-    ).toEqual({
+    expect(browserActions.setCacheValues([PLUME_CACHE_KEYS.VOLUME], [80])).toEqual({
       type: BROWSER_ACTIONS.SET_CACHE_VALUES,
       payload: { keys: [PLUME_CACHE_KEYS.VOLUME], values: [80] },
     });
