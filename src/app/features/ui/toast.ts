@@ -139,15 +139,15 @@ export const createToast = (config: ToastConfig): ToastHandle => {
     dismissed = true;
     clearTimer();
     el.classList.add("bpe-toast--exiting");
-    el.addEventListener(
-      "animationend",
-      (e: AnimationEvent) => {
-        if (e.animationName !== "bpe-toast-exit") return;
-        el.remove();
-        if (container.children.length === 0) container.remove();
-      },
-      { once: true }
-    );
+
+    const onExitEnd = (e: AnimationEvent): void => {
+      if (e.animationName !== "bpe-toast-exit") return;
+      el.removeEventListener("animationend", onExitEnd);
+      el.remove();
+      if (container.children.length === 0) container.remove();
+    };
+    el.addEventListener("animationend", onExitEnd);
+
     logger(CPL.INFO, getString("INFO__TOAST__DISMISSED", [config.label]));
     config.onDismissed?.();
   };
