@@ -1,4 +1,4 @@
-import { getString, logDetectedBrowser } from "@/shared/i18n";
+import { getString, logDetectedBrowser, setForcedLanguage } from "@/shared/i18n";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("getString", () => {
@@ -12,6 +12,52 @@ describe("getString", () => {
     const result = getString("KEY_THAT_DOES_NOT_EXIST");
     expect(result).toBe("KEY_THAT_DOES_NOT_EXIST");
     expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+});
+
+describe("setForcedLanguage", () => {
+  afterEach(() => {
+    setForcedLanguage("auto");
+  });
+
+  it("getString returns the ES string when es is forced", () => {
+    setForcedLanguage("es");
+    expect(getString("POPUP__GENERAL__TAB_LABEL")).toBe("General");
+  });
+
+  it("getString returns the FR string when fr is forced", () => {
+    setForcedLanguage("fr");
+    expect(getString("POPUP__GENERAL__TAB_LABEL")).toBe("Général");
+  });
+
+  it("getString returns the EN string when en is forced", () => {
+    setForcedLanguage("en");
+    expect(getString("POPUP__GENERAL__TAB_LABEL")).toBe("General");
+  });
+
+  it("getString reverts to default behavior when set back to auto", () => {
+    setForcedLanguage("fr");
+    setForcedLanguage("auto");
+    expect(getString("POPUP__GENERAL__TAB_LABEL")).toBe("General");
+  });
+
+  it("getString reverts to default behavior when set to null", () => {
+    setForcedLanguage("fr");
+    setForcedLanguage(null);
+    expect(getString("POPUP__GENERAL__TAB_LABEL")).toBe("General");
+  });
+
+  it("forced locale takes priority over the EN bundled fallback", () => {
+    setForcedLanguage("fr");
+    expect(getString("LABEL__TRACK")).toBe("en cours de lecture : ");
+  });
+
+  it("falls back to EN when the forced locale is missing a key", () => {
+    setForcedLanguage("fr");
+    // key absent from all locales still falls through to EN then warns
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(getString("KEY_ONLY_IN_EN_FALLBACK")).toBe("KEY_ONLY_IN_EN_FALLBACK");
     warnSpy.mockRestore();
   });
 });

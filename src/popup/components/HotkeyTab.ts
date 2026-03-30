@@ -1,11 +1,11 @@
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
 import type { IMessageSender } from "@/domain/ports/messaging";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
-import { resetHotkeys } from "@/popup/use-cases/resetHotkeys";
-import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
 import { createHotkeyRow, HotkeyRowInstance } from "@/popup/components/HotkeyRow";
 import type { TabDefinition } from "@/popup/components/TabBar";
+import { resetHotkeys } from "@/popup/use-cases/resetHotkeys";
+import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 const ACTION_ORDER: HotkeyAction[] = [
   HotkeyAction.PLAY_PAUSE,
@@ -51,14 +51,14 @@ export const createHotkeyTab = (
 
   const buildDigitSeekRow = (): HTMLDivElement => {
     const row = document.createElement("div");
-    row.className = "hotkey-row";
+    row.className = "setting-row";
 
     const label = document.createElement("span");
-    label.className = "hotkey-row__label hotkey-row__label--info";
+    label.className = "setting-row__label setting-row__label--info";
     label.textContent = getString("LABEL__HOTKEY__DIGIT_SEEK");
 
     const badge = document.createElement("span");
-    badge.className = "hotkey-row__badge";
+    badge.className = "setting-row__badge";
     badge.textContent = "0 – 9";
     badge.ariaLabel = getString("LABEL__HOTKEY__DIGIT_SEEK");
 

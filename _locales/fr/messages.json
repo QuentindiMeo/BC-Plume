@@ -367,11 +367,17 @@
     }
   },
 
-  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Lecture" },
-  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Doit être un nombre entier" },
-  "LABEL__PLAYBACK__RESET": { "message": "Réinitialiser" },
+  "POPUP__GENERAL__TAB_LABEL": { "message": "Général" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
+  "LABEL__GENERAL__RESET": { "message": "Réinitialiser" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+
+  "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Langue" },
+  "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Langue d'affichage imposée" },
+  "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
+  "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Échec de la sauvegarde de la préférence de langue" },
+  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": { "message": "Rechargez la page pour que le changement de langue prenne effet" },
 
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Secondes sautées via les boutons" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Durée du saut en secondes pour les boutons de saut avant/arrière" },

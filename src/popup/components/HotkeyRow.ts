@@ -71,18 +71,18 @@ export const createHotkeyRow = (
   let capturedAlt = false;
 
   const root = document.createElement("div");
-  root.className = "hotkey-row";
+  root.className = "setting-row";
   root.role = "group";
 
   const label = document.createElement("span");
-  label.className = "hotkey-row__label";
+  label.className = "setting-row__label";
   label.textContent = getString(`LABEL__HOTKEY__${action}`);
 
   const value = document.createElement("div");
-  value.className = "hotkey-row__value";
+  value.className = "setting-row__value";
 
   const btn = document.createElement("button");
-  btn.className = "hotkey-row__btn";
+  btn.className = "setting-row__btn";
 
   const conflictContainer = document.createElement("div");
   conflictContainer.hidden = true;
@@ -105,7 +105,7 @@ export const createHotkeyRow = (
     capturedCtrl = false;
     capturedShift = false;
     capturedAlt = false;
-    btn.classList.remove("hotkey-row__btn--capturing");
+    btn.classList.remove("setting-row__btn--capturing");
     conflictContainer.hidden = true;
     conflictContainer.innerHTML = "";
     refreshBtn();
@@ -129,7 +129,7 @@ export const createHotkeyRow = (
     capturedAlt = false;
     conflictContainer.hidden = true;
     conflictContainer.innerHTML = "";
-    btn.classList.remove("hotkey-row__btn--capturing");
+    btn.classList.remove("setting-row__btn--capturing");
     refreshBtn();
     liveRegion.textContent = "";
     onBindingChange(action, newBinding);
@@ -140,14 +140,14 @@ export const createHotkeyRow = (
     conflictContainer.innerHTML = "";
 
     const msg = document.createElement("span");
-    msg.className = "hotkey-row__conflict-msg";
+    msg.className = "setting-row__conflict-msg";
     msg.textContent = getString("WARN__HOTKEYS__CONFLICT", [getString(`LABEL__HOTKEY__${conflictingAction}`)]);
 
     const actions = document.createElement("div");
-    actions.className = "hotkey-row__conflict-actions";
+    actions.className = "setting-row__conflict-actions";
 
     const confirmBtn = document.createElement("button");
-    confirmBtn.className = "hotkey-row__conflict-btn hotkey-row__conflict-btn--confirm";
+    confirmBtn.className = "setting-row__conflict-btn setting-row__conflict-btn--confirm";
     confirmBtn.textContent = getString("POPUP__HOTKEYS__CONFIRM_CONFLICT");
     confirmBtn.addEventListener("click", () => {
       onConflictClear(conflictingAction);
@@ -155,7 +155,7 @@ export const createHotkeyRow = (
     });
 
     const cancelBtn = document.createElement("button");
-    cancelBtn.className = "hotkey-row__conflict-btn hotkey-row__conflict-btn--cancel";
+    cancelBtn.className = "setting-row__conflict-btn setting-row__conflict-btn--cancel";
     cancelBtn.textContent = getString("POPUP__HOTKEYS__CANCEL");
     cancelBtn.addEventListener("click", () => cancelCapture());
 
@@ -163,13 +163,13 @@ export const createHotkeyRow = (
     actions.appendChild(cancelBtn);
 
     const wrapper = document.createElement("div");
-    wrapper.className = "hotkey-row__conflict";
+    wrapper.className = "setting-row__conflict";
     wrapper.appendChild(msg);
     wrapper.appendChild(actions);
 
     conflictContainer.appendChild(wrapper);
 
-    btn.classList.remove("hotkey-row__btn--capturing");
+    btn.classList.remove("setting-row__btn--capturing");
     refreshBtn();
   };
 
@@ -199,7 +199,7 @@ export const createHotkeyRow = (
     capturedCode = null;
     capturedLabel = null;
 
-    btn.classList.add("hotkey-row__btn--capturing");
+    btn.classList.add("setting-row__btn--capturing");
     btn.textContent = getString("POPUP__HOTKEYS__PRESS_KEY");
     btn.ariaLabel = getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]);
     liveRegion.textContent = getString("ARIA__HOTKEY_ROW__CAPTURING", [getString(`LABEL__HOTKEY__${action}`)]);

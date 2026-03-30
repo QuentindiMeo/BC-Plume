@@ -10,6 +10,9 @@ export const PLUME_CONSTANTS = {
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
 } as const;
 
+export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr"] as const;
+export type PlumeLanguage = (typeof PLUME_SUPPORTED_LANGUAGES)[number];
+
 export enum LOOP_MODE {
   NONE = "none",
   COLLECTION = "collection",
@@ -46,6 +49,7 @@ export const TRACK_RESTART_THRESHOLD_MIN = 0 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MAX = 10 as WholeNumber;
 
 export const PLUME_DEFAULTS = {
+  language: PLUME_SUPPORTED_LANGUAGES[0],
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
   trackRestartThreshold: 5 as WholeNumber, // in seconds
   seekJumpDuration: 10 as WholeNumber, // in seconds

@@ -2,6 +2,7 @@ import {
   assertBoundedInteger,
   assertWholeNumber,
   PLUME_DEFAULTS,
+  PLUME_SUPPORTED_LANGUAGES,
   SEEK_JUMP_DURATION_MAX,
   SEEK_JUMP_DURATION_MIN,
   TRACK_RESTART_THRESHOLD_MAX,
@@ -9,14 +10,16 @@ import {
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
   WholeNumber,
+  type PlumeLanguage,
 } from "@/domain/plume";
 import type { IMessageSender } from "@/domain/ports/messaging";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
+import type { TabDefinition } from "@/popup/components/TabBar";
+import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
 import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
-import type { TabDefinition } from "@/popup/components/TabBar";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 interface NumericRowConfig {
   labelKey: string;
@@ -51,21 +54,21 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   const row = document.createElement("div");
-  row.className = "hotkey-row";
+  row.className = "setting-row";
 
   const label = document.createElement("span");
-  label.className = "hotkey-row__label";
+  label.className = "setting-row__label";
   label.textContent = getString(labelKey);
 
   const value = document.createElement("div");
-  value.className = "hotkey-row__value";
+  value.className = "setting-row__value";
 
   const inputRow = document.createElement("div");
-  inputRow.className = "playback-row__input-row";
+  inputRow.className = "general-row__input-row";
 
   const input = document.createElement("input");
   input.type = "number";
-  input.className = "playback-row__input";
+  input.className = "general-row__input";
   input.min = String(min);
   input.max = String(max);
   input.value = String(currentValue);
@@ -75,19 +78,19 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   input.ariaInvalid = "false";
 
   const unit = document.createElement("span");
-  unit.className = "playback-row__unit";
+  unit.className = "general-row__unit";
   unit.textContent = getString(unitKey);
   unit.ariaHidden = "true";
 
   const error = document.createElement("span");
-  error.className = "playback-row__error";
+  error.className = "general-row__error";
   error.id = `${inputId}-error`;
   error.role = "alert";
   error.hidden = true;
 
   const resetBtn = document.createElement("button");
-  resetBtn.className = "playback-row__reset-link";
-  resetBtn.textContent = getString("LABEL__PLAYBACK__RESET");
+  resetBtn.className = "general-row__reset-link";
+  resetBtn.textContent = getString("LABEL__GENERAL__RESET");
   resetBtn.hidden = currentValue === defaultValue;
 
   const validate = (raw: string): { valid: true; value: WholeNumber } | { valid: false; error: string } => {
@@ -95,7 +98,7 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
     try {
       assertWholeNumber(num);
     } catch {
-      return { valid: false, error: getString("ERROR__PLAYBACK__NOT_INTEGER") };
+      return { valid: false, error: getString("ERROR__GENERAL__NOT_INTEGER") };
     }
     try {
       assertBoundedInteger(num, min, max);
@@ -174,20 +177,113 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   return row;
 };
 
+interface SelectRowConfig<T extends string> {
+  labelKey: string;
+  ariaKey: string;
+  options: Array<{ value: T; labelKey: string }>;
+  defaultValue: T;
+  initialValue: T;
+  errorPersistenceKey: string;
+  selectId: string;
+  onSave: (value: T) => Promise<void>;
+}
+
+const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLElement => {
+  const { labelKey, ariaKey, options, defaultValue, initialValue, errorPersistenceKey, selectId, onSave } = config;
+
+  const row = document.createElement("div");
+  row.className = "setting-row";
+
+  const label = document.createElement("span");
+  label.className = "setting-row__label";
+  label.textContent = getString(labelKey);
+
+  const value = document.createElement("div");
+  value.className = "setting-row__value";
+
+  const inputRow = document.createElement("div");
+  inputRow.className = "general-row__input-row";
+
+  const select = document.createElement("select");
+  select.className = "general-row__select";
+  select.id = selectId;
+  select.ariaLabel = getString(ariaKey);
+
+  for (const opt of options) {
+    const option = document.createElement("option");
+    option.value = opt.value;
+    option.textContent = getString(opt.labelKey);
+    if (opt.value === initialValue) option.selected = true;
+    select.appendChild(option);
+  }
+
+  const resetBtn = document.createElement("button");
+  resetBtn.className = "general-row__reset-link";
+  resetBtn.textContent = getString("LABEL__GENERAL__RESET");
+  resetBtn.hidden = initialValue === defaultValue;
+
+  select.addEventListener("change", () => {
+    resetBtn.hidden = select.value === defaultValue;
+    onSave(select.value as T).catch(() => {
+      logger(CPL.ERROR, getString(errorPersistenceKey));
+    });
+  });
+
+  resetBtn.addEventListener("click", () => {
+    select.value = defaultValue;
+    resetBtn.hidden = true;
+    onSave(defaultValue).catch(() => {
+      logger(CPL.ERROR, getString(errorPersistenceKey));
+    });
+  });
+
+  inputRow.appendChild(select);
+  value.appendChild(inputRow);
+  value.appendChild(resetBtn);
+
+  row.appendChild(label);
+  row.appendChild(value);
+
+  return row;
+};
+
 /**
- * Returns a buildPanel factory for the Playback tab.
+ * Returns a buildPanel factory for the General tab.
  * Call the returned function once to produce the tab panel element.
  */
-export const createPlaybackTab = (
+export const createGeneralTab = (
   storedSeekJumpDuration: WholeNumber | undefined,
   storedVolumeHotkeyStep: WholeNumber | undefined,
   storedTrackRestartThreshold: WholeNumber | undefined,
+  storedForcedLanguage: PlumeLanguage | undefined,
   sender: IMessageSender
 ): TabDefinition["buildPanel"] => {
   const buildSection = (): HTMLElement => {
     const section = document.createElement("section");
     section.className = "settings__section";
-    section.ariaLabel = getString("POPUP__PLAYBACK__TAB_LABEL");
+    section.ariaLabel = getString("POPUP__GENERAL__TAB_LABEL");
+
+    const refreshNotice = document.createElement("p");
+    refreshNotice.className = "general-row__refresh-notice";
+    refreshNotice.textContent = getString("INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED");
+    refreshNotice.hidden = true;
+
+    const languageRow = buildSelectRow({
+      labelKey: "LABEL__GENERAL__FORCED_LANGUAGE",
+      ariaKey: "ARIA__GENERAL__FORCED_LANGUAGE_SELECT",
+      options: PLUME_SUPPORTED_LANGUAGES.map((code) => ({
+        value: code,
+        labelKey: `LABEL__LANGUAGE__${code.toUpperCase()}`,
+      })),
+      defaultValue: PLUME_DEFAULTS.language,
+      initialValue: storedForcedLanguage ?? PLUME_DEFAULTS.language,
+      errorPersistenceKey: "ERROR__FORCED_LANGUAGE__PERSISTENCE",
+      selectId: "forced-language-select",
+      onSave: async (value) => {
+        await saveForcedLanguage(value);
+        refreshNotice.hidden = false;
+      },
+    });
 
     const seekJumpRow = buildNumericRow({
       labelKey: "LABEL__PLAYBACK__SEEK_JUMP_DURATION",
@@ -229,6 +325,8 @@ export const createPlaybackTab = (
       onSave: (value) => saveTrackRestartThreshold(value, sender),
     });
 
+    section.appendChild(languageRow);
+    section.appendChild(refreshNotice);
     section.appendChild(seekJumpRow);
     section.appendChild(volumeStepRow);
     section.appendChild(trackRestartRow);
