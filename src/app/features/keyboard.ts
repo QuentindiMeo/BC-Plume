@@ -1,14 +1,14 @@
+import type { CleanupCallback } from "@/app/features/types";
+import { getMessageReceiverInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { seekToProgress } from "@/app/use-cases/seek-to-progress";
 import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
+import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
 import { PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
-import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
 import { NoArgFunction } from "@/shared/types";
-import { getMessageReceiverInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { seekToProgress } from "@/app/use-cases/seek-to-progress";
-import type { CleanupCallback } from "@/app/features/types";
 
 const { VOLUME_SLIDER_GRANULARITY, PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -26,12 +26,24 @@ interface KeyboardHandlers {
 // e.code values for both digit row and numpad
 const DIGIT_CODES = new Set<string>(Array.from({ length: 10 }, (_, i) => [`Digit${i}`, `Numpad${i}`]).flat());
 
-// Produces a canonical composite key encoding modifiers + physical key code
-export const bindingKey = (b: KeyBinding): string =>
-  `${b.ctrl ? "ctrl:" : ""}${b.shift ? "shift:" : ""}${b.alt ? "alt:" : ""}${b.code}`;
+// Plain single-letter bindings (no modifiers) are matched by their label character rather
+// than by physical key code, making DEFAULT_HOTKEYS work on all keyboard layouts.
+const isAlpha = (key: string): boolean => (key >= "a" && key <= "z") || (key >= "A" && key <= "Z");
+const isLetterBinding = (b: KeyBinding): boolean =>
+  !b.ctrl && !b.shift && !b.alt && b.label.length === 1 && isAlpha(b.label);
 
-const eventKey = (e: KeyboardEvent): string =>
-  `${e.ctrlKey ? "ctrl:" : ""}${e.shiftKey ? "shift:" : ""}${e.altKey ? "alt:" : ""}${e.code}`;
+// Produces a canonical composite key encoding modifiers + key identity.
+// Letter bindings use "key:<char>" so they match any layout pressing that letter.
+export const bindingKey = (b: KeyBinding): string => {
+  if (isLetterBinding(b)) return `key:${b.label.toLowerCase()}`;
+  return `${b.ctrl ? "ctrl:" : ""}${b.shift ? "shift:" : ""}${b.alt ? "alt:" : ""}${b.code}`;
+};
+
+const eventKey = (e: KeyboardEvent): string => {
+  if (!e.ctrlKey && !e.shiftKey && !e.altKey && e.key.length === 1 && isAlpha(e.key))
+    return `key:${e.key.toLowerCase()}`;
+  return `${e.ctrlKey ? "ctrl:" : ""}${e.shiftKey ? "shift:" : ""}${e.altKey ? "alt:" : ""}${e.code}`;
+};
 
 // Maps a binding's composite key to a HotkeyAction for fast reverse lookup
 const buildCodeToActionMap = (bindings: Record<HotkeyAction, KeyBinding>): Map<string, HotkeyAction> => {
