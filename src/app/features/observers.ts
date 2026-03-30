@@ -1,14 +1,3 @@
-import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
-import { guiActions } from "@/domain/ports/plume-ui";
-import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
-import { getBcPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { isLastTrackOfAlbumPlaying } from "@/app/use-cases/navigate-track";
-import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
 import { setupAudioEventListeners } from "@/app/features/audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "@/app/features/fullscreen";
 import { setupHotkeys } from "@/app/features/keyboard";
@@ -25,6 +14,17 @@ import {
   setupPlayerStickiness,
 } from "@/app/features/ui";
 import { handleLoopCycle } from "@/app/features/ui/loop";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { isLastTrackOfAlbumPlaying } from "@/app/use-cases/navigate-track";
+import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
+import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 // Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.
@@ -64,11 +64,7 @@ const updateTrackDisplay = () => {
     const titleHeight = titleText.offsetHeight;
     if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
       const logo = plume.headerLogo;
-      if (logo) {
-        const deltaPaddingPx = titleHeight - PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX;
-        const deltaPaddingRem = deltaPaddingPx / PLUME_CONSTANTS.PX_PER_REM;
-        logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM + deltaPaddingRem}rem`;
-      }
+      if (logo) logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
     }
   }
 
