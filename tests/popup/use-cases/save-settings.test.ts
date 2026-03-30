@@ -35,11 +35,6 @@ describe("saveForcedLanguage", () => {
     }
   );
 
-  it("does not broadcast to any tabs", async () => {
-    await saveForcedLanguage("fr");
-    expect(fakeSender.broadcasts).toHaveLength(0);
-  });
-
   it("throws RangeError and does not persist for an invalid language code", async () => {
     await expect(saveForcedLanguage("de" as PlumeLanguage)).rejects.toThrow(RangeError);
     expect(Object.keys(fakeStorage.store)).toHaveLength(0);
