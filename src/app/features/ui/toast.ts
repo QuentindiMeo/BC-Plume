@@ -1,8 +1,8 @@
-import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { createSafeSvgElement } from "../../../shared/svg";
-import { PLUME_SVG } from "../../../svg/icons";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { createSafeSvgElement } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
 
 export interface ToastCta {
   href: string;
@@ -107,7 +107,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 
   const timer = document.createElement("div");
   timer.className = "bpe-toast__timer";
-  timer.setAttribute("aria-hidden", "true");
+  timer.ariaHidden = "true";
   timer.style.setProperty("--toast-timer-duration", `${config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS}s`);
 
   toast.appendChild(icon);
@@ -139,15 +139,15 @@ export const createToast = (config: ToastConfig): ToastHandle => {
     dismissed = true;
     clearTimer();
     el.classList.add("bpe-toast--exiting");
-    el.addEventListener(
-      "animationend",
-      (e: AnimationEvent) => {
-        if (e.animationName !== "bpe-toast-exit") return;
-        el.remove();
-        if (container.children.length === 0) container.remove();
-      },
-      { once: true }
-    );
+
+    const onExitEnd = (e: AnimationEvent): void => {
+      if (e.animationName !== "bpe-toast-exit") return;
+      el.removeEventListener("animationend", onExitEnd);
+      el.remove();
+      if (container.children.length === 0) container.remove();
+    };
+    el.addEventListener("animationend", onExitEnd);
+
     logger(CPL.INFO, getString("INFO__TOAST__DISMISSED", [config.label]));
     config.onDismissed?.();
   };

@@ -1,10 +1,10 @@
-import { PLUME_CACHE_KEYS } from "../../domain/browser";
-import { APP_VERSION, PLUME_CHANGELOG_URL } from "../../domain/meta";
-import { browserActions } from "../../domain/ports/browser";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getBrowserInstance } from "../stores/BrowserImpl";
-import { createToast, ToastHandle } from "./ui/toast";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { APP_VERSION, PLUME_CHANGELOG_URL } from "@/domain/meta";
+import { browserActions } from "@/domain/ports/browser";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { createToast, ToastHandle } from "@/app/features/ui/toast";
 
 let releaseToastHandle: ToastHandle | null = null;
 

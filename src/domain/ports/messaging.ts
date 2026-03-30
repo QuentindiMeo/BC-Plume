@@ -1,4 +1,4 @@
-import type { PlumeMessage } from "../../shared/messages";
+import type { PlumeMessage } from "@/domain/messages";
 
 export type MessageHandler = (message: PlumeMessage) => void;
 

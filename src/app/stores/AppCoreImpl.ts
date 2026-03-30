@@ -1,23 +1,30 @@
-import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "../../domain/browser";
-import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "../../domain/hotkeys";
+import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "@/domain/browser";
+import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
 import {
+  assertBoundedInteger,
   LOOP_MODE,
   LOOP_MODE_CYCLE,
-  LoopModeType,
+  type LoopModeType,
   PLUME_DEFAULTS,
+  SEEK_JUMP_DURATION_MAX,
+  SEEK_JUMP_DURATION_MIN,
   TIME_DISPLAY_METHOD,
-  TimeDisplayMethodType,
-} from "../../domain/plume";
-import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "../../domain/ports/app-core";
-import { browserActions } from "../../domain/ports/browser";
-import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "../../domain/store";
-import { meta, PROCESS_ENV } from "../../infra/node";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "../../shared/presenters";
-import { getMusicPlayerInstance } from "./adapters";
-import { getBrowserInstance } from "./BrowserImpl";
-import { handleUnknownAction } from "./shared";
+  type TimeDisplayMethodType,
+  TRACK_RESTART_THRESHOLD_MAX,
+  TRACK_RESTART_THRESHOLD_MIN,
+  VOLUME_HOTKEY_STEP_MAX,
+  VOLUME_HOTKEY_STEP_MIN,
+} from "@/domain/plume";
+import { AppCore, AppCoreListener, CORE_ACTIONS, CoreAction, coreActions, IAppCore } from "@/domain/ports/app-core";
+import { browserActions } from "@/domain/ports/browser";
+import { createScenarioRecorder, IScenarioControls, IScenarioView, Thunk } from "@/domain/store";
+import { meta, PROCESS_ENV } from "@/infra/node";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "@/shared/presenters";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { handleUnknownAction } from "@/app/stores/shared";
 
 const INITIAL_STATE: AppCore = {
   pageType: null,
@@ -32,14 +39,22 @@ const INITIAL_STATE: AppCore = {
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
   isFullscreen: false,
+
   hotkeyBindings: { ...DEFAULT_HOTKEYS },
+  seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
+  volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
+  trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
 };
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
   "durationDisplayMethod",
   "loopMode",
   "volume",
+
   "hotkeyBindings",
+  "seekJumpDuration",
+  "volumeHotkeyStep",
+  "trackRestartThreshold",
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
@@ -82,6 +97,12 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.LOOP_MODE] = state.loopMode;
         } else if (key === "hotkeyBindings") {
           toSave[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = state.hotkeyBindings;
+        } else if (key === "seekJumpDuration") {
+          toSave[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION] = state.seekJumpDuration;
+        } else if (key === "volumeHotkeyStep") {
+          toSave[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP] = state.volumeHotkeyStep;
+        } else if (key === "trackRestartThreshold") {
+          toSave[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] = state.trackRestartThreshold;
         }
       }
 
@@ -214,6 +235,38 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
         updateState("hotkeyBindings", action.payload);
         break;
+      case CORE_ACTIONS.SET_SEEK_JUMP_DURATION:
+        try {
+          assertBoundedInteger(action.payload, SEEK_JUMP_DURATION_MIN, SEEK_JUMP_DURATION_MAX);
+          updateState("seekJumpDuration", action.payload);
+        } catch {
+          logger(CPL.WARN, getString("WARN__SEEK_JUMP_DURATION__INVALID_VALUE"));
+          const defaultSeekJumpDuration = PLUME_DEFAULTS.seekJumpDuration;
+          updateState("seekJumpDuration", defaultSeekJumpDuration);
+          return;
+        }
+        break;
+      case CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP:
+        try {
+          assertBoundedInteger(action.payload, VOLUME_HOTKEY_STEP_MIN, VOLUME_HOTKEY_STEP_MAX);
+          updateState("volumeHotkeyStep", action.payload);
+        } catch {
+          logger(CPL.WARN, getString("WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE"));
+          const defaultVolumeStep = PLUME_DEFAULTS.volumeHotkeyStep;
+          updateState("volumeHotkeyStep", defaultVolumeStep);
+          return;
+        }
+        break;
+      case CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD:
+        try {
+          assertBoundedInteger(action.payload, TRACK_RESTART_THRESHOLD_MIN, TRACK_RESTART_THRESHOLD_MAX);
+          updateState("trackRestartThreshold", action.payload);
+        } catch {
+          logger(CPL.WARN, getString("WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE"));
+          const defaultTrackRestartThreshold = PLUME_DEFAULTS.trackRestartThreshold;
+          updateState("trackRestartThreshold", defaultTrackRestartThreshold);
+        }
+        break;
       case CORE_ACTIONS.SET_LOOP_MODE:
         updateState("loopMode", action.payload);
         break;
@@ -244,6 +297,9 @@ const createAppCoreInstance = (): IAppCore => {
         PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD,
         PLUME_CACHE_KEYS.VOLUME,
         PLUME_CACHE_KEYS.HOTKEY_BINDINGS,
+        PLUME_CACHE_KEYS.SEEK_JUMP_DURATION,
+        PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP,
+        PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD,
       ];
       const result = await browserCache.get(keys);
 
@@ -304,6 +360,44 @@ const createAppCoreInstance = (): IAppCore => {
             ])
           ) as Record<HotkeyAction, KeyBinding>;
           dispatch(coreActions.setHotkeyBindings(resolved));
+        }
+      }
+      if (result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION] !== undefined) {
+        const value = result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION];
+        try {
+          assertBoundedInteger(value, SEEK_JUMP_DURATION_MIN, SEEK_JUMP_DURATION_MAX);
+          dispatch(coreActions.setSeekJumpDuration(value));
+          logger(CPL.INFO, getString("INFO__SEEK_JUMP_DURATION__LOADED"), `${value}s`);
+        } catch {
+          logger(CPL.WARN, getString("WARN__SEEK_JUMP_DURATION__INVALID_VALUE"));
+          const defaultSeekJumpDuration = PLUME_DEFAULTS.seekJumpDuration;
+          dispatch(coreActions.setSeekJumpDuration(defaultSeekJumpDuration));
+        }
+      }
+
+      if (result[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP] !== undefined) {
+        const value = result[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP];
+        try {
+          assertBoundedInteger(value, VOLUME_HOTKEY_STEP_MIN, VOLUME_HOTKEY_STEP_MAX);
+          dispatch(coreActions.setVolumeHotkeyStep(value));
+          logger(CPL.INFO, getString("INFO__VOLUME_HOTKEY_STEP__LOADED"), `${value}%`);
+        } catch {
+          logger(CPL.WARN, getString("WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE"));
+          const defaultVolumeStep = PLUME_DEFAULTS.volumeHotkeyStep;
+          dispatch(coreActions.setVolumeHotkeyStep(defaultVolumeStep));
+        }
+      }
+
+      if (result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] !== undefined) {
+        const value = result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD];
+        try {
+          assertBoundedInteger(value, TRACK_RESTART_THRESHOLD_MIN, TRACK_RESTART_THRESHOLD_MAX);
+          dispatch(coreActions.setTrackRestartThreshold(value));
+          logger(CPL.INFO, getString("INFO__TRACK_RESTART_THRESHOLD__LOADED"), `${value}s`);
+        } catch {
+          logger(CPL.WARN, getString("WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE"));
+          const defaultThreshold = PLUME_DEFAULTS.trackRestartThreshold;
+          dispatch(coreActions.setTrackRestartThreshold(defaultThreshold));
         }
       }
     } catch (error) {
@@ -435,6 +529,8 @@ const createAppCoreInstance = (): IAppCore => {
     },
   };
 };
+
+export { createAppCoreInstance };
 
 let appCoreInstance: IAppCore | null = null;
 export const getAppCoreInstance = (): IAppCore => {

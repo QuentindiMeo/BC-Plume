@@ -1,11 +1,9 @@
-import type { LoopModeType } from "../../domain/plume";
-import { LOOP_MODE, PLUME_CONSTANTS } from "../../domain/plume";
-import type { BcPlayerPort } from "../../domain/ports/bc-player";
-import type { MusicPlayerPort } from "../../domain/ports/music-player";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getMusicPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
+import { LOOP_MODE } from "@/domain/plume";
+import type { IAppCore } from "@/domain/ports/app-core";
+import type { BcPlayerPort } from "@/domain/ports/bc-player";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 export const isLastTrackOfAlbumPlaying = (bcPlayer: BcPlayerPort): boolean => {
   const trackRowTitles = bcPlayer.getTrackRowTitles();
@@ -18,12 +16,11 @@ export const isLastTrackOfAlbumPlaying = (bcPlayer: BcPlayerPort): boolean => {
   return lastTrackTitle === currentTrackTitle;
 };
 
-const { TIME_BEFORE_RESTART } = PLUME_CONSTANTS;
+// Restarts the current track if past trackRestartThreshold seconds, otherwise goes to the previous track.
+export const navigateTrackBackward = (appCore: IAppCore, player: MusicPlayerPort, bcPlayer: BcPlayerPort): void => {
+  const trackRestartThreshold = appCore.getState().trackRestartThreshold;
 
-// Restarts the current track if past TIME_BEFORE_RESTART seconds, otherwise goes to the previous track.
-// navigateTrackForward needs no player arg because it only delegates to the BC button with no seek fallback.
-export const navigateTrackBackward = (player: MusicPlayerPort, bcPlayer: BcPlayerPort): void => {
-  if (player.getCurrentTime() > TIME_BEFORE_RESTART) {
+  if (player.getCurrentTime() > trackRestartThreshold) {
     player.seekTo(0);
     logger(CPL.INFO, getString("DEBUG__TRACK__RESTARTED"));
     return;
@@ -41,9 +38,9 @@ export const navigateTrackBackward = (player: MusicPlayerPort, bcPlayer: BcPlaye
 
 // When loopMode is COLLECTION and the next track button is absent (last track),
 // wrap around to the first track by clicking the first track row in the album table.
-export const navigateTrackForward = (bcPlayer: BcPlayerPort, loopMode: LoopModeType): void => {
+export const navigateTrackForward = (appCore: IAppCore, musicPlayer: MusicPlayerPort, bcPlayer: BcPlayerPort): void => {
   const bcNextBtn = bcPlayer.getNextTrackButton();
-  const pageType = getAppCoreInstance().getState().pageType;
+  const { pageType, loopMode } = appCore.getState();
   const currentIsLastTrackOfAlbum = isLastTrackOfAlbumPlaying(bcPlayer);
 
   if (currentIsLastTrackOfAlbum && loopMode !== LOOP_MODE.NONE) {
@@ -53,10 +50,9 @@ export const navigateTrackForward = (bcPlayer: BcPlayerPort, loopMode: LoopModeT
     for (const _ of tracks) bcPrevBtn?.click();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));
   } else if (pageType === "track" && loopMode !== LOOP_MODE.NONE) {
-    const musicPlayer = getMusicPlayerInstance();
     // On track pages in TRACK loop mode, treat "next" as restarting the current track.
     musicPlayer.seekTo(0);
-    logger(CPL.INFO, getString("DEBUG__NEXT_TRACK__RESTARTED"));
+    logger(CPL.INFO, getString("DEBUG__TRACK__RESTARTED"));
   } else if (bcNextBtn) {
     bcNextBtn.click();
     logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__DISPATCHED"));

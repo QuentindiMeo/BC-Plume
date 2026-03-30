@@ -1,7 +1,7 @@
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { getBcPlayerInstance } from "../../stores/adapters";
-import type { CleanupCallback } from "../types";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import type { CleanupCallback } from "@/app/features/types";
 
 const SCROLLED_CLASSNAME = "scrolled";
 

@@ -1,13 +1,17 @@
-import { HotkeyAction, KeyBinding } from "../hotkeys";
-import { LoopModeType, TimeDisplayMethodType } from "../plume";
-import { IAction, IScenarioView, IStore } from "../store";
-import { BcPageType } from "./bc-player";
+import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
+import { LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
+import { IAction, IScenarioView, IStore } from "@/domain/store";
+import { BcPageType } from "@/domain/ports/bc-player";
 
 export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;
   loopMode: LoopModeType;
   volume: number;
+
   hotkeyBindings: Record<HotkeyAction, KeyBinding>;
+  seekJumpDuration: number;
+  volumeHotkeyStep: number;
+  trackRestartThreshold: number;
 }
 
 export interface AppTransientState {
@@ -38,7 +42,11 @@ export enum CORE_ACTIONS {
   TOGGLE_MUTE = "TOGGLE_MUTE",
   SET_VOLUME = "SET_VOLUME",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
+
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
+  SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
+  SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
+  SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
 }
 
 export type CoreAction =
@@ -55,7 +63,10 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
-  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>;
+  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
+  | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
+  | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
+  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>;
 
 interface ICoreActions {
   setPageType: (pageType: BcPageType | null) => CoreAction;
@@ -71,7 +82,11 @@ interface ICoreActions {
   toggleMute: () => CoreAction;
   setVolume: (volume: number) => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
+
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
+  setSeekJumpDuration: (duration: number) => CoreAction;
+  setVolumeHotkeyStep: (step: number) => CoreAction;
+  setTrackRestartThreshold: (threshold: number) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -97,9 +112,22 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
   }),
+
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
     type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
     payload: bindings,
+  }),
+  setSeekJumpDuration: (duration: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_SEEK_JUMP_DURATION,
+    payload: duration,
+  }),
+  setVolumeHotkeyStep: (step: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP,
+    payload: step,
+  }),
+  setTrackRestartThreshold: (threshold: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
+    payload: threshold,
   }),
 } as const;
 

@@ -5,9 +5,9 @@ import {
   measureContrastRatioWCAG,
   RGBToHSL,
   WCAG_CONTRAST_NORMAL,
-} from "../../shared/colors";
-import { getString } from "../../shared/i18n";
-import { getBcPlayerInstance } from "../stores/adapters";
+} from "@/shared/colors";
+import { getString } from "@/shared/i18n";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
 
 const getArtistNameElement = (): HTMLSpanElement => {
   const bcPlayer = getBcPlayerInstance();

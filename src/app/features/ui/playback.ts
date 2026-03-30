@@ -1,55 +1,60 @@
-import { guiActions } from "../../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { setSvgContent } from "../../../shared/svg";
-import { PLUME_SVG } from "../../../svg/icons";
-import { getBcPlayerInstance, getMusicPlayerInstance } from "../../stores/adapters";
-import { getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance } from "../../stores/GuiImpl";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
 import {
   navigateTrackBackward,
   navigateTrackForward,
   seekBackward,
   seekForward,
   togglePlayback,
-} from "../../use-cases";
-import { applyLoopBtnState, handleLoopCycle } from "./loop";
+} from "@/app/use-cases";
+import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 
 export const handlePlayPause = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
-  togglePlayback(getAppCoreInstance());
+
+  const appCore = getAppCoreInstance();
+  togglePlayback(appCore);
 };
 
 export const handleTrackBackward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__PREV_TRACK__CLICKED"));
 
+  const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
   const bcPlayer = getBcPlayerInstance();
-  navigateTrackBackward(musicPlayer, bcPlayer);
+  navigateTrackBackward(appCore, musicPlayer, bcPlayer);
 };
 
 export const handleTrackForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
 
-  const bcPlayer = getBcPlayerInstance();
   const appCore = getAppCoreInstance();
-  const loopMode = appCore.getState().loopMode;
-  navigateTrackForward(bcPlayer, loopMode);
+  const musicPlayer = getMusicPlayerInstance();
+  const bcPlayer = getBcPlayerInstance();
+  navigateTrackForward(appCore, musicPlayer, bcPlayer);
 };
 
 export const handleTimeBackward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
+  const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
-  seekBackward(getAppCoreInstance(), musicPlayer);
+  seekBackward(appCore, musicPlayer);
 };
 
 export const handleTimeForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
+  const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
-  seekForward(getAppCoreInstance(), musicPlayer);
+  seekForward(appCore, musicPlayer);
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {

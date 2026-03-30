@@ -43,7 +43,6 @@
   "WARN__VOLUME__NOT_LOADED": { "message": "Impossible de charger le volume : " },
   "WARN__VOLUME__NOT_SAVED": { "message": "Impossible de sauvegarder le volume : " },
   "WARN__COVER_ART__NOT_FOUND": { "message": "Pochette non trouvée" },
-  "WARN__DURATION_CELL__NOT_FOUND": { "message": "Cellule de durée non trouvée pour la piste" },
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Section d'information non trouvée pour le mode plein écran" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Conteneur Plume non trouvé pour le mode plein écran" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée,  calcul de la durée totale ignoré" },
@@ -163,7 +162,7 @@
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
   "DEBUG__LOOP__CYCLED": { "message": "Mode de répétition changé" },
   "LABEL__RUNTIME": {
-    "message": "$MINUTES$ min $SECONDES$ s",
+    "message": "$MINUTES$ min $SECONDES$ s$JOUABLES$",
     "placeholders": {
       "minutes": {
         "content": "$1",
@@ -172,9 +171,14 @@
       "secondes": {
         "content": "$2",
         "example": "30"
+      },
+      "jouables": {
+        "content": "$3",
+        "example": " jouables"
       }
     }
   },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " jouables" },
   "LABEL__TRACK": { "message": "en cours de lecture : " },
   "LABEL__TRACK_CURRENT": {
     "message": "en cours de lecture ($PISTE$) :",
@@ -188,9 +192,9 @@
   "LABEL__TRACK_UNKNOWN": { "message": "titre inconnu" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "LABEL__TRACK_BACKWARD": { "message": "Recommencer / Aller à la piste précédente" },
-  "LABEL__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
+  "LABEL__TIME_BACKWARD": { "message": "Reculer" },
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
-  "LABEL__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
+  "LABEL__TIME_FORWARD": { "message": "Avancer" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
   "LABEL__LOOP": { "message": "Répétition" },
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
@@ -306,7 +310,10 @@
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
   },
 
-  "POPUPTITLE": { "message": "Paramètres de Plume" },
+  "POPUP_TITLE": { "message": "Panneau de configuration" },
+  "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },
+
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
@@ -327,8 +334,8 @@
     }
   },
   "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Lecture / Pause" },
-  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Reculer de 10 secondes" },
-  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avancer de 10 secondes" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Reculer" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Avancer" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Augmenter le volume" },
   "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Diminuer le volume" },
   "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Piste précédente / Recommencer" },
@@ -358,5 +365,33 @@
         "example": "Lecture / Pause"
       }
     }
-  }
+  },
+
+  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Lecture" },
+  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Doit être un nombre entier" },
+  "LABEL__PLAYBACK__RESET": { "message": "Réinitialiser" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
+
+  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Secondes sautées via les boutons" },
+  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Durée du saut en secondes pour les boutons de saut avant/arrière" },
+  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Échec de la sauvegarde de la durée du saut" },
+  "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
+  "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Doit valoir entre 1 et 300" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Valeur de durée de saut invalide, utilisation de la valeur par défaut" },
+  "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Durée du saut chargée :" },
+
+  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Cran de volume par raccourci clavier" },
+  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Pourcentage du pas de volume par appui de raccourci" },
+  "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Doit valoir entre 1 et 20" },
+  "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Échec de la sauvegarde du pas de volume" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Valeur de pas de volume invalide, utilisation de la valeur par défaut" },
+  "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Pas de volume chargé :" },
+
+  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Seuil de redémarrage de piste" },
+  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": { "message": "Secondes pendant lesquelles le bouton de piste précédente redémarre la piste actuelle" },
+  "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Doit valoir entre 0 et 10" },
+  "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Échec de la sauvegarde du seuil de redémarrage de piste" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valeur de seuil de redémarrage de piste invalide, utilisation de la valeur par défaut" },
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Seuil de redémarrage de piste chargé :" }
 }

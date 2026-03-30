@@ -1,26 +1,26 @@
-import { APP_VERSION, PLUME_KO_FI_URL } from "../../domain/meta";
-import { LoopModeType, PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions } from "../../domain/ports/app-core";
-import { guiActions } from "../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../infra/elements/plume";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { PLUME_SVG } from "../../svg/icons";
-import { getBcPlayerInstance, getMusicPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
-import { seekToProgress, setVolume, toggleDurationDisplay } from "../use-cases";
-import { CleanupCallback, SubscriptionCallback } from "./types";
-import { applyLoopBtnState, handleLoopCycle } from "./ui/loop";
+import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
+import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { PLUME_SVG } from "@/svg/icons";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   handlePlayPause,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
   handleTrackForward,
-} from "./ui/playback";
-import { createSafeSvgElement, setSvgContent } from "../../shared/svg";
-import { handleMuteToggle } from "./ui/volume";
+} from "@/app/features/ui/playback";
+import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
+import { handleMuteToggle } from "@/app/features/ui/volume";
 
 const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

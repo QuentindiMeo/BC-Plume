@@ -1,4 +1,4 @@
-export { createFullscreenButtonSection } from "./fullscreen-button";
+export { createFullscreenButtonSection } from "@/app/features/ui/fullscreen-button";
 export {
   createPlaybackControlPanel,
   handlePlayPause,
@@ -6,9 +6,9 @@ export {
   handleTimeForward,
   handleTrackBackward,
   handleTrackForward,
-} from "./playback";
-export { setupPlayerStickiness } from "./player-stickiness";
-export { createProgressBar, dispatchAudioProgressToStore as syncProgressToStore } from "./progress";
-export { createToast } from "./toast";
-export type { ToastConfig, ToastCta, ToastHandle, ToastBorderType } from "./toast";
-export { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "./volume";
+} from "@/app/features/ui/playback";
+export { setupPlayerStickiness } from "@/app/features/ui/player-stickiness";
+export { createProgressBar, dispatchAudioProgressToStore as syncProgressToStore } from "@/app/features/ui/progress";
+export { createToast } from "@/app/features/ui/toast";
+export type { ToastConfig, ToastCta, ToastHandle, ToastBorderType } from "@/app/features/ui/toast";
+export { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "@/app/features/ui/volume";

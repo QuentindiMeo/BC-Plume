@@ -1,13 +1,13 @@
-import { INITIAL_TIME_DISPLAY, PLUME_CONSTANTS } from "../../../domain/plume";
-import { coreActions } from "../../../domain/ports/app-core";
-import { guiActions } from "../../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
-import { getString } from "../../../shared/i18n";
-import { CPL, logger } from "../../../shared/logger";
-import { getMusicPlayerInstance } from "../../stores/adapters";
-import { getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance } from "../../stores/GuiImpl";
-import { seekToProgress, toggleDurationDisplay } from "../../use-cases";
+import { INITIAL_TIME_DISPLAY, PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { seekToProgress, toggleDurationDisplay } from "@/app/use-cases";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

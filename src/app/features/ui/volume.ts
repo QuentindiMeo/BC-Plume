@@ -1,14 +1,14 @@
-import { PLUME_CONSTANTS } from "../../../domain/plume";
-import { coreActions } from "../../../domain/ports/app-core";
-import { guiActions } from "../../../domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
-import { getString } from "../../../shared/i18n";
-import { setSvgContent } from "../../../shared/svg";
-import { PLUME_SVG } from "../../../svg/icons";
-import { getMusicPlayerInstance } from "../../stores/adapters";
-import { getAppCoreInstance } from "../../stores/AppCoreImpl";
-import { getGuiInstance } from "../../stores/GuiImpl";
-import { setVolume } from "../../use-cases/set-volume";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { setVolume } from "@/app/use-cases/set-volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

@@ -5,6 +5,13 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+- _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)  
+The settings popup gains a tabbed layout (Hotkeys / Playback), with three new entries in the Playback tab to configure seek jumps, volume control and track restart.  
+Custom hotkeys can now include modifier keys (Ctrl, Shift, Alt) in any combination.  
+The album runtime is adjusted to tell if some tracks are unplayable.  
+A full Vitest-based unit test suite is introduced covering domain logic, use-cases, shared utilities, and popup use-cases.  
+Various bugs are fixed: layout is not independent on hotkeys, track pages don't throw a diagnostic error, toast container doesn't block the fullscreen exit button.
+
   - _**[1.9.2]** Mar 24 2026_: Health Check Fix, Unavailable Tracks, SVGs Security [#116](https://github.com/QuentindiMeo/BC-Plume/pull/116)  
   Loop mode bugs are fixed: the penultimate track of an album no longer gets stuck repeating, and collection loop mode is no longer available on single track pages.  
   Unplayable tracks in a collection are now detected and surfaced to the user via toast notifications.  

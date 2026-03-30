@@ -1,10 +1,10 @@
-import { launchPlume } from "./app/features/lifecycle";
-import { registerBcPlayer, registerMessageReceiver, registerMusicPlayer } from "./app/stores/adapters";
-import { getGuiInstance } from "./app/stores/GuiImpl";
-import type { BcPlayerPort } from "./domain/ports/bc-player";
-import type { MusicPlayerPort } from "./domain/ports/music-player";
-import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter, createRuntimeMessageReceiver } from "./infra/adapters";
-import { logDetectedBrowser } from "./shared/i18n";
+import { launchPlume } from "@/app/features/lifecycle";
+import { registerBcPlayer, registerMessageReceiver, registerMusicPlayer } from "@/app/stores/adapters";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import type { BcPlayerPort } from "@/domain/ports/bc-player";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
+import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter, createRuntimeMessageReceiver } from "@/infra/adapters";
+import { logDetectedBrowser } from "@/shared/i18n";
 
 (() => {
   "use strict";

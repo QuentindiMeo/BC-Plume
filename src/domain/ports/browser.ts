@@ -1,5 +1,5 @@
-import { PlumeCacheKey } from "../browser";
-import { IAction, IStore } from "../store";
+import { PlumeCacheKey } from "@/domain/browser";
+import { IAction, IStore } from "@/domain/store";
 
 export interface IBrowserApi {
   storage: {

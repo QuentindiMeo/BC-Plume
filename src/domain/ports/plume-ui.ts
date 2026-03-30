@@ -1,4 +1,4 @@
-import { IAction, IStore } from "../store";
+import { IAction, IStore } from "@/domain/store";
 
 export interface Gui {
   // Plume's own UI elements registered after injection

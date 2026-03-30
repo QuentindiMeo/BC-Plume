@@ -14,13 +14,13 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.9.2-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.10.0-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
 </div>
 <div id="badges2" align="center">
-  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?color=blueviolet&logo=clarifai" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last release date" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?label=last%20release&color=blueviolet&logo=clarifai" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
@@ -55,12 +55,14 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Unified player**: Completely replaces the Bandcamp player with an enhanced version
 - **Time navigation**: Click and drag to seek within the track seamlessly
   - **Time display mode**: Switch between track duration and remaining time (remembered across pages)
-- **Custom playback controls**: Play/Pause buttons, skip back/forward 10 seconds with a modern design
+- **Playback controls**: Play/Pause button, previous/next track, and seek backward/forward in a track
+  - **... with fine-tuning in popup**: Configure seek jump duration, volume hotkey step, and track restart threshold
 - **Loop mode**: Cycle through no loop, track loop, and collection loop (remembered across pages)
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
 - **Keyboard shortcuts**: Control playback, volume, seeking, and more without touching the mouse
   - **Customizable hotkeys**: Remap every shortcut to your liking via the extension popup
   - Digit row (0–9), Numpad (0–9 with NumLock), and letter keys all supported
+- **Sticky player behavior**: Player sticks visually while scrolling for quicker access
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
@@ -85,9 +87,10 @@ This extension uses:
 - **Cross-Browser API**: Automatic Chromium/Firefox detection
 - **Content Scripts**: To interact with Bandcamp pages
 - **Storage API & localStorage**: Saves preferences in browser cache
-- **Vanilla TypeScript**: No external dependencies
+- **Vanilla TypeScript**: No runtime framework dependency in the injected player
 
-The code is fully commented and structured for understanding, easy contribution and modification.
+The code is fully commented and structured for understanding, easy contribution and modification.  
+Plume includes a Vitest-based unit test suite for core logic and use-cases.
 
 ## 🐛 Troubleshooting
 
@@ -109,6 +112,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
+- _**[1.10.0]** Mar 30 2026_: latest — **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106) | [Promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8) release.
 - _**[1.6.0]** Jan 18 2026_: **Pedal To The Metal** [#067](https://github.com/QuentindiMeo/BC-Plume/pull/67)
 - _**[1.4.0]** Sep 08 2025_: **Sticky Sherlock** [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48) | Word is spread on Reddit: Plume is ready for use.

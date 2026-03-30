@@ -1,7 +1,7 @@
-import { BcPlayerPort } from "../../domain/ports/bc-player";
-import { BC_ELEM_SELECTORS } from "../../infra/elements/bandcamp";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
+import { BcPlayerPort } from "@/domain/ports/bc-player";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 export interface TrackQuantifiers {
   current: number;

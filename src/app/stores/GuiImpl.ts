@@ -1,5 +1,5 @@
-import { DefinedGui, Gui, GUI_ACTIONS, GuiAction, IGui } from "../../domain/ports/plume-ui";
-import { handleUnknownAction } from "./shared";
+import { DefinedGui, Gui, GUI_ACTIONS, GuiAction, IGui } from "@/domain/ports/plume-ui";
+import { handleUnknownAction } from "@/app/stores/shared";
 
 const INITIAL_STATE: Gui = {
   plumeContainer: null,

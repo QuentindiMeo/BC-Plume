@@ -1,5 +1,5 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions, IAppCore } from "../../domain/ports/app-core";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions, IAppCore } from "@/domain/ports/app-core";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 

@@ -1,6 +1,6 @@
-import { PLUME_CACHE_KEYS } from "../../domain/browser";
-import { KeyBindingMap } from "../../domain/hotkeys";
-import { inferBrowserApi } from "../../shared/browser";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { KeyBindingMap } from "@/domain/hotkeys";
+import { inferBrowserApi } from "@/shared/browser";
 
 export const loadHotkeys = async (): Promise<KeyBindingMap | undefined> => {
   const browserApi = inferBrowserApi();

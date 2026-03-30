@@ -4,6 +4,7 @@ dist/
 build/
 *lock*
 *.zip
+coverage/
 
 # To prevent committing sensitive files
 .env*

@@ -1,14 +1,14 @@
-import { HotkeyAction, KeyBinding } from "../../domain/hotkeys";
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions } from "../../domain/ports/app-core";
-import { PLUME_MESSAGE_TYPE } from "../../shared/messages";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { NoArgFunction } from "../../shared/types";
-import { getMusicPlayerInstance, getMessageReceiverInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { seekToProgress } from "../use-cases/seek-to-progress";
-import type { CleanupCallback } from "./types";
+import type { CleanupCallback } from "@/app/features/types";
+import { getMessageReceiverInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { seekToProgress } from "@/app/use-cases/seek-to-progress";
+import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
+import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { NoArgFunction } from "@/shared/types";
 
 const { VOLUME_SLIDER_GRANULARITY, PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -26,11 +26,30 @@ interface KeyboardHandlers {
 // e.code values for both digit row and numpad
 const DIGIT_CODES = new Set<string>(Array.from({ length: 10 }, (_, i) => [`Digit${i}`, `Numpad${i}`]).flat());
 
-// Maps a KeyBinding's code to a HotkeyAction for fast reverse lookup
+// Plain single-letter bindings (no modifiers) are matched by their label character rather
+// than by physical key code, making DEFAULT_HOTKEYS work on all keyboard layouts.
+const isAlpha = (key: string): boolean => (key >= "a" && key <= "z") || (key >= "A" && key <= "Z");
+const isLetterBinding = (b: KeyBinding): boolean =>
+  !b.ctrl && !b.shift && !b.alt && b.label.length === 1 && isAlpha(b.label);
+
+// Produces a canonical composite key encoding modifiers + key identity.
+// Letter bindings use "key:<char>" so they match any layout pressing that letter.
+export const bindingKey = (b: KeyBinding): string => {
+  if (isLetterBinding(b)) return `key:${b.label.toLowerCase()}`;
+  return `${b.ctrl ? "ctrl:" : ""}${b.shift ? "shift:" : ""}${b.alt ? "alt:" : ""}${b.code}`;
+};
+
+const eventKey = (e: KeyboardEvent): string => {
+  if (!e.ctrlKey && !e.shiftKey && !e.altKey && e.key.length === 1 && isAlpha(e.key))
+    return `key:${e.key.toLowerCase()}`;
+  return `${e.ctrlKey ? "ctrl:" : ""}${e.shiftKey ? "shift:" : ""}${e.altKey ? "alt:" : ""}${e.code}`;
+};
+
+// Maps a binding's composite key to a HotkeyAction for fast reverse lookup
 const buildCodeToActionMap = (bindings: Record<HotkeyAction, KeyBinding>): Map<string, HotkeyAction> => {
   const map = new Map<string, HotkeyAction>();
   for (const [action, binding] of Object.entries(bindings)) {
-    map.set(binding.code, action as HotkeyAction);
+    map.set(bindingKey(binding), action as HotkeyAction);
   }
   return map;
 };
@@ -59,7 +78,8 @@ export const setupHotkeys = (
       (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
     if (userIsTypingInInput) return;
 
-    if (DIGIT_CODES.has(e.code)) {
+    const isModifierKey = e.ctrlKey || e.shiftKey || e.altKey;
+    if (DIGIT_CODES.has(e.code) && !isModifierKey) {
       if (!e.getModifierState("NumLock") && e.code.startsWith("Numpad")) return;
 
       e.preventDefault();
@@ -73,7 +93,7 @@ export const setupHotkeys = (
       return;
     }
 
-    const action = codeToAction.get(e.code);
+    const action = codeToAction.get(eventKey(e));
     if (!action) return;
 
     e.preventDefault();
@@ -95,12 +115,16 @@ export const setupHotkeys = (
       case HotkeyAction.TIME_FORWARD:
         handlers.handleTimeForward();
         break;
-      case HotkeyAction.VOLUME_UP:
-        handleAdjustVolume(5);
+      case HotkeyAction.VOLUME_UP: {
+        const volumeHotkeyStep = appCore.getState().volumeHotkeyStep;
+        handleAdjustVolume(volumeHotkeyStep);
         break;
-      case HotkeyAction.VOLUME_DOWN:
-        handleAdjustVolume(-5);
+      }
+      case HotkeyAction.VOLUME_DOWN: {
+        const volumeHotkeyStep = appCore.getState().volumeHotkeyStep * -1;
+        handleAdjustVolume(volumeHotkeyStep);
         break;
+      }
       case HotkeyAction.TRACK_BACKWARD:
         handlers.handleTrackBackward();
         break;
@@ -129,6 +153,12 @@ export const setupHotkeys = (
     if (message.type === PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED) {
       currentBindings = { ...message.bindings };
       codeToAction = buildCodeToActionMap(currentBindings);
+    } else if (message.type === PLUME_MESSAGE_TYPE.SEEK_JUMP_DURATION_UPDATED) {
+      appCore.dispatch(coreActions.setSeekJumpDuration(message.seekJumpDuration));
+    } else if (message.type === PLUME_MESSAGE_TYPE.VOLUME_HOTKEY_STEP_UPDATED) {
+      appCore.dispatch(coreActions.setVolumeHotkeyStep(message.volumeHotkeyStep));
+    } else if (message.type === PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED) {
+      appCore.dispatch(coreActions.setTrackRestartThreshold(message.trackRestartThreshold));
     }
   });
 

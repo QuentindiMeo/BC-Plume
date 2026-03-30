@@ -16,6 +16,9 @@ export type HotkeyCode = string;
 export interface KeyBinding {
   code: HotkeyCode;
   label: string;
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
 }
 
 export type KeyBindingMap = Partial<Record<HotkeyAction, KeyBinding>>;

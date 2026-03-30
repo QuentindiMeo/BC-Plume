@@ -1,4 +1,4 @@
-import { INITIAL_TIME_DISPLAY, TIME_DISPLAY_METHOD, TimeState } from "../domain/plume";
+import { INITIAL_TIME_DISPLAY, TIME_DISPLAY_METHOD, TimeState } from "@/domain/plume";
 
 // Internal helper: Format time as MM:SS
 export const presentFormattedTime = (seconds: number): string => {

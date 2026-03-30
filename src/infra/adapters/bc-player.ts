@@ -1,5 +1,5 @@
-import type { BcPageType, BcPlayerPort } from "../../domain/ports/bc-player";
-import { BC_ELEM_SELECTORS, BC_PLAYER_SELECTORS } from "../elements/bandcamp";
+import type { BcPageType, BcPlayerPort } from "@/domain/ports/bc-player";
+import { BC_ELEM_SELECTORS, BC_PLAYER_SELECTORS } from "@/infra/elements/bandcamp";
 
 export class BcPlayerAdapter implements BcPlayerPort {
   private query<T extends Element>(selector: string): T | null {

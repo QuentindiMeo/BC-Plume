@@ -1,8 +1,8 @@
-import { PLUME_ELEM_SELECTORS } from "../../../infra/elements/plume";
-import { getString } from "../../../shared/i18n";
-import { createSafeSvgElement } from "../../../shared/svg";
-import { NoArgFunction } from "../../../shared/types";
-import { PLUME_SVG } from "../../../svg/icons";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { createSafeSvgElement } from "@/shared/svg";
+import { NoArgFunction } from "@/shared/types";
+import { PLUME_SVG } from "@/svg/icons";
 
 const createFullscreenButton = (onToggle: NoArgFunction): HTMLButtonElement => {
   const fullscreenBtnId = PLUME_ELEM_SELECTORS.fullscreenBtnLabel.split("#")[1];

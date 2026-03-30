@@ -1,15 +1,16 @@
-import { PLUME_CONSTANTS } from "../../domain/plume";
-import { coreActions } from "../../domain/ports/app-core";
-import { guiActions } from "../../domain/ports/plume-ui";
-import { getString } from "../../shared/i18n";
-import { CPL, logger } from "../../shared/logger";
-import { getBcPlayerInstance } from "../stores/adapters";
-import { getAppCoreInstance } from "../stores/AppCoreImpl";
-import { getGuiInstance } from "../stores/GuiImpl";
-import { shouldShowReleaseToast } from "../use-cases";
-import { checkBandcampElements } from "./bc-diagnostic";
-import { debugBandcampControls } from "./debug";
-import { injectEnhancements } from "./injection";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { shouldShowReleaseToast } from "@/app/use-cases";
+import { checkBandcampElements } from "@/app/features/bc-diagnostic";
+import { debugBandcampControls } from "@/app/features/debug";
+import { injectEnhancements } from "@/app/features/injection";
 import {
   CleanupHandles,
   createDomObserver,
@@ -17,8 +18,8 @@ import {
   isPlumeInjected,
   registerUnloadCleanup,
   setupListeners,
-} from "./observers";
-import { showReleaseToast } from "./toast";
+} from "@/app/features/observers";
+import { showReleaseToast } from "@/app/features/toast";
 
 const initPlayback = () => {
   // BC's native play button is clicked to trigger its own internal playback bootstrap
@@ -115,7 +116,8 @@ export const launchPlume = (): void => {
       return;
     }
 
-    if (await shouldShowReleaseToast()) showReleaseToast();
+    const browserCache = getBrowserInstance().getState().cache;
+    if (await shouldShowReleaseToast(browserCache)) showReleaseToast();
 
     setupListeners(handles);
     initPlayback();
