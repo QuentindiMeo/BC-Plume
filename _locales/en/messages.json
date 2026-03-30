@@ -380,6 +380,7 @@
   "LABEL__LANGUAGE__ES": { "message": "Español" },
   "LABEL__LANGUAGE__FR": { "message": "Français" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Failed to save language preference" },
+  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": { "message": "Refresh the page for the language change to take effect" },
 
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Seek buttons step" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Seek buttons step duration in seconds" },

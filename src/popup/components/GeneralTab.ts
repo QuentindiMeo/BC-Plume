@@ -263,6 +263,11 @@ export const createGeneralTab = (
     section.className = "settings__section";
     section.ariaLabel = getString("POPUP__GENERAL__TAB_LABEL");
 
+    const refreshNotice = document.createElement("p");
+    refreshNotice.className = "general-row__refresh-notice";
+    refreshNotice.textContent = getString("INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED");
+    refreshNotice.hidden = true;
+
     const languageRow = buildSelectRow({
       labelKey: "LABEL__GENERAL__FORCED_LANGUAGE",
       ariaKey: "ARIA__GENERAL__FORCED_LANGUAGE_SELECT",
@@ -274,7 +279,10 @@ export const createGeneralTab = (
       initialValue: storedForcedLanguage ?? PLUME_DEFAULTS.language,
       errorPersistenceKey: "ERROR__FORCED_LANGUAGE__PERSISTENCE",
       selectId: "forced-language-select",
-      onSave: saveForcedLanguage,
+      onSave: async (value) => {
+        await saveForcedLanguage(value);
+        refreshNotice.hidden = false;
+      },
     });
 
     const seekJumpRow = buildNumericRow({
@@ -318,6 +326,7 @@ export const createGeneralTab = (
     });
 
     section.appendChild(languageRow);
+    section.appendChild(refreshNotice);
     section.appendChild(seekJumpRow);
     section.appendChild(volumeStepRow);
     section.appendChild(trackRestartRow);

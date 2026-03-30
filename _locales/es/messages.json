@@ -377,6 +377,7 @@
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Anulación del idioma de la interfaz" },
   "LABEL__LANGUAGE__AUTO": { "message": "Automático" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Error al guardar la preferencia de idioma" },
+  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": { "message": "Recarga la página para que el cambio de idioma tenga efecto" },
 
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Duración del salto de búsqueda" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Duración del salto de búsqueda en segundos para los botones" },
