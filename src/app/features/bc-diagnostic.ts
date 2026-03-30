@@ -1,7 +1,7 @@
+import { createToast } from "@/app/features/ui/toast";
 import { BC_ELEM_SELECTORS, BcElementKey } from "@/infra/elements/bandcamp";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
-import { createToast } from "@/app/features/ui/toast";
 
 export interface BcHealthCheckResult {
   allRequiredFound: boolean;
@@ -13,6 +13,7 @@ const ALBUM_ONLY_KEYS = new Set<BcElementKey>([
   "albumPageCurrentTrackTitle",
   "trackList",
   "trackRow",
+  "playableTrack",
   "trackTitle",
   "unplayableTrackTitle",
   "trackDuration",

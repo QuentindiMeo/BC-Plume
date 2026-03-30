@@ -1,7 +1,7 @@
+import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import type { BcPlayerPort } from "@/domain/ports/bc-player";
 import { getString } from "@/shared/i18n";
-import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
 
 export interface TrackMetadataResult {
   trackTitle: string;
