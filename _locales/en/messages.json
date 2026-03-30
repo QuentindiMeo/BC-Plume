@@ -367,11 +367,19 @@
     }
   },
 
-  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Playback" },
-  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Must be a whole number" },
-  "LABEL__PLAYBACK__RESET": { "message": "Reset" },
+  "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
+  "LABEL__GENERAL__RESET": { "message": "Reset" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+
+  "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Language" },
+  "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Display language override" },
+  "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
+  "LABEL__LANGUAGE__EN": { "message": "English" },
+  "LABEL__LANGUAGE__ES": { "message": "Español" },
+  "LABEL__LANGUAGE__FR": { "message": "Français" },
+  "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Failed to save language preference" },
 
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Seek buttons step" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Seek buttons step duration in seconds" },

@@ -367,11 +367,16 @@
     }
   },
 
-  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Reproducción" },
-  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Debe ser un número entero" },
-  "LABEL__PLAYBACK__RESET": { "message": "Restablecer" },
+  "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
+  "LABEL__GENERAL__RESET": { "message": "Restablecer" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+
+  "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Idioma" },
+  "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Anulación del idioma de la interfaz" },
+  "LABEL__LANGUAGE__AUTO": { "message": "Automático" },
+  "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Error al guardar la preferencia de idioma" },
 
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Duración del salto de búsqueda" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Duración del salto de búsqueda en segundos para los botones" },

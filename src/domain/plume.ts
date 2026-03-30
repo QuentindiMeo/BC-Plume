@@ -10,6 +10,10 @@ export const PLUME_CONSTANTS = {
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
 } as const;
 
+export const PLUME_LANGUAGE_AUTO = "auto" as const;
+export const PLUME_SUPPORTED_LANGUAGES = [PLUME_LANGUAGE_AUTO, "en", "es", "fr"] as const;
+export type PlumeLanguage = (typeof PLUME_SUPPORTED_LANGUAGES)[number];
+
 export enum LOOP_MODE {
   NONE = "none",
   COLLECTION = "collection",
