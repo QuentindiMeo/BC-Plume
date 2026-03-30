@@ -1,4 +1,4 @@
-import { PLUME_LANGUAGE_AUTO, PLUME_SUPPORTED_LANGUAGES, type PlumeLanguage } from "@/domain/plume";
+import type { PlumeLanguage } from "@/domain/plume";
 import { CPL, logger } from "@/shared/logger";
 import enMessages from "../../_locales/en/messages.json";
 import esMessages from "../../_locales/es/messages.json";
@@ -29,16 +29,8 @@ const LOCALE_MAPS: Record<string, LocaleMap> = {
 let forcedLocale: LocaleMap | null = null;
 
 export const setForcedLanguage = (lang: PlumeLanguage | null): void => {
-  if (!lang || lang === PLUME_LANGUAGE_AUTO) {
-    forcedLocale = null;
-    return;
-  }
-  if (!(PLUME_SUPPORTED_LANGUAGES as readonly string[]).includes(lang)) {
-    console.warn(`[Plume i18n] Unsupported language code: "${lang}", falling back to auto`);
-    forcedLocale = null;
-    return;
-  }
-  forcedLocale = LOCALE_MAPS[lang] ?? null;
+  const chosenLocale = lang !== null ? LOCALE_MAPS[lang] : null;
+  forcedLocale = chosenLocale ?? null;
 };
 
 const applyEnglishSubstitutions = (entry: EnglishLocaleEntry, substitutions?: string[]): string => {

@@ -1,4 +1,3 @@
-import { PLUME_LANGUAGE_AUTO } from "@/domain/plume";
 import { createTabsMessageSender } from "@/infra/adapters";
 import { createSettingsPanel } from "@/popup/components/SettingsPanel";
 import { loadForcedLanguage } from "@/popup/use-cases/loadForcedLanguage";
@@ -13,7 +12,7 @@ import { setForcedLanguage } from "@/shared/i18n";
     [loadForcedLanguage(), loadSeekJumpDuration(), loadVolumeHotkeyStep(), loadTrackRestartThreshold(), loadHotkeys()]
   );
 
-  setForcedLanguage(forcedLanguage ?? PLUME_LANGUAGE_AUTO);
+  setForcedLanguage(forcedLanguage ?? null);
 
   const messageSender = createTabsMessageSender();
 
