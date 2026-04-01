@@ -37,4 +37,7 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
   fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
+  tracklistToggleBtn = "button#bpe-tracklist-toggle-btn",
+  tracklistDropdown = "div#bpe-tracklist-dropdown",
+  tracklistItem = "div.bpe-tracklist-item",
 }

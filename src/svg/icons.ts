@@ -185,4 +185,9 @@ export enum PLUME_SVG {
       <path d="M12 4L9.91 6.09L12 8.18V4Z" fill="currentColor" />
     </svg>
   `,
+  chevronDown = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="none">
+      <path fill="currentColor" d="M3.5 5.5L8 10l4.5-4.5H3.5z"/>
+    </svg>
+  `,
 }

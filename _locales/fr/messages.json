@@ -399,5 +399,48 @@
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Doit valoir entre 0 et 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Échec de la sauvegarde du seuil de redémarrage de piste" },
   "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valeur de seuil de redémarrage de piste invalide, utilisation de la valeur par défaut" },
-  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Seuil de redémarrage de piste chargé :" }
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Seuil de redémarrage de piste chargé :" },
+
+  "ARIA__TRACKLIST__TOGGLE_OPEN": { "message": "Ouvrir la liste des pistes" },
+  "ARIA__TRACKLIST__TOGGLE_CLOSE": { "message": "Fermer la liste des pistes" },
+  "ARIA__TRACKLIST__PANEL": { "message": "Liste des pistes" },
+  "ARIA__TRACKLIST__ITEM": {
+    "message": "Piste $NUMBER$ : $TITLE$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Nom de la chanson" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_CURRENT": {
+    "message": "Piste $NUMBER$ : $TITLE$, en cours de lecture",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Nom de la chanson" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_UNPLAYABLE": {
+    "message": "Piste $NUMBER$ : $TITLE$, indisponible",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Nom de la chanson" }
+    }
+  },
+  "DEBUG__TRACKLIST__NAVIGATED": {
+    "message": "Liste des pistes : navigation vers la piste $NUMBER$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
+    "message": "Liste des pistes : l'index de piste $INDEX$ est hors limites",
+    "placeholders": {
+      "index": { "content": "$1", "example": "10" }
+    }
+  },
+  "WARN__TRACKLIST__TRACK_UNPLAYABLE": {
+    "message": "Liste des pistes : la piste $NUMBER$ n'est pas lisible",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  }
 }

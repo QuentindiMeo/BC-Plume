@@ -399,5 +399,48 @@
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Debe estar entre 0 y 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Error al guardar el umbral de reinicio de pista" },
   "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valor de umbral de reinicio de pista inválido, usando el predeterminado" },
-  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Umbral de reinicio de pista cargado:" }
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Umbral de reinicio de pista cargado:" },
+
+  "ARIA__TRACKLIST__TOGGLE_OPEN": { "message": "Abrir lista de pistas" },
+  "ARIA__TRACKLIST__TOGGLE_CLOSE": { "message": "Cerrar lista de pistas" },
+  "ARIA__TRACKLIST__PANEL": { "message": "Lista de pistas" },
+  "ARIA__TRACKLIST__ITEM": {
+    "message": "Pista $NUMBER$: $TITLE$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Nombre de canción" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_CURRENT": {
+    "message": "Pista $NUMBER$: $TITLE$, reproduciendo actualmente",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Nombre de canción" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_UNPLAYABLE": {
+    "message": "Pista $NUMBER$: $TITLE$, no disponible",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Nombre de canción" }
+    }
+  },
+  "DEBUG__TRACKLIST__NAVIGATED": {
+    "message": "Lista de pistas: navegado a la pista $NUMBER$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
+    "message": "Lista de pistas: el índice de pista $INDEX$ está fuera de rango",
+    "placeholders": {
+      "index": { "content": "$1", "example": "10" }
+    }
+  },
+  "WARN__TRACKLIST__TRACK_UNPLAYABLE": {
+    "message": "Lista de pistas: la pista $NUMBER$ no es reproducible",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  }
 }
