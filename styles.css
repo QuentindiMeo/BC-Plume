@@ -81,7 +81,7 @@ div.name-section__titling h2 {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 0.5rem;
 }
-#bpe-header-container:has(+ #bpe-tracklist-dropdown:not([hidden])) {
+#bpe-header-container:has(+ #bpe-tracklist-dropdown.is-open) {
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
@@ -170,12 +170,19 @@ div.name-section__titling h2 {
 }
 
 #bpe-tracklist-dropdown {
-  max-height: 14rem;
-  overflow-y: auto;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
 
   background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0 0 0.5rem 0.5rem;
+}
+#bpe-tracklist-dropdown.is-open {
+  max-height: 10rem;
+  overflow-y: auto;
+  opacity: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .bpe-tracklist-item {

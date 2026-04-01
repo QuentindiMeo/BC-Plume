@@ -30,12 +30,13 @@ export const createTracklistToggle = (): {
   dropdownEl.id = DROPDOWN_ID;
   dropdownEl.role = "listbox";
   dropdownEl.ariaLabel = getString("ARIA__TRACKLIST__PANEL");
-  dropdownEl.hidden = true;
+  dropdownEl.ariaHidden = "true";
 
   let isOpen = false;
 
   const close = (refocus = true): void => {
-    dropdownEl.hidden = true;
+    dropdownEl.classList.remove("is-open");
+    dropdownEl.ariaHidden = "true";
     toggleBtn.ariaExpanded = "false";
     toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
     toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
@@ -128,7 +129,8 @@ export const createTracklistToggle = (): {
 
   const open = (): void => {
     renderItems();
-    dropdownEl.hidden = false;
+    dropdownEl.classList.add("is-open");
+    dropdownEl.ariaHidden = "false";
     toggleBtn.ariaExpanded = "true";
     toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
     toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
