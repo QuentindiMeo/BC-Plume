@@ -129,7 +129,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
     currentTitleSection.appendChild(toggleBtn);
-    plumeContainer.appendChild(dropdownEl);
+    headerContainer.appendChild(dropdownEl);
     tracklistCleanup = cleanup;
   }
 

@@ -62,9 +62,15 @@ const updateTrackDisplay = () => {
 
     // Cache offsetHeight to avoid multiple layout recalculations
     const titleHeight = titleText.offsetHeight;
+    const tracklistToggleBtn = plume.plumeContainer.querySelector(
+      PLUME_ELEM_SELECTORS.tracklistToggleBtn
+    ) as HTMLButtonElement;
     if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
       const logo = plume.headerLogo;
-      if (logo) logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
+      logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
+      tracklistToggleBtn.style.marginTop = `-${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+    } else {
+      tracklistToggleBtn.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
     }
   }
 

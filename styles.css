@@ -75,6 +75,7 @@ div.name-section__titling h2 {
 }
 
 #bpe-header-container {
+  position: relative;
   display: flex;
   justify-content: flex-end;
   padding: 0.75rem 0.75rem;
@@ -109,24 +110,139 @@ div.name-section__titling h2 {
   width: 75%;
 
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 #bpe-header-title-pretext {
+  padding-right: 0.25rem;
   font-style: italic;
+  text-align: right;
 }
 
 #bpe-header-title {
-  max-width: 95%;
+  flex: 1 1 auto;
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 0.875rem;
   line-height: normal;
+  white-space: nowrap;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+#bpe-tracklist-toggle-btn {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+
+  margin: 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+#bpe-tracklist-toggle-btn:hover {
+  color: #ffffff;
+}
+#bpe-tracklist-toggle-btn svg {
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+#bpe-tracklist-toggle-btn[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+#bpe-tracklist-toggle-btn:focus-visible {
+  outline: 2px solid var(--plume);
+  outline-offset: 1px;
+}
+
+#bpe-tracklist-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 14rem;
+  overflow-y: auto;
+
+  background: rgba(10, 10, 15, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.bpe-tracklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  outline: none;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.bpe-tracklist-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+.bpe-tracklist-item:focus {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 0 0 1px var(--plume);
+}
+.bpe-tracklist-item--active {
+  color: var(--progbar-fill-bg-left);
+  font-weight: 600;
+}
+.bpe-tracklist-item--active:hover,
+.bpe-tracklist-item--active:focus {
+  background: rgba(32, 160, 195, 0.1);
+}
+.bpe-tracklist-item--active:focus {
+  box-shadow: inset 0 0 0 1px var(--plume);
+}
+.bpe-tracklist-item--unplayable {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+.bpe-tracklist-item__number {
+  flex-shrink: 0;
+  min-width: 1.5rem;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.75rem;
+}
+.bpe-tracklist-item--active .bpe-tracklist-item__number {
+  color: var(--progbar-fill-bg-left);
+}
+.bpe-tracklist-item__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bpe-tracklist-item__duration {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
 }
 
 #bpe-playback-manager {
@@ -523,6 +639,9 @@ div.name-section__titling h2 {
 
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-current {
   width: 100%;
+}
+#bpe-fullscreen-clone #bpe-tracklist-toggle-btn {
+  display: none;
 }
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-title {
   white-space: nowrap;
