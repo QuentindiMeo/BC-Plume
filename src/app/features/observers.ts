@@ -84,8 +84,9 @@ const updateTrackDisplay = () => {
 export interface CleanupHandles {
   audioEvents: CleanupCallback | null;
   storeSubscriptions: CleanupCallback | null;
-  hotkeys: CleanupCallback | null;
   stickiness: CleanupCallback | null;
+  tracklist: CleanupCallback | null;
+  hotkeys: CleanupCallback | null;
   toast: CleanupCallback | null;
 }
 
@@ -217,9 +218,9 @@ export const registerUnloadCleanup = (
     cleanupFullscreenMode();
     cleanupReleaseToast();
 
-    if (handles.stickiness) {
-      handles.stickiness();
-      handles.stickiness = null;
+    if (handles.audioEvents) {
+      handles.audioEvents();
+      handles.audioEvents = null;
     }
 
     if (handles.storeSubscriptions) {
@@ -227,14 +228,19 @@ export const registerUnloadCleanup = (
       handles.storeSubscriptions = null;
     }
 
+    if (handles.stickiness) {
+      handles.stickiness();
+      handles.stickiness = null;
+    }
+
+    if (handles.tracklist) {
+      handles.tracklist();
+      handles.tracklist = null;
+    }
+
     if (handles.hotkeys) {
       handles.hotkeys();
       handles.hotkeys = null;
-    }
-
-    if (handles.audioEvents) {
-      handles.audioEvents();
-      handles.audioEvents = null;
     }
   });
 };

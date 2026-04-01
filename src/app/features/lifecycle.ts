@@ -1,13 +1,3 @@
-import { PLUME_CONSTANTS } from "@/domain/plume";
-import { coreActions } from "@/domain/ports/app-core";
-import { guiActions } from "@/domain/ports/plume-ui";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
-import { getBcPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getBrowserInstance } from "@/app/stores/BrowserImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { shouldShowReleaseToast } from "@/app/use-cases";
 import { checkBandcampElements } from "@/app/features/bc-diagnostic";
 import { debugBandcampControls } from "@/app/features/debug";
 import { injectEnhancements } from "@/app/features/injection";
@@ -20,6 +10,16 @@ import {
   setupListeners,
 } from "@/app/features/observers";
 import { showReleaseToast } from "@/app/features/toast";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { shouldShowReleaseToast } from "@/app/use-cases";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 const initPlayback = () => {
   // BC's native play button is clicked to trigger its own internal playback bootstrap
@@ -52,8 +52,9 @@ export const launchPlume = (): void => {
   const handles: CleanupHandles = {
     audioEvents: null,
     storeSubscriptions: null,
-    hotkeys: null,
     stickiness: null,
+    tracklist: null,
+    hotkeys: null,
     toast: null,
   };
 
@@ -109,12 +110,13 @@ export const launchPlume = (): void => {
     const durationDisplayMethod = appCore.getState().durationDisplayMethod;
     logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
-    const isInjected = await injectEnhancements();
+    const { ok: isInjected, tracklistCleanup } = await injectEnhancements();
     if (!isInjected) {
       alert(getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
       isInitializing = false;
       return;
     }
+    handles.tracklist = tracklistCleanup ?? null;
 
     const browserCache = getBrowserInstance().getState().cache;
     if (await shouldShowReleaseToast(browserCache)) showReleaseToast();

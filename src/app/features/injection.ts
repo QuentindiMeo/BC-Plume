@@ -3,10 +3,12 @@ import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/f
 import { getInfoSectionWithRuntime } from "@/app/features/runtime";
 import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
 import { getAppropriatePretextColor, getCurrentTrackTitle } from "@/app/features/track-title";
+import { CleanupCallback } from "@/app/features/types";
 import {
   createFullscreenButtonSection,
   createPlaybackControlPanel,
   createProgressBar,
+  createTracklistToggle,
   createVolumeControlSection,
 } from "@/app/features/ui";
 import { createToast } from "@/app/features/ui/toast";
@@ -31,6 +33,8 @@ interface PlumeView {
   // Derived values computed during construction, forwarded to hydration
   initialTrackTitle: string;
   initialTrackNumberText: string;
+
+  tracklistCleanup: CleanupCallback;
 }
 
 const notifyUnplayableTracks = () => {
@@ -120,6 +124,15 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitleText);
+
+  let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
+  if (isAlbumPage) {
+    const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
+    currentTitleSection.appendChild(toggleBtn);
+    plumeContainer.appendChild(dropdownEl);
+    tracklistCleanup = cleanup;
+  }
+
   headerContainer.appendChild(currentTitleSection);
 
   plumeContainer.appendChild(headerContainer);
@@ -139,7 +152,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
   plumeContainer.appendChild(fullscreenBtnSection);
 
-  return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText };
+  return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
 };
 
 const hydratePlumeView = (view: PlumeView, appCore: IAppCore, plumeUi: IGui): void => {
@@ -156,14 +169,14 @@ const mountPlumeView = (view: PlumeView, container: Element): void => {
   container.appendChild(view.plumeContainer);
 };
 
-export const injectEnhancements = async (): Promise<boolean> => {
+export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistCleanup: CleanupCallback }> => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
 
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
     logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
-    return false;
+    return { ok: false, tracklistCleanup: () => {} };
   }
 
   const isAlbumPage = appCore.getState().pageType === "album";
@@ -180,5 +193,5 @@ export const injectEnhancements = async (): Promise<boolean> => {
     addRuntime();
     notifyUnplayableTracks();
   }
-  return true;
+  return { ok: true, tracklistCleanup: view.tracklistCleanup };
 };
