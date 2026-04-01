@@ -126,16 +126,18 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitleSection.appendChild(currentTitleText);
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
+  let pendingDropdown: HTMLDivElement | undefined;
   if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
     currentTitleSection.appendChild(toggleBtn);
-    headerContainer.appendChild(dropdownEl);
+    pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
   }
 
   headerContainer.appendChild(currentTitleSection);
 
   plumeContainer.appendChild(headerContainer);
+  if (pendingDropdown) plumeContainer.appendChild(pendingDropdown);
 
   const playbackManager = document.createElement("div");
   playbackManager.id = PLUME_ELEM_SELECTORS.playbackManager.split("#")[1];
