@@ -2,8 +2,6 @@ export const PLUME_CONSTANTS = {
   SPA_REINIT_DELAY_MS: 1000, // delay before reinitializing after SPA navigation
   TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // delay for track display refresh after navigation
   AUDIO_RETRY_MS: 1000, // delay before retrying audio element lookup
-  LOGO_DEFAULT_VERTICAL_PADDING_REM: 1, // default vertical padding for the header logo
-  LATIN_SINGLE_LINE_HEIGHT_PX: 19, // expected single-line height for Latin characters, used as baseline for title padding
   SEEK_PAUSE_GUARD_MS: 100, // delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
