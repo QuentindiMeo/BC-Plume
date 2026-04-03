@@ -68,9 +68,15 @@ const updateTrackDisplay = () => {
     if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
       const logo = plume.headerLogo;
       logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
-      tracklistToggleBtn.style.marginTop = `-${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+      if (isAlbumPage && tracklistToggleBtn) {
+        tracklistToggleBtn.style.marginTop = `-${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+        tracklistToggleBtn.style.paddingTop = "0";
+      }
     } else {
-      tracklistToggleBtn.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+      if (isAlbumPage && tracklistToggleBtn) {
+        tracklistToggleBtn.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+        tracklistToggleBtn.style.marginTop = "0";
+      }
     }
   }
 

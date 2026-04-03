@@ -6,7 +6,7 @@ const makeBtn = () => ({ click: vi.fn() });
 const makeRow = (playable: boolean) =>
   ({
     classList: { contains: (c: string) => c === "linked" && playable },
-  }) as unknown as HTMLTableRowElement;
+  }) as HTMLTableRowElement;
 
 const makeBcPlayer = (
   rows: HTMLTableRowElement[],
@@ -18,10 +18,10 @@ const makeBcPlayer = (
   ({
     getTrackRows: () => rows,
     getTrackRowTitles: () => titles,
-    getTrackTitle: () => currentTitle,
+    getTrackTitle: (_pageType: string) => currentTitle,
     getPreviousTrackButton: () => prevBtn,
     getNextTrackButton: () => nextBtn,
-  }) as unknown as BcPlayerPort;
+  }) as BcPlayerPort;
 
 describe("navigateToTrack", () => {
   it("clicks next once when the target is one ahead of the current track", () => {

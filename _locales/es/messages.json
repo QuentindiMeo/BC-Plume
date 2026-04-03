@@ -442,5 +442,6 @@
     "placeholders": {
       "number": { "content": "$1", "example": "3" }
     }
-  }
+  },
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Lista de pistas: la pista actual es desconocida, no se puede navegar"}
 }
