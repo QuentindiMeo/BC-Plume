@@ -66,11 +66,12 @@ export class BcPlayerAdapter implements BcPlayerPort {
   }
 
   getTrackRowTitles(): string[] {
-    const trackList = this.query<HTMLTableElement>(BC_ELEM_SELECTORS.trackList);
-    if (!trackList) return [];
-    return Array.from(trackList.querySelectorAll<HTMLSpanElement>(BC_ELEM_SELECTORS.trackTitle)).map(
-      (el) => el.textContent?.trim() ?? ""
-    );
+    return this.getTrackRows().map((row) => {
+      const el =
+        row.querySelector<HTMLElement>(BC_ELEM_SELECTORS.trackTitle) ??
+        row.querySelector<HTMLElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
+      return el?.textContent?.trim() ?? "";
+    });
   }
 
   getTrackRowDurations(): (string | null)[] {
