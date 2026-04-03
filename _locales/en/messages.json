@@ -402,5 +402,49 @@
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Must be between 0 and 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Failed to save track restart threshold" },
   "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Invalid track restart threshold value, using default" },
-  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Track restart threshold loaded:" }
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Track restart threshold loaded:" },
+
+  "ARIA__TRACKLIST__TOGGLE_OPEN": { "message": "Open tracklist" },
+  "ARIA__TRACKLIST__TOGGLE_CLOSE": { "message": "Close tracklist" },
+  "ARIA__TRACKLIST__PANEL": { "message": "Track list" },
+  "ARIA__TRACKLIST__ITEM": {
+    "message": "Track $NUMBER$: $TITLE$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_CURRENT": {
+    "message": "Track $NUMBER$: $TITLE$, currently playing",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_UNPLAYABLE": {
+    "message": "Track $NUMBER$: $TITLE$, unavailable",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "DEBUG__TRACKLIST__NAVIGATED": {
+    "message": "Tracklist: navigated to track $NUMBER$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
+    "message": "Tracklist: track index $INDEX$ is out of bounds",
+    "placeholders": {
+      "index": { "content": "$1", "example": "10" }
+    }
+  },
+  "WARN__TRACKLIST__TRACK_UNPLAYABLE": {
+    "message": "Tracklist: track $NUMBER$ is not playable",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Tracklist: current track is unknown, can't navigate" }
 }

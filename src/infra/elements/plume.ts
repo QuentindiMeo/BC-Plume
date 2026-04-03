@@ -2,11 +2,16 @@
 export enum PLUME_ELEM_SELECTORS {
   bcElements = "div#bpe-hidden-original",
   plumeContainer = "div#bpe-plume",
+
   headerContainer = "div#bpe-header-container",
   headerLogo = "a#bpe-header-logo",
   headerCurrent = "div#bpe-header-current",
   headerTitlePretext = "span#bpe-header-title-pretext",
   headerTitle = "span#bpe-header-title",
+  tracklistToggleBtn = "button#bpe-tracklist-toggle-btn",
+  tracklistDropdown = "div#bpe-tracklist-dropdown",
+  tracklistItem = "div.bpe-tracklist-item",
+
   playbackManager = "div#bpe-playback-manager",
   playbackControls = "div#bpe-playback-controls",
   progressContainer = "div#bpe-progress-container",
@@ -14,18 +19,21 @@ export enum PLUME_ELEM_SELECTORS {
   timeDisplay = "div#bpe-time-display",
   elapsedDisplay = "span#bpe-elapsed-display",
   durationDisplay = "span#bpe-duration-display",
+
   trackBwdBtn = "button#bpe-track-bwd-btn",
   timeBwdBtn = "button#bpe-time-bwd-btn",
   playPauseBtn = "button#bpe-play-pause-btn",
   timeFwdBtn = "button#bpe-time-fwd-btn",
   trackFwdBtn = "button#bpe-track-fwd-btn",
   loopBtn = "button#bpe-loop-btn",
-  fullscreenBtn = "button#bpe-fullscreen-btn",
-  fullscreenBtnLabel = "span#bpe-fullscreen-btn-label",
+
   volumeContainer = "div#bpe-volume-container",
   muteBtn = "button#bpe-mute-btn",
   volumeSlider = "input#bpe-volume-slider",
   volumeValue = "div#bpe-volume-value",
+
+  fullscreenBtn = "button#bpe-fullscreen-btn",
+  fullscreenBtnLabel = "span#bpe-fullscreen-btn-label",
   fullscreenBtnContainer = "div#bpe-fullscreen-btn-container",
   fullscreenOverlay = "div#bpe-fullscreen-overlay",
   fullscreenBackground = "div#bpe-fullscreen-background",

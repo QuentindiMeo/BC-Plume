@@ -10,7 +10,7 @@ The settings popup gains a tabbed layout (Hotkeys / Playback), with three new en
 Custom hotkeys can now include modifier keys (Ctrl, Shift, Alt) in any combination.  
 The album runtime is adjusted to tell if some tracks are unplayable.  
 A full Vitest-based unit test suite is introduced covering domain logic, use-cases, shared utilities, and popup use-cases.  
-Various bugs are fixed: layout is not independent on hotkeys, track pages don't throw a diagnostic error, toast container doesn't block the fullscreen exit button.
+Various bugs are fixed: layout is now independent on hotkeys, track pages don't throw a diagnostic error, toast container doesn't block the fullscreen exit button.
 
   - _**[1.9.2]** Mar 24 2026_: Health Check Fix, Unavailable Tracks, SVGs Security [#116](https://github.com/QuentindiMeo/BC-Plume/pull/116)  
   Loop mode bugs are fixed: the penultimate track of an album no longer gets stuck repeating, and collection loop mode is no longer available on single track pages.  

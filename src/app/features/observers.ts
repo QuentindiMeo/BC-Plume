@@ -62,9 +62,21 @@ const updateTrackDisplay = () => {
 
     // Cache offsetHeight to avoid multiple layout recalculations
     const titleHeight = titleText.offsetHeight;
+    const tracklistToggleBtn = plume.plumeContainer.querySelector(
+      PLUME_ELEM_SELECTORS.tracklistToggleBtn
+    ) as HTMLButtonElement;
     if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
       const logo = plume.headerLogo;
-      if (logo) logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
+      logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
+      if (isAlbumPage && tracklistToggleBtn) {
+        tracklistToggleBtn.style.marginTop = `-${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+        tracklistToggleBtn.style.paddingTop = "0";
+      }
+    } else {
+      if (isAlbumPage && tracklistToggleBtn) {
+        tracklistToggleBtn.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
+        tracklistToggleBtn.style.marginTop = "0";
+      }
     }
   }
 
@@ -84,8 +96,9 @@ const updateTrackDisplay = () => {
 export interface CleanupHandles {
   audioEvents: CleanupCallback | null;
   storeSubscriptions: CleanupCallback | null;
-  hotkeys: CleanupCallback | null;
   stickiness: CleanupCallback | null;
+  tracklist: CleanupCallback | null;
+  hotkeys: CleanupCallback | null;
   toast: CleanupCallback | null;
 }
 
@@ -217,9 +230,9 @@ export const registerUnloadCleanup = (
     cleanupFullscreenMode();
     cleanupReleaseToast();
 
-    if (handles.stickiness) {
-      handles.stickiness();
-      handles.stickiness = null;
+    if (handles.audioEvents) {
+      handles.audioEvents();
+      handles.audioEvents = null;
     }
 
     if (handles.storeSubscriptions) {
@@ -227,14 +240,19 @@ export const registerUnloadCleanup = (
       handles.storeSubscriptions = null;
     }
 
+    if (handles.stickiness) {
+      handles.stickiness();
+      handles.stickiness = null;
+    }
+
+    if (handles.tracklist) {
+      handles.tracklist();
+      handles.tracklist = null;
+    }
+
     if (handles.hotkeys) {
       handles.hotkeys();
       handles.hotkeys = null;
-    }
-
-    if (handles.audioEvents) {
-      handles.audioEvents();
-      handles.audioEvents = null;
     }
   });
 };
