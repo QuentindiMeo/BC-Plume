@@ -2,49 +2,99 @@ import { navigateToTrack } from "@/app/use-cases/navigate-to-track";
 import type { BcPlayerPort } from "@/domain/ports/bc-player";
 import { describe, expect, it, vi } from "vitest";
 
+const makeBtn = () => ({ click: vi.fn() });
 const makeRow = (playable: boolean) =>
   ({
     classList: { contains: (c: string) => c === "linked" && playable },
-    click: vi.fn(),
   }) as unknown as HTMLTableRowElement;
 
-const makeBcPlayer = (rows: HTMLTableRowElement[]): BcPlayerPort =>
-  ({ getTrackRows: () => rows }) as unknown as BcPlayerPort;
+const makeBcPlayer = (
+  rows: HTMLTableRowElement[],
+  titles: string[],
+  currentTitle: string | null,
+  prevBtn = makeBtn(),
+  nextBtn = makeBtn()
+): BcPlayerPort =>
+  ({
+    getTrackRows: () => rows,
+    getTrackRowTitles: () => titles,
+    getTrackTitle: () => currentTitle,
+    getPreviousTrackButton: () => prevBtn,
+    getNextTrackButton: () => nextBtn,
+  }) as unknown as BcPlayerPort;
 
 describe("navigateToTrack", () => {
-  it("clicks the row when the index is valid and the track is playable", () => {
-    const row = makeRow(true);
-    navigateToTrack(0, makeBcPlayer([row]));
-    expect(row.click).toHaveBeenCalledOnce();
-  });
-
-  it("clicks the correct row by index when multiple rows exist", () => {
+  it("clicks next once when the target is one ahead of the current track", () => {
+    const next = makeBtn();
     const rows = [makeRow(true), makeRow(true), makeRow(true)];
-    navigateToTrack(1, makeBcPlayer(rows));
-    expect(rows[0].click).not.toHaveBeenCalled();
-    expect(rows[1].click).toHaveBeenCalledOnce();
-    expect(rows[2].click).not.toHaveBeenCalled();
+    navigateToTrack(1, makeBcPlayer(rows, ["A", "B", "C"], "A", makeBtn(), next));
+    expect(next.click).toHaveBeenCalledOnce();
   });
 
-  it("does not click when the index is negative", () => {
-    const row = makeRow(true);
-    navigateToTrack(-1, makeBcPlayer([row]));
-    expect(row.click).not.toHaveBeenCalled();
+  it("clicks next N times for a forward jump of N", () => {
+    const next = makeBtn();
+    const rows = [makeRow(true), makeRow(true), makeRow(true), makeRow(true)];
+    navigateToTrack(3, makeBcPlayer(rows, ["A", "B", "C", "D"], "A", makeBtn(), next));
+    expect(next.click).toHaveBeenCalledTimes(3);
   });
 
-  it("does not click when the index equals the row count", () => {
-    const row = makeRow(true);
-    navigateToTrack(1, makeBcPlayer([row]));
-    expect(row.click).not.toHaveBeenCalled();
+  it("clicks prev once when the target is one behind the current track", () => {
+    const prev = makeBtn();
+    const rows = [makeRow(true), makeRow(true), makeRow(true)];
+    navigateToTrack(0, makeBcPlayer(rows, ["A", "B", "C"], "B", prev, makeBtn()));
+    expect(prev.click).toHaveBeenCalledOnce();
   });
 
-  it("does not click when the track is unplayable (no linked class)", () => {
-    const row = makeRow(false);
-    navigateToTrack(0, makeBcPlayer([row]));
-    expect(row.click).not.toHaveBeenCalled();
+  it("clicks prev N times for a backward jump of N", () => {
+    const prev = makeBtn();
+    const rows = [makeRow(true), makeRow(true), makeRow(true), makeRow(true)];
+    navigateToTrack(0, makeBcPlayer(rows, ["A", "B", "C", "D"], "C", prev, makeBtn()));
+    expect(prev.click).toHaveBeenCalledTimes(2);
+  });
+
+  it("does nothing when the target is already the current track", () => {
+    const prev = makeBtn();
+    const next = makeBtn();
+    const rows = [makeRow(true), makeRow(true)];
+    navigateToTrack(1, makeBcPlayer(rows, ["A", "B"], "B", prev, next));
+    expect(prev.click).not.toHaveBeenCalled();
+    expect(next.click).not.toHaveBeenCalled();
+  });
+
+  it("uses prev-then-next fallback when the current track is unknown", () => {
+    const prev = makeBtn();
+    const next = makeBtn();
+    const rows = [makeRow(true), makeRow(true), makeRow(true)];
+    navigateToTrack(2, makeBcPlayer(rows, ["A", "B", "C"], null, prev, next));
+    expect(prev.click).toHaveBeenCalledTimes(3); // rows.length to reach start
+    expect(next.click).toHaveBeenCalledTimes(2); // trackIndex steps forward
+  });
+
+  it("does not navigate when the index is negative", () => {
+    const prev = makeBtn();
+    const next = makeBtn();
+    navigateToTrack(-1, makeBcPlayer([makeRow(true)], ["A"], "A", prev, next));
+    expect(prev.click).not.toHaveBeenCalled();
+    expect(next.click).not.toHaveBeenCalled();
+  });
+
+  it("does not navigate when the index equals the row count", () => {
+    const prev = makeBtn();
+    const next = makeBtn();
+    navigateToTrack(1, makeBcPlayer([makeRow(true)], ["A"], "A", prev, next));
+    expect(prev.click).not.toHaveBeenCalled();
+    expect(next.click).not.toHaveBeenCalled();
+  });
+
+  it("does not navigate when the track is unplayable", () => {
+    const prev = makeBtn();
+    const next = makeBtn();
+    navigateToTrack(0, makeBcPlayer([makeRow(false)], ["A"], null, prev, next));
+    expect(prev.click).not.toHaveBeenCalled();
+    expect(next.click).not.toHaveBeenCalled();
   });
 
   it("does not throw when the rows array is empty", () => {
-    expect(() => navigateToTrack(0, makeBcPlayer([]))).not.toThrow();
+    expect(() => navigateToTrack(0, makeBcPlayer([], [], null))).not.toThrow();
   });
 });
