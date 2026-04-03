@@ -16,12 +16,12 @@ const makeBcPlayer = (
   nextBtn = makeBtn()
 ): BcPlayerPort =>
   ({
+    getTrackTitle: (_pageType: string) => currentTitle,
     getTrackRows: () => rows,
     getTrackRowTitles: () => titles,
-    getTrackTitle: (_pageType: string) => currentTitle,
     getPreviousTrackButton: () => prevBtn,
     getNextTrackButton: () => nextBtn,
-  }) as BcPlayerPort;
+  }) as unknown as BcPlayerPort;
 
 describe("navigateToTrack", () => {
   it("clicks next once when the target is one ahead of the current track", () => {

@@ -118,21 +118,24 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitlePretext.style.color = getAppropriatePretextColor();
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
+  const titleRow = document.createElement("div");
+  titleRow.className = "bpe-header-title-row";
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
   currentTitleText.textContent = initialTrackTitle;
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
-  currentTitleSection.appendChild(currentTitleText);
+  titleRow.appendChild(currentTitleText);
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
   let pendingDropdown: HTMLDivElement | undefined;
   if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
-    currentTitleSection.appendChild(toggleBtn);
+    titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
   }
+  currentTitleSection.appendChild(titleRow);
 
   headerContainer.appendChild(currentTitleSection);
 
