@@ -59,7 +59,7 @@ Spanish localization is added.
 On single track pages, the track display and the rewind feature are fixed.  
 Bugs related to updates (play/pause button icon, ARIA labels for track display, seeking in progress) are fixed.
 
-- _**[1.5.0]** Nov 10 2025_: **Demi-tour, slide !** [#060](https://github.com/QuentindiMeo/BC-Plume/pull/60)  
+- _**[1.5.0]** Nov 10 2025_: **"Demi-tour, slide !"** [#060](https://github.com/QuentindiMeo/BC-Plume/pull/60)  
 The volume slider is redesigned for better aesthetics and usability.  
 The "previous track" button restarts the current track if it's already playing.  
 ARIA labels are added to interactive elements, improving screen reader support.  

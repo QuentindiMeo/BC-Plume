@@ -101,7 +101,6 @@ export const createTracklistToggle = (): {
           : getString("ARIA__TRACKLIST__ITEM", [String(idx + 1), title]);
         item.addEventListener("click", () => {
           navigateToTrack(idx, bcPlayer);
-          close();
         });
       }
 
@@ -150,13 +149,6 @@ export const createTracklistToggle = (): {
     else open();
   });
 
-  const handleOutsidePointerDown = (e: PointerEvent): void => {
-    if (isOpen && !toggleBtn.contains(e.target as Node) && !dropdownEl.contains(e.target as Node)) {
-      close(false);
-    }
-  };
-  document.addEventListener("pointerdown", handleOutsidePointerDown);
-
   dropdownEl.addEventListener("keydown", (e: KeyboardEvent) => {
     const playableItems = getPlayableItems();
     const focused = document.activeElement as HTMLDivElement | null;
@@ -184,33 +176,14 @@ export const createTracklistToggle = (): {
         e.preventDefault();
         if (focused && playableItems.includes(focused)) focused.click();
         break;
-      case "Escape":
-        e.preventDefault();
-        close();
-        break;
     }
   });
-
-  const handleDocumentKeydown = (e: KeyboardEvent): void => {
-    if (
-      isOpen &&
-      e.key === "Escape" &&
-      document.activeElement !== dropdownEl &&
-      !dropdownEl.contains(document.activeElement)
-    ) {
-      e.preventDefault();
-      close();
-    }
-  };
-  document.addEventListener("keydown", handleDocumentKeydown);
 
   const unsubscribeTrackTitle = getAppCoreInstance().subscribe("trackTitle", () => {
     if (isOpen) updateActiveItem();
   });
 
   const cleanup = (): void => {
-    document.removeEventListener("pointerdown", handleOutsidePointerDown);
-    document.removeEventListener("keydown", handleDocumentKeydown);
     unsubscribeTrackTitle();
   };
 

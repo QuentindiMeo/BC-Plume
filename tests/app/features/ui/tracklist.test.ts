@@ -108,41 +108,40 @@ describe("createTracklistToggle", () => {
     expect(vi.mocked(navigateToTrack)).not.toHaveBeenCalled();
   });
 
-  it("clicking a playable item navigates to the correct index and closes the panel", () => {
+  it("clicking a playable item navigates to the correct index and keeps the panel open", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     const playable = items(dropdownEl).filter((i) => !i.classList.contains("bpe-tracklist-item--unplayable"));
     playable[1].click(); // second playable item → track index 1
     expect(vi.mocked(navigateToTrack)).toHaveBeenCalledWith(1, fakeBcPlayer);
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("outside pointer-down closes the panel", () => {
+  it("outside pointer-down does not close the panel", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("Escape on document closes the panel when focus is outside the dropdown", () => {
+  it("Escape on document does not close the panel", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     press(document, "Escape");
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("Escape keydown inside the dropdown closes the panel", () => {
+  it("Escape keydown inside the dropdown does not close the panel", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     press(dropdownEl, "Escape");
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("cleanup removes document listeners — outside clicks no longer close the panel", () => {
+  it("cleanup does not close an open panel", () => {
     const { toggleBtn, dropdownEl, cleanup } = setup();
     toggleBtn.click();
     cleanup();
-    document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
     expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 });
