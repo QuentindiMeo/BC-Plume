@@ -64,15 +64,19 @@ export const createTracklistToggle = (): {
     } else if (idx >= total - EDGE_TRACK_COUNT) {
       dropdownEl.scrollTo({ top: dropdownEl.scrollHeight, behavior: "smooth" });
     } else {
-      const itemTop = activeItem.offsetTop;
+      // Use idx * itemHeight instead of offsetTop: offsetTop is relative to offsetParent,
+      // which varies between the main view and the fullscreen clone (different positioned ancestors).
+      // All items are uniform height, so idx * itemHeight is the exact content offset, context-independent.
       const itemHeight = activeItem.offsetHeight;
-      dropdownEl.scrollTo({ top: itemTop - itemHeight * (EDGE_TRACK_COUNT + 1), behavior: "smooth" });
+      const scrollTop = idx * itemHeight - (dropdownEl.clientHeight - itemHeight) / 2;
+      dropdownEl.scrollTo({ top: Math.max(0, scrollTop), behavior: "smooth" });
     }
   };
 
   const updateActiveItem = (): void => {
     const currentTitle = getAppCoreInstance().getState().trackTitle;
     const tracklistItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+
     Array.from(tracklistItems).forEach((trackItem) => {
       const idx = Number(trackItem.dataset["index"]);
       const title = trackItem.dataset["title"] ?? "";
