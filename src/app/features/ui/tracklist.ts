@@ -11,6 +11,7 @@ const TOGGLE_BTN_ID = PLUME_ELEM_SELECTORS.tracklistToggleBtn.split("#")[1];
 const ITEM_CLASS = PLUME_ELEM_SELECTORS.tracklistItem.split(".")[1];
 const ITEM_ACTIVE_CLASS = `${ITEM_CLASS}--active`;
 const ITEM_UNPLAYABLE_CLASS = `${ITEM_CLASS}--unplayable`;
+const EDGE_TRACK_COUNT = 2; // Tracks within this many positions of either end are not centered (first/last 2 tracks)
 
 export const createTracklistToggle = (): {
   toggleBtn: HTMLButtonElement;
@@ -47,24 +48,49 @@ export const createTracklistToggle = (): {
   const getPlayableItems = (): HTMLDivElement[] =>
     Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
 
+  // Scrolls the active (playing) track into the center of the visible dropdown area.
+  const scrollActiveItemToCenter = (): void => {
+    const allItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+    if (allItems.length === 0) return;
+
+    const activeItem = dropdownEl.querySelector<HTMLDivElement>(`.${ITEM_ACTIVE_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`);
+    if (!activeItem) return;
+
+    const idx = Number(activeItem.dataset["index"]);
+    const total = allItems.length;
+
+    if (idx < EDGE_TRACK_COUNT) {
+      dropdownEl.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (idx >= total - EDGE_TRACK_COUNT) {
+      dropdownEl.scrollTo({ top: dropdownEl.scrollHeight, behavior: "smooth" });
+    } else {
+      const itemTop = activeItem.offsetTop;
+      const itemHeight = activeItem.offsetHeight;
+      dropdownEl.scrollTo({ top: itemTop - itemHeight * (EDGE_TRACK_COUNT + 1), behavior: "smooth" });
+    }
+  };
+
   const updateActiveItem = (): void => {
     const currentTitle = getAppCoreInstance().getState().trackTitle;
-    Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`)).forEach((item) => {
-      const idx = Number(item.dataset["index"]);
-      const title = item.dataset["title"] ?? "";
+    const tracklistItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+    Array.from(tracklistItems).forEach((trackItem) => {
+      const idx = Number(trackItem.dataset["index"]);
+      const title = trackItem.dataset["title"] ?? "";
       const isActive = currentTitle !== null && title === currentTitle;
-      const wasActive = item.classList.contains(ITEM_ACTIVE_CLASS);
+      const wasActive = trackItem.classList.contains(ITEM_ACTIVE_CLASS);
       if (isActive === wasActive) return;
 
-      item.classList.toggle(ITEM_ACTIVE_CLASS, isActive);
-      item.ariaSelected = String(isActive);
+      trackItem.classList.toggle(ITEM_ACTIVE_CLASS, isActive);
+      trackItem.ariaSelected = String(isActive);
 
-      if (!item.classList.contains(ITEM_UNPLAYABLE_CLASS)) {
-        item.ariaLabel = isActive
+      if (!trackItem.classList.contains(ITEM_UNPLAYABLE_CLASS)) {
+        trackItem.ariaLabel = isActive
           ? getString("ARIA__TRACKLIST__ITEM_CURRENT", [String(idx + 1), title])
           : getString("ARIA__TRACKLIST__ITEM", [String(idx + 1), title]);
       }
     });
+
+    scrollActiveItemToCenter();
   };
 
   const renderItems = (): void => {
@@ -141,8 +167,16 @@ export const createTracklistToggle = (): {
     );
     const firstPlayable = dropdownEl.querySelector<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`);
     const focusTarget = activePlayableItem ?? firstPlayable;
-    focusTarget?.scrollIntoView({ block: "nearest" });
-    focusTarget?.focus();
+    // preventScroll: let the transition-end handler do the centering scroll instead
+    focusTarget?.focus({ preventScroll: true });
+
+    // Center after the max-height transition completes so clientHeight is final
+    const onTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName !== "max-height") return;
+      dropdownEl.removeEventListener("transitionend", onTransitionEnd);
+      scrollActiveItemToCenter();
+    };
+    dropdownEl.addEventListener("transitionend", onTransitionEnd);
   };
 
   toggleBtn.addEventListener("click", () => {

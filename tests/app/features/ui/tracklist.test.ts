@@ -146,3 +146,47 @@ describe("createTracklistToggle", () => {
     expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 });
+
+describe("scroll centering on open", () => {
+  let scrollIntoViewSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    fakeAppCore = new FakeAppCore({ trackTitle: "Track A" });
+    scrollIntoViewSpy = vi.spyOn(window.HTMLElement.prototype, "scrollIntoView");
+  });
+
+  afterEach(() => {
+    cleanupFn?.();
+    vi.restoreAllMocks();
+  });
+
+  // happy-dom does not propagate propertyName from TransitionEventInit, so we set it manually
+  const fireTransitionEnd = (dropdownEl: HTMLDivElement, property = "max-height"): void => {
+    const event = new Event("transitionend") as TransitionEvent;
+    Object.defineProperty(event, "propertyName", { value: property });
+    dropdownEl.dispatchEvent(event);
+  };
+
+  it("scrolls the active item into view after the max-height transition completes", () => {
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    fireTransitionEnd(dropdownEl);
+    // fakeBcPlayer has 3 tracks; all indices (0, 1, 2) qualify as edge tracks → scrollIntoView
+    expect(scrollIntoViewSpy).toHaveBeenCalledWith({ block: "nearest", behavior: "smooth" });
+  });
+
+  it("does not scroll for unrelated CSS transitions", () => {
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    fireTransitionEnd(dropdownEl, "opacity");
+    expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not scroll when no active item is present", () => {
+    fakeAppCore = new FakeAppCore({ trackTitle: null });
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    fireTransitionEnd(dropdownEl);
+    expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+  });
+});
