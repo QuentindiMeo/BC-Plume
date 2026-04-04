@@ -214,6 +214,16 @@ export const createTracklistToggle = (): {
     }
   });
 
+  dropdownEl.addEventListener("mouseleave", () => {
+    if (!isOpen) return;
+    const onTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName !== "max-height") return;
+      dropdownEl.removeEventListener("transitionend", onTransitionEnd);
+      if (isOpen) scrollActiveItemToCenter();
+    };
+    dropdownEl.addEventListener("transitionend", onTransitionEnd);
+  });
+
   const unsubscribeTrackTitle = getAppCoreInstance().subscribe("trackTitle", () => {
     if (isOpen) updateActiveItem();
   });

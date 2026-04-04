@@ -148,11 +148,11 @@ describe("createTracklistToggle", () => {
 });
 
 describe("scroll centering on open", () => {
-  let scrollIntoViewSpy: ReturnType<typeof vi.spyOn>;
+  let scrollToSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     fakeAppCore = new FakeAppCore({ trackTitle: "Track A" });
-    scrollIntoViewSpy = vi.spyOn(window.HTMLElement.prototype, "scrollIntoView");
+    scrollToSpy = vi.spyOn(window.HTMLElement.prototype, "scrollTo");
   });
 
   afterEach(() => {
@@ -167,26 +167,46 @@ describe("scroll centering on open", () => {
     dropdownEl.dispatchEvent(event);
   };
 
-  it("scrolls the active item into view after the max-height transition completes", () => {
+  it("scrolls to top after open transition when active track is at edge (index 0)", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     fireTransitionEnd(dropdownEl);
-    // fakeBcPlayer has 3 tracks; all indices (0, 1, 2) qualify as edge tracks → scrollIntoView
-    expect(scrollIntoViewSpy).toHaveBeenCalledWith({ block: "nearest", behavior: "smooth" });
+    // Track A is index 0 → edge → scrollTo top: 0
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
   });
 
   it("does not scroll for unrelated CSS transitions", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
+    scrollToSpy.mockClear();
     fireTransitionEnd(dropdownEl, "opacity");
-    expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  it("recenters after mouseleave once the max-height transition completes", () => {
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    scrollToSpy.mockClear();
+    dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    // No scroll yet — waiting for the shrink transition
+    expect(scrollToSpy).not.toHaveBeenCalled();
+    fireTransitionEnd(dropdownEl);
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
+  });
+
+  it("does not recenter on mouseleave when closed", () => {
+    const { dropdownEl } = setup();
+    dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    fireTransitionEnd(dropdownEl);
+    expect(scrollToSpy).not.toHaveBeenCalled();
   });
 
   it("does not scroll when no active item is present", () => {
     fakeAppCore = new FakeAppCore({ trackTitle: null });
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
+    scrollToSpy.mockClear();
     fireTransitionEnd(dropdownEl);
-    expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+    expect(scrollToSpy).not.toHaveBeenCalled();
   });
 });
