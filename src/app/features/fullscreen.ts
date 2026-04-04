@@ -19,6 +19,7 @@ import {
   handleTrackBackward,
   handleTrackForward,
 } from "@/app/features/ui/playback";
+import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { handleMuteToggle } from "@/app/features/ui/volume";
 
@@ -196,6 +197,7 @@ const renderLoopButton = (elements: FullscreenElements, loopMode: LoopModeType):
 const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const plume = getGuiInstance().getState();
   const appCore = getAppCoreInstance();
+  const isAlbumPage = appCore.getState().pageType === "album";
 
   const subscriptions: Array<SubscriptionCallback> = [];
   const elements: FullscreenElements = getFullscreenElements(clone);
@@ -270,6 +272,26 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   Array.from(plume.titleDisplay.childNodes).forEach((node) => {
     elements.headerContainer.appendChild(node.cloneNode(true));
   });
+
+  // Re-initialize the tracklist for the fullscreen clone.
+  // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another
+  // inert clone of the toggle button. Replace both inert elements with a fresh instance.
+  if (isAlbumPage) {
+    const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup: tracklistCleanup } = createTracklistToggle();
+    subscriptions.push(tracklistCleanup);
+
+    // Toggle button lives inside the re-populated header
+    const inertToggle = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
+    inertToggle?.replaceWith(fsToggleBtn);
+
+    // Dropdown is a direct child of the plumeClone (sibling of the header)
+    const inertDropdown = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistDropdown);
+    if (inertDropdown) {
+      inertDropdown.replaceWith(fsDropdownEl);
+    } else {
+      clone.appendChild(fsDropdownEl);
+    }
+  }
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
   renderProgressSlider(elements, appCore.computed.progressPercentage());

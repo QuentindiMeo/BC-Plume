@@ -19,6 +19,7 @@ vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCo
 
 const fakeBcPlayer = {
   getTrackRows: () => [makeLinkedRow(), makeLinkedRow(), makeUnlinkedRow()],
+  getTrackPlayabilityMap: () => [true, true, false],
   getTrackRowTitles: () => ["Track A", "Track B", "Track C"],
   getTrackRowDurations: () => ["3:00", "4:00", "----"],
 };
@@ -108,41 +109,104 @@ describe("createTracklistToggle", () => {
     expect(vi.mocked(navigateToTrack)).not.toHaveBeenCalled();
   });
 
-  it("clicking a playable item navigates to the correct index and closes the panel", () => {
+  it("clicking a playable item navigates to the correct index and keeps the panel open", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     const playable = items(dropdownEl).filter((i) => !i.classList.contains("bpe-tracklist-item--unplayable"));
     playable[1].click(); // second playable item → track index 1
     expect(vi.mocked(navigateToTrack)).toHaveBeenCalledWith(1, fakeBcPlayer);
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("outside pointer-down closes the panel", () => {
+  it("outside pointer-down does not close the panel", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("Escape on document closes the panel when focus is outside the dropdown", () => {
+  it("Escape on document does not close the panel", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     press(document, "Escape");
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("Escape keydown inside the dropdown closes the panel", () => {
+  it("Escape keydown inside the dropdown does not close the panel", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     press(dropdownEl, "Escape");
-    expect(dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("cleanup removes document listeners — outside clicks no longer close the panel", () => {
+  it("cleanup does not close an open panel", () => {
     const { toggleBtn, dropdownEl, cleanup } = setup();
     toggleBtn.click();
     cleanup();
-    document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
     expect(dropdownEl.classList.contains("is-open")).toBe(true);
+  });
+});
+
+describe("scroll centering on open", () => {
+  let scrollToSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    fakeAppCore = new FakeAppCore({ trackTitle: "Track A" });
+    scrollToSpy = vi.spyOn(window.HTMLElement.prototype, "scrollTo");
+  });
+
+  afterEach(() => {
+    cleanupFn?.();
+    vi.restoreAllMocks();
+  });
+
+  // happy-dom does not propagate propertyName from TransitionEventInit, so we set it manually
+  const fireTransitionEnd = (dropdownEl: HTMLDivElement, property = "max-height"): void => {
+    const event = new Event("transitionend") as TransitionEvent;
+    Object.defineProperty(event, "propertyName", { value: property });
+    dropdownEl.dispatchEvent(event);
+  };
+
+  it("scrolls to top after open transition when active track is at edge (index 0)", () => {
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    fireTransitionEnd(dropdownEl);
+    // Track A is index 0 → edge → scrollTo top: 0
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
+  });
+
+  it("does not scroll for unrelated CSS transitions", () => {
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    scrollToSpy.mockClear();
+    fireTransitionEnd(dropdownEl, "opacity");
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  it("recenters after mouseleave once the max-height transition completes", () => {
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    scrollToSpy.mockClear();
+    dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    // No scroll yet — waiting for the shrink transition
+    expect(scrollToSpy).not.toHaveBeenCalled();
+    fireTransitionEnd(dropdownEl);
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
+  });
+
+  it("does not recenter on mouseleave when closed", () => {
+    const { dropdownEl } = setup();
+    dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    fireTransitionEnd(dropdownEl);
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not scroll when no active item is present", () => {
+    fakeAppCore = new FakeAppCore({ trackTitle: null });
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    scrollToSpy.mockClear();
+    fireTransitionEnd(dropdownEl);
+    expect(scrollToSpy).not.toHaveBeenCalled();
   });
 });

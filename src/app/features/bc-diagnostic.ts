@@ -13,6 +13,7 @@ const ALBUM_ONLY_KEYS = new Set<BcElementKey>([
   "albumPageCurrentTrackTitle",
   "trackList",
   "trackRow",
+  "playStatus",
   "playableTrack",
   "trackTitle",
   "unplayableTrackTitle",

@@ -59,25 +59,6 @@ const updateTrackDisplay = () => {
   if (titleText) {
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
-
-    // Cache offsetHeight to avoid multiple layout recalculations
-    const titleHeight = titleText.offsetHeight;
-    const tracklistToggleBtn = plume.plumeContainer.querySelector(
-      PLUME_ELEM_SELECTORS.tracklistToggleBtn
-    ) as HTMLButtonElement;
-    if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
-      const logo = plume.headerLogo;
-      logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
-      if (isAlbumPage && tracklistToggleBtn) {
-        tracklistToggleBtn.style.marginTop = `-${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
-        tracklistToggleBtn.style.paddingTop = "0";
-      }
-    } else {
-      if (isAlbumPage && tracklistToggleBtn) {
-        tracklistToggleBtn.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM / 4}rem`;
-        tracklistToggleBtn.style.marginTop = "0";
-      }
-    }
   }
 
   if (preText) {

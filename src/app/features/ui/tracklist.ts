@@ -11,6 +11,7 @@ const TOGGLE_BTN_ID = PLUME_ELEM_SELECTORS.tracklistToggleBtn.split("#")[1];
 const ITEM_CLASS = PLUME_ELEM_SELECTORS.tracklistItem.split(".")[1];
 const ITEM_ACTIVE_CLASS = `${ITEM_CLASS}--active`;
 const ITEM_UNPLAYABLE_CLASS = `${ITEM_CLASS}--unplayable`;
+const EDGE_TRACK_COUNT = 2; // Tracks within this many positions of either end are not centered (first/last 2 tracks)
 
 export const createTracklistToggle = (): {
   toggleBtn: HTMLButtonElement;
@@ -47,24 +48,53 @@ export const createTracklistToggle = (): {
   const getPlayableItems = (): HTMLDivElement[] =>
     Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
 
+  // Scrolls the active (playing) track into the center of the visible dropdown area.
+  const scrollActiveItemToCenter = (): void => {
+    const allItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+    if (allItems.length === 0) return;
+
+    const activeItem = dropdownEl.querySelector<HTMLDivElement>(`.${ITEM_ACTIVE_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`);
+    if (!activeItem) return;
+
+    const idx = Number(activeItem.dataset["index"]);
+    const total = allItems.length;
+
+    if (idx < EDGE_TRACK_COUNT) {
+      dropdownEl.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (idx >= total - EDGE_TRACK_COUNT) {
+      dropdownEl.scrollTo({ top: dropdownEl.scrollHeight, behavior: "smooth" });
+    } else {
+      // Use idx * itemHeight instead of offsetTop: offsetTop is relative to offsetParent,
+      // which varies between the main view and the fullscreen clone (different positioned ancestors).
+      // All items are uniform height, so idx * itemHeight is the exact content offset, context-independent.
+      const itemHeight = activeItem.offsetHeight;
+      const scrollTop = idx * itemHeight - (dropdownEl.clientHeight - itemHeight) / 2;
+      dropdownEl.scrollTo({ top: Math.max(0, scrollTop), behavior: "smooth" });
+    }
+  };
+
   const updateActiveItem = (): void => {
     const currentTitle = getAppCoreInstance().getState().trackTitle;
-    Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`)).forEach((item) => {
-      const idx = Number(item.dataset["index"]);
-      const title = item.dataset["title"] ?? "";
+    const tracklistItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+
+    Array.from(tracklistItems).forEach((trackItem) => {
+      const idx = Number(trackItem.dataset["index"]);
+      const title = trackItem.dataset["title"] ?? "";
       const isActive = currentTitle !== null && title === currentTitle;
-      const wasActive = item.classList.contains(ITEM_ACTIVE_CLASS);
+      const wasActive = trackItem.classList.contains(ITEM_ACTIVE_CLASS);
       if (isActive === wasActive) return;
 
-      item.classList.toggle(ITEM_ACTIVE_CLASS, isActive);
-      item.ariaSelected = String(isActive);
+      trackItem.classList.toggle(ITEM_ACTIVE_CLASS, isActive);
+      trackItem.ariaSelected = String(isActive);
 
-      if (!item.classList.contains(ITEM_UNPLAYABLE_CLASS)) {
-        item.ariaLabel = isActive
+      if (!trackItem.classList.contains(ITEM_UNPLAYABLE_CLASS)) {
+        trackItem.ariaLabel = isActive
           ? getString("ARIA__TRACKLIST__ITEM_CURRENT", [String(idx + 1), title])
           : getString("ARIA__TRACKLIST__ITEM", [String(idx + 1), title]);
       }
     });
+
+    scrollActiveItemToCenter();
   };
 
   const renderItems = (): void => {
@@ -72,12 +102,13 @@ export const createTracklistToggle = (): {
     const rows = bcPlayer.getTrackRows();
     const titles = bcPlayer.getTrackRowTitles();
     const durations = bcPlayer.getTrackRowDurations();
+    const playabilityMap = bcPlayer.getTrackPlayabilityMap();
     const currentTitle = getAppCoreInstance().getState().trackTitle;
 
     dropdownEl.innerHTML = "";
 
-    rows.forEach((row, idx) => {
-      const isPlayable = row.classList.contains("linked");
+    rows.forEach((_row, idx) => {
+      const isPlayable = playabilityMap[idx];
       const title = titles[idx] ?? "";
       const duration = durations[idx] ?? "----";
       const isActive = currentTitle !== null && title === currentTitle;
@@ -101,7 +132,6 @@ export const createTracklistToggle = (): {
           : getString("ARIA__TRACKLIST__ITEM", [String(idx + 1), title]);
         item.addEventListener("click", () => {
           navigateToTrack(idx, bcPlayer);
-          close();
         });
       }
 
@@ -141,21 +171,21 @@ export const createTracklistToggle = (): {
     );
     const firstPlayable = dropdownEl.querySelector<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`);
     const focusTarget = activePlayableItem ?? firstPlayable;
-    focusTarget?.scrollIntoView({ block: "nearest" });
-    focusTarget?.focus();
+    // preventScroll: let the transition-end handler do the centering scroll instead
+    focusTarget?.focus({ preventScroll: true });
+
+    // Center after the max-height transition completes so clientHeight is final
+    const onTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName !== "max-height") return;
+      if (isOpen) scrollActiveItemToCenter();
+    };
+    dropdownEl.addEventListener("transitionend", onTransitionEnd, { once: true });
   };
 
   toggleBtn.addEventListener("click", () => {
     if (isOpen) close();
     else open();
   });
-
-  const handleOutsidePointerDown = (e: PointerEvent): void => {
-    if (isOpen && !toggleBtn.contains(e.target as Node) && !dropdownEl.contains(e.target as Node)) {
-      close(false);
-    }
-  };
-  document.addEventListener("pointerdown", handleOutsidePointerDown);
 
   dropdownEl.addEventListener("keydown", (e: KeyboardEvent) => {
     const playableItems = getPlayableItems();
@@ -184,33 +214,23 @@ export const createTracklistToggle = (): {
         e.preventDefault();
         if (focused && playableItems.includes(focused)) focused.click();
         break;
-      case "Escape":
-        e.preventDefault();
-        close();
-        break;
     }
   });
 
-  const handleDocumentKeydown = (e: KeyboardEvent): void => {
-    if (
-      isOpen &&
-      e.key === "Escape" &&
-      document.activeElement !== dropdownEl &&
-      !dropdownEl.contains(document.activeElement)
-    ) {
-      e.preventDefault();
-      close();
-    }
-  };
-  document.addEventListener("keydown", handleDocumentKeydown);
+  dropdownEl.addEventListener("mouseleave", () => {
+    if (!isOpen) return;
+    const onTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName !== "max-height") return;
+      if (isOpen) scrollActiveItemToCenter();
+    };
+    dropdownEl.addEventListener("transitionend", onTransitionEnd, { once: true });
+  });
 
   const unsubscribeTrackTitle = getAppCoreInstance().subscribe("trackTitle", () => {
     if (isOpen) updateActiveItem();
   });
 
   const cleanup = (): void => {
-    document.removeEventListener("pointerdown", handleOutsidePointerDown);
-    document.removeEventListener("keydown", handleDocumentKeydown);
     unsubscribeTrackTitle();
   };
 

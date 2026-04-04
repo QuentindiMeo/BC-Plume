@@ -18,7 +18,6 @@ import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
-import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -39,14 +38,13 @@ interface PlumeView {
 
 const notifyUnplayableTracks = () => {
   const bcPlayer = getBcPlayerInstance();
-  const trackRows = bcPlayer.getTrackRows();
+  const playabilityMap = bcPlayer.getTrackPlayabilityMap();
+  const titles = bcPlayer.getTrackRowTitles();
   const unplayableTracks: { nb: number; title: string }[] = [];
 
-  trackRows.forEach((row, idx) => {
-    if (row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1])) return;
-
-    const titleEl = row.querySelector<HTMLDivElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
-    const title = titleEl?.textContent?.trim() ?? `#${idx + 1}`;
+  playabilityMap.forEach((isPlayable, idx) => {
+    if (isPlayable) return;
+    const title = titles[idx] ?? `#${idx + 1}`;
     unplayableTracks.push({ nb: idx + 1, title });
   });
 
@@ -59,15 +57,15 @@ const notifyUnplayableTracks = () => {
       description: getString("LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION", [title]),
       borderType: "warning",
     });
-    return;
+  } else {
+    const titlesList = unplayableTracks.map((track) => track.nb).join(", ");
+    createToast({
+      label: getString("META__TOAST__UNPLAYABLE_TRACKS"),
+      title: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE", [String(unplayableTracks.length)]),
+      description: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION", [titlesList]),
+      borderType: "warning",
+    });
   }
-  const titlesList = unplayableTracks.map((t) => t.nb).join(", ");
-  createToast({
-    label: getString("META__TOAST__UNPLAYABLE_TRACKS"),
-    title: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE", [String(unplayableTracks.length)]),
-    description: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION", [titlesList]),
-    borderType: "warning",
-  });
 };
 
 const addRuntime = () => {
@@ -118,21 +116,24 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitlePretext.style.color = getAppropriatePretextColor();
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
+  const titleRow = document.createElement("div");
+  titleRow.className = "bpe-header-title-row";
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
   currentTitleText.textContent = initialTrackTitle;
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
-  currentTitleSection.appendChild(currentTitleText);
+  titleRow.appendChild(currentTitleText);
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
   let pendingDropdown: HTMLDivElement | undefined;
   if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
-    currentTitleSection.appendChild(toggleBtn);
+    titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
   }
+  currentTitleSection.appendChild(titleRow);
 
   headerContainer.appendChild(currentTitleSection);
 
