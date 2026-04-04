@@ -10,8 +10,8 @@ export const navigateToTrack = (trackIndex: number, bcPlayer: BcPlayerPort): voi
     return;
   }
 
-  const row = rows[trackIndex];
-  if (!row.classList.contains("linked")) {
+  const playabilityMap = bcPlayer.getTrackPlayabilityMap();
+  if (playabilityMap[trackIndex] === false) {
     logger(CPL.WARN, getString("WARN__TRACKLIST__TRACK_UNPLAYABLE", [String(trackIndex + 1)]));
     return;
   }

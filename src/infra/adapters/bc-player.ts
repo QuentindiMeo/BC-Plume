@@ -65,6 +65,15 @@ export class BcPlayerAdapter implements BcPlayerPort {
     return Array.from(trackList.querySelectorAll<HTMLTableRowElement>(BC_ELEM_SELECTORS.trackRow));
   }
 
+  getTrackPlayabilityMap(): boolean[] {
+    return this.getTrackRows().map((row) => {
+      const playStatus = row.querySelector<HTMLElement>(BC_ELEM_SELECTORS.playStatus);
+      if (playStatus) return !playStatus.classList.contains("disabled");
+      // Fallback: if play_status element is missing, use .linked as fallback (works only on unreleased tracks)
+      return row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1]);
+    });
+  }
+
   getTrackRowTitles(): string[] {
     return this.getTrackRows().map((row) => {
       const el =

@@ -72,12 +72,13 @@ export const createTracklistToggle = (): {
     const rows = bcPlayer.getTrackRows();
     const titles = bcPlayer.getTrackRowTitles();
     const durations = bcPlayer.getTrackRowDurations();
+    const playabilityMap = bcPlayer.getTrackPlayabilityMap();
     const currentTitle = getAppCoreInstance().getState().trackTitle;
 
     dropdownEl.innerHTML = "";
 
-    rows.forEach((row, idx) => {
-      const isPlayable = row.classList.contains("linked");
+    rows.forEach((_row, idx) => {
+      const isPlayable = playabilityMap[idx];
       const title = titles[idx] ?? "";
       const duration = durations[idx] ?? "----";
       const isActive = currentTitle !== null && title === currentTitle;

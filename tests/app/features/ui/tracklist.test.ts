@@ -19,6 +19,7 @@ vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCo
 
 const fakeBcPlayer = {
   getTrackRows: () => [makeLinkedRow(), makeLinkedRow(), makeUnlinkedRow()],
+  getTrackPlayabilityMap: () => [true, true, false],
   getTrackRowTitles: () => ["Track A", "Track B", "Track C"],
   getTrackRowDurations: () => ["3:00", "4:00", "----"],
 };

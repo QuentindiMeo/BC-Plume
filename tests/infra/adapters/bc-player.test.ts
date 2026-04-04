@@ -73,3 +73,66 @@ describe("BcPlayerAdapter.getTrackRowTitles", () => {
     expect(adapter.getTrackRowTitles()).toEqual([""]);
   });
 });
+
+describe("BcPlayerAdapter.getTrackPlayabilityMap", () => {
+  let adapter: BcPlayerAdapter;
+
+  beforeEach(() => {
+    adapter = new BcPlayerAdapter();
+    document.body.innerHTML = "";
+  });
+
+  const buildTableWithPlayStatus = (rows: { disabled: boolean }[]): void => {
+    const table = document.createElement("table");
+    table.id = "track_table";
+    rows.forEach(({ disabled }) => {
+      const tr = document.createElement("tr");
+      tr.className = "track_row_view linked";
+      const td = document.createElement("td");
+      td.className = "play-col";
+      const a = document.createElement("a");
+      const div = document.createElement("div");
+      div.className = disabled ? "play_status disabled" : "play_status";
+      a.appendChild(div);
+      td.appendChild(a);
+      tr.appendChild(td);
+      table.appendChild(tr);
+    });
+    document.body.appendChild(table);
+  };
+
+  it("returns true for playable tracks (no disabled class)", () => {
+    buildTableWithPlayStatus([{ disabled: false }, { disabled: false }]);
+    expect(adapter.getTrackPlayabilityMap()).toEqual([true, true]);
+  });
+
+  it("returns false for unplayable tracks (disabled class)", () => {
+    buildTableWithPlayStatus([{ disabled: true }, { disabled: true }]);
+    expect(adapter.getTrackPlayabilityMap()).toEqual([false, false]);
+  });
+
+  it("returns correct mixed playability", () => {
+    buildTableWithPlayStatus([{ disabled: true }, { disabled: false }, { disabled: false }, { disabled: true }]);
+    expect(adapter.getTrackPlayabilityMap()).toEqual([false, true, true, false]);
+  });
+
+  it("falls back to linked class when play_status element is missing", () => {
+    const table = document.createElement("table");
+    table.id = "track_table";
+
+    const linkedRow = document.createElement("tr");
+    linkedRow.className = "track_row_view linked";
+    table.appendChild(linkedRow);
+
+    const unlinkedRow = document.createElement("tr");
+    unlinkedRow.className = "track_row_view";
+    table.appendChild(unlinkedRow);
+
+    document.body.appendChild(table);
+    expect(adapter.getTrackPlayabilityMap()).toEqual([true, false]);
+  });
+
+  it("returns empty array when no track table exists", () => {
+    expect(adapter.getTrackPlayabilityMap()).toEqual([]);
+  });
+});

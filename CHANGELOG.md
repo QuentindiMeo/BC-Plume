@@ -18,7 +18,7 @@ Various bugs are fixed: layout is now independent on hotkeys, track pages don't 
   The health check diagnostic replaces its `alert()` with the toast system and correctly handles standalone single track pages.  
   The progress seek bar no longer shows a not-allowed cursor when dragging.  
   SVG injection is hardened: a sanitizer strips dangerous elements and unsafe attributes.  
-  Magic numbers and strings are extracted into named constants.
+  Fixed a bug where single track pages would throw a diagnostic error due to a false positive.
 
   - _**[1.9.1]** Mar 16 2026_: Hotfixing the persistence logic [#111](https://github.com/QuentindiMeo/BC-Plume/pull/111)  
   The persistence logic was somehow broken by the modifications in the latest when adding new core actions—it's fixed now.  
@@ -51,10 +51,11 @@ The app is bundled using esbuild, a pre-commit hook is added to ensure Prettier 
 - _**[1.7.0]** Feb 01 2026_: **Tell Me Quick, What Time Is It?** [#076](https://github.com/QuentindiMeo/BC-Plume/pull/76)  
 Hotkeys are added (`Ctrl+Alt+...`) for play/pause (`space`), rewind/forward seeking (`←`/`→`), previous/next track (`PgUp`/`PgDown`), volume control (`↑`/`↓`), and fullscreen toggle (`F`).  
 The album and title are displayed in fullscreen mode.  
-The total runtime of the album is displayed in the track display—not on the fullscreen view.  
+The total runtime of collections is displayed inside Bandcamp's track display—also on the fullscreen view.  
 The cover art and presentation section (left side) are made selectable, allowing users to easily copy the album title and artist name, or extract the cover art.
 
 - _**[1.6.0]** Jan 18 2026_: **Pedal To The Metal** [#067](https://github.com/QuentindiMeo/BC-Plume/pull/67)  
+The fullscreen mode is implemented, allowing users to enjoy the music with an immersive experience.  
 Spanish localization is added.  
 On single track pages, the track display and the rewind feature are fixed.  
 Bugs related to updates (play/pause button icon, ARIA labels for track display, seeking in progress) are fixed.

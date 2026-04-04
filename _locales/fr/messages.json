@@ -162,7 +162,7 @@
   "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
   "DEBUG__LOOP__CYCLED": { "message": "Mode de répétition changé" },
   "LABEL__RUNTIME": {
-    "message": "$MINUTES$ min $SECONDES$ s$JOUABLES$",
+    "message": "$MINUTES$ min $SECONDES$ s$LISIBLES$",
     "placeholders": {
       "minutes": {
         "content": "$1",
@@ -172,13 +172,13 @@
         "content": "$2",
         "example": "30"
       },
-      "jouables": {
+      "lisibles": {
         "content": "$3",
-        "example": " jouables"
+        "example": " lisibles"
       }
     }
   },
-  "LABEL__RUNTIME__PLAYABLE": { "message": " jouables" },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " lisibles" },
   "LABEL__TRACK": { "message": "en cours de lecture : " },
   "LABEL__TRACK_CURRENT": {
     "message": "en cours de lecture ($PISTE$) :",

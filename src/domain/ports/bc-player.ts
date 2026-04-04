@@ -14,6 +14,7 @@ export interface BcPlayerPort {
 
   // Track list data — data-centric access to album track table
   getTrackRows(): HTMLTableRowElement[];
+  getTrackPlayabilityMap(): boolean[];
   getTrackRowTitles(): string[];
   getTrackRowDurations(): (string | null)[];
 
