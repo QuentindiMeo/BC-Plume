@@ -30,7 +30,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
 
     const playabilityMap = bcPlayer.getTrackPlayabilityMap();
     trackRowDurations.forEach((durationText, idx) => {
-      if (durationText === null || !playabilityMap[idx]) return;
+      if (durationText === null || playabilityMap[idx] === false) return;
 
       const parts = durationText.split(":").map((part) => Number.parseInt(part, 10));
       let seconds = 0;

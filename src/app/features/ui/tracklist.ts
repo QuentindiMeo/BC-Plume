@@ -177,10 +177,9 @@ export const createTracklistToggle = (): {
     // Center after the max-height transition completes so clientHeight is final
     const onTransitionEnd = (e: TransitionEvent): void => {
       if (e.propertyName !== "max-height") return;
-      dropdownEl.removeEventListener("transitionend", onTransitionEnd);
-      scrollActiveItemToCenter();
+      if (isOpen) scrollActiveItemToCenter();
     };
-    dropdownEl.addEventListener("transitionend", onTransitionEnd);
+    dropdownEl.addEventListener("transitionend", onTransitionEnd, { once: true });
   };
 
   toggleBtn.addEventListener("click", () => {
@@ -222,10 +221,9 @@ export const createTracklistToggle = (): {
     if (!isOpen) return;
     const onTransitionEnd = (e: TransitionEvent): void => {
       if (e.propertyName !== "max-height") return;
-      dropdownEl.removeEventListener("transitionend", onTransitionEnd);
       if (isOpen) scrollActiveItemToCenter();
     };
-    dropdownEl.addEventListener("transitionend", onTransitionEnd);
+    dropdownEl.addEventListener("transitionend", onTransitionEnd, { once: true });
   });
 
   const unsubscribeTrackTitle = getAppCoreInstance().subscribe("trackTitle", () => {
