@@ -656,9 +656,6 @@ div.name-section__titling h2 {
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-current {
   width: 100%;
 }
-#bpe-fullscreen-clone #bpe-tracklist-toggle-btn {
-  display: none;
-}
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-title {
   white-space: nowrap;
 }
