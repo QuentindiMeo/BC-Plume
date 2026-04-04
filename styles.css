@@ -8,6 +8,7 @@
   --progbar-bg: rgba(0, 0, 0, 0.85);
   --progbar-fill-bg-left: #2bb8db;
   --progbar-fill-bg-right: #1da0c3;
+  --tracklist-scrollbar-thumb: #2bb8dbd9;
 
   --title-line-height: 1.75; /* fixed across all scripts — prevents height jump when switching script heights. */
 }
@@ -187,6 +188,19 @@ div.name-section__titling h2 {
 
   background: rgba(0, 0, 0, 0.2);
   border-radius: 0 0 0.5rem 0.5rem;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--tracklist-scrollbar-thumb) transparent;
+}
+#bpe-tracklist-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+#bpe-tracklist-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+#bpe-tracklist-dropdown::-webkit-scrollbar-thumb {
+  background: var(--tracklist-scrollbar-thumb);
+  border-radius: 2px;
 }
 #bpe-tracklist-dropdown.is-open {
   max-height: 6.5rem;
