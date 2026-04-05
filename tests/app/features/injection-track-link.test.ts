@@ -23,7 +23,7 @@ vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),
 }));
 vi.mock("@/svg/icons", () => ({ PLUME_SVG: { logo: "", externalLink: "", chevronDown: "" } }));
-vi.mock("@/domain/meta", () => ({ APP_VERSION: "0.0.0-test", PLUME_KO_FI_URL: "https://example.com" }));
+vi.mock("@/domain/meta", () => ({ APP_VERSION: "0.0.0-test", PLUME_LINKTREE_URL: "https://example.com" }));
 vi.mock("@/domain/ports/app-core", async (importOriginal: () => Promise<typeof import("@/domain/ports/app-core")>) => {
   const actual = await importOriginal();
   return { ...actual };

@@ -15,7 +15,7 @@ import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapte
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
-import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
+import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
@@ -440,7 +440,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   versionTag.id = `${fullscreenLogo.id}__version`;
   versionTag.textContent = APP_VERSION;
   fullscreenLogo.appendChild(versionTag);
-  fullscreenLogo.href = PLUME_KO_FI_URL;
+  fullscreenLogo.href = PLUME_LINKTREE_URL;
   fullscreenLogo.target = "_blank";
   fullscreenLogo.rel = "noopener noreferrer";
   fullscreenLogo.ariaLabel = getString("ARIA__APP_NAME");

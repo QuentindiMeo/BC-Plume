@@ -15,7 +15,7 @@ import { createToast } from "@/app/features/ui/toast";
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
+import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
@@ -95,7 +95,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   versionTag.id = `${headerLogo.id}__version`;
   versionTag.textContent = APP_VERSION;
   headerLogo.appendChild(versionTag);
-  headerLogo.href = PLUME_KO_FI_URL;
+  headerLogo.href = PLUME_LINKTREE_URL;
   headerLogo.target = "_blank";
   headerLogo.rel = "noopener noreferrer";
   headerLogo.ariaLabel = getString("ARIA__APP_NAME");

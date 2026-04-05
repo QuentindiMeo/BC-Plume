@@ -91,7 +91,7 @@
   },
   "LABEL__TRACK_UNKNOWN": { "message": "titre inconnu" },
   "ARIA__APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
-  "ARIA__LOGO_LINK": { "message": "Soutenez Plume sur Ko-fi" },
+  "ARIA__LOGO_LINK": { "message": "En savoir plus sur Plume" },
   "ARIA__TRACK": {
     "message": "Le morceau $TITRE_PISTE$ est en cours de lecture",
     "placeholders": {

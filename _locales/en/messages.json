@@ -85,7 +85,7 @@
   },
   "LABEL__TRACK_UNKNOWN": { "message": "unknown track" },
   "ARIA__APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
-  "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
+  "ARIA__LOGO_LINK": { "message": "Learn more about Plume" },
   "ARIA__TRACK": {
     "message": "The track $TRACK_TITLE$ is currently playing",
     "placeholders": {
