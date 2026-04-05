@@ -56,11 +56,6 @@ const updateTrackDisplay = () => {
 
   const isAlbumPage = appCore.getState().pageType === "album";
 
-  if (titleText) {
-    titleText.textContent = newTrackTitle;
-    titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
-  }
-
   if (preText) {
     preText.textContent = trackNumberText;
 
@@ -70,6 +65,33 @@ const updateTrackDisplay = () => {
         ? getString("ARIA__TRACK_CURRENT", [String(current), String(total), newTrackTitle])
         : getString("ARIA__TRACK", [newTrackTitle]);
     }
+  }
+
+  if (titleText) {
+    if (isAlbumPage) {
+      const trackLink = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
+      if (trackLink) {
+        const trackUrl = bcPlayer.getCurrentTrackUrl();
+        if (!trackLink) {
+          logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+          return;
+        }
+
+        if (trackUrl) {
+          trackLink.href = trackUrl;
+          trackLink.ariaDisabled = "false";
+          trackLink.style.pointerEvents = "";
+          trackLink.tabIndex = 0;
+        } else {
+          trackLink.removeAttribute("href");
+          trackLink.ariaDisabled = "true";
+          trackLink.style.pointerEvents = "none";
+          trackLink.tabIndex = -1;
+        }
+      }
+    }
+    titleText.textContent = newTrackTitle;
+    titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
   }
 };
 

@@ -2,7 +2,7 @@ import { toggleFullscreenMode } from "@/app/features/fullscreen";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/features/original-player";
 import { getInfoSectionWithRuntime } from "@/app/features/runtime";
 import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
-import { getAppropriatePretextColor, getCurrentTrackTitle } from "@/app/features/track-title";
+import { getAppropriateAccentColor, getCurrentTrackTitle } from "@/app/features/track-title";
 import { CleanupCallback } from "@/app/features/types";
 import {
   createFullscreenButtonSection,
@@ -113,11 +113,39 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
     ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
   currentTitlePretext.textContent = initialTrackNumberText;
-  currentTitlePretext.style.color = getAppropriatePretextColor();
+  currentTitlePretext.style.color = getAppropriateAccentColor();
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
   const titleRow = document.createElement("div");
   titleRow.className = "bpe-header-title-row";
+
+  if (isAlbumPage) {
+    const trackLink = document.createElement("a");
+    trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
+    const trackUrl = bcPlayer.getCurrentTrackUrl();
+    if (trackLink) {
+      if (trackUrl) {
+        trackLink.href = trackUrl;
+        trackLink.ariaDisabled = "false";
+        trackLink.style.pointerEvents = "";
+        trackLink.tabIndex = 0;
+      } else {
+        trackLink.removeAttribute("href");
+        trackLink.ariaDisabled = "true";
+        trackLink.style.pointerEvents = "none";
+        trackLink.tabIndex = -1;
+      }
+    } else {
+      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+    }
+    trackLink.target = "_self";
+    trackLink.ariaLabel = getString("ARIA__TRACK_LINK");
+    trackLink.title = getString("ARIA__TRACK_LINK");
+    const linkSvg = createSafeSvgElement(PLUME_SVG.externalLink);
+    if (linkSvg) trackLink.appendChild(linkSvg);
+    titleRow.appendChild(trackLink);
+  }
+
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
   currentTitleText.textContent = initialTrackTitle;

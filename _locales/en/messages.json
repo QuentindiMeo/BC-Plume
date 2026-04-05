@@ -73,9 +73,9 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "currently playing:" },
+  "LABEL__TRACK": { "message": "currently playing" },
   "LABEL__TRACK_CURRENT": {
-    "message": "currently playing ($NUMBERING$):",
+    "message": "currently playing ($NUMBERING$)",
     "placeholders": {
       "numbering": {
         "content": "$1",
@@ -112,6 +112,9 @@
       }
     }
   },
+
+  "ARIA__TRACK_LINK": { "message": "Go to track page" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Track link element not found, disabling link" },
 
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "Runtime could not be calculated" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Track list not found, skipping runtime calculation" },

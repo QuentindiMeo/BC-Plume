@@ -79,9 +79,9 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "en cours de lecture : " },
+  "LABEL__TRACK": { "message": "en cours de lecture" },
   "LABEL__TRACK_CURRENT": {
-    "message": "en cours de lecture ($PISTE$) :",
+    "message": "en cours de lecture ($PISTE$)",
     "placeholders": {
       "piste": {
         "content": "$1",
@@ -118,6 +118,9 @@
       }
     }
   },
+
+  "ARIA__TRACK_LINK": { "message": "Aller à la page du morceau" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Élément de lien de piste non trouvé, désactivation du lien" },
 
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "La durée totale n'a pas pu être calculée" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée, calcul de la durée totale ignoré" },

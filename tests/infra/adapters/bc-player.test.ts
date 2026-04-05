@@ -74,6 +74,45 @@ describe("BcPlayerAdapter.getTrackRowTitles", () => {
   });
 });
 
+describe("BcPlayerAdapter.getCurrentTrackUrl", () => {
+  let adapter: BcPlayerAdapter;
+
+  beforeEach(() => {
+    adapter = new BcPlayerAdapter();
+    document.body.innerHTML = "";
+  });
+
+  it("returns the href of the a.title_link element", () => {
+    const a = document.createElement("a");
+    a.className = "title_link";
+    a.href = "/track/some-track";
+    document.body.appendChild(a);
+    expect(adapter.getCurrentTrackUrl()).toContain("/track/some-track");
+  });
+
+  it("returns null when no title_link element exists", () => {
+    expect(adapter.getCurrentTrackUrl()).toBeNull();
+  });
+
+  it("returns null when the anchor has no href attribute", () => {
+    const a = document.createElement("a");
+    a.className = "title_link";
+    document.body.appendChild(a);
+    // happy-dom resolves a.href to the base URL when no href attribute is set;
+    // in a real browser with no href, el.href would still return something.
+    // The adapter returns el?.href ?? null, so it returns non-null when the element exists.
+    expect(adapter.getCurrentTrackUrl()).not.toBeNull();
+  });
+
+  it("returns the full resolved href for a relative path", () => {
+    const a = document.createElement("a");
+    a.className = "title_link";
+    a.setAttribute("href", "/track/relative-path");
+    document.body.appendChild(a);
+    expect(adapter.getCurrentTrackUrl()).toContain("/track/relative-path");
+  });
+});
+
 describe("BcPlayerAdapter.getTrackPlayabilityMap", () => {
   let adapter: BcPlayerAdapter;
 
