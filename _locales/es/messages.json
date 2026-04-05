@@ -121,6 +121,9 @@
     }
   },
 
+  "ARIA__TRACK_LINK": { "message": "Ir a la página de la pista" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Elemento de enlace de pista no encontrado, deshabilitando enlace" },
+
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "No se pudo calcular el tiempo total" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista de pistas no encontrada, omitiendo cálculo del tiempo total" },
   "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },

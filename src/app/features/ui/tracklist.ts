@@ -223,7 +223,7 @@ export const createTracklistToggle = (): {
       if (e.propertyName !== "max-height") return;
       if (isOpen) scrollActiveItemToCenter();
     };
-    dropdownEl.addEventListener("transitionend", onTransitionEnd, { once: true });
+    dropdownEl.addEventListener("transitionend", onTransitionEnd);
   });
 
   const unsubscribeTrackTitle = getAppCoreInstance().subscribe("trackTitle", () => {

@@ -118,6 +118,20 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitleSection.appendChild(currentTitlePretext);
   const titleRow = document.createElement("div");
   titleRow.className = "bpe-header-title-row";
+
+  if (isAlbumPage) {
+    const trackLink = document.createElement("a");
+    trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
+    const trackUrl = bcPlayer.getCurrentTrackUrl();
+    if (trackUrl) trackLink.href = trackUrl;
+    trackLink.target = "_self";
+    trackLink.ariaLabel = getString("ARIA__TRACK_LINK");
+    trackLink.title = getString("ARIA__TRACK_LINK");
+    const linkSvg = createSafeSvgElement(PLUME_SVG.externalLink);
+    if (linkSvg) trackLink.appendChild(linkSvg);
+    titleRow.appendChild(trackLink);
+  }
+
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
   currentTitleText.textContent = initialTrackTitle;

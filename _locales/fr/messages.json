@@ -119,6 +119,9 @@
     }
   },
 
+  "ARIA__TRACK_LINK": { "message": "Aller à la page du morceau" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Élément de lien de piste non trouvé, désactivation du lien" },
+
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "La durée totale n'a pas pu être calculée" },
   "WARN__TRACK_LIST__NOT_FOUND": { "message": "Liste de pistes non trouvée, calcul de la durée totale ignoré" },
   "INFO__RUNTIME__CALCULATED": { "message": "Durée totale calculée :" },

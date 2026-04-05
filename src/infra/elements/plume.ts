@@ -8,6 +8,7 @@ export enum PLUME_ELEM_SELECTORS {
   headerCurrent = "div#bpe-header-current",
   headerTitlePretext = "span#bpe-header-title-pretext",
   headerTitle = "span#bpe-header-title",
+  headerTrackLink = "a#bpe-header-track-link",
   tracklistToggleBtn = "button#bpe-tracklist-toggle-btn",
   tracklistDropdown = "div#bpe-tracklist-dropdown",
   tracklistItem = "div.bpe-tracklist-item",

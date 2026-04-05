@@ -74,6 +74,27 @@ describe("BcPlayerAdapter.getTrackRowTitles", () => {
   });
 });
 
+describe("BcPlayerAdapter.getCurrentTrackUrl", () => {
+  let adapter: BcPlayerAdapter;
+
+  beforeEach(() => {
+    adapter = new BcPlayerAdapter();
+    document.body.innerHTML = "";
+  });
+
+  it("returns the href of the a.title_link element", () => {
+    const a = document.createElement("a");
+    a.className = "title_link";
+    a.href = "/track/some-track";
+    document.body.appendChild(a);
+    expect(adapter.getCurrentTrackUrl()).toContain("/track/some-track");
+  });
+
+  it("returns null when no title_link element exists", () => {
+    expect(adapter.getCurrentTrackUrl()).toBeNull();
+  });
+});
+
 describe("BcPlayerAdapter.getTrackPlayabilityMap", () => {
   let adapter: BcPlayerAdapter;
 
