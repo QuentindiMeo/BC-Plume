@@ -14,7 +14,6 @@
   "ERROR__STATE__PERSIST_FAILED": { "message": "Échec de l'enregistrement de l'état : " },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état global : " },
   "ERROR__STATE__LISTENER_FAILED": { "message": "Erreur de l'écouteur d'état : " },
-  "WARN__STATE__UNKNOWN_ACTION": { "message": "Action du store inconnue : " },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Abonnements du store initialisés" },
   "DEBUG__STATE__PERSISTED": { "message": "État enregistré dans le stockage : " },
 
@@ -217,6 +216,7 @@
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Bouton de coupure du son non trouvé" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Élément de curseur de volume ou d'affichage non trouvé" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Valeur de volume invalide :" },
   "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
     "message": "Ajuster le volume avec un delta nul peut indiquer une erreur logique dans le code"
   },
@@ -253,6 +253,9 @@
   "ARIA__UNMUTE": { "message": "Rétablir le son" },
 
   "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Bouton de répétition non trouvé" },
+  "INFO__LOOP_MODE__COERCED": {
+    "message": "Mode de répétition chargé en album mais appliqué en piste (page à piste unique)"
+  },
   "DEBUG__LOOP__CYCLED": { "message": "Mode de répétition changé" },
   "LABEL__LOOP": { "message": "Répétition" },
   "ARIA__LOOP__OFF": { "message": "Répétition : désactivée" },
@@ -329,6 +332,9 @@
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Langue" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Langue d'affichage imposée" },
   "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
+  "LABEL__LANGUAGE__EN": { "message": "Anglais" },
+  "LABEL__LANGUAGE__ES": { "message": "Espagnol" },
+  "LABEL__LANGUAGE__FR": { "message": "Français" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },

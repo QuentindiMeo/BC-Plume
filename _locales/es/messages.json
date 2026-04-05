@@ -14,7 +14,6 @@
   "ERROR__STATE__PERSIST_FAILED": { "message": "Error al guardar el estado: " },
   "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Error en el oyente global de estado: " },
   "ERROR__STATE__LISTENER_FAILED": { "message": "Error en el oyente de estado: " },
-  "WARN__STATE__UNKNOWN_ACTION": { "message": "Acción de almacén desconocida: " },
   "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Suscripciones de almacén inicializadas" },
   "DEBUG__STATE__PERSISTED": { "message": "Estado guardado en almacenamiento: " },
 
@@ -221,6 +220,7 @@
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": {
     "message": "Elemento de control deslizante de volumen o visualización no encontrado"
   },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Valor de volumen inválido:" },
   "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
     "message": "Ajustar el volumen con un delta nulo puede indicar un error lógico en el código"
   },
@@ -257,6 +257,9 @@
   "ARIA__UNMUTE": { "message": "Activar sonido" },
 
   "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Botón de repetición no encontrado" },
+  "INFO__LOOP_MODE__COERCED": {
+    "message": "Modo de repetición cargado como álbum pero aplicado como pista (página de pista única)"
+  },
   "DEBUG__LOOP__CYCLED": { "message": "Modo de repetición cambiado" },
   "LABEL__LOOP": { "message": "Repetición" },
   "ARIA__LOOP__OFF": { "message": "Repetición: desactivada" },
@@ -333,6 +336,9 @@
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Idioma" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Anulación del idioma de la interfaz" },
   "LABEL__LANGUAGE__AUTO": { "message": "Automático" },
+  "LABEL__LANGUAGE__EN": { "message": "Inglés" },
+  "LABEL__LANGUAGE__ES": { "message": "Español" },
+  "LABEL__LANGUAGE__FR": { "message": "Francés" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
