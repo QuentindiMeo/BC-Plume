@@ -107,6 +107,8 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
+  currentTitleSection.role = "group";
+  currentTitleSection.tabIndex = 0;
   currentTitleSection.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);

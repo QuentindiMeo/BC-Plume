@@ -60,8 +60,9 @@ export const getActiveLocale = (): string => {
       if (map === forcedLocale) return code;
     }
   }
-  const uiLang = browserI18n ? ((globalThis as any).chrome?.i18n?.getUILanguage?.() as string | undefined) : undefined;
-  return uiLang?.split("-")[0] ?? "en";
+  const api = (globalThis as any).browser ?? (globalThis as any).chrome;
+  const uiLang = (api?.i18n?.getUILanguage?.() as string | undefined)?.split("-")[0];
+  return uiLang && uiLang in LOCALE_MAPS ? uiLang : "en";
 };
 
 export const getString = (key: string, substitutions?: string[]): string => {

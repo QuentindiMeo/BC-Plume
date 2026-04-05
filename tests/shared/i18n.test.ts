@@ -105,11 +105,18 @@ describe("getActiveLocale (browser i18n live path)", () => {
     vi.resetModules();
   });
 
-  it("returns the browser UI language when available", async () => {
+  it("returns the chrome UI language when available", async () => {
     vi.stubGlobal("chrome", { i18n: { getMessage: () => "", getUILanguage: () => "fr-FR" } });
     vi.resetModules();
     const { getActiveLocale: fresh } = await import("@/shared/i18n");
     expect(fresh()).toBe("fr");
+  });
+
+  it("returns the Firefox browser UI language when available", async () => {
+    vi.stubGlobal("browser", { i18n: { getMessage: () => "", getUILanguage: () => "es" } });
+    vi.resetModules();
+    const { getActiveLocale: fresh } = await import("@/shared/i18n");
+    expect(fresh()).toBe("es");
   });
 
   it("returns base language code stripped of region subtag", async () => {
@@ -117,6 +124,13 @@ describe("getActiveLocale (browser i18n live path)", () => {
     vi.resetModules();
     const { getActiveLocale: fresh } = await import("@/shared/i18n");
     expect(fresh()).toBe("es");
+  });
+
+  it("falls back to 'en' for unsupported browser locale", async () => {
+    vi.stubGlobal("chrome", { i18n: { getMessage: () => "", getUILanguage: () => "de-DE" } });
+    vi.resetModules();
+    const { getActiveLocale: fresh } = await import("@/shared/i18n");
+    expect(fresh()).toBe("en");
   });
 
   it("forced locale takes priority over browser UI language", async () => {
