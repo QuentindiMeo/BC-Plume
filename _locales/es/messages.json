@@ -21,7 +21,7 @@
   "LOG__INITIALIZATION__START": { "message": "Inicializando Plume..." },
   "LOG__INITIALIZATION__COMPLETE": { "message": "Plume inicializado exitosamente" },
   "LOG__MOUNT__COMPLETE": { "message": "Plume montado exitosamente" },
-  "LOG__NAVIGATION_DETECTED": { "message": "Navegación detectada,  reiniciando..." },
+  "LOG__NAVIGATION_DETECTED": { "message": "Navegación detectada, reiniciando..." },
 
   "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementos del reproductor original ocultos" },
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
@@ -52,13 +52,12 @@
     "message": "Contenedor del reproductor no encontrado, buscando una alternativa..."
   },
 
-  "WARN__AUDIO__NOT_FOUND": { "message": "No se encontró elemento de audio" },
-  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado,  reintentando en 2s..." },
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando en 2s..." },
   "INFO__AUDIO__FOUND": { "message": "Elemento de audio encontrado" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Oyentes de eventos de audio configurados" },
 
-  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG:  Elementos de control detectados ===" },
+  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Elementos de control detectados ===" },
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controles potenciales encontrados: " },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIN DEBUG ===" },
 
@@ -124,7 +123,7 @@
   },
 
   "WARN__RUNTIME__NOT_CALCULATED": { "message": "No se pudo calcular el tiempo total" },
-  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista de pistas no encontrada,  omitiendo cálculo del tiempo total" },
+  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista de pistas no encontrada, omitiendo cálculo del tiempo total" },
   "INFO__RUNTIME__CALCULATED": { "message": "Tiempo total calculado:" },
   "LABEL__RUNTIME": {
     "message": "$MINUTOS$ min $SEGUNDOS$ s$REPRODUCIBLE$",
@@ -175,8 +174,7 @@
   "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Elemento de control deslizante de progreso no encontrado" },
   "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elemento de visualización de tiempo transcurrido no encontrado" },
   "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Elemento de visualización de duración no encontrado" },
-  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "No se pudo cargar el método de visualización de tiempo: " },
-  "INFO__TIME_DISPLAY_METHOD__APPLIED": {
+  "INFO__DURATION_DISPLAY_METHOD__APPLIED": {
     "message": "Método de visualización de tiempo aplicado: $METHOD$",
     "placeholders": {
       "method": {
@@ -223,9 +221,6 @@
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": {
     "message": "Elemento de control deslizante de volumen o visualización no encontrado"
   },
-  "WARN__VOLUME__INVALID_VALUE": { "message": "Valor de volumen inválido,  usando valor predeterminado" },
-  "WARN__VOLUME__NOT_LOADED": { "message": "No se pudo cargar el volumen: " },
-  "WARN__VOLUME__NOT_SAVED": { "message": "No se pudo guardar el volumen: " },
   "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
     "message": "Ajustar el volumen con un delta nulo puede indicar un error lógico en el código"
   },
@@ -338,9 +333,6 @@
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Idioma" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Anulación del idioma de la interfaz" },
   "LABEL__LANGUAGE__AUTO": { "message": "Automático" },
-  "LABEL__LANGUAGE__EN": { "message": "English" },
-  "LABEL__LANGUAGE__ES": { "message": "Español" },
-  "LABEL__LANGUAGE__FR": { "message": "Français" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
@@ -349,9 +341,6 @@
     "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } }
   },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Error al persistir los atajos de teclado" },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": {
-    "message": "Almacenamiento de atajos no disponible, usando los valores predeterminados"
-  },
   "WARN__HOTKEY_BINDINGS__INVALID_CACHE": {
     "message": "La entrada de caché de atajos de teclado no es válida, usando valores predeterminados"
   },

@@ -126,7 +126,7 @@ const createAppCoreInstance = (): IAppCore => {
         try {
           listener(state[key], prevValue);
         } catch (error) {
-          logger(CPL.ERROR, "State listener failed", { key, error });
+          logger(CPL.ERROR, getString("ERROR__STATE__LISTENER_FAILED"), { key, error });
         }
       });
     }
@@ -135,7 +135,7 @@ const createAppCoreInstance = (): IAppCore => {
       try {
         listener(state);
       } catch (error) {
-        logger(CPL.ERROR, "Global state listener failed", error);
+        logger(CPL.ERROR, getString("ERROR__STATE__GLOBAL_LISTENER_FAILED"), error);
       }
     });
   };
@@ -401,7 +401,7 @@ const createAppCoreInstance = (): IAppCore => {
         }
       }
     } catch (error) {
-      logger(CPL.ERROR, "Failed to load persisted state", error);
+      logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);
     }
   };
 

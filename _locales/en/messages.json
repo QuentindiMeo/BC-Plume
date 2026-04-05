@@ -48,7 +48,6 @@
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },
 
-  "WARN__AUDIO__NOT_FOUND": { "message": "No audio element found" },
   "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },
   "INFO__AUDIO__FOUND": { "message": "Audio element found" },
   "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
@@ -167,13 +166,12 @@
   "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Progress slider element not found" },
   "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elapsed display element not found" },
   "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Duration display element not found" },
-  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "Unable to load time display method:" },
-  "INFO__TIME_DISPLAY_METHOD__APPLIED": {
-    "message": "Time display method applied: $METHOD$",
+  "INFO__DURATION_DISPLAY_METHOD__APPLIED": {
+    "message": "Duration display method applied: $METHOD$",
     "placeholders": {
       "method": {
         "content": "$1",
-        "example": "seconds"
+        "example": "remaining"
       }
     }
   },
@@ -213,9 +211,6 @@
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
-  "WARN__VOLUME__INVALID_VALUE": { "message": "Invalid volume value, using default" },
-  "WARN__VOLUME__NOT_LOADED": { "message": "Unable to load volume:" },
-  "WARN__VOLUME__NOT_SAVED": { "message": "Unable to save volume:" },
   "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
     "message": "Adjusting volume with a null delta may indicate a logic error in the code"
   },
@@ -335,7 +330,6 @@
     "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } }
   },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Failed to persist hotkey bindings" },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
   "WARN__HOTKEY_BINDINGS__INVALID_CACHE": {
     "message": "Hotkey bindings cache entry is invalid, falling back to defaults"
   },

@@ -108,7 +108,7 @@ export const launchPlume = (): void => {
 
     // Duration display method is already loaded from persisted state
     const durationDisplayMethod = appCore.getState().durationDisplayMethod;
-    logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
+    logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
     const { ok: isInjected, tracklistCleanup } = await injectEnhancements();
     if (!isInjected) {
