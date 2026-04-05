@@ -2,6 +2,7 @@
 export enum BC_ELEM_SELECTORS {
   pageBackground = "#pgBd",
   infoSection = "div#name-section",
+  middleColumn = "div.middleColumn",
   trackView = "div.trackView",
   fromAlbum = "span.fromAlbum",
   playerParent = "div.inline_player",

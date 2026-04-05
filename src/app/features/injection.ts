@@ -18,6 +18,7 @@ import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -215,6 +216,14 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   const isAlbumPage = appCore.getState().pageType === "album";
 
   hideOriginalPlayerElements();
+
+  // Reorder middleColumn just before mounting Plume so the leftColumn growth doesn't shift it.
+  const trackView = bcPlayerContainer.closest(BC_ELEM_SELECTORS.trackView);
+  const middleCol = trackView?.querySelector<HTMLElement>(BC_ELEM_SELECTORS.middleColumn);
+  if (middleCol) {
+    middleCol.style.marginTop = "-3rem";
+    trackView!.appendChild(middleCol);
+  }
 
   const view = await buildPlumeView(isAlbumPage);
   hydratePlumeView(view, appCore, plumeUi);
