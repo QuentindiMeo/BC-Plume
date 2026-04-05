@@ -18,8 +18,9 @@ import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
@@ -79,6 +80,9 @@ const addRuntime = () => {
 const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
+  plumeContainer.lang = getActiveLocale();
+  plumeContainer.role = "region";
+  plumeContainer.ariaLabel = getString("ARIA__APP_NAME");
 
   const headerContainer = document.createElement("div");
   headerContainer.id = PLUME_ELEM_SELECTORS.headerContainer.split("#")[1];
@@ -103,7 +107,8 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
-  currentTitleSection.tabIndex = 0; // make it focusable for screen readers
+  currentTitleSection.role = "group";
+  currentTitleSection.tabIndex = 0;
   currentTitleSection.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
@@ -213,6 +218,14 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   const isAlbumPage = appCore.getState().pageType === "album";
 
   hideOriginalPlayerElements();
+
+  // Reorder middleColumn just before mounting Plume so the leftColumn growth doesn't shift it.
+  const trackView = bcPlayerContainer.closest(BC_ELEM_SELECTORS.trackView);
+  const middleCol = trackView?.querySelector<HTMLElement>(BC_ELEM_SELECTORS.middleColumn);
+  if (middleCol) {
+    middleCol.style.marginTop = "-3rem";
+    trackView!.appendChild(middleCol);
+  }
 
   const view = await buildPlumeView(isAlbumPage);
   hydratePlumeView(view, appCore, plumeUi);

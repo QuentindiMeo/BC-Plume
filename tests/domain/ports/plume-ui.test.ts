@@ -128,8 +128,8 @@ describe("guiActions.setElapsedDisplay", () => {
 });
 
 describe("guiActions.setDurationDisplay", () => {
-  it("returns the correct action shape with a span element", () => {
-    const element = { tagName: "SPAN" } as unknown as HTMLSpanElement;
+  it("returns the correct action shape with a button element", () => {
+    const element = { tagName: "BUTTON" } as unknown as HTMLButtonElement;
     expect(guiActions.setDurationDisplay(element)).toEqual({
       type: GUI_ACTIONS.SET_DURATION_DISPLAY,
       payload: element,

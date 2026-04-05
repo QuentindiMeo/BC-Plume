@@ -19,7 +19,7 @@ export enum PLUME_ELEM_SELECTORS {
   progressSlider = "input#bpe-progress-slider",
   timeDisplay = "div#bpe-time-display",
   elapsedDisplay = "span#bpe-elapsed-display",
-  durationDisplay = "span#bpe-duration-display",
+  durationDisplay = "button#bpe-duration-display",
 
   trackBwdBtn = "button#bpe-track-bwd-btn",
   timeBwdBtn = "button#bpe-time-bwd-btn",
@@ -43,7 +43,7 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
   fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
   fullscreenTitlingContainer = "div.bpe-fullscreen-titling",
-  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
+  fullscreenTitlingRelease = "h2#bpe-fullscreen-titling__release",
   fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
 }

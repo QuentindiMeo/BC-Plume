@@ -22,6 +22,7 @@ import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
+import { presentFormattedTime } from "@/shared/presenters";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -31,7 +32,7 @@ interface FullscreenElements {
   headerContainer: HTMLDivElement;
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
-  durationDisplay: HTMLSpanElement;
+  durationDisplay: HTMLButtonElement;
   playPauseBtn: HTMLButtonElement;
   volumeSlider: HTMLInputElement;
   volumeDisplay: HTMLDivElement;
@@ -44,6 +45,22 @@ interface FullscreenElements {
 }
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
+
+let fullscreenLiveRegion: HTMLDivElement | null = null;
+const announceFullscreenState = (messageKey: string): void => {
+  if (!fullscreenLiveRegion) {
+    fullscreenLiveRegion = document.createElement("div");
+    fullscreenLiveRegion.ariaLive = "polite";
+    fullscreenLiveRegion.role = "status";
+    fullscreenLiveRegion.className = "sr-live";
+    document.body.appendChild(fullscreenLiveRegion);
+  }
+  // Clear then set to ensure re-announcement even if the same message is sent twice
+  fullscreenLiveRegion.textContent = "";
+  requestAnimationFrame(() => {
+    fullscreenLiveRegion!.textContent = getString(messageKey);
+  });
+};
 
 const exitFullscreenMode = (): void => {
   const plumeUi = getGuiInstance();
@@ -82,6 +99,10 @@ const renderVolume = (elements: FullscreenElements, volume: number): void => {
   }
 
   elements.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+  elements.volumeSlider.setAttribute(
+    "aria-valuetext",
+    `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`
+  );
   elements.volumeDisplay.textContent = `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`;
 };
 
@@ -135,6 +156,12 @@ const renderProgressSlider = (elements: FullscreenElements, progressPercentage: 
   const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
   elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
   elements.progressSlider.style.backgroundImage = bgImg;
+
+  const { currentTime, duration } = getAppCoreInstance().getState();
+  elements.progressSlider.setAttribute(
+    "aria-valuetext",
+    getString("ARIA__PROGRESS_VALUETEXT", [presentFormattedTime(currentTime), presentFormattedTime(duration)])
+  );
 };
 
 const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | null): void => {
@@ -196,7 +223,7 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     headerContainer: clone.querySelector(PLUME_ELEM_SELECTORS.headerContainer) as HTMLDivElement,
     progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
-    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLSpanElement,
+    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLButtonElement,
     playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
     volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
     volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
@@ -353,6 +380,9 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   const overlay = document.createElement("div");
   overlay.id = PLUME_ELEM_SELECTORS.fullscreenOverlay.split("#")[1];
+  overlay.role = "dialog";
+  overlay.ariaModal = "true";
+  overlay.ariaLabel = getString("ARIA__FULLSCREEN_OVERLAY");
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
@@ -366,12 +396,6 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const presentationContainer = document.createElement("div");
   presentationContainer.id = PLUME_ELEM_SELECTORS.fullscreenPresentationContainer.split("#")[1];
 
-  const coverArtImg = document.createElement("img");
-  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
-  coverArtImg.src = artworkUrl;
-  coverArtImg.alt = getString("ARIA__COVER_ART");
-  presentationContainer.appendChild(coverArtImg);
-
   const newNameSection = bcPlayer.getInfoSection() as HTMLDivElement | null;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
@@ -380,10 +404,18 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
+
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
-  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingProject.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = `"${headTitle.textContent?.trim()}"`;
+  const releaseName = headTitle.textContent?.trim() || "";
+  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
+  if (!isAlbumPage) headTitle.textContent = `"${releaseName}"`;
+
+  const coverArtImg = document.createElement("img");
+  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
+  coverArtImg.src = artworkUrl;
+  coverArtImg.alt = releaseName ? getString("ARIA__COVER_ART_FOR", [releaseName]) : getString("ARIA__COVER_ART");
+  presentationContainer.appendChild(coverArtImg);
 
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);
@@ -491,6 +523,7 @@ export const toggleFullscreenMode = (): void => {
 
   if (isCurrentlyFullscreen) {
     exitFullscreenMode();
+    announceFullscreenState("ARIA__FULLSCREEN__EXITED");
     logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
     return;
   }
@@ -526,5 +559,6 @@ export const toggleFullscreenMode = (): void => {
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));
 
+  announceFullscreenState("ARIA__FULLSCREEN__ENTERED");
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

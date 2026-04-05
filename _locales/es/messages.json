@@ -218,6 +218,14 @@
   "LABEL__TIME_FORWARD": { "message": "Avanzar" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Cambiar a visualización restante/duración" },
   "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
+  "ARIA__DURATION_DISPLAY": { "message": "Alternar entre la visualización del tiempo restante y la duración total" },
+  "ARIA__PROGRESS_VALUETEXT": {
+    "message": "$ELAPSED$ de $DURATION$",
+    "placeholders": {
+      "ELAPSED": { "content": "$1" },
+      "DURATION": { "content": "$2" }
+    }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Botón de silencio no encontrado" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": {
@@ -325,8 +333,17 @@
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Contenedor de Plume no encontrado para modo de pantalla completa" },
   "INFO__FULLSCREEN__ENTERED": { "message": "Pasar a pantalla completa" },
   "INFO__FULLSCREEN__EXITED": { "message": "Salir de pantalla completa" },
+  "ARIA__FULLSCREEN__ENTERED": { "message": "Modo pantalla completa activado" },
+  "ARIA__FULLSCREEN__EXITED": { "message": "Modo pantalla completa desactivado" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Carátula de $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Reproductor de música en pantalla completa" },
 
   "POPUP_TITLE": { "message": "Panel de configuración" },
   "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },

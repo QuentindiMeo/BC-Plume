@@ -17,7 +17,7 @@ vi.mock("@/infra/elements/plume", () => ({
     fullscreenBtnContainer: "div#bpe-fullscreen-btn-container",
   },
 }));
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
 vi.mock("@/shared/logger", () => ({ CPL: { WARN: "warn", LOG: "log", ERROR: "error" }, logger: vi.fn() }));
 vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),
