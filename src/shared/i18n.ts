@@ -8,12 +8,12 @@ interface BrowserApiI18n {
   getMessage: (key: string, substitutions?: string | string[]) => string;
 }
 
-type EnglishLocaleEntry = {
+type LocaleEntry = {
   message: string;
   placeholders?: Record<string, { content: string; example?: string }>;
 };
 
-type LocaleMap = Record<string, EnglishLocaleEntry>;
+type LocaleMap = Record<string, LocaleEntry>;
 
 const browserI18n = ((): BrowserApiI18n | null => {
   const api = (globalThis as any).browser ?? (globalThis as any).chrome;
@@ -33,7 +33,7 @@ export const setForcedLanguage = (lang: PlumeLanguage | null): void => {
   forcedLocale = chosenLocale ?? null;
 };
 
-const applyEnglishSubstitutions = (entry: EnglishLocaleEntry, substitutions?: string[]): string => {
+const applyEnglishSubstitutions = (entry: LocaleEntry, substitutions?: string[]): string => {
   let subs: string[];
 
   if (Array.isArray(substitutions)) {
@@ -52,6 +52,16 @@ const applyEnglishSubstitutions = (entry: EnglishLocaleEntry, substitutions?: st
   }
 
   return message;
+};
+
+export const getActiveLocale = (): string => {
+  if (forcedLocale) {
+    for (const [code, map] of Object.entries(LOCALE_MAPS)) {
+      if (map === forcedLocale) return code;
+    }
+  }
+  const uiLang = browserI18n ? ((globalThis as any).chrome?.i18n?.getUILanguage?.() as string | undefined) : undefined;
+  return uiLang?.split("-")[0] ?? "en";
 };
 
 export const getString = (key: string, substitutions?: string[]): string => {

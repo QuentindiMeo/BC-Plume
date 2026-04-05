@@ -43,7 +43,7 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenPresentationContainer = "div#bpe-fullscreen-presentation",
   fullscreenCoverArt = "img#bpe-fullscreen-cover-art",
   fullscreenTitlingContainer = "div.bpe-fullscreen-titling",
-  fullscreenTitlingProject = "h2#bpe-fullscreen-titling__project",
+  fullscreenTitlingRelease = "h2#bpe-fullscreen-titling__release",
   fullscreenTitlingArtist = "h3#bpe-fullscreen-titling__artist",
   fullscreenClone = "div#bpe-fullscreen-clone",
 }

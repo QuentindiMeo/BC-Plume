@@ -337,6 +337,13 @@
   "ARIA__FULLSCREEN__EXITED": { "message": "Modo pantalla completa desactivado" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
   "ARIA__COVER_ART": { "message": "Imagen de carátula" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Carátula de $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Reproductor de música en pantalla completa" },
 
   "POPUP_TITLE": { "message": "Panel de configuración" },
   "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },

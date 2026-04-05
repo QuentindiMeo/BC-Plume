@@ -333,6 +333,13 @@
   "ARIA__FULLSCREEN__EXITED": { "message": "Mode plein écran désactivé" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Pochette de $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Lecteur musical en plein écran" },
 
   "POPUP_TITLE": { "message": "Panneau de configuration" },
   "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },

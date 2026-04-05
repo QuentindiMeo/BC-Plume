@@ -380,6 +380,9 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   const overlay = document.createElement("div");
   overlay.id = PLUME_ELEM_SELECTORS.fullscreenOverlay.split("#")[1];
+  overlay.role = "dialog";
+  overlay.ariaModal = "true";
+  overlay.ariaLabel = getString("ARIA__FULLSCREEN_OVERLAY");
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
@@ -393,12 +396,6 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const presentationContainer = document.createElement("div");
   presentationContainer.id = PLUME_ELEM_SELECTORS.fullscreenPresentationContainer.split("#")[1];
 
-  const coverArtImg = document.createElement("img");
-  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
-  coverArtImg.src = artworkUrl;
-  coverArtImg.alt = getString("ARIA__COVER_ART");
-  presentationContainer.appendChild(coverArtImg);
-
   const newNameSection = bcPlayer.getInfoSection() as HTMLDivElement | null;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
@@ -407,10 +404,18 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
+
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
-  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingProject.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = `"${headTitle.textContent?.trim()}"`;
+  const releaseName = headTitle.textContent?.trim() || "";
+  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
+  if (!isAlbumPage) headTitle.textContent = `"${releaseName}"`;
+
+  const coverArtImg = document.createElement("img");
+  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
+  coverArtImg.src = artworkUrl;
+  coverArtImg.alt = releaseName ? getString("ARIA__COVER_ART_FOR", [releaseName]) : getString("ARIA__COVER_ART");
+  presentationContainer.appendChild(coverArtImg);
 
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);

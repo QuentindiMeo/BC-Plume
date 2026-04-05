@@ -323,6 +323,13 @@
   "ARIA__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Cover art for $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
 
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },

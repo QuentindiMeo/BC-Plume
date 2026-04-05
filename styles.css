@@ -997,3 +997,62 @@ div.name-section__titling h2 {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (prefers-contrast: more) {
+  /* Plume container & header */
+  #bpe-plume {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+  #bpe-header-container {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  /* Playback buttons */
+  #bpe-playback-controls button {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+  #bpe-playback-controls button:disabled {
+    opacity: 0.6 !important;
+  }
+  #bpe-play-pause-btn {
+    background: rgba(29, 160, 195, 0.4) !important;
+    border-color: var(--plume) !important;
+  }
+
+  /* Volume */
+  #bpe-mute-btn.muted {
+    opacity: 0.7 !important;
+  }
+  #bpe-volume-slider {
+    background: rgba(255, 255, 255, 0.4) !important;
+  }
+
+  /* Tracklist */
+  .bpe-tracklist-item:hover,
+  .bpe-tracklist-item:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
+  #bpe-tracklist-dropdown {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  /* Fullscreen button */
+  #bpe-fullscreen-btn {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  /* Fullscreen exit button */
+  #bpe-fullscreen-exit-btn {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  /* Text opacity */
+  #bpe-time-display,
+  #bpe-volume-value,
+  #bpe-header-title-pretext {
+    color: rgba(255, 255, 255, 1) !important;
+  }
+}

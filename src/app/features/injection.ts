@@ -19,7 +19,7 @@ import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
@@ -79,6 +79,7 @@ const addRuntime = () => {
 const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
+  plumeContainer.lang = getActiveLocale();
 
   const headerContainer = document.createElement("div");
   headerContainer.id = PLUME_ELEM_SELECTORS.headerContainer.split("#")[1];
