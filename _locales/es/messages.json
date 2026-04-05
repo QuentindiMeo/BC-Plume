@@ -218,6 +218,7 @@
   "LABEL__TIME_FORWARD": { "message": "Avanzar" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Cambiar a visualización restante/duración" },
   "ARIA__PROGRESS_SLIDER": { "message": "Deslizador de progreso del audio" },
+  "ARIA__DURATION_DISPLAY": { "message": "Alternar entre la visualización del tiempo restante y la duración total" },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Botón de silencio no encontrado" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": {

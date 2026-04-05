@@ -31,7 +31,7 @@ interface FullscreenElements {
   headerContainer: HTMLDivElement;
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
-  durationDisplay: HTMLSpanElement;
+  durationDisplay: HTMLButtonElement;
   playPauseBtn: HTMLButtonElement;
   volumeSlider: HTMLInputElement;
   volumeDisplay: HTMLDivElement;
@@ -196,7 +196,7 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     headerContainer: clone.querySelector(PLUME_ELEM_SELECTORS.headerContainer) as HTMLDivElement,
     progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
-    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLSpanElement,
+    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLButtonElement,
     playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
     volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
     volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,

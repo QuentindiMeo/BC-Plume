@@ -210,6 +210,7 @@
   "LABEL__TIME_FORWARD": { "message": "Fast forward" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "ARIA__PROGRESS_SLIDER": { "message": "Audio progress slider" },
+  "ARIA__DURATION_DISPLAY": { "message": "Toggle between remaining and total duration display" },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },

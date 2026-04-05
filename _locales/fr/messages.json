@@ -216,6 +216,7 @@
   "LABEL__TIME_FORWARD": { "message": "Avancer" },
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
+  "ARIA__DURATION_DISPLAY": { "message": "Basculer entre l'affichage du temps restant et de la durée totale" },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Bouton de coupure du son non trouvé" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Élément de curseur de volume ou d'affichage non trouvé" },

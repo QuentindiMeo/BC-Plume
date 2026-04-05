@@ -19,7 +19,7 @@ export enum PLUME_ELEM_SELECTORS {
   progressSlider = "input#bpe-progress-slider",
   timeDisplay = "div#bpe-time-display",
   elapsedDisplay = "span#bpe-elapsed-display",
-  durationDisplay = "span#bpe-duration-display",
+  durationDisplay = "button#bpe-duration-display",
 
   trackBwdBtn = "button#bpe-track-bwd-btn",
   timeBwdBtn = "button#bpe-time-bwd-btn",
