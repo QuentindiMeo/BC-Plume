@@ -33,6 +33,19 @@ export const createHotkeyTab = (
   ) as Record<HotkeyAction, KeyBinding>;
 
   const rows = new Map<HotkeyAction, HotkeyRowInstance>();
+  let saveError: HTMLElement | null = null;
+
+  const showSaveError = (): void => {
+    if (!saveError) return;
+    saveError.textContent = getString("ERROR__HOTKEYS__PERSISTENCE");
+    saveError.hidden = false;
+  };
+
+  const clearSaveError = (): void => {
+    if (!saveError) return;
+    saveError.textContent = "";
+    saveError.hidden = true;
+  };
 
   const clearBinding = (action: HotkeyAction): void => {
     const cleared: KeyBinding = { code: "", label: getString("POPUP__HOTKEYS__DISABLED") };
@@ -41,11 +54,14 @@ export const createHotkeyTab = (
   };
 
   const handleBindingChange = (action: HotkeyAction, newBinding: KeyBinding): void => {
+    clearSaveError();
+
     currentBindings[action] = newBinding;
     saveHotkeys(currentBindings, sender).catch(() => {
       logger(CPL.ERROR, getString("ERROR__HOTKEYS__PERSISTENCE"));
       currentBindings[action] = storedBindings?.[action] ?? DEFAULT_HOTKEYS[action];
       rows.get(action)?.updateBinding(currentBindings[action]);
+      showSaveError();
     });
   };
 
@@ -86,6 +102,12 @@ export const createHotkeyTab = (
     }
 
     section.appendChild(buildDigitSeekRow());
+
+    saveError = document.createElement("p");
+    saveError.className = "general-row__error";
+    saveError.role = "alert";
+    saveError.hidden = true;
+    section.appendChild(saveError);
 
     return section;
   };

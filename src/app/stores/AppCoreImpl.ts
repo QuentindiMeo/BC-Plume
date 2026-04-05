@@ -1,3 +1,6 @@
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { handleUnknownAction } from "@/app/stores/shared";
 import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
 import {
@@ -22,9 +25,6 @@ import { meta, PROCESS_ENV } from "@/infra/node";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedDuration, presentFormattedElapsed, presentProgressPercentage } from "@/shared/presenters";
-import { getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getBrowserInstance } from "@/app/stores/BrowserImpl";
-import { handleUnknownAction } from "@/app/stores/shared";
 
 const INITIAL_STATE: AppCore = {
   pageType: null,
@@ -126,7 +126,7 @@ const createAppCoreInstance = (): IAppCore => {
         try {
           listener(state[key], prevValue);
         } catch (error) {
-          logger(CPL.ERROR, "State listener failed", { key, error });
+          logger(CPL.ERROR, getString("ERROR__STATE__LISTENER_FAILED"), { key, error });
         }
       });
     }
@@ -135,7 +135,7 @@ const createAppCoreInstance = (): IAppCore => {
       try {
         listener(state);
       } catch (error) {
-        logger(CPL.ERROR, "Global state listener failed", error);
+        logger(CPL.ERROR, getString("ERROR__STATE__GLOBAL_LISTENER_FAILED"), error);
       }
     });
   };
@@ -195,7 +195,7 @@ const createAppCoreInstance = (): IAppCore => {
         break;
       case CORE_ACTIONS.SET_VOLUME:
         if (action.payload < 0 || action.payload > 1) {
-          logger(CPL.WARN, "Invalid volume value", action.payload);
+          logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
           return;
         }
         updateState("volume", action.payload);
@@ -313,7 +313,7 @@ const createAppCoreInstance = (): IAppCore => {
         if (clampedVolume === 0) {
           dispatch(coreActions.setIsMuted(true));
         }
-        logger(CPL.INFO, "Volume loaded:", `${Math.round(clampedVolume * 100)}%`);
+        logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), [`${Math.round(clampedVolume * 100)}%`]);
       }
 
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
@@ -323,7 +323,7 @@ const createAppCoreInstance = (): IAppCore => {
           : PLUME_DEFAULTS.durationDisplayMethod;
 
         dispatch(coreActions.setDurationDisplayMethod(cachedMethod));
-        logger(CPL.INFO, "Time display method applied:", cachedMethod);
+        logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [cachedMethod]));
       }
 
       if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
@@ -334,7 +334,7 @@ const createAppCoreInstance = (): IAppCore => {
         if (state.pageType === "track" && cachedMode === LOOP_MODE.COLLECTION) {
           // Collection loop doesn't make sense on track page - treat as TRACK loop
           inferredLoopMode = LOOP_MODE.TRACK;
-          logger(CPL.INFO, "Loop mode loaded as COLLECTION but pageType is track - applied TRACK mode instead");
+          logger(CPL.INFO, getString("INFO__LOOP_MODE__COERCED"));
         }
         dispatch(coreActions.setLoopMode(inferredLoopMode));
 
@@ -401,7 +401,7 @@ const createAppCoreInstance = (): IAppCore => {
         }
       }
     } catch (error) {
-      logger(CPL.ERROR, "Failed to load persisted state", error);
+      logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);
     }
   };
 

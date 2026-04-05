@@ -2,6 +2,7 @@ import { PlumeCacheKey } from "@/domain/browser";
 import { BrowserAction, IBrowser, IBrowserApi, IBrowserCache, IBrowserState } from "@/domain/ports/browser";
 import { meta, PROCESS_ENV } from "@/infra/node";
 import { inferBrowserApi } from "@/shared/browser";
+import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
 let unifiedBrowserApi: IBrowserApi | null = null;
@@ -41,10 +42,10 @@ const createBrowserInstance = (): IBrowser => {
     state.cache
       .set(toSet)
       .then(() => {
-        logger(CPL.DEBUG, "State persisted", { keys, values });
+        logger(CPL.DEBUG, getString("DEBUG__STATE__PERSISTED"), { keys, values });
       })
       .catch((error) => {
-        logger(CPL.ERROR, "Failed to persist state", error);
+        logger(CPL.ERROR, getString("ERROR__STATE__PERSIST_FAILED"), error);
       });
   };
 

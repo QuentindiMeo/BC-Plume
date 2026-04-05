@@ -55,16 +55,6 @@ export const checkBandcampElements = (): BcHealthCheckResult => {
     logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL", [selector]))
   );
 
-  if (missingRequired.length === 0) {
-    logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__ALL_FOUND"));
-  } else {
-    createToast({
-      label: getString("META__TOAST__HEALTH_CHECK"),
-      title: getString("LABEL__TOAST__HEALTH_CHECK__TITLE", [String(missingRequired.length)]),
-      description: getString("LABEL__TOAST__HEALTH_CHECK__DESCRIPTION"),
-      borderType: "error",
-    });
-  }
   return {
     allRequiredFound: missingRequired.length === 0,
     missing,

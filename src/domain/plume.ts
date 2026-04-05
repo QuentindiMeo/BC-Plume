@@ -2,6 +2,7 @@ export const PLUME_CONSTANTS = {
   SPA_REINIT_DELAY_MS: 1000, // delay before reinitializing after SPA navigation
   TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // delay for track display refresh after navigation
   AUDIO_RETRY_MS: 1000, // delay before retrying audio element lookup
+  AUDIO_RETRY_TOAST_THRESHOLD: 3, // show toast after this many failed audio retries
   SEEK_PAUSE_GUARD_MS: 100, // delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
@@ -36,7 +37,7 @@ export function assertWholeNumber(value: number): asserts value is WholeNumber {
 }
 export function assertBoundedInteger(value: number, min: WholeNumber, max: WholeNumber): asserts value is WholeNumber {
   assertWholeNumber(value);
-  if (value < min || value > max) throw new RangeError("Out of range");
+  if (value < min || value > max) throw new RangeError(`${value} is out of range (${min}–${max})`);
 }
 
 export const SEEK_JUMP_DURATION_MIN = 1 as WholeNumber;
