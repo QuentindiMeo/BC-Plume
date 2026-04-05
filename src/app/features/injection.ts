@@ -80,6 +80,8 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
   plumeContainer.lang = getActiveLocale();
+  plumeContainer.role = "region";
+  plumeContainer.ariaLabel = getString("ARIA__APP_NAME");
 
   const headerContainer = document.createElement("div");
   headerContainer.id = PLUME_ELEM_SELECTORS.headerContainer.split("#")[1];
