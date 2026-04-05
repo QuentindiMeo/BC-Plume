@@ -49,7 +49,7 @@
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Élément parent du lecteur non trouvé" },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Conteneur du lecteur non trouvé, recherche d'une alternative..." },
 
-  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Élément audio non trouvé, nouvelle tentative dans 2s..." },
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Élément audio non trouvé, nouvelle tentative..." },
   "INFO__AUDIO__FOUND": { "message": "Élément audio trouvé" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nouvel élément audio détecté" },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Écouteurs d'événements audio configurés" },

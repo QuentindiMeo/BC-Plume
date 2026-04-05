@@ -47,7 +47,7 @@
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
   "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },
 
-  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying..." },
   "INFO__AUDIO__FOUND": { "message": "Audio element found" },
   "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Audio event listeners set up" },

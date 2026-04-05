@@ -51,7 +51,7 @@
     "message": "Contenedor del reproductor no encontrado, buscando una alternativa..."
   },
 
-  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando en 2s..." },
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento de audio no encontrado, reintentando..." },
   "INFO__AUDIO__FOUND": { "message": "Elemento de audio encontrado" },
   "INFO__NEW_AUDIO__FOUND": { "message": "Nuevo elemento de audio detectado" },
   "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Oyentes de eventos de audio configurados" },

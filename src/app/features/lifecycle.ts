@@ -78,8 +78,21 @@ export const launchPlume = (): void => {
       return;
     }
 
-    const plumeCanBuild = checkBandcampElements().allRequiredFound;
-    if (!plumeCanBuild) return;
+    const healthResult = checkBandcampElements();
+    if (healthResult.allRequiredFound) {
+      logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__ALL_FOUND"));
+    } else {
+      const missingRequiredCount = healthResult.missing.filter((el) => el.required).length;
+      createToast({
+        label: getString("META__TOAST__HEALTH_CHECK"),
+        title: getString("LABEL__TOAST__HEALTH_CHECK__TITLE", [String(missingRequiredCount)]),
+        description: getString("LABEL__TOAST__HEALTH_CHECK__DESCRIPTION"),
+        borderType: "error",
+      });
+
+      isInitializing = false;
+      return;
+    }
 
     const audioElement = await findAudioElement();
     if (!audioElement) {
@@ -97,6 +110,7 @@ export const launchPlume = (): void => {
       setTimeout(init, PLUME_CONSTANTS.AUDIO_RETRY_MS);
       return;
     }
+    audioRetryCount = 0;
     audioToastHandle?.dismiss();
     audioToastHandle = null;
 

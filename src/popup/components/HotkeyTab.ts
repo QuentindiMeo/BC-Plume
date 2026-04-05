@@ -57,14 +57,12 @@ export const createHotkeyTab = (
     clearSaveError();
 
     currentBindings[action] = newBinding;
-    saveHotkeys(currentBindings, sender)
-      .then(() => clearSaveError())
-      .catch(() => {
-        logger(CPL.ERROR, getString("ERROR__HOTKEYS__PERSISTENCE"));
-        currentBindings[action] = storedBindings?.[action] ?? DEFAULT_HOTKEYS[action];
-        rows.get(action)?.updateBinding(currentBindings[action]);
-        showSaveError();
-      });
+    saveHotkeys(currentBindings, sender).catch(() => {
+      logger(CPL.ERROR, getString("ERROR__HOTKEYS__PERSISTENCE"));
+      currentBindings[action] = storedBindings?.[action] ?? DEFAULT_HOTKEYS[action];
+      rows.get(action)?.updateBinding(currentBindings[action]);
+      showSaveError();
+    });
   };
 
   const buildDigitSeekRow = (): HTMLDivElement => {
