@@ -94,12 +94,18 @@ div.name-section__titling h2 {
   position: absolute;
   top: 0px;
   left: 0px;
+  padding: 0.75rem 2rem 0 2rem;
+  border-radius: 0.25rem;
+
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 0.75rem 2rem 0 2rem;
 
   scale: 0.25;
+}
+#bpe-header-logo:focus-visible {
+  outline: 0.25rem solid var(--plume);
+  outline-offset: 1rem;
 }
 #bpe-header-logo__version {
   margin: 0;
@@ -334,7 +340,7 @@ div.name-section__titling h2 {
 }
 #bpe-progress-slider:focus-visible {
   outline-color: var(--plume);
-  outline-offset: 2px;
+  outline-offset: 0.25rem;
 }
 #bpe-progress-slider::-webkit-slider-thumb {
   width: 0.75rem;
@@ -390,6 +396,9 @@ div.name-section__titling h2 {
   color: inherit;
   font: inherit;
 }
+#bpe-duration-display:focus-visible {
+  outline: 2px solid var(--plume);
+}
 
 #bpe-playback-controls {
   margin-bottom: 0.25rem;
@@ -426,6 +435,9 @@ div.name-section__titling h2 {
 #bpe-playback-controls button:active {
   transform: scale(0.95);
 }
+#bpe-playback-controls button:focus-visible {
+  outline: 2px solid var(--plume);
+}
 #bpe-playback-controls button:disabled {
   opacity: 0.4;
   pointer-events: none;
@@ -460,20 +472,25 @@ div.name-section__titling h2 {
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
+
   padding: 0;
   margin: 0;
   background: transparent;
   border: none;
+  border-radius: 0.25rem;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: white;
 
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 #bpe-mute-btn:hover {
   color: var(--progbar-fill-bg-left);
+}
+#bpe-mute-btn:focus-visible {
+  outline: 2px solid var(--plume);
 }
 #bpe-mute-btn.muted {
   opacity: 0.5;
@@ -495,7 +512,7 @@ div.name-section__titling h2 {
 }
 #bpe-volume-slider:focus-visible {
   outline-color: var(--plume);
-  outline-offset: 2px;
+  outline-offset: 0.5rem;
 }
 #bpe-volume-slider::-webkit-slider-thumb {
   width: 1rem;
@@ -564,6 +581,9 @@ div.name-section__titling h2 {
   transform: scale(1.025);
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
+}
+#bpe-fullscreen-btn:focus-visible {
+  outline: 2px solid var(--plume);
 }
 #bpe-fullscreen-btn:active {
   transform: scale(1);
@@ -746,6 +766,9 @@ div.name-section__titling h2 {
   background: rgba(0, 0, 0, 0.9);
   border-color: var(--progbar-fill-bg-right);
   box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5);
+}
+#bpe-fullscreen-exit-btn:focus-visible {
+  outline: 2px solid var(--plume);
 }
 #bpe-fullscreen-exit-btn:active {
   transform: scale(0.95);
