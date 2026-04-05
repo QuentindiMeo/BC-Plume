@@ -70,9 +70,25 @@ const updateTrackDisplay = () => {
   if (titleText) {
     if (isAlbumPage) {
       const trackLink = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
-      const trackUrl = bcPlayer.getCurrentTrackUrl();
-      if (trackLink) trackLink.href = trackUrl || "#";
-      else logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+      if (trackLink) {
+        const trackUrl = bcPlayer.getCurrentTrackUrl();
+        if (!trackLink) {
+          logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+          return;
+        }
+
+        if (trackUrl) {
+          trackLink.href = trackUrl;
+          trackLink.ariaDisabled = "false";
+          trackLink.style.pointerEvents = "";
+          trackLink.tabIndex = 0;
+        } else {
+          trackLink.removeAttribute("href");
+          trackLink.ariaDisabled = "true";
+          trackLink.style.pointerEvents = "none";
+          trackLink.tabIndex = -1;
+        }
+      }
     }
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated

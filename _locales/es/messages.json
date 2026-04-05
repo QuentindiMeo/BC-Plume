@@ -81,7 +81,7 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "reproduciendo ahora " },
+  "LABEL__TRACK": { "message": "reproduciendo ahora" },
   "LABEL__TRACK_CURRENT": {
     "message": "reproduciendo ahora ($NUMERACION$)",
     "placeholders": {

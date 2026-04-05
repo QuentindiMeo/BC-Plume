@@ -43,7 +43,7 @@ div.name-section__titling h2 {
 }
 .inline_player.scrolled { /* when the user scrolls low enough, Plume becomes sticky */
   top: .5rem;
-  margin: 0;
+  margin: 0 !important;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -138,10 +138,17 @@ div.name-section__titling h2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1rem;
-  height: 1rem;
+
+  width: 1.25rem;
+  height: 1.25rem;
   margin-left: auto;
   margin-right: 0.25rem;
+
+  border-radius: 0.25rem;
+}
+#bpe-header-track-link:focus-visible {
+  outline: 1px solid var(--plume);
+  outline-offset: 1px;
 }
 #bpe-header-track-link svg {
   width: 0.75rem;
@@ -197,7 +204,7 @@ div.name-section__titling h2 {
   transform: rotate(180deg);
 }
 #bpe-tracklist-toggle-btn:focus-visible {
-  outline: 2px solid var(--plume);
+  outline: 1px solid var(--plume);
   outline-offset: 1px;
 }
 

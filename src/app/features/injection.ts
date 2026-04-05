@@ -123,7 +123,21 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
     const trackUrl = bcPlayer.getCurrentTrackUrl();
-    if (trackUrl) trackLink.href = trackUrl;
+    if (trackLink) {
+      if (trackUrl) {
+        trackLink.href = trackUrl;
+        trackLink.ariaDisabled = "false";
+        trackLink.style.pointerEvents = "";
+        trackLink.tabIndex = 0;
+      } else {
+        trackLink.removeAttribute("href");
+        trackLink.ariaDisabled = "true";
+        trackLink.style.pointerEvents = "none";
+        trackLink.tabIndex = -1;
+      }
+    } else {
+      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+    }
     trackLink.target = "_self";
     trackLink.ariaLabel = getString("ARIA__TRACK_LINK");
     trackLink.title = getString("ARIA__TRACK_LINK");

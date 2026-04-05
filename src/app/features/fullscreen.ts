@@ -145,8 +145,24 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
 
   const trackLink = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
   if (trackLink) {
-    const trackUrl = getBcPlayerInstance().getCurrentTrackUrl();
-    if (trackUrl) trackLink.href = trackUrl;
+    const bcPlayer = getBcPlayerInstance();
+    const trackUrl = bcPlayer.getCurrentTrackUrl();
+    if (!trackLink) {
+      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+      return;
+    }
+
+    if (trackUrl) {
+      trackLink.href = trackUrl;
+      trackLink.ariaDisabled = "false";
+      trackLink.style.pointerEvents = "";
+      trackLink.tabIndex = 0;
+    } else {
+      trackLink.removeAttribute("href");
+      trackLink.ariaDisabled = "true";
+      trackLink.style.pointerEvents = "none";
+      trackLink.tabIndex = -1;
+    }
   }
 
   const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;

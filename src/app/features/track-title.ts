@@ -22,7 +22,7 @@ const getTrackTitleElement = (): HTMLElement | null => {
   return bcPlayer.getTrackTitleElement();
 };
 
-// Determine appropriate pretext color based on WCAG contrast with Bandcamp theme colors
+// Determine appropriate accent color based on WCAG contrast with Bandcamp theme colors
 export const getAppropriateAccentColor = (): string => {
   const trackTitleEl = getTrackTitleElement();
   const artistEl = getArtistNameElement();
