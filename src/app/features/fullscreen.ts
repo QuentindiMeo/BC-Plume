@@ -1,3 +1,4 @@
+import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
@@ -142,6 +143,12 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
     return;
   }
 
+  const trackLink = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
+  if (trackLink) {
+    const trackUrl = getBcPlayerInstance().getCurrentTrackUrl();
+    if (trackUrl) trackLink.href = trackUrl;
+  }
+
   const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
   if (!headerTitle) {
     logger(CPL.ERROR, getString("ERROR__HEADER_TITLE__NOT_FOUND"));
@@ -273,6 +280,14 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   Array.from(plume.titleDisplay.childNodes).forEach((node) => {
     elements.headerContainer.appendChild(node.cloneNode(true));
   });
+
+  // Apply the Bandcamp theme color to the track link in the fullscreen clone
+  if (isAlbumPage) {
+    const fsTrackLink = elements.headerContainer.querySelector(
+      PLUME_ELEM_SELECTORS.headerTrackLink
+    ) as HTMLAnchorElement;
+    if (fsTrackLink) fsTrackLink.style.color = getAppropriateAccentColor();
+  }
 
   // Re-initialize the tracklist for the fullscreen clone.
   // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another

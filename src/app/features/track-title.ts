@@ -1,3 +1,4 @@
+import { getBcPlayerInstance } from "@/app/stores/adapters";
 import {
   adjustColorContrast,
   FALLBACK_GRAY_RGB_STR,
@@ -7,7 +8,6 @@ import {
   WCAG_CONTRAST_NORMAL,
 } from "@/shared/colors";
 import { getString } from "@/shared/i18n";
-import { getBcPlayerInstance } from "@/app/stores/adapters";
 
 const getArtistNameElement = (): HTMLSpanElement => {
   const bcPlayer = getBcPlayerInstance();
@@ -23,7 +23,7 @@ const getTrackTitleElement = (): HTMLElement | null => {
 };
 
 // Determine appropriate pretext color based on WCAG contrast with Bandcamp theme colors
-export const getAppropriatePretextColor = (): string => {
+export const getAppropriateAccentColor = (): string => {
   const trackTitleEl = getTrackTitleElement();
   const artistEl = getArtistNameElement();
   if (!trackTitleEl || !artistEl) return FALLBACK_GRAY_RGB_STR;

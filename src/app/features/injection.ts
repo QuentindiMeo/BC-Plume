@@ -2,7 +2,7 @@ import { toggleFullscreenMode } from "@/app/features/fullscreen";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/features/original-player";
 import { getInfoSectionWithRuntime } from "@/app/features/runtime";
 import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
-import { getAppropriatePretextColor, getCurrentTrackTitle } from "@/app/features/track-title";
+import { getAppropriateAccentColor, getCurrentTrackTitle } from "@/app/features/track-title";
 import { CleanupCallback } from "@/app/features/types";
 import {
   createFullscreenButtonSection,
@@ -113,7 +113,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
     ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
   currentTitlePretext.textContent = initialTrackNumberText;
-  currentTitlePretext.style.color = getAppropriatePretextColor();
+  currentTitlePretext.style.color = getAppropriateAccentColor();
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
   const titleRow = document.createElement("div");

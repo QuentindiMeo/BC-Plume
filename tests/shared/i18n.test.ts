@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 describe("getString", () => {
   it("resolves placeholders using the substitutions array", () => {
     const result = getString("LABEL__TRACK_CURRENT", ["3/10"]);
-    expect(result).toBe("currently playing (3/10):");
+    expect(result).toBe("currently playing (3/10)");
   });
 
   it("returns the key and warns when the key does not exist", () => {
@@ -50,7 +50,7 @@ describe("setForcedLanguage", () => {
 
   it("forced locale takes priority over the EN bundled fallback", () => {
     setForcedLanguage("fr");
-    expect(getString("LABEL__TRACK")).toBe("en cours de lecture : ");
+    expect(getString("LABEL__TRACK")).toBe("en cours de lecture");
   });
 
   it("falls back to EN when the forced locale is missing a key", () => {
@@ -79,7 +79,7 @@ describe("getString (browser i18n live path)", () => {
     vi.stubGlobal("chrome", { i18n: { getMessage: () => "" } });
     vi.resetModules();
     const { getString: getStringFresh } = await import("@/shared/i18n");
-    expect(getStringFresh("LABEL__TRACK")).toBe("currently playing:");
+    expect(getStringFresh("LABEL__TRACK")).toBe("currently playing");
   });
 });
 

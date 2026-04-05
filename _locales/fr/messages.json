@@ -79,9 +79,9 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "en cours de lecture : " },
+  "LABEL__TRACK": { "message": "en cours de lecture" },
   "LABEL__TRACK_CURRENT": {
-    "message": "en cours de lecture ($PISTE$) :",
+    "message": "en cours de lecture ($PISTE$)",
     "placeholders": {
       "piste": {
         "content": "$1",

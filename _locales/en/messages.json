@@ -73,9 +73,9 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "currently playing:" },
+  "LABEL__TRACK": { "message": "currently playing" },
   "LABEL__TRACK_CURRENT": {
-    "message": "currently playing ($NUMBERING$):",
+    "message": "currently playing ($NUMBERING$)",
     "placeholders": {
       "numbering": {
         "content": "$1",
