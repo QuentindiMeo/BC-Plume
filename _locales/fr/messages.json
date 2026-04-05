@@ -217,6 +217,13 @@
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Basculer vers l'affichage restant/durée" },
   "ARIA__PROGRESS_SLIDER": { "message": "Curseur d'avancement du morceau" },
   "ARIA__DURATION_DISPLAY": { "message": "Basculer entre l'affichage du temps restant et de la durée totale" },
+  "ARIA__PROGRESS_VALUETEXT": {
+    "message": "$ELAPSED$ sur $DURATION$",
+    "placeholders": {
+      "ELAPSED": { "content": "$1" },
+      "DURATION": { "content": "$2" }
+    }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Bouton de coupure du son non trouvé" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Élément de curseur de volume ou d'affichage non trouvé" },
@@ -322,6 +329,8 @@
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Conteneur Plume non trouvé pour le mode plein écran" },
   "INFO__FULLSCREEN__ENTERED": { "message": "Mode plein écran activé" },
   "INFO__FULLSCREEN__EXITED": { "message": "Mode plein écran désactivé" },
+  "ARIA__FULLSCREEN__ENTERED": { "message": "Mode plein écran activé" },
+  "ARIA__FULLSCREEN__EXITED": { "message": "Mode plein écran désactivé" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Quitter le mode plein écran" },
   "ARIA__COVER_ART": { "message": "Image de la pochette" },
 

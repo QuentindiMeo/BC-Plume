@@ -211,6 +211,13 @@
   "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "ARIA__PROGRESS_SLIDER": { "message": "Audio progress slider" },
   "ARIA__DURATION_DISPLAY": { "message": "Toggle between remaining and total duration display" },
+  "ARIA__PROGRESS_VALUETEXT": {
+    "message": "$ELAPSED$ of $DURATION$",
+    "placeholders": {
+      "ELAPSED": { "content": "$1" },
+      "DURATION": { "content": "$2" }
+    }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
@@ -312,6 +319,8 @@
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Plume container not found for fullscreen mode" },
   "INFO__FULLSCREEN__ENTERED": { "message": "Entered fullscreen mode" },
   "INFO__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
+  "ARIA__FULLSCREEN__ENTERED": { "message": "Entered fullscreen mode" },
+  "ARIA__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
   "ARIA__COVER_ART": { "message": "Cover Art Image" },
 

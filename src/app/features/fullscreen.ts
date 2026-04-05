@@ -22,6 +22,7 @@ import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
+import { presentFormattedTime } from "@/shared/presenters";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -44,6 +45,22 @@ interface FullscreenElements {
 }
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
+
+let fullscreenLiveRegion: HTMLDivElement | null = null;
+const announceFullscreenState = (messageKey: string): void => {
+  if (!fullscreenLiveRegion) {
+    fullscreenLiveRegion = document.createElement("div");
+    fullscreenLiveRegion.ariaLive = "polite";
+    fullscreenLiveRegion.role = "status";
+    fullscreenLiveRegion.className = "sr-live";
+    document.body.appendChild(fullscreenLiveRegion);
+  }
+  // Clear then set to ensure re-announcement even if the same message is sent twice
+  fullscreenLiveRegion.textContent = "";
+  requestAnimationFrame(() => {
+    fullscreenLiveRegion!.textContent = getString(messageKey);
+  });
+};
 
 const exitFullscreenMode = (): void => {
   const plumeUi = getGuiInstance();
@@ -82,6 +99,10 @@ const renderVolume = (elements: FullscreenElements, volume: number): void => {
   }
 
   elements.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+  elements.volumeSlider.setAttribute(
+    "aria-valuetext",
+    `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`
+  );
   elements.volumeDisplay.textContent = `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`;
 };
 
@@ -135,6 +156,12 @@ const renderProgressSlider = (elements: FullscreenElements, progressPercentage: 
   const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
   elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
   elements.progressSlider.style.backgroundImage = bgImg;
+
+  const { currentTime, duration } = getAppCoreInstance().getState();
+  elements.progressSlider.setAttribute(
+    "aria-valuetext",
+    getString("ARIA__PROGRESS_VALUETEXT", [presentFormattedTime(currentTime), presentFormattedTime(duration)])
+  );
 };
 
 const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | null): void => {
@@ -491,6 +518,7 @@ export const toggleFullscreenMode = (): void => {
 
   if (isCurrentlyFullscreen) {
     exitFullscreenMode();
+    announceFullscreenState("ARIA__FULLSCREEN__EXITED");
     logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
     return;
   }
@@ -526,5 +554,6 @@ export const toggleFullscreenMode = (): void => {
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));
 
+  announceFullscreenState("ARIA__FULLSCREEN__ENTERED");
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

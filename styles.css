@@ -603,6 +603,15 @@ div.name-section__titling h2 {
   to   { opacity: 1; }
 }
 
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-3rem); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(3rem); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 #bpe-fullscreen-overlay {
   position: fixed;
   top: 0;
@@ -774,13 +783,14 @@ div.name-section__titling h2 {
   transform: scale(0.95);
 }
 
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-3rem); }
-  to   { opacity: 1; transform: translateX(0);     }
-}
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(3rem); }
-  to   { opacity: 1; transform: translateX(0); }
+/* Visually hidden but accessible to screen readers */
+.sr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 /* Responsive adjustments for fullscreen */
@@ -981,9 +991,9 @@ div.name-section__titling h2 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bpe-toast,
-  .bpe-toast--exiting,
-  .bpe-toast__timer {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,3 +1,10 @@
+import { updateTrackForwardBtnState } from "@/app/features/observers";
+import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncLoopBtn } from "@/app/features/ui/loop";
+import { syncMuteBtn } from "@/app/features/ui/volume";
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { PLUME_CONSTANTS } from "@/domain/plume";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
@@ -6,13 +13,6 @@ import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
 import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
-import { getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { updateTrackForwardBtnState } from "@/app/features/observers";
-import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
-import { syncLoopBtn } from "@/app/features/ui/loop";
-import { syncMuteBtn } from "@/app/features/ui/volume";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -42,6 +42,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       plume.progressSlider.value = `${progressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
       plume.progressSlider.style.backgroundImage = bgImg;
+      plume.progressSlider.setAttribute(
+        "aria-valuetext",
+        getString("ARIA__PROGRESS_VALUETEXT", [presentFormattedTime(elapsed), presentFormattedTime(duration)])
+      );
 
       // Update time displays
       plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
@@ -55,6 +59,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       musicPlayer.setVolume(volume);
 
       plume.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+      plume.volumeSlider.setAttribute("aria-valuetext", `${plume.volumeSlider.value}${getString("META__PERCENTAGE")}`);
 
       // Update volume display text (store as single source of truth)
       if (volumeValueDisplay) {
