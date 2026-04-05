@@ -1,15 +1,3 @@
-import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
-import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
-import { coreActions } from "@/domain/ports/app-core";
-import { guiActions } from "@/domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
-import { PLUME_SVG } from "@/svg/icons";
-import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
@@ -19,9 +7,22 @@ import {
   handleTrackBackward,
   handleTrackForward,
 } from "@/app/features/ui/playback";
+import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
-import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { handleMuteToggle } from "@/app/features/ui/volume";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
+import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
 
 const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -465,11 +466,15 @@ export const toggleFullscreenMode = (): void => {
 
   // Enter fullscreen - dispatch state change first, then build DOM
   const isAlbumPage = appCore.getState().pageType === "album";
-
   const overlay = buildFullscreenOverlay(isAlbumPage);
   if (!overlay) {
-    // Failed to build overlay - revert state
     appCore.dispatch(coreActions.setIsFullscreen(false));
+    createToast({
+      label: getString("META__TOAST__FULLSCREEN_UNAVAILABLE"),
+      title: getString("LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE"),
+      description: getString("LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION"),
+      borderType: "warning",
+    });
     return;
   }
 

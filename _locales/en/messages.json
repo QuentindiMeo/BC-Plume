@@ -447,6 +447,20 @@
   "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
   "META__TOAST__RELEASE": { "message": "release update" },
 
+  "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume couldn't load" },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "No suitable player container was found on this page." },
+  "META__TOAST__INJECTION_FAILED": { "message": "injection failure" },
+
+  "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Waiting for audio" },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "No audio element detected yet. Playback controls are inactive." },
+  "META__TOAST__AUDIO_NOT_FOUND": { "message": "audio not found" },
+
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Fullscreen unavailable" },
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION": {
+    "message": "Required page elements are missing. Check the console for details."
+  },
+  "META__TOAST__FULLSCREEN_UNAVAILABLE": { "message": "fullscreen unavailable" },
+
   "LABEL__TOAST__HEALTH_CHECK__TITLE": {
     "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
     "placeholders": { "missing_required": { "content": "$1", "example": "3" } }

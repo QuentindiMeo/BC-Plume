@@ -10,6 +10,7 @@ import {
   setupListeners,
 } from "@/app/features/observers";
 import { showReleaseToast } from "@/app/features/toast";
+import { createToast, ToastHandle } from "@/app/features/ui/toast";
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getBrowserInstance } from "@/app/stores/BrowserImpl";
@@ -60,6 +61,8 @@ export const launchPlume = (): void => {
 
   const isInitializedRef = { value: false };
   let isInitializing = false;
+  let audioRetryCount = 0;
+  let audioToastHandle: ToastHandle | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -80,11 +83,22 @@ export const launchPlume = (): void => {
 
     const audioElement = await findAudioElement();
     if (!audioElement) {
+      audioRetryCount++;
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
+      if (audioRetryCount >= PLUME_CONSTANTS.AUDIO_RETRY_TOAST_THRESHOLD && !audioToastHandle) {
+        audioToastHandle = createToast({
+          label: getString("META__TOAST__AUDIO_NOT_FOUND"),
+          title: getString("LABEL__TOAST__AUDIO_NOT_FOUND__TITLE"),
+          description: getString("LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION"),
+          borderType: "warning",
+        });
+      }
       isInitializing = false;
       setTimeout(init, PLUME_CONSTANTS.AUDIO_RETRY_MS);
       return;
     }
+    audioToastHandle?.dismiss();
+    audioToastHandle = null;
 
     // Make audio element available before loading persisted state so that MusicPlayerAdapter calls (e.g. setLoop) inside the thunk don't throw.
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
@@ -112,7 +126,12 @@ export const launchPlume = (): void => {
 
     const { ok: isInjected, tracklistCleanup } = await injectEnhancements();
     if (!isInjected) {
-      alert(getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
+      createToast({
+        label: getString("META__TOAST__INJECTION_FAILED"),
+        title: getString("LABEL__TOAST__INJECTION_FAILED__TITLE"),
+        description: getString("LABEL__TOAST__INJECTION_FAILED__DESCRIPTION"),
+        borderType: "error",
+      });
       isInitializing = false;
       return;
     }

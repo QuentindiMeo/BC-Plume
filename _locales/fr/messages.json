@@ -469,6 +469,24 @@
   "LABEL__TOAST__RELEASE__CTA": { "message": "Voir les nouveautés" },
   "META__TOAST__RELEASE": { "message": "mise à jour de version" },
 
+  "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume n'a pas pu se charger" },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": {
+    "message": "Aucun conteneur de lecteur adapté n'a été trouvé sur cette page."
+  },
+  "META__TOAST__INJECTION_FAILED": { "message": "échec d'injection" },
+
+  "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "En attente de l'audio" },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": {
+    "message": "Aucun élément audio détecté pour le moment. Les contrôles de lecture sont inactifs."
+  },
+  "META__TOAST__AUDIO_NOT_FOUND": { "message": "audio introuvable" },
+
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Plein écran indisponible" },
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION": {
+    "message": "Des éléments requis sont absents de la page. Consultez la console pour plus de détails."
+  },
+  "META__TOAST__FULLSCREEN_UNAVAILABLE": { "message": "plein écran indisponible" },
+
   "LABEL__TOAST__HEALTH_CHECK__TITLE": {
     "message": "Diagnostic : $MISSING_REQUIRED$ élément(s) requis manquant(s)",
     "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
