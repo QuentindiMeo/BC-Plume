@@ -48,16 +48,16 @@ describe("setForcedLanguage", () => {
     expect(getString("POPUP__GENERAL__TAB_LABEL")).toBe("General");
   });
 
-  it("forced locale takes priority over the EN bundled fallback", () => {
+  it("forced locale takes priority over the bundled fallback", () => {
     setForcedLanguage("fr");
     expect(getString("LABEL__TRACK")).toBe("en cours de lecture");
   });
 
-  it("falls back to EN when the forced locale is missing a key", () => {
+  it("prints key when it's missing from both the forced locale and the fallback", () => {
     setForcedLanguage("fr");
-    // key absent from all locales still falls through to EN then warns
+    // key absent from all locales still falls through to fallback then warns
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    expect(getString("KEY_ONLY_IN_EN_FALLBACK")).toBe("KEY_ONLY_IN_EN_FALLBACK");
+    expect(getString("KEY_NOT_PRESENT_IN_FR_LOCALE")).toBe("KEY_NOT_PRESENT_IN_FR_LOCALE");
     warnSpy.mockRestore();
   });
 });

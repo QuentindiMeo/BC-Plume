@@ -72,10 +72,6 @@ const updateTrackDisplay = () => {
       const trackLink = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
       if (trackLink) {
         const trackUrl = bcPlayer.getCurrentTrackUrl();
-        if (!trackLink) {
-          logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
-          return;
-        }
 
         if (trackUrl) {
           trackLink.href = trackUrl;
@@ -89,6 +85,8 @@ const updateTrackDisplay = () => {
           trackLink.tabIndex = -1;
         }
       }
+    } else {
+      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
     }
     titleText.textContent = newTrackTitle;
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated

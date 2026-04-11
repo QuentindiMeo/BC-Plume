@@ -33,7 +33,7 @@ export const setForcedLanguage = (lang: PlumeLanguage | null): void => {
   forcedLocale = chosenLocale ?? null;
 };
 
-const applyEnglishSubstitutions = (entry: LocaleEntry, substitutions?: string[]): string => {
+const applyEnglishSubstitution = (entry: LocaleEntry, substitutions?: string[]): string => {
   let subs: string[];
 
   if (Array.isArray(substitutions)) {
@@ -69,7 +69,7 @@ export const getString = (key: string, substitutions?: string[]): string => {
   // Forced locale takes priority over the browser API
   if (forcedLocale) {
     const entry = forcedLocale[key];
-    if (entry) return applyEnglishSubstitutions(entry, substitutions);
+    if (entry) return applyEnglishSubstitution(entry, substitutions);
   }
 
   if (browserI18n) {
@@ -79,7 +79,7 @@ export const getString = (key: string, substitutions?: string[]): string => {
 
   // Fallback to bundled EN messages if browser API is unavailable or doesn't have the key
   const englishLocaleEntry = (enMessages as LocaleMap)[key];
-  if (englishLocaleEntry) return applyEnglishSubstitutions(englishLocaleEntry, substitutions);
+  if (englishLocaleEntry) return applyEnglishSubstitution(englishLocaleEntry, substitutions);
 
   console.warn(`[Plume i18n] Key "${key}" not found in any locale`);
   return key;

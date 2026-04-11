@@ -127,8 +127,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   if (isAlbumPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
-    const trackUrl = bcPlayer.getCurrentTrackUrl();
+
     if (trackLink) {
+      const trackUrl = bcPlayer.getCurrentTrackUrl();
+
       if (trackUrl) {
         trackLink.href = trackUrl;
         trackLink.ariaDisabled = "false";

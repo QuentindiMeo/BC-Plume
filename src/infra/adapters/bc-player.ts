@@ -13,7 +13,7 @@ export class BcPlayerAdapter implements BcPlayerPort {
 
   getCurrentTrackUrl(): string | null {
     const el = this.query<HTMLAnchorElement>(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle);
-    return el?.href ?? null;
+    return el?.getAttribute("href") || null;
   }
 
   // Album and track pages expose the current track title under different elements.

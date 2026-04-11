@@ -174,10 +174,6 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
   if (trackLink) {
     const bcPlayer = getBcPlayerInstance();
     const trackUrl = bcPlayer.getCurrentTrackUrl();
-    if (!trackLink) {
-      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
-      return;
-    }
 
     if (trackUrl) {
       trackLink.href = trackUrl;
@@ -190,6 +186,8 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
       trackLink.style.pointerEvents = "none";
       trackLink.tabIndex = -1;
     }
+  } else {
+    logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
   }
 
   const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;

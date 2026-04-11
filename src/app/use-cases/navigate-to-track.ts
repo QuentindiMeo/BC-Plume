@@ -22,7 +22,7 @@ export const navigateToTrack = (trackIndex: number, bcPlayer: BcPlayerPort): voi
 
   if (currentIndex === trackIndex) return;
   if (currentIndex === -1) {
-    logger(CPL.ERROR, getString("ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN", ["0"]));
+    logger(CPL.ERROR, getString("ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN"));
     return;
   }
 
