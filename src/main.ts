@@ -7,8 +7,13 @@ import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import { BcPlayerAdapter, GuiAudioProvider, MusicPlayerAdapter, createRuntimeMessageReceiver } from "@/infra/adapters";
 import { logDetectedBrowser, setForcedLanguage } from "@/shared/i18n";
 
-(async () => {
+(() => {
   "use strict";
+
+  // Guard against double injection (manifest content_scripts + scripting API)
+  const marker = "__plume_content_loaded__";
+  if ((document as any)[marker]) return;
+  (document as any)[marker] = true;
 
   const audioProvider = new GuiAudioProvider(getGuiInstance);
   const bandcampPlayer = new BcPlayerAdapter();
@@ -20,8 +25,9 @@ import { logDetectedBrowser, setForcedLanguage } from "@/shared/i18n";
   registerMessageReceiver(messageReceiver);
 
   // Load language before launching the app to ensure the UI reflects the correct language from the start.
-  const forcedLanguage = await loadForcedLanguage();
-  setForcedLanguage(forcedLanguage ?? null);
+  loadForcedLanguage().then((forcedLanguage) => {
+    setForcedLanguage(forcedLanguage ?? null);
+  });
 
   logDetectedBrowser();
   launchPlume();

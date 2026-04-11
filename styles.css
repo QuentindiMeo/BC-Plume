@@ -253,6 +253,11 @@ div.name-section__titling h2 {
 #bpe-tracklist-dropdown.is-open:hover {
   max-height: 10rem;
 }
+#bpe-tracklist-dropdown.is-open:focus-visible {
+  border-radius: var(--focusable-outline-border-radius);
+  outline: var(--focusable-outline);
+  outline-offset: -1px;
+}
 
 .bpe-tracklist-item {
   display: flex;
