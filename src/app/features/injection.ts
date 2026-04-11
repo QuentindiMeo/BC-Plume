@@ -18,7 +18,7 @@ import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
-import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
+import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -219,13 +219,10 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
 
   hideOriginalPlayerElements();
 
-  // Reorder middleColumn just before mounting Plume so the leftColumn growth doesn't shift it.
+  // Reorder middleColumn before mounting Plume so keyboard tab order reaches Plume first.
   const trackView = bcPlayerContainer.closest(BC_ELEM_SELECTORS.trackView);
-  const middleCol = trackView?.querySelector<HTMLElement>(BC_ELEM_SELECTORS.middleColumn);
-  if (middleCol) {
-    middleCol.style.marginTop = "-3rem";
-    trackView!.appendChild(middleCol);
-  }
+  const middleCol = trackView?.querySelector<HTMLElement>(`:scope > ${BC_ELEM_SELECTORS.middleColumn}`);
+  if (middleCol) trackView!.appendChild(middleCol);
 
   const view = await buildPlumeView(isAlbumPage);
   hydratePlumeView(view, appCore, plumeUi);
@@ -236,6 +233,12 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   if (isAlbumPage) {
     addRuntime();
     notifyUnplayableTracks();
+  }
+
+  // Compensate the visual shift only when the name-section overflows past the leftColumn
+  if (middleCol) {
+    const nameSection = trackView?.querySelector<HTMLElement>(BC_ELEM_SELECTORS.infoSection);
+    if (nameSection && nameSection.offsetWidth <= BC_NAME_SECTION_DEFAULT_WIDTH) middleCol.style.marginTop = "-3rem";
   }
   return { ok: true, tracklistCleanup: view.tracklistCleanup };
 };
