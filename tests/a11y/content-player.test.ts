@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeAppCore } from "../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../fakes/FakeMusicPlayer";
-import { checkA11y } from "./axe-helper";
+import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
 
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: { DEBUG: "debug", WARN: "warn" }, logger: vi.fn() }));
@@ -96,12 +96,16 @@ afterEach(() => {
 
 describe("content-player accessibility", () => {
   describe("createPlaybackControlPanel", () => {
-    it("has no a11y violations", async () => {
-      const { createPlaybackControlPanel } = await import("@/app/features/ui/playback");
-      const panel = createPlaybackControlPanel();
-      document.body.appendChild(panel);
-      await checkA11y(panel);
-    });
+    it(
+      "has no a11y violations",
+      async () => {
+        const { createPlaybackControlPanel } = await import("@/app/features/ui/playback");
+        const panel = createPlaybackControlPanel();
+        document.body.appendChild(panel);
+        await checkA11y(panel);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("all buttons have accessible names", async () => {
       const { createPlaybackControlPanel } = await import("@/app/features/ui/playback");
@@ -117,13 +121,17 @@ describe("content-player accessibility", () => {
   });
 
   describe("createVolumeControlSection", () => {
-    it("has no a11y violations", async () => {
-      const { createVolumeControlSection } = await import("@/app/features/ui/volume");
-      const section = await createVolumeControlSection();
-      expect(section).not.toBeNull();
-      document.body.appendChild(section!);
-      await checkA11y(section!);
-    });
+    it(
+      "has no a11y violations",
+      async () => {
+        const { createVolumeControlSection } = await import("@/app/features/ui/volume");
+        const section = await createVolumeControlSection();
+        expect(section).not.toBeNull();
+        document.body.appendChild(section!);
+        await checkA11y(section!);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("mute button has aria-pressed", async () => {
       const { createVolumeControlSection } = await import("@/app/features/ui/volume");
@@ -141,12 +149,16 @@ describe("content-player accessibility", () => {
   });
 
   describe("createProgressBar", () => {
-    it("has no a11y violations", async () => {
-      const { createProgressBar } = await import("@/app/features/ui/progress");
-      const bar = createProgressBar();
-      document.body.appendChild(bar);
-      await checkA11y(bar);
-    });
+    it(
+      "has no a11y violations",
+      async () => {
+        const { createProgressBar } = await import("@/app/features/ui/progress");
+        const bar = createProgressBar();
+        document.body.appendChild(bar);
+        await checkA11y(bar);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("progress slider has aria-label", async () => {
       const { createProgressBar } = await import("@/app/features/ui/progress");
@@ -164,12 +176,16 @@ describe("content-player accessibility", () => {
   });
 
   describe("createFullscreenButtonSection", () => {
-    it("has no a11y violations", async () => {
-      const { createFullscreenButtonSection } = await import("@/app/features/ui/fullscreen-button");
-      const section = createFullscreenButtonSection(() => {});
-      document.body.appendChild(section);
-      await checkA11y(section);
-    });
+    it(
+      "has no a11y violations",
+      async () => {
+        const { createFullscreenButtonSection } = await import("@/app/features/ui/fullscreen-button");
+        const section = createFullscreenButtonSection(() => {});
+        document.body.appendChild(section);
+        await checkA11y(section);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("fullscreen button has accessible name", async () => {
       const { createFullscreenButtonSection } = await import("@/app/features/ui/fullscreen-button");

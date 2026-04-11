@@ -2,7 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeMessageSender } from "../fakes/FakeMessageSender";
-import { checkA11y } from "./axe-helper";
+import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
 
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: { ERROR: "error", WARN: "warn" }, logger: vi.fn() }));
@@ -39,26 +39,34 @@ afterEach(() => {
 
 describe("popup accessibility", () => {
   describe("createTabBar", () => {
-    it("has no a11y violations with two tabs", async () => {
-      const { createTabBar } = await import("@/popup/components/TabBar");
-      const tabBar = createTabBar([
-        { id: "alpha", label: "Alpha", buildPanel: () => document.createElement("div") },
-        { id: "beta", label: "Beta", buildPanel: () => document.createElement("div") },
-      ]);
-      document.body.appendChild(tabBar.el);
-      await checkA11y(tabBar.el);
-    });
+    it(
+      "has no a11y violations with two tabs",
+      async () => {
+        const { createTabBar } = await import("@/popup/components/TabBar");
+        const tabBar = createTabBar([
+          { id: "alpha", label: "Alpha", buildPanel: () => document.createElement("div") },
+          { id: "beta", label: "Beta", buildPanel: () => document.createElement("div") },
+        ]);
+        document.body.appendChild(tabBar.el);
+        await checkA11y(tabBar.el);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
-    it("maintains valid ARIA after switching tabs", async () => {
-      const { createTabBar } = await import("@/popup/components/TabBar");
-      const tabBar = createTabBar([
-        { id: "alpha", label: "Alpha", buildPanel: () => document.createElement("div") },
-        { id: "beta", label: "Beta", buildPanel: () => document.createElement("div") },
-      ]);
-      document.body.appendChild(tabBar.el);
-      tabBar.activate("beta");
-      await checkA11y(tabBar.el);
-    });
+    it(
+      "maintains valid ARIA after switching tabs",
+      async () => {
+        const { createTabBar } = await import("@/popup/components/TabBar");
+        const tabBar = createTabBar([
+          { id: "alpha", label: "Alpha", buildPanel: () => document.createElement("div") },
+          { id: "beta", label: "Beta", buildPanel: () => document.createElement("div") },
+        ]);
+        document.body.appendChild(tabBar.el);
+        tabBar.activate("beta");
+        await checkA11y(tabBar.el);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("tabs have proper ARIA relationships", async () => {
       const { createTabBar } = await import("@/popup/components/TabBar");
@@ -76,21 +84,25 @@ describe("popup accessibility", () => {
   });
 
   describe("createHotkeyRow", () => {
-    it("has no a11y violations", async () => {
-      const { HotkeyAction, DEFAULT_HOTKEYS } = await import("@/domain/hotkeys");
-      const { createHotkeyRow } = await import("@/popup/components/HotkeyRow");
+    it(
+      "has no a11y violations",
+      async () => {
+        const { HotkeyAction, DEFAULT_HOTKEYS } = await import("@/domain/hotkeys");
+        const { createHotkeyRow } = await import("@/popup/components/HotkeyRow");
 
-      const allBindings = { ...DEFAULT_HOTKEYS };
-      const row = createHotkeyRow(
-        HotkeyAction.PLAY_PAUSE,
-        DEFAULT_HOTKEYS[HotkeyAction.PLAY_PAUSE],
-        () => allBindings,
-        vi.fn(),
-        vi.fn()
-      );
-      document.body.appendChild(row.el);
-      await checkA11y(row.el);
-    });
+        const allBindings = { ...DEFAULT_HOTKEYS };
+        const row = createHotkeyRow(
+          HotkeyAction.PLAY_PAUSE,
+          DEFAULT_HOTKEYS[HotkeyAction.PLAY_PAUSE],
+          () => allBindings,
+          vi.fn(),
+          vi.fn()
+        );
+        document.body.appendChild(row.el);
+        await checkA11y(row.el);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("button has accessible name with action and binding", async () => {
       const { HotkeyAction, DEFAULT_HOTKEYS } = await import("@/domain/hotkeys");
@@ -125,13 +137,17 @@ describe("popup accessibility", () => {
   });
 
   describe("createGeneralTab", () => {
-    it("has no a11y violations", async () => {
-      const { createGeneralTab } = await import("@/popup/components/GeneralTab");
-      const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, sender);
-      const panel = buildPanel();
-      document.body.appendChild(panel);
-      await checkA11y(panel);
-    });
+    it(
+      "has no a11y violations",
+      async () => {
+        const { createGeneralTab } = await import("@/popup/components/GeneralTab");
+        const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, sender);
+        const panel = buildPanel();
+        document.body.appendChild(panel);
+        await checkA11y(panel);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("numeric inputs have aria-describedby linked to error elements", async () => {
       const { createGeneralTab } = await import("@/popup/components/GeneralTab");
@@ -163,23 +179,27 @@ describe("popup accessibility", () => {
   });
 
   describe("createSettingsPanel", () => {
-    it("full popup has no a11y violations", async () => {
-      const { createSettingsPanel } = await import("@/popup/components/SettingsPanel");
-      const container = document.createElement("div");
-      const panel = createSettingsPanel(
-        {
-          forcedLanguage: undefined,
-          seekJumpDuration: undefined,
-          volumeHotkeyStep: undefined,
-          trackRestartThreshold: undefined,
-          hotkeyBindings: undefined,
-        },
-        sender
-      );
-      panel.mount(container);
-      document.body.appendChild(container);
-      await checkA11y(container);
-    });
+    it(
+      "full popup has no a11y violations",
+      async () => {
+        const { createSettingsPanel } = await import("@/popup/components/SettingsPanel");
+        const container = document.createElement("div");
+        const panel = createSettingsPanel(
+          {
+            forcedLanguage: undefined,
+            seekJumpDuration: undefined,
+            volumeHotkeyStep: undefined,
+            trackRestartThreshold: undefined,
+            hotkeyBindings: undefined,
+          },
+          sender
+        );
+        panel.mount(container);
+        document.body.appendChild(container);
+        await checkA11y(container);
+      },
+      AXE_TEST_TIMEOUT
+    );
 
     it("header has h1 and decorative logo is hidden from assistive tech", async () => {
       const { createSettingsPanel } = await import("@/popup/components/SettingsPanel");
