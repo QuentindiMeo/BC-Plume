@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const sass = require("sass");
 const postcss = require("postcss");
-const tailwindcss = require("tailwindcss");
+const tailwindcss = require("@tailwindcss/postcss");
 const autoprefixer = require("autoprefixer");
 
 const isDev = process.argv.includes("--dev");
@@ -51,30 +51,36 @@ const popupBuildOptions = {
   outfile: path.join(distDir, "popup.js"),
 };
 
-const tailwindConfig = path.join(__dirname, "..", "tailwind.config.js");
-
 const styleEntries = [
   {
-    input: path.join(__dirname, "..", "src", "tailwind.scss"),
+    input: path.join(__dirname, "..", "src", "tailwind.css"),
     output: path.join(distDir, "tailwind.css"),
+    useSass: false,
   },
   {
     input: path.join(__dirname, "..", "src", "styles.scss"),
     output: path.join(distDir, "styles.css"),
+    useSass: true,
   },
 ];
 
 const postcssProcessor = postcss([
-  tailwindcss({ config: tailwindConfig }),
+  tailwindcss(),
   autoprefixer(),
 ]);
 
-const buildStyleEntry = async ({ input, output }) => {
-  const sassResult = sass.compile(input, {
-    style: !isDev && !isTest ? "compressed" : "expanded",
-    loadPaths: [path.join(__dirname, "..", "src")],
-  });
-  const postcssResult = await postcssProcessor.process(sassResult.css, {
+const buildStyleEntry = async ({ input, output, useSass }) => {
+  let css;
+  if (useSass) {
+    const sassResult = sass.compile(input, {
+      style: !isDev && !isTest ? "compressed" : "expanded",
+      loadPaths: [path.join(__dirname, "..", "src")],
+    });
+    css = sassResult.css;
+  } else {
+    css = fs.readFileSync(input, "utf8");
+  }
+  const postcssResult = await postcssProcessor.process(css, {
     from: input,
     to: output,
   });
@@ -88,7 +94,8 @@ const watchStyles = () => {
   const srcDir = path.join(__dirname, "..", "src");
   try {
     fs.watch(srcDir, { recursive: true }, (_, filename) => {
-      if (!filename || !filename.endsWith(".scss")) return;
+      if (!filename) return;
+      if (!filename.endsWith(".scss") && filename !== "tailwind.css") return;
       buildStyles().catch((err) => console.error("❌ Style rebuild failed:", err));
     });
   } catch (err) {

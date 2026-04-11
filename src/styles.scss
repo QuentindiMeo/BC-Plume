@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 /* Plume - Styles */
 
 /* declare variables */
@@ -21,40 +23,29 @@ div#name-section h3 {
   font-weight: unset;
 }
 div#name-section span.fromAlbum {
-  font-style: italic;
+  @apply italic;
 }
 
 div.name-section__titling {
-  display: flex;
-  align-items: baseline;
-  gap: 0.375rem;
+  @apply flex items-baseline gap-1.5;
 }
 div.name-section__titling h2 {
-  margin-right: 0 !important;
+  @apply mr-0!;
 }
 
 .inline_player { /* parent component */
-  position: sticky !important;
-  top: 0;
+  @apply sticky! top-0 rounded-lg my-4! mx-0!;
   z-index: 9; /* ensure it stays above other contents, especially the album collection promotion */
-
-  margin: 1em 0 !important;
-  border-radius: .5rem;
 
   transition: background-color 0.2s ease, margin 0.2s ease !important;
 }
 .inline_player.scrolled { /* when the user scrolls low enough, Plume becomes sticky */
-  top: .5rem;
-  margin: 0 !important;
+  @apply top-2 m-0!;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.progbar,
-.progbar_empty {
-  height: 0.5rem !important;
-  border-radius: 0.25rem !important;
-
-  cursor: pointer !important;
+.progbar, .progbar_empty {
+  @apply h-2! rounded! cursor-pointer!;
 }
 
 .progbar {
@@ -68,41 +59,27 @@ div.name-section__titling h2 {
 }
 
 #bpe-hidden-original {
-  display: none !important;
-  visibility: hidden !important;
+  @apply hidden! invisible!;
 }
 
 /**************** Plume styling ****************/
 
 #bpe-plume {
-  border-radius: .5rem;
+  @apply rounded-lg border;
   background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 #bpe-header-container {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.75rem 0.75rem;
+  @apply flex justify-end p-3 rounded-lg;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 0.5rem;
 }
 #bpe-header-container:has(+ #bpe-tracklist-dropdown.is-open) {
-  border-radius: 0.5rem 0.5rem 0 0;
+  @apply rounded-b-none;
 }
 
 #bpe-header-logo {
-  transform-origin: top left;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  padding: 0.75rem 2rem 0 2rem;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-
-  scale: 0.25;
+  @apply absolute top-0 left-0 flex flex-col items-end pt-3 px-8 pb-0 scale-[0.25] origin-top-left;
 }
 #bpe-header-logo:focus-visible {
   border-radius: var(--focusable-outline-border-radius);
@@ -110,23 +87,13 @@ div.name-section__titling h2 {
   outline-offset: 1rem;
 }
 #bpe-header-logo__version {
-  margin: 0;
-  margin-top: 0.5rem;
-
+  @apply m-0 mt-2 text-5xl font-bold italic;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 3rem;
-  font-weight: bold;
-  font-style: italic;
   color: var(--plume);
 }
 
 #bpe-header-current {
-  width: 75%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-
+  @apply w-3/4 flex flex-col items-end;
 }
 #bpe-header-current:focus-visible {
   border-radius: var(--focusable-outline-border-radius);
@@ -135,28 +102,15 @@ div.name-section__titling h2 {
 }
 
 #bpe-header-title-pretext {
-  padding-right: 0.25rem;
-  font-style: italic;
-  text-align: right;
+  @apply pr-1 italic text-right;
 }
 
 .bpe-header-title-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
+  @apply flex items-center w-full min-w-0;
 }
 
 #bpe-header-track-link {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-left: auto;
-  margin-right: 0.25rem;
+  @apply shrink-0 inline-flex items-center justify-center w-5 h-5 ml-auto mr-1;
 }
 #bpe-header-track-link:focus-visible {
   border-radius: var(--focusable-outline-border-radius);
@@ -164,56 +118,31 @@ div.name-section__titling h2 {
   outline-offset: 1px;
 }
 #bpe-header-track-link svg {
-  width: 0.75rem;
-  height: 0.75rem;
+  @apply w-3 h-3;
 }
 
 #bpe-header-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  margin-right: 0.25rem;
-
+  @apply flex-auto min-w-0 mr-1 text-sm text-white text-right truncate;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.875rem;
   line-height: var(--title-line-height);
-  white-space: nowrap;
-  color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 #bpe-header-track-link + #bpe-header-title {
-  flex: 0 1 auto;
-  margin-right: 0;
+  @apply flex-initial mr-0;
 }
 
 #bpe-tracklist-toggle-btn {
-  flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
-  padding: 0;
-  padding-top: 0.25rem;
-
-  margin: 0;
-  background: transparent;
-  border: none;
+  @apply shrink-0 w-5 h-5 p-0 pt-1 m-0 bg-transparent border-none flex items-center justify-center cursor-pointer;
   color: rgba(255, 255, 255, 0.7);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
 }
 #bpe-tracklist-toggle-btn:hover {
-  color: #ffffff;
+  @apply text-white;
 }
 #bpe-tracklist-toggle-btn svg {
-  transition: transform 0.2s ease;
-  pointer-events: none;
+  @apply pointer-events-none transition-transform;
 }
 #bpe-tracklist-toggle-btn[aria-expanded="true"] svg {
-  transform: rotate(180deg);
+  @apply rotate-180;
 }
 #bpe-tracklist-toggle-btn:focus-visible {
   border-radius: var(--focusable-outline-border-radius);
@@ -222,31 +151,27 @@ div.name-section__titling h2 {
 }
 
 #bpe-tracklist-dropdown {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
+  @apply max-h-0 overflow-hidden opacity-0 rounded-b-lg;
   transition: max-height 0.25s ease, opacity 0.2s ease;
 
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 0.5rem 0.5rem;
 
   scrollbar-width: thin;
   scrollbar-color: var(--tracklist-scrollbar-thumb) transparent;
 }
 #bpe-tracklist-dropdown::-webkit-scrollbar {
-  width: 4px;
+  @apply w-1;
 }
 #bpe-tracklist-dropdown::-webkit-scrollbar-track {
-  background: transparent;
+  @apply bg-transparent;
 }
 #bpe-tracklist-dropdown::-webkit-scrollbar-thumb {
+  @apply rounded-sm;
   background: var(--tracklist-scrollbar-thumb);
-  border-radius: 2px;
 }
 #bpe-tracklist-dropdown.is-open {
+  @apply overflow-y-auto opacity-100;
   max-height: 6.5rem;
-  overflow-y: auto;
-  opacity: 1;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   transition: max-height 0.25s ease, opacity 0.2s ease;
 }
@@ -260,16 +185,9 @@ div.name-section__titling h2 {
 }
 
 .bpe-tracklist-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.75rem;
-  cursor: pointer;
+  @apply flex items-center gap-2 py-1.5 px-3 text-xs font-sans cursor-pointer outline-none;
   transition: background 0.15s ease;
-  outline: none;
 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.85);
 }
 .bpe-tracklist-item:hover {
@@ -280,8 +198,8 @@ div.name-section__titling h2 {
   box-shadow: inset 0 0 0 1px var(--plume);
 }
 .bpe-tracklist-item--active {
+  @apply font-semibold;
   color: var(--progbar-fill-bg-left);
-  font-weight: 600;
 }
 .bpe-tracklist-item--active:hover,
 .bpe-tracklist-item--active:focus {
@@ -291,62 +209,36 @@ div.name-section__titling h2 {
   box-shadow: inset 0 0 0 1px var(--plume);
 }
 .bpe-tracklist-item--unplayable {
-  opacity: 0.35;
-  cursor: default;
-  pointer-events: none;
+  @apply opacity-35 cursor-default pointer-events-none;
 }
 
 .bpe-tracklist-item__number {
-  flex-shrink: 0;
-  min-width: 1.5rem;
-  text-align: right;
+  @apply shrink-0 min-w-6 text-right text-xs;
   color: rgba(255, 255, 255, 0.45);
-  font-size: 0.75rem;
 }
 .bpe-tracklist-item--active .bpe-tracklist-item__number {
   color: var(--progbar-fill-bg-left);
 }
 .bpe-tracklist-item__title {
-  flex: 1 1 auto;
-  min-width: 0;
+  @apply flex-auto min-w-0 truncate;
   line-height: var(--title-line-height);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .bpe-tracklist-item__duration {
-  flex-shrink: 0;
+  @apply shrink-0 text-xs tabular-nums;
   color: rgba(255, 255, 255, 0.45);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
 }
 
 #bpe-playback-manager {
-  position: relative;
-  padding: 0.5rem 1rem;
-  margin-top: 0.1rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  @apply relative py-2 px-4 mt-px flex flex-col gap-1;
 }
 
 #bpe-progress-container {
-  position: relative;
-  margin: 0;
+  @apply relative m-0;
 }
 
 #bpe-progress-slider {
-  width: 100%;
-  height: 0.5rem;
-  margin: 0;
-  border-radius: 0.25rem;
-
-  cursor: pointer;
-  position: relative;
+  @apply w-full h-2 m-0 rounded cursor-pointer relative appearance-none;
   -webkit-user-drag: none;
-
-  appearance: none;
   -webkit-appearance: none;
 }
 #bpe-progress-slider:focus-visible {
@@ -354,16 +246,8 @@ div.name-section__titling h2 {
   outline-offset: 0.25rem;
 }
 #bpe-progress-slider::-webkit-slider-thumb {
-  width: 0.75rem;
-  height: 0.75rem;
-  background: #ffffff;
-  border-radius: 50%;
+  @apply w-3 h-3 bg-white rounded-full cursor-pointer appearance-none transition-all;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  appearance: none;
   -webkit-appearance: none;
 }
 #bpe-progress-slider::-webkit-slider-thumb:hover {
@@ -371,40 +255,21 @@ div.name-section__titling h2 {
   background: lightgray;
 }
 #bpe-progress-slider::-moz-range-thumb {
-  width: 0.75rem;
-  height: 0.75rem;
-  background: #ffffff;
-  border: none;
-  border-radius: 50%;
+  @apply w-3 h-3 border-none bg-white rounded-full cursor-pointer transition-all;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 #bpe-progress-slider::-moz-range-thumb:hover {
+  @apply bg-[lightgray];
   transform: scale(1.2);
-  background: lightgray;
 }
 
 #bpe-time-display {
-  display: flex;
-  justify-content: space-between;
-
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.75rem;
+  @apply flex justify-between text-xs font-sans;
   color: rgba(255, 255, 255, 0.8);
 }
 
 #bpe-duration-display {
-  cursor: pointer;
-  background: none;
-  border: none;
-  outline-offset: 2px;
-
-  padding: 0;
-  margin: 0;
-
-  color: inherit;
+  @apply cursor-pointer bg-transparent border-none p-0 m-0 outline-offset-2 text-inherit;
   font: inherit;
 }
 #bpe-duration-display:focus-visible {
@@ -413,30 +278,14 @@ div.name-section__titling h2 {
 }
 
 #bpe-playback-controls {
-  margin-bottom: 0.25rem;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.75rem;
+  @apply mb-1 flex justify-center items-center gap-3;
 }
 
 #bpe-playback-controls button {
-  width: 2.5rem;
-  height: 2.5rem;
+  @apply w-10 h-10 rounded-full mr-0! flex items-center justify-center text-white transition-all;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(0.625rem);
   border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-
-  margin-right: 0 !important;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-
-  transition: all 0.3s ease;
 }
 #bpe-playback-controls button:hover {
   transform: scale(1.1);
@@ -451,14 +300,11 @@ div.name-section__titling h2 {
   outline: var(--focusable-outline);
 }
 #bpe-playback-controls button:disabled {
-  opacity: 0.4;
-  pointer-events: none;
+  @apply opacity-40 pointer-events-none;
 }
 
 #bpe-play-pause-btn {
-  width: 3.5rem !important;
-  height: 3.5rem !important;
-
+  @apply size-14!;
   background: rgba(29, 160, 195, 0.2) !important;
   border-color: var(--progbar-fill-bg-right) !important;
 }
@@ -468,34 +314,12 @@ div.name-section__titling h2 {
 }
 
 #bpe-volume-container {
-  position: relative;
-  padding: 0.75rem 1rem;
-  margin: 0;
+  @apply relative py-3 px-4 m-0 flex items-center gap-3 rounded-lg;
   background: rgba(0, 0, 0, 0.2);
-
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  border-radius: 0.5rem;
 }
 
 #bpe-mute-btn {
-  flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
-
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  border: none;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-
-  transition: color 0.2s ease, opacity 0.2s ease;
+  @apply shrink-0 w-8 h-8 p-0 m-0 bg-transparent border-none flex items-center justify-center text-white transition-all;
 }
 #bpe-mute-btn:hover {
   color: var(--progbar-fill-bg-left);
@@ -505,20 +329,12 @@ div.name-section__titling h2 {
   outline: var(--focusable-outline);
 }
 #bpe-mute-btn.muted {
-  opacity: 0.5;
+  @apply opacity-50;
 }
 
 #bpe-volume-slider {
-  flex: 1;
-  height: 0.5rem;
-  margin: 0;
+  @apply flex-1 h-2 m-0 rounded cursor-pointer relative appearance-none;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 0.25rem;
-
-  cursor: pointer;
-  position: relative;
-
-  appearance: none;
   -webkit-appearance: none;
 }
 #bpe-volume-slider:focus-visible {
@@ -526,67 +342,38 @@ div.name-section__titling h2 {
   outline-offset: 0.5rem;
 }
 #bpe-volume-slider::-webkit-slider-thumb {
-  width: 1rem;
-  height: 1rem;
+  @apply w-4 h-4 border-none rounded-[25%] appearance-none transition-all;
   background: var(--progbar-fill-bg-right);
-  border: none;
-  border-radius: 25%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 
-  transition: all 0.2s ease;
-
-  appearance: none;
   -webkit-appearance: none;
 }
 #bpe-volume-slider::-webkit-slider-thumb:hover {
-  scale: 1.15;
+  @apply scale-[1.15];
   background: var(--progbar-fill-bg-left);
 }
 #bpe-volume-slider::-moz-range-thumb {
-  width: 1rem;
-  height: 1rem;
+  @apply w-4 h-4 border-none rounded-[25%] transition-all;
   background: var(--progbar-fill-bg-right);
-  border: none;
-  border-radius: 25%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-
-  transition: all 0.2s ease;
 }
 #bpe-volume-slider::-moz-range-thumb:hover {
-  scale: 1.1;
+  @apply scale-[1.1];
   background: var(--progbar-fill-bg-left);
 }
 
 #bpe-volume-value {
-  width: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  text-align: right;
-  font-size: 0.75rem;
-  font-weight: 600;
+  @apply w-8 text-right text-xs font-sans font-semibold;
   color: var(--progbar-fill-bg-right);
 }
 
 #bpe-fullscreen-btn-container {
-  display: flex;
-  justify-content: center;
-  padding: 0.5rem 0;
+  @apply flex justify-center py-2;
 }
 #bpe-fullscreen-btn {
-  width: min-content !important;
-  height: 2rem !important;
+  @apply h-8! w-min! rounded-lg text-white flex items-center gap-2 py-0 px-2 m-0 z-10 backdrop-blur-sm transition-transform;
   background: rgba(255, 255, 255, 0.05) !important;
   border: 0.0625rem solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 0.5rem;
-  backdrop-filter: blur(0.625rem);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.5rem;
-  margin: 0;
-
-  transition: transform 0.3s ease;
-  z-index: 10;
 }
 #bpe-fullscreen-btn:hover {
   transform: scale(1.025);
@@ -600,11 +387,7 @@ div.name-section__titling h2 {
   transform: scale(1);
 }
 #bpe-fullscreen-btn-label {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin-left: 0.25rem;
+  @apply text-xs font-medium text-white font-sans ml-1;
 }
 
 /* Fullscreen Mode Styles */
@@ -624,165 +407,95 @@ div.name-section__titling h2 {
 }
 
 #bpe-fullscreen-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  @apply fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-9999;
   animation: fadeIn 0.3s ease-in-out;
 }
 
 #bpe-fullscreen-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #000;
-
-  /* Heavy blur and dimming */
-  filter: blur(1.5rem) brightness(0.5);
-  scale: 1.1; /* needed because blur shrinks the opaque zone */
-
-  /* Make background inert */
-  pointer-events: none;
-  user-select: none;
+  @apply
+    absolute top-0 left-0 w-screen h-screen scale-110 /* because blur shrinks the opaque zone */
+  bg-black bg-cover bg-center bg-no-repeat blur-xl brightness-50 /* Heavy blur and dimming */
+    pointer-events-none select-none
+  ;
 }
 
 #bpe-fullscreen-content {
-  position: relative;
-  z-index: 10000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3rem;
-
-  pointer-events: all;
+  @apply relative flex items-center justify-center gap-12 pointer-events-auto z-10000;
 }
 
 #bpe-fullscreen-presentation {
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  @apply relative flex flex-col items-center justify-center;
 }
 #bpe-fullscreen-presentation #name-section {
-  color: #ffffff;
+  @apply text-white;
 }
 #bpe-fullscreen-cover-art {
-  min-width: 25vw;
-  max-width: 30vw;
-  max-height: 60vh;
+  @apply min-w-[25vw] max-w-[30vw] max-h-[60vh] rounded-lg;
 
-  border-radius: 0.5rem;
   box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
 
   animation: slideInLeft 0.5s ease-out;
 }
 .bpe-fullscreen-titling {
-  position: absolute;
-  bottom: -8vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
+  @apply absolute bottom-[-8vh] flex flex-col items-center gap-1;
 
   animation: slideInRight 0.5s ease-out;
 }
 .bpe-fullscreen-titling h2, .bpe-fullscreen-titling h3 {
-  margin: 0;
-  text-align: center;
+  @apply m-0 text-center;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 .bpe-fullscreen-titling .name-section__titling {
-  font-style: italic;
+  @apply italic;
 }
 .bpe-fullscreen-titling .name-section__titling span.runtime {
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-style: normal;
-  color: #ffffffaf !important;
+  @apply text-xs font-medium not-italic text-[#ffffffaf]!;
 }
 
 #bpe-fullscreen-clone {
-  background: #ffffff07;
-  border-radius: .5rem;
+  @apply rounded-lg flex flex-col justify-center;
+  background: rgba(255, 255, 255, 0.03);
   box-shadow: rgba(0, 0, 0, 0.2) 0 0 0.25rem;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 #bpe-fullscreen-clone > #bpe-header-logo {
-  position: relative;
-  height: 6rem;
-  padding: 0;
-  margin-bottom: 1rem;
-
-  scale: 1;
+  @apply relative h-24 p-0 mb-4 items-center scale-100;
   transform: unset;
   transform-origin: unset;
-
-  align-items: center;
 }
 #bpe-fullscreen-clone > #bpe-header-logo:focus-visible {
   outline-width: 2px;
   outline-offset: 0;
 }
 #bpe-fullscreen-clone > #bpe-header-logo p {
-  margin: 0;
-  font-size: 1rem;
+  @apply m-0 text-base;
 }
 
 #bpe-fullscreen-clone #bpe-header-container {
-  max-width: 25em;
+  @apply max-w-[25em];
 }
 
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-logo {
-  display: none;
+  @apply hidden;
 }
 
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-current {
-  width: 100%;
+  @apply w-full;
 }
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-title {
-  white-space: nowrap;
+  @apply whitespace-nowrap;
 }
 
 #bpe-fullscreen-exit-btn {
-  z-index: 10001;
-  position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
-
-  width: 3rem;
-  height: 3rem;
+  @apply
+    z-10001 fixed top-6 right-6 w-12 h-12 rounded-full
+    flex items-center justify-center
+    text-white backdrop-blur-sm
+    transition-all
+  ;
   background: rgba(0, 0, 0, 0.7);
   border: 0.125rem solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  backdrop-filter: blur(10px);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-
-  transition: all 0.3s ease;
   animation: fadeIn 0.3s ease-out;
 }
 #bpe-fullscreen-exit-btn:hover {
@@ -800,25 +513,17 @@ div.name-section__titling h2 {
 
 /* Visually hidden but accessible to screen readers */
 .sr-live {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
+  @apply sr-only;
 }
 
 /* Responsive adjustments for fullscreen */
 @media (max-width: 768px) {
   #bpe-fullscreen-content {
-    height: auto;
-    flex-direction: column;
-    gap: 1rem;
+    @apply h-auto flex-col gap-4;
   }
 
   #bpe-fullscreen-cover-art {
-    max-width: 70vw;
-    max-height: 40vh;
+    @apply max-w-[70vw] max-h-[40vh];
   }
 
   .bpe-fullscreen-titling {
@@ -826,7 +531,7 @@ div.name-section__titling h2 {
   }
 
   #bpe-fullscreen-presentation {
-    gap: 0.25rem;
+    @apply gap-1;
   }
 }
 
@@ -853,39 +558,26 @@ div.name-section__titling h2 {
 }
 
 #bpe-toast-container {
-  z-index: 11000;
-  position: fixed;
-  top: 1.25rem;
-  right: 1.25rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  @apply fixed top-5 right-5 flex flex-col gap-3 z-11000;
 }
 
 #bpe-toast-container:empty {
-  pointer-events: none;
+  @apply pointer-events-none;
 }
 
 .bpe-toast {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-
-  width: calc(100vw - 2.5rem);
-  max-width: 25rem;
-  padding: 0.875rem 1rem;
+  @apply
+    relative overflow-hidden
+    w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg
+    flex items-start
+    font-sans backdrop-blur-sm
+  ;
 
   background: rgba(15, 15, 20, 0.8);
-  backdrop-filter: blur(8px);
   border: 1px solid rgba(32, 160, 195, 0.35);
-  border-radius: 0.5rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(32, 160, 195, 0.15);
 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
   animation: bpe-toast-enter 0.3s ease-out;
-  overflow: hidden;
 
   &:hover {
     background: rgba(10, 10, 15, 0.9);
@@ -893,95 +585,59 @@ div.name-section__titling h2 {
   }
 
   &--exiting {
+    @apply pointer-events-none;
     animation: bpe-toast-exit 0.25s ease-in forwards;
-    pointer-events: none;
   }
 }
 
 .bpe-toast__icon {
-  flex-shrink: 0;
-  width: 15%;
-  height: unset;
-  place-self: center;
-  margin-top: -0.5rem;
+  @apply shrink-0 w-[15%] h-auto place-self-center -mt-2;
 }
 
 .bpe-toast__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-  margin-left: 1rem;
+  @apply flex-1 flex flex-col gap-1 min-w-0 ml-4;
 }
 
 .bpe-toast__body * {
-  width: fit-content;
+  @apply w-fit;
 }
 
 .bpe-toast__title {
-  margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.3;
-  font-weight: 600;
-  color: #ffffff;
+  @apply m-0 text-sm font-semibold text-white leading-[1.3];
 }
 
 .bpe-toast__description {
-  margin: 0;
-  font-size: 0.75rem;
-  line-height: 1.4;
-  font-weight: 400;
+  @apply m-0 text-xs font-normal leading-[1.4];
   color: rgba(255, 255, 255, 0.7);
 }
 
 .bpe-toast__cta {
-  display: block;
-  padding-top: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
+  @apply block pt-1.5 text-xs font-medium whitespace-nowrap no-underline;
   color: var(--progbar-fill-bg-left);
-  text-decoration: none;
-  white-space: nowrap;
 }
 .bpe-toast__cta:hover {
-  text-decoration: underline;
+  @apply underline;
 }
 
 .bpe-toast__dismiss {
-  flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
-  margin: -0.75rem -0.75rem 0 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent;
-  border: none;
+  @apply
+    shrink-0 w-11 h-11 border-none mx-0 -my-3
+    flex items-center justify-center
+    bg-transparent
+    text-xl leading-none
+    cursor-pointer transition-colors
+  ;
   border-radius: var(--focusable-outline-border-radius);
-  cursor: pointer;
-
-  font-size: 1.25rem;
-  line-height: 1;
   color: rgba(255, 255, 255, 0.5);
-
-  transition: color 0.15s ease;
 }
 .bpe-toast__dismiss:hover {
-  color: #ffffff;
+  @apply text-white;
 }
 
 .bpe-toast__timer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  width: 100%;
+  @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
   background: linear-gradient(90deg, var(--progbar-fill-bg-left), var(--progbar-fill-bg-right));
   animation: bpe-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
-  pointer-events: none;
 }
 
 .bpe-toast--paused .bpe-toast__timer {
@@ -990,12 +646,8 @@ div.name-section__titling h2 {
 
 @media (max-width: 480px) {
   #bpe-toast-container {
-    top: auto;
-    right: auto;
-    bottom: 1rem;
-    left: 50%;
+    @apply top-auto right-auto bottom-4 left-1/2 items-center;
     transform: translateX(-50%);
-    align-items: center;
   }
 
   .bpe-toast {
@@ -1070,6 +722,6 @@ div.name-section__titling h2 {
   #bpe-time-display,
   #bpe-volume-value,
   #bpe-header-title-pretext {
-    color: rgba(255, 255, 255, 1) !important;
+    @apply text-white!;
   }
 }
