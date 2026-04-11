@@ -1,15 +1,4 @@
-import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
-import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
-import { coreActions } from "@/domain/ports/app-core";
-import { guiActions } from "@/domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
-import { PLUME_SVG } from "@/svg/icons";
-import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
@@ -19,8 +8,23 @@ import {
   handleTrackBackward,
   handleTrackForward,
 } from "@/app/features/ui/playback";
-import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
+import { createToast } from "@/app/features/ui/toast";
+import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { handleMuteToggle } from "@/app/features/ui/volume";
+import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
+import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
+import { presentFormattedTime } from "@/shared/presenters";
+import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
 
 const { PROGRESS_SLIDER_GRANULARITY, VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -28,7 +32,7 @@ interface FullscreenElements {
   headerContainer: HTMLDivElement;
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
-  durationDisplay: HTMLSpanElement;
+  durationDisplay: HTMLButtonElement;
   playPauseBtn: HTMLButtonElement;
   volumeSlider: HTMLInputElement;
   volumeDisplay: HTMLDivElement;
@@ -41,6 +45,22 @@ interface FullscreenElements {
 }
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
+
+let fullscreenLiveRegion: HTMLDivElement | null = null;
+const announceFullscreenState = (messageKey: string): void => {
+  if (!fullscreenLiveRegion) {
+    fullscreenLiveRegion = document.createElement("div");
+    fullscreenLiveRegion.ariaLive = "polite";
+    fullscreenLiveRegion.role = "status";
+    fullscreenLiveRegion.className = "sr-live";
+    document.body.appendChild(fullscreenLiveRegion);
+  }
+  // Clear then set to ensure re-announcement even if the same message is sent twice
+  fullscreenLiveRegion.textContent = "";
+  requestAnimationFrame(() => {
+    fullscreenLiveRegion!.textContent = getString(messageKey);
+  });
+};
 
 const exitFullscreenMode = (): void => {
   const plumeUi = getGuiInstance();
@@ -79,6 +99,10 @@ const renderVolume = (elements: FullscreenElements, volume: number): void => {
   }
 
   elements.volumeSlider.value = Math.round(volume * VOLUME_SLIDER_GRANULARITY).toString();
+  elements.volumeSlider.setAttribute(
+    "aria-valuetext",
+    `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`
+  );
   elements.volumeDisplay.textContent = `${elements.volumeSlider.value}${getString("META__PERCENTAGE")}`;
 };
 
@@ -132,12 +156,38 @@ const renderProgressSlider = (elements: FullscreenElements, progressPercentage: 
   const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
   elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
   elements.progressSlider.style.backgroundImage = bgImg;
+
+  const { currentTime, duration } = getAppCoreInstance().getState();
+  elements.progressSlider.setAttribute(
+    "aria-valuetext",
+    getString("ARIA__PROGRESS_VALUETEXT", [presentFormattedTime(currentTime), presentFormattedTime(duration)])
+  );
 };
 
 const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | null): void => {
   if (!elements.headerContainer || !trackTitle) {
     logger(CPL.ERROR, getString("ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND"));
     return;
+  }
+
+  const trackLink = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
+  if (trackLink) {
+    const bcPlayer = getBcPlayerInstance();
+    const trackUrl = bcPlayer.getCurrentTrackUrl();
+
+    if (trackUrl) {
+      trackLink.href = trackUrl;
+      trackLink.ariaDisabled = "false";
+      trackLink.style.pointerEvents = "";
+      trackLink.tabIndex = 0;
+    } else {
+      trackLink.removeAttribute("href");
+      trackLink.ariaDisabled = "true";
+      trackLink.style.pointerEvents = "none";
+      trackLink.tabIndex = -1;
+    }
+  } else {
+    logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
   }
 
   const headerTitle = elements.headerContainer.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
@@ -171,7 +221,7 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     headerContainer: clone.querySelector(PLUME_ELEM_SELECTORS.headerContainer) as HTMLDivElement,
     progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
-    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLSpanElement,
+    durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLButtonElement,
     playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
     volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
     volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
@@ -196,6 +246,7 @@ const renderLoopButton = (elements: FullscreenElements, loopMode: LoopModeType):
 const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const plume = getGuiInstance().getState();
   const appCore = getAppCoreInstance();
+  const isAlbumPage = appCore.getState().pageType === "album";
 
   const subscriptions: Array<SubscriptionCallback> = [];
   const elements: FullscreenElements = getFullscreenElements(clone);
@@ -271,6 +322,34 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     elements.headerContainer.appendChild(node.cloneNode(true));
   });
 
+  // Apply the Bandcamp theme color to the track link in the fullscreen clone
+  if (isAlbumPage) {
+    const fsTrackLink = elements.headerContainer.querySelector(
+      PLUME_ELEM_SELECTORS.headerTrackLink
+    ) as HTMLAnchorElement;
+    if (fsTrackLink) fsTrackLink.style.color = getAppropriateAccentColor();
+  }
+
+  // Re-initialize the tracklist for the fullscreen clone.
+  // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another
+  // inert clone of the toggle button. Replace both inert elements with a fresh instance.
+  if (isAlbumPage) {
+    const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup: tracklistCleanup } = createTracklistToggle();
+    subscriptions.push(tracklistCleanup);
+
+    // Toggle button lives inside the re-populated header
+    const inertToggle = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
+    inertToggle?.replaceWith(fsToggleBtn);
+
+    // Dropdown is a direct child of the plumeClone (sibling of the header)
+    const inertDropdown = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistDropdown);
+    if (inertDropdown) {
+      inertDropdown.replaceWith(fsDropdownEl);
+    } else {
+      clone.appendChild(fsDropdownEl);
+    }
+  }
+
   // Apply initial state using pure rendering functions (same logic as subscriptions)
   renderProgressSlider(elements, appCore.computed.progressPercentage());
   renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
@@ -299,6 +378,9 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   const overlay = document.createElement("div");
   overlay.id = PLUME_ELEM_SELECTORS.fullscreenOverlay.split("#")[1];
+  overlay.role = "dialog";
+  overlay.ariaModal = "true";
+  overlay.ariaLabel = getString("ARIA__FULLSCREEN_OVERLAY");
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
@@ -312,12 +394,6 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const presentationContainer = document.createElement("div");
   presentationContainer.id = PLUME_ELEM_SELECTORS.fullscreenPresentationContainer.split("#")[1];
 
-  const coverArtImg = document.createElement("img");
-  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
-  coverArtImg.src = artworkUrl;
-  coverArtImg.alt = getString("ARIA__COVER_ART");
-  presentationContainer.appendChild(coverArtImg);
-
   const newNameSection = bcPlayer.getInfoSection() as HTMLDivElement | null;
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
@@ -326,10 +402,18 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
 
   // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
+
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
   const headTitle = adjustedNameSection.querySelector("h2")!;
-  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingProject.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = `"${headTitle.textContent?.trim()}"`;
+  const releaseName = headTitle.textContent?.trim() || "";
+  headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
+  if (!isAlbumPage) headTitle.textContent = `"${releaseName}"`;
+
+  const coverArtImg = document.createElement("img");
+  coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
+  coverArtImg.src = artworkUrl;
+  coverArtImg.alt = releaseName ? getString("ARIA__COVER_ART_FOR", [releaseName]) : getString("ARIA__COVER_ART");
+  presentationContainer.appendChild(coverArtImg);
 
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);
@@ -354,7 +438,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   versionTag.id = `${fullscreenLogo.id}__version`;
   versionTag.textContent = APP_VERSION;
   fullscreenLogo.appendChild(versionTag);
-  fullscreenLogo.href = PLUME_KO_FI_URL;
+  fullscreenLogo.href = PLUME_LINKTREE_URL;
   fullscreenLogo.target = "_blank";
   fullscreenLogo.rel = "noopener noreferrer";
   fullscreenLogo.ariaLabel = getString("ARIA__APP_NAME");
@@ -437,17 +521,22 @@ export const toggleFullscreenMode = (): void => {
 
   if (isCurrentlyFullscreen) {
     exitFullscreenMode();
+    announceFullscreenState("ARIA__FULLSCREEN__EXITED");
     logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
     return;
   }
 
   // Enter fullscreen - dispatch state change first, then build DOM
   const isAlbumPage = appCore.getState().pageType === "album";
-
   const overlay = buildFullscreenOverlay(isAlbumPage);
   if (!overlay) {
-    // Failed to build overlay - revert state
     appCore.dispatch(coreActions.setIsFullscreen(false));
+    createToast({
+      label: getString("META__TOAST__FULLSCREEN_UNAVAILABLE"),
+      title: getString("LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE"),
+      description: getString("LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION"),
+      borderType: "warning",
+    });
     return;
   }
 
@@ -468,5 +557,6 @@ export const toggleFullscreenMode = (): void => {
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));
 
+  announceFullscreenState("ARIA__FULLSCREEN__ENTERED");
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

@@ -1,5 +1,7 @@
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding } from "@/domain/hotkeys";
+import { PLUME_SUPPORTED_LANGUAGES, PlumeLanguage } from "@/domain/plume";
+import { loadForcedLanguage } from "@/popup/use-cases/loadForcedLanguage";
 import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
@@ -119,6 +121,27 @@ describe("loadTrackRestartThreshold", () => {
   it("returns undefined for a float", async () => {
     fakeStorage.store[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] = 1.5;
     expect(await loadTrackRestartThreshold()).toBeUndefined();
+  });
+});
+
+describe("loadForcedLanguage", () => {
+  it("returns undefined when key is absent", async () => {
+    expect(await loadForcedLanguage()).toBeUndefined();
+  });
+
+  it.each(PLUME_SUPPORTED_LANGUAGES)("accepts valid language code '%s'", async (lang: PlumeLanguage) => {
+    fakeStorage.store[PLUME_CACHE_KEYS.FORCED_LANGUAGE] = lang;
+    expect(await loadForcedLanguage()).toBe(lang);
+  });
+
+  it("returns undefined for an unrecognized language code", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.FORCED_LANGUAGE] = "de";
+    expect(await loadForcedLanguage()).toBeUndefined();
+  });
+
+  it("returns undefined for a non-string value", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.FORCED_LANGUAGE] = 42;
+    expect(await loadForcedLanguage()).toBeUndefined();
   });
 });
 

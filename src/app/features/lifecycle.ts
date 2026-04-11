@@ -1,13 +1,3 @@
-import { PLUME_CONSTANTS } from "@/domain/plume";
-import { coreActions } from "@/domain/ports/app-core";
-import { guiActions } from "@/domain/ports/plume-ui";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
-import { getBcPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getBrowserInstance } from "@/app/stores/BrowserImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { shouldShowReleaseToast } from "@/app/use-cases";
 import { checkBandcampElements } from "@/app/features/bc-diagnostic";
 import { debugBandcampControls } from "@/app/features/debug";
 import { injectEnhancements } from "@/app/features/injection";
@@ -20,6 +10,17 @@ import {
   setupListeners,
 } from "@/app/features/observers";
 import { showReleaseToast } from "@/app/features/toast";
+import { createToast, ToastHandle } from "@/app/features/ui/toast";
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { shouldShowReleaseToast } from "@/app/use-cases";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
+import { guiActions } from "@/domain/ports/plume-ui";
+import { getString } from "@/shared/i18n";
+import { CPL, logger } from "@/shared/logger";
 
 const initPlayback = () => {
   // BC's native play button is clicked to trigger its own internal playback bootstrap
@@ -52,13 +53,16 @@ export const launchPlume = (): void => {
   const handles: CleanupHandles = {
     audioEvents: null,
     storeSubscriptions: null,
-    hotkeys: null,
     stickiness: null,
+    tracklist: null,
+    hotkeys: null,
     toast: null,
   };
 
   const isInitializedRef = { value: false };
   let isInitializing = false;
+  let audioRetryCount = 0;
+  let audioToastHandle: ToastHandle | null = null;
 
   const init = async () => {
     // Prevent concurrent initialization
@@ -74,16 +78,41 @@ export const launchPlume = (): void => {
       return;
     }
 
-    const plumeCanBuild = checkBandcampElements().allRequiredFound;
-    if (!plumeCanBuild) return;
+    const healthResult = checkBandcampElements();
+    if (healthResult.allRequiredFound) {
+      logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__ALL_FOUND"));
+    } else {
+      const missingRequiredCount = healthResult.missing.filter((el) => el.required).length;
+      createToast({
+        label: getString("META__TOAST__HEALTH_CHECK"),
+        title: getString("LABEL__TOAST__HEALTH_CHECK__TITLE", [String(missingRequiredCount)]),
+        description: getString("LABEL__TOAST__HEALTH_CHECK__DESCRIPTION"),
+        borderType: "error",
+      });
+
+      isInitializing = false;
+      return;
+    }
 
     const audioElement = await findAudioElement();
     if (!audioElement) {
+      audioRetryCount++;
       logger(CPL.WARN, getString("WARN__AUDIO_ELEMENT__NOT_FOUND"));
+      if (audioRetryCount >= PLUME_CONSTANTS.AUDIO_RETRY_TOAST_THRESHOLD && !audioToastHandle) {
+        audioToastHandle = createToast({
+          label: getString("META__TOAST__AUDIO_NOT_FOUND"),
+          title: getString("LABEL__TOAST__AUDIO_NOT_FOUND__TITLE"),
+          description: getString("LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION"),
+          borderType: "warning",
+        });
+      }
       isInitializing = false;
       setTimeout(init, PLUME_CONSTANTS.AUDIO_RETRY_MS);
       return;
     }
+    audioRetryCount = 0;
+    audioToastHandle?.dismiss();
+    audioToastHandle = null;
 
     // Make audio element available before loading persisted state so that MusicPlayerAdapter calls (e.g. setLoop) inside the thunk don't throw.
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
@@ -107,14 +136,20 @@ export const launchPlume = (): void => {
 
     // Duration display method is already loaded from persisted state
     const durationDisplayMethod = appCore.getState().durationDisplayMethod;
-    logger(CPL.INFO, getString("INFO__TIME_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
+    logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [durationDisplayMethod]));
 
-    const isInjected = await injectEnhancements();
+    const { ok: isInjected, tracklistCleanup } = await injectEnhancements();
     if (!isInjected) {
-      alert(getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
+      createToast({
+        label: getString("META__TOAST__INJECTION_FAILED"),
+        title: getString("LABEL__TOAST__INJECTION_FAILED__TITLE"),
+        description: getString("LABEL__TOAST__INJECTION_FAILED__DESCRIPTION"),
+        borderType: "error",
+      });
       isInitializing = false;
       return;
     }
+    handles.tracklist = tracklistCleanup ?? null;
 
     const browserCache = getBrowserInstance().getState().cache;
     if (await shouldShowReleaseToast(browserCache)) showReleaseToast();

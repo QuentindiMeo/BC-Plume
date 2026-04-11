@@ -11,6 +11,11 @@ export class BcPlayerAdapter implements BcPlayerPort {
     return false;
   }
 
+  getCurrentTrackUrl(): string | null {
+    const el = this.query<HTMLAnchorElement>(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle);
+    return el?.getAttribute("href") || null;
+  }
+
   // Album and track pages expose the current track title under different elements.
   getTrackTitle(pageType: BcPageType): string | null {
     const selector =
@@ -21,16 +26,10 @@ export class BcPlayerAdapter implements BcPlayerPort {
     return text ?? null;
   }
 
-  getAlbumContext(): string | null {
-    const el = this.query<HTMLElement>(BC_ELEM_SELECTORS.fromAlbum);
-    const text = el?.textContent?.trim();
-    return text ?? null;
-  }
-
   getArtworkUrl(): string | null {
     const img = this.query<HTMLImageElement>(BC_ELEM_SELECTORS.coverArt);
     if (!img?.src) return null;
-    // Bandcamp suffixes: _2 = 350px, _5 = 700px. Upgrade for fullscreen use.
+    // Bandcamp suffixes: _2 = 350px (default), _5 = 700px. Upgrade for fullscreen use.
     return img.src.replace(/_\d+\.jpg$/, "_5.jpg");
   }
 
@@ -65,12 +64,22 @@ export class BcPlayerAdapter implements BcPlayerPort {
     return Array.from(trackList.querySelectorAll<HTMLTableRowElement>(BC_ELEM_SELECTORS.trackRow));
   }
 
+  getTrackPlayabilityMap(): boolean[] {
+    return this.getTrackRows().map((row) => {
+      const playStatus = row.querySelector<HTMLElement>(BC_ELEM_SELECTORS.playStatus);
+      if (playStatus) return !playStatus.classList.contains("disabled");
+      // Fallback: if play_status element is missing, use .linked as fallback (works only on unreleased tracks)
+      return row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1]);
+    });
+  }
+
   getTrackRowTitles(): string[] {
-    const trackList = this.query<HTMLTableElement>(BC_ELEM_SELECTORS.trackList);
-    if (!trackList) return [];
-    return Array.from(trackList.querySelectorAll<HTMLSpanElement>(BC_ELEM_SELECTORS.trackTitle)).map(
-      (el) => el.textContent?.trim() ?? ""
-    );
+    return this.getTrackRows().map((row) => {
+      const el =
+        row.querySelector<HTMLElement>(BC_ELEM_SELECTORS.trackTitle) ??
+        row.querySelector<HTMLElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
+      return el?.textContent?.trim() ?? "";
+    });
   }
 
   getTrackRowDurations(): (string | null)[] {

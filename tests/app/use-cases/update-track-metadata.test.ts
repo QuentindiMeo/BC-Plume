@@ -23,8 +23,8 @@ describe("updateTrackMetadata", () => {
 
     const result = updateTrackMetadata(appCore, bcPlayer);
 
-    expect(appCore.getState().trackNumber).toBe("currently playing:");
-    expect(result.trackNumberText).toBe("currently playing:");
+    expect(appCore.getState().trackNumber).toBe("currently playing");
+    expect(result.trackNumberText).toBe("currently playing");
   });
 
   it("null title: stores LABEL__TRACK_UNKNOWN fallback as track title", () => {

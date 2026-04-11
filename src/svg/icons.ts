@@ -102,6 +102,18 @@ export enum PLUME_SVG {
       </g>
     </svg>
   `,
+  externalLink = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+      <polyline points="15 3 21 3 21 9"/>
+      <line x1="10" y1="14" x2="21" y2="3"/>
+    </svg>
+  `,
+  chevronDown = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="none">
+      <path fill="currentColor" d="M3.5 5.5L8 10l4.5-4.5H3.5z"/>
+    </svg>
+  `,
   trackBackward = `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M2 7H5V17H2V7Z" fill="currentColor" />
@@ -137,29 +149,6 @@ export enum PLUME_SVG {
       <path d="M2 17L9.00232 12L2 7V17Z" fill="currentColor" />
     </svg>
   `,
-  fullscreen = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor" />
-      <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor" />
-      <path d="M17 17H14V19H19V14H17V17Z" fill="currentColor" />
-      <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor" />
-    </svg>
-  `,
-  fullscreenExit = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 16H8V19H10V14H5V16Z" fill="currentColor" />
-      <path d="M8 8H5V10H10V5H8V8Z" fill="currentColor" />
-      <path d="M14 19H16V16H19V14H14V19Z" fill="currentColor" />
-      <path d="M16 8V5H14V10H19V8H16Z" fill="currentColor" />
-    </svg>
-  `,
-  volumeOn = `
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor" />
-      <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12Z" fill="currentColor" />
-      <path d="M14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z" fill="currentColor" />
-    </svg>
-  `,
   loopNone = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
       <path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
@@ -177,12 +166,35 @@ export enum PLUME_SVG {
       <text x="12" y="14" font-size="6" font-weight="bold" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-family="sans-serif">1</text>
     </svg>
   `,
+  volumeOn = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor" />
+      <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12Z" fill="currentColor" />
+      <path d="M14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z" fill="currentColor" />
+    </svg>
+  `,
   volumeMuted = `
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V10.18L16.45 12.63C16.48 12.43 16.5 12.22 16.5 12Z" fill="currentColor" />
       <path d="M19 12C19 12.94 18.8 13.82 18.46 14.64L19.97 16.15C20.63 14.91 21 13.5 21 12C21 7.72 18.01 4.14 14 3.23V5.29C16.89 6.15 19 8.83 19 12Z" fill="currentColor" />
       <path d="M4.27 3L3 4.27L7.73 9H3V15H7L12 20V13.27L16.25 17.52C15.58 18.04 14.83 18.45 14 18.7V20.76C15.38 20.45 16.63 19.81 17.69 18.95L19.73 21L21 19.73L12 10.73L4.27 3Z" fill="currentColor" />
       <path d="M12 4L9.91 6.09L12 8.18V4Z" fill="currentColor" />
+    </svg>
+  `,
+  fullscreen = `
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor" />
+      <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor" />
+      <path d="M17 17H14V19H19V14H17V17Z" fill="currentColor" />
+      <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor" />
+    </svg>
+  `,
+  fullscreenExit = `
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 16H8V19H10V14H5V16Z" fill="currentColor" />
+      <path d="M8 8H5V10H10V5H8V8Z" fill="currentColor" />
+      <path d="M14 19H16V16H19V14H14V19Z" fill="currentColor" />
+      <path d="M16 8V5H14V10H19V8H16Z" fill="currentColor" />
     </svg>
   `,
 }

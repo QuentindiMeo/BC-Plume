@@ -56,18 +56,6 @@ const updateTrackDisplay = () => {
 
   const isAlbumPage = appCore.getState().pageType === "album";
 
-  if (titleText) {
-    titleText.textContent = newTrackTitle;
-    titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
-
-    // Cache offsetHeight to avoid multiple layout recalculations
-    const titleHeight = titleText.offsetHeight;
-    if (titleHeight !== PLUME_CONSTANTS.LATIN_SINGLE_LINE_HEIGHT_PX) {
-      const logo = plume.headerLogo;
-      if (logo) logo.style.paddingTop = `${PLUME_CONSTANTS.LOGO_DEFAULT_VERTICAL_PADDING_REM}rem`;
-    }
-  }
-
   if (preText) {
     preText.textContent = trackNumberText;
 
@@ -78,14 +66,40 @@ const updateTrackDisplay = () => {
         : getString("ARIA__TRACK", [newTrackTitle]);
     }
   }
+
+  if (titleText) {
+    if (isAlbumPage) {
+      const trackLink = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
+      if (trackLink) {
+        const trackUrl = bcPlayer.getCurrentTrackUrl();
+
+        if (trackUrl) {
+          trackLink.href = trackUrl;
+          trackLink.ariaDisabled = "false";
+          trackLink.style.pointerEvents = "";
+          trackLink.tabIndex = 0;
+        } else {
+          trackLink.removeAttribute("href");
+          trackLink.ariaDisabled = "true";
+          trackLink.style.pointerEvents = "none";
+          trackLink.tabIndex = -1;
+        }
+      }
+    } else {
+      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+    }
+    titleText.textContent = newTrackTitle;
+    titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
+  }
 };
 
 // Holds all active cleanup callbacks so observers and the unload handler can reach them
 export interface CleanupHandles {
   audioEvents: CleanupCallback | null;
   storeSubscriptions: CleanupCallback | null;
-  hotkeys: CleanupCallback | null;
   stickiness: CleanupCallback | null;
+  tracklist: CleanupCallback | null;
+  hotkeys: CleanupCallback | null;
   toast: CleanupCallback | null;
 }
 
@@ -217,9 +231,9 @@ export const registerUnloadCleanup = (
     cleanupFullscreenMode();
     cleanupReleaseToast();
 
-    if (handles.stickiness) {
-      handles.stickiness();
-      handles.stickiness = null;
+    if (handles.audioEvents) {
+      handles.audioEvents();
+      handles.audioEvents = null;
     }
 
     if (handles.storeSubscriptions) {
@@ -227,14 +241,19 @@ export const registerUnloadCleanup = (
       handles.storeSubscriptions = null;
     }
 
+    if (handles.stickiness) {
+      handles.stickiness();
+      handles.stickiness = null;
+    }
+
+    if (handles.tracklist) {
+      handles.tracklist();
+      handles.tracklist = null;
+    }
+
     if (handles.hotkeys) {
       handles.hotkeys();
       handles.hotkeys = null;
-    }
-
-    if (handles.audioEvents) {
-      handles.audioEvents();
-      handles.audioEvents = null;
     }
   });
 };

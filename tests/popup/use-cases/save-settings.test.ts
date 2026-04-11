@@ -1,8 +1,9 @@
 import { BANDCAMP_TAB_PATTERN, PLUME_CACHE_KEYS } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction } from "@/domain/hotkeys";
 import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
-import type { WholeNumber } from "@/domain/plume";
+import type { PlumeLanguage, WholeNumber } from "@/domain/plume";
 import { resetHotkeys } from "@/popup/use-cases/resetHotkeys";
+import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
 import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
@@ -23,6 +24,21 @@ beforeEach(() => {
   vi.mocked(inferBrowserApi).mockReturnValue({
     storage: { local: fakeStorage },
   } as unknown as ReturnType<typeof inferBrowserApi>);
+});
+
+describe("saveForcedLanguage", () => {
+  it.each(["auto", "en", "es", "fr"] as const)(
+    "persists valid language code '%s' under the correct key",
+    async (lang: PlumeLanguage) => {
+      await saveForcedLanguage(lang);
+      expect(fakeStorage.store[PLUME_CACHE_KEYS.FORCED_LANGUAGE]).toBe(lang);
+    }
+  );
+
+  it("throws RangeError and does not persist for an invalid language code", async () => {
+    await expect(saveForcedLanguage("de" as PlumeLanguage)).rejects.toThrow(RangeError);
+    expect(Object.keys(fakeStorage.store)).toHaveLength(0);
+  });
 });
 
 describe("saveSeekJumpDuration", () => {

@@ -1,6 +1,22 @@
-import { bindingKey } from "@/app/features/keyboard";
-import type { KeyBinding } from "@/domain/hotkeys";
-import { describe, expect, it } from "vitest";
+// @vitest-environment happy-dom
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
+
+let fakeAppCore = new FakeAppCore();
+vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
+vi.mock("@/app/stores/adapters", () => ({
+  getMessageReceiverInstance: () => ({ onMessage: () => () => {} }),
+  getMusicPlayerInstance: () => ({}),
+}));
+vi.mock("@/app/use-cases/seek-to-progress", () => ({ seekToProgress: vi.fn() }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+vi.mock("@/shared/logger", () => ({ CPL: {}, logger: vi.fn() }));
+vi.mock("@/infra/elements/plume", () => ({
+  PLUME_ELEM_SELECTORS: { tracklistDropdown: "div#bpe-tracklist-dropdown" },
+}));
+
+import { bindingKey, setupHotkeys } from "@/app/features/keyboard";
+import { type KeyBinding, DEFAULT_HOTKEYS } from "@/domain/hotkeys";
 
 const binding = (
   code: string,
@@ -59,5 +75,75 @@ describe("bindingKey", () => {
   it("non-letter single-char keys (digits, symbols) use code-based lookup", () => {
     expect(bindingKey({ code: "Digit1", label: "1" })).toBe("Digit1");
     expect(bindingKey({ code: "BracketLeft", label: "[" })).toBe("BracketLeft");
+  });
+});
+
+describe("setupHotkeys — arrow keys inside tracklist", () => {
+  const noopHandlers = {
+    handlePlayPause: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handleTimeForward: vi.fn(),
+    handleTrackBackward: vi.fn(),
+    handleTrackForward: vi.fn(),
+    handleMuteToggle: vi.fn(),
+    toggleFullscreenMode: vi.fn(),
+    handleLoopCycle: vi.fn(),
+  };
+
+  let cleanup: () => void;
+  let dropdown: HTMLDivElement;
+  let item: HTMLDivElement;
+
+  beforeEach(() => {
+    fakeAppCore = new FakeAppCore();
+    dropdown = document.createElement("div");
+    dropdown.id = "bpe-tracklist-dropdown";
+    item = document.createElement("div");
+    dropdown.appendChild(item);
+    document.body.appendChild(dropdown);
+    cleanup = setupHotkeys(noopHandlers, DEFAULT_HOTKEYS);
+  });
+
+  afterEach(() => {
+    cleanup();
+    document.body.removeChild(dropdown);
+    vi.clearAllMocks();
+  });
+
+  const fireKey = (target: EventTarget, code: string): KeyboardEvent => {
+    const event = new KeyboardEvent("keydown", { code, bubbles: true, cancelable: true });
+    target.dispatchEvent(event);
+    return event;
+  };
+
+  it("suppresses up/down/Space/Enter keys when focus is inside the tracklist dropdown", () => {
+    const event1 = fireKey(item, "ArrowUp");
+    expect(event1.defaultPrevented).toBe(false);
+    const event2 = fireKey(item, "ArrowDown");
+    expect(event2.defaultPrevented).toBe(false);
+    const event3 = fireKey(item, "Space");
+    expect(event3.defaultPrevented).toBe(false);
+    const event4 = fireKey(item, "Enter");
+    expect(event4.defaultPrevented).toBe(false);
+  });
+
+  it("does NOT suppress up/down/Space hotkeys when focus is outside the tracklist", () => {
+    const outside = document.createElement("div");
+    document.body.appendChild(outside);
+    const event1 = fireKey(outside, "ArrowUp");
+    expect(event1.defaultPrevented).toBe(true);
+    const event2 = fireKey(outside, "ArrowDown");
+    expect(event2.defaultPrevented).toBe(true);
+    const event3 = fireKey(outside, "Space");
+    expect(event3.defaultPrevented).toBe(true);
+    document.body.removeChild(outside);
+  });
+
+  it("does NOT suppress non-arrow hotkeys when focus is inside the tracklist", () => {
+    const { code, label: key } = DEFAULT_HOTKEYS.MUTE;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    item.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(noopHandlers.handleMuteToggle).toHaveBeenCalled();
   });
 });

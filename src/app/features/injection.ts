@@ -2,23 +2,25 @@ import { toggleFullscreenMode } from "@/app/features/fullscreen";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/features/original-player";
 import { getInfoSectionWithRuntime } from "@/app/features/runtime";
 import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
-import { getAppropriatePretextColor, getCurrentTrackTitle } from "@/app/features/track-title";
+import { getAppropriateAccentColor, getCurrentTrackTitle } from "@/app/features/track-title";
+import { CleanupCallback } from "@/app/features/types";
 import {
   createFullscreenButtonSection,
   createPlaybackControlPanel,
   createProgressBar,
+  createTracklistToggle,
   createVolumeControlSection,
 } from "@/app/features/ui";
 import { createToast } from "@/app/features/ui/toast";
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { APP_VERSION, PLUME_KO_FI_URL } from "@/domain/meta";
+import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
-import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
+import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
@@ -31,18 +33,19 @@ interface PlumeView {
   // Derived values computed during construction, forwarded to hydration
   initialTrackTitle: string;
   initialTrackNumberText: string;
+
+  tracklistCleanup: CleanupCallback;
 }
 
 const notifyUnplayableTracks = () => {
   const bcPlayer = getBcPlayerInstance();
-  const trackRows = bcPlayer.getTrackRows();
+  const playabilityMap = bcPlayer.getTrackPlayabilityMap();
+  const titles = bcPlayer.getTrackRowTitles();
   const unplayableTracks: { nb: number; title: string }[] = [];
 
-  trackRows.forEach((row, idx) => {
-    if (row.classList.contains(BC_ELEM_SELECTORS.playableTrack.split(".")[1])) return;
-
-    const titleEl = row.querySelector<HTMLDivElement>(BC_ELEM_SELECTORS.unplayableTrackTitle);
-    const title = titleEl?.textContent?.trim() ?? `#${idx + 1}`;
+  playabilityMap.forEach((isPlayable, idx) => {
+    if (isPlayable) return;
+    const title = titles[idx] ?? `#${idx + 1}`;
     unplayableTracks.push({ nb: idx + 1, title });
   });
 
@@ -55,15 +58,15 @@ const notifyUnplayableTracks = () => {
       description: getString("LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION", [title]),
       borderType: "warning",
     });
-    return;
+  } else {
+    const titlesList = unplayableTracks.map((track) => track.nb).join(", ");
+    createToast({
+      label: getString("META__TOAST__UNPLAYABLE_TRACKS"),
+      title: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE", [String(unplayableTracks.length)]),
+      description: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION", [titlesList]),
+      borderType: "warning",
+    });
   }
-  const titlesList = unplayableTracks.map((t) => t.nb).join(", ");
-  createToast({
-    label: getString("META__TOAST__UNPLAYABLE_TRACKS"),
-    title: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE", [String(unplayableTracks.length)]),
-    description: getString("LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION", [titlesList]),
-    borderType: "warning",
-  });
 };
 
 const addRuntime = () => {
@@ -77,6 +80,9 @@ const addRuntime = () => {
 const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
+  plumeContainer.lang = getActiveLocale();
+  plumeContainer.role = "region";
+  plumeContainer.ariaLabel = getString("ARIA__APP_NAME");
 
   const headerContainer = document.createElement("div");
   headerContainer.id = PLUME_ELEM_SELECTORS.headerContainer.split("#")[1];
@@ -89,7 +95,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   versionTag.id = `${headerLogo.id}__version`;
   versionTag.textContent = APP_VERSION;
   headerLogo.appendChild(versionTag);
-  headerLogo.href = PLUME_KO_FI_URL;
+  headerLogo.href = PLUME_LINKTREE_URL;
   headerLogo.target = "_blank";
   headerLogo.rel = "noopener noreferrer";
   headerLogo.ariaLabel = getString("ARIA__APP_NAME");
@@ -101,7 +107,8 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
-  currentTitleSection.tabIndex = 0; // make it focusable for screen readers
+  currentTitleSection.role = "group";
+  currentTitleSection.tabIndex = 0;
   currentTitleSection.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
@@ -111,18 +118,62 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
     ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
   currentTitlePretext.textContent = initialTrackNumberText;
-  currentTitlePretext.style.color = getAppropriatePretextColor();
+  currentTitlePretext.style.color = getAppropriateAccentColor();
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
+  const titleRow = document.createElement("div");
+  titleRow.className = "bpe-header-title-row";
+
+  if (isAlbumPage) {
+    const trackLink = document.createElement("a");
+    trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
+
+    if (trackLink) {
+      const trackUrl = bcPlayer.getCurrentTrackUrl();
+
+      if (trackUrl) {
+        trackLink.href = trackUrl;
+        trackLink.ariaDisabled = "false";
+        trackLink.style.pointerEvents = "";
+        trackLink.tabIndex = 0;
+      } else {
+        trackLink.removeAttribute("href");
+        trackLink.ariaDisabled = "true";
+        trackLink.style.pointerEvents = "none";
+        trackLink.tabIndex = -1;
+      }
+    } else {
+      logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
+    }
+    trackLink.target = "_self";
+    trackLink.ariaLabel = getString("ARIA__TRACK_LINK");
+    trackLink.title = getString("ARIA__TRACK_LINK");
+    const linkSvg = createSafeSvgElement(PLUME_SVG.externalLink);
+    if (linkSvg) trackLink.appendChild(linkSvg);
+    titleRow.appendChild(trackLink);
+  }
+
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
   currentTitleText.textContent = initialTrackTitle;
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
-  currentTitleSection.appendChild(currentTitleText);
+  titleRow.appendChild(currentTitleText);
+
+  let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
+  let pendingDropdown: HTMLDivElement | undefined;
+  if (isAlbumPage) {
+    const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
+    titleRow.appendChild(toggleBtn);
+    pendingDropdown = dropdownEl;
+    tracklistCleanup = cleanup;
+  }
+  currentTitleSection.appendChild(titleRow);
+
   headerContainer.appendChild(currentTitleSection);
 
   plumeContainer.appendChild(headerContainer);
+  if (pendingDropdown) plumeContainer.appendChild(pendingDropdown);
 
   const playbackManager = document.createElement("div");
   playbackManager.id = PLUME_ELEM_SELECTORS.playbackManager.split("#")[1];
@@ -139,7 +190,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
   plumeContainer.appendChild(fullscreenBtnSection);
 
-  return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText };
+  return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
 };
 
 const hydratePlumeView = (view: PlumeView, appCore: IAppCore, plumeUi: IGui): void => {
@@ -156,19 +207,24 @@ const mountPlumeView = (view: PlumeView, container: Element): void => {
   container.appendChild(view.plumeContainer);
 };
 
-export const injectEnhancements = async (): Promise<boolean> => {
+export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistCleanup: CleanupCallback }> => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
 
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
     logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
-    return false;
+    return { ok: false, tracklistCleanup: () => {} };
   }
 
   const isAlbumPage = appCore.getState().pageType === "album";
 
   hideOriginalPlayerElements();
+
+  // Reorder middleColumn before mounting Plume so keyboard tab order reaches Plume first.
+  const trackView = bcPlayerContainer.closest(BC_ELEM_SELECTORS.trackView);
+  const middleCol = trackView?.querySelector<HTMLElement>(`:scope > ${BC_ELEM_SELECTORS.middleColumn}`);
+  if (middleCol) trackView!.appendChild(middleCol);
 
   const view = await buildPlumeView(isAlbumPage);
   hydratePlumeView(view, appCore, plumeUi);
@@ -180,5 +236,11 @@ export const injectEnhancements = async (): Promise<boolean> => {
     addRuntime();
     notifyUnplayableTracks();
   }
-  return true;
+
+  // Compensate the visual shift only when the name-section overflows past the leftColumn
+  if (middleCol) {
+    const nameSection = trackView?.querySelector<HTMLElement>(BC_ELEM_SELECTORS.infoSection);
+    if (nameSection && nameSection.offsetWidth <= BC_NAME_SECTION_DEFAULT_WIDTH) middleCol.style.marginTop = "-3rem";
+  }
+  return { ok: true, tracklistCleanup: view.tracklistCleanup };
 };

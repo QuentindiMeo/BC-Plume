@@ -1,8 +1,28 @@
 {
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
-  "APP_DESCRIPTION": { "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player." },
+  "APP_DESCRIPTION": {
+    "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player."
+  },
 
   "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
+  "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
+  "INFO__BROWSER__DETECTED": { "message": "Detected browser:" },
+
+  "ERROR__STATE__LOAD_FAILED": { "message": "Failed to load persisted state:" },
+  "ERROR__STATE__PERSIST_FAILED": { "message": "Failed to persist state:" },
+  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Global state listener error:" },
+  "ERROR__STATE__LISTENER_FAILED": { "message": "State listener error:" },
+  "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Store subscriptions initialized" },
+  "DEBUG__STATE__PERSISTED": { "message": "State persisted to storage:" },
+
+  "LOG__INITIALIZATION__START": { "message": "Plume initialization..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialized successfully" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume mounted successfully" },
+  "LOG__NAVIGATION_DETECTED": { "message": "Navigation detected, resetting..." },
+
+  "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Original player elements hidden" },
+  "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },
+
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
     "message": "Bandcamp element not found (required): $SELECTOR$",
     "placeholders": {
@@ -12,48 +32,6 @@
       }
     }
   },
-  "ERROR__STATE__LOAD_FAILED": { "message": "Failed to load persisted state:" },
-  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Global state listener error:" },
-  "ERROR__STATE__LISTENER_FAILED": { "message": "State listener error:" },
-  "ERROR__STATE__PERSIST_FAILED": { "message": "Failed to persist state:" },
-  "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
-  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
-  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Header container or track number not found" },
-  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Header container or track title not found" },
-  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Header pretext element not found" },
-  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Header title element not found" },
-  "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Progress slider element not found" },
-  "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Duration display element not found" },
-  "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elapsed display element not found" },
-  "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Play/Pause button not found" },
-  "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Loop button not found" },
-  "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
-  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
-  "WARN__BROWSER_API__NOT_DETECTED": { "message": "No browser API detected, using localStorage as fallback" },
-  "WARN__STATE__UNKNOWN_ACTION": { "message": "Unknown store action:" },
-  "WARN__VOLUME__INVALID_VALUE": { "message": "Invalid volume value, using default" },
-  "WARN__AUDIO__NOT_FOUND": { "message": "No audio element found" },
-  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying in 2s..." },
-  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },
-  "WARN__RUNTIME__NOT_CALCULATED": { "message": "Runtime could not be calculated" },
-  "WARN__TIME_DISPLAY_METHOD__NOT_LOADED": { "message": "Unable to load time display method:" },
-  "WARN__PREV_TRACK__NOT_FOUND": { "message": "Previous track button not found" },
-  "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Next track button not found" },
-  "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Play/Pause button not found" },
-  "WARN__VOLUME__NOT_LOADED": { "message": "Unable to load volume:" },
-  "WARN__VOLUME__NOT_SAVED": { "message": "Unable to save volume:" },
-  "WARN__COVER_ART__NOT_FOUND": { "message": "Cover art not found" },
-  "WARN__INFO_SECTION__NOT_FOUND": { "message": "Info section not found for fullscreen mode" },
-  "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Plume container not found for fullscreen mode" },
-  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Track list not found, skipping runtime calculation" },
-  "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": { "message": "Adjusting volume with a null delta may indicate a logic error in the code" },
-  "LOG__MOUNT__COMPLETE": { "message": "Plume mounted successfully" },
-  "LOG__INITIALIZATION__START": { "message": "Plume initialization..." },
-  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume initialized successfully" },
-  "LOG__NAVIGATION_DETECTED": { "message": "Navigation detected, resetting..." },
-  "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Original player elements hidden" },
-  "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Original player elements restored" },
-  "INFO__BROWSER__DETECTED": { "message": "Detected browser:" },
   "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
     "message": "Bandcamp element not found (optional): $SELECTOR$",
     "placeholders": {
@@ -64,54 +42,24 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "All Bandcamp elements found" },
-  "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Store subscriptions initialized" },
-  "INFO__HOTKEYS__REGISTERED": { "message": "Hotkeys registered" },
-  "INFO__RUNTIME__CALCULATED": { "message": "Total runtime calculated:" },
-  "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
-  "INFO__TIME_DISPLAY_METHOD__APPLIED": {
-    "message": "Time display method applied: $METHOD$",
-    "placeholders": {
-      "method": {
-        "content": "$1",
-        "example": "seconds"
-      }
-    }
-  },
-  "INFO__VOLUME__APPLIED": {
-    "message": "Volume applied to new audio: $VOLUME$$PERCENTAGE$",
-    "placeholders": {
-      "volume": {
-        "content": "$1",
-        "example": "75"
-      },
-      "percentage": {
-        "content": "$2",
-        "example": "%"
-      }
-    }
-  },
-  "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Audio event listeners set up" },
+
+  "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },
+  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Player container not found, searching for an alternative..." },
+
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Audio element not found, retrying..." },
   "INFO__AUDIO__FOUND": { "message": "Audio element found" },
-  "INFO__VOLUME__LOADED": { "message": "Volume loaded from storage:" },
-  "INFO__VOLUME__FOUND": {
-    "message": "Restored volume: $VOLUME$$PERCENTAGE$",
-    "placeholders": {
-      "volume": {
-        "content": "$1",
-        "example": "75"
-      },
-      "percentage": {
-        "content": "$2",
-        "example": "%"
-      }
-    }
-  },
-  "INFO__FULLSCREEN__ENTERED": { "message": "Entered fullscreen mode" },
-  "INFO__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
+  "INFO__NEW_AUDIO__FOUND": { "message": "New audio element detected" },
+  "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Audio event listeners set up" },
+
   "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Detected control elements ===" },
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Potential controls found:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== END DEBUG ===" },
-  "DEBUG__STATE__PERSISTED": { "message": "State persisted to storage:" },
+
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Header container or track number not found" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Header container or track title not found" },
+  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Header pretext element not found" },
+  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Header title element not found" },
   "DEBUG__TRACK__QUANTIFIERS": {
     "message": "Current track number: $TRACK_NUMBER$, Total tracks: $TOTAL_TRACKS$",
     "placeholders": {
@@ -125,63 +73,9 @@
       }
     }
   },
-  "DEBUG__PROGRESS_SLIDER__INPUT": {
-    "message": "Progress slider moved: $VALUE$ s",
-    "placeholders": {
-      "value": {
-        "content": "$1",
-        "example": "50"
-      }
-    }
-  },
-  "DEBUG__PREV_TRACK__CLICKED": { "message": "Previous track button clicked" },
-  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Previous track event dispatched" },
-  "DEBUG__TRACK__RESTARTED": { "message": "Current track restarted" },
-  "DEBUG__REWIND_TIME__CLICKED": { "message": "Rewind button clicked" },
-  "DEBUG__REWIND_TIME__DISPATCHED": {
-    "message": "Time rewound to: $TIME$ s",
-    "placeholders": {
-      "time": {
-        "content": "$1",
-        "example": "120"
-      }
-    }
-  },
-  "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Play/Pause button clicked" },
-  "DEBUG__FORWARD_TIME__CLICKED": { "message": "Forward button clicked" },
-  "DEBUG__FORWARD_TIME__DISPATCHED": {
-    "message": "Time forwarded to: $TIME$ s",
-    "placeholders": {
-      "time": {
-        "content": "$1",
-        "example": "120"
-      }
-    }
-  },
-  "DEBUG__NEXT_TRACK__CLICKED": { "message": "Next track button clicked" },
-  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
-  "DEBUG__LOOP__CYCLED": { "message": "Loop mode cycled" },
-  "LABEL__RUNTIME": {
-    "message": "$MINUTES$ min $SECONDS$ s$PLAYABLE$",
-    "placeholders": {
-      "minutes": {
-        "content": "$1",
-        "example": "5"
-      },
-      "seconds": {
-        "content": "$2",
-        "example": "30"
-      },
-      "playable": {
-        "content": "$3",
-        "example": " playable"
-      }
-    }
-  },
-  "LABEL__RUNTIME__PLAYABLE": { "message": " playable" },
-  "LABEL__TRACK": { "message": "currently playing:" },
+  "LABEL__TRACK": { "message": "currently playing" },
   "LABEL__TRACK_CURRENT": {
-    "message": "currently playing ($NUMBERING$):",
+    "message": "currently playing ($NUMBERING$)",
     "placeholders": {
       "numbering": {
         "content": "$1",
@@ -190,30 +84,8 @@
     }
   },
   "LABEL__TRACK_UNKNOWN": { "message": "unknown track" },
-  "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
-  "LABEL__TRACK_BACKWARD": { "message": "Restart track / Go to previous track" },
-  "LABEL__TIME_BACKWARD": { "message": "Rewind" },
-  "LABEL__PLAY_PAUSE": { "message": "Play/Pause" },
-  "LABEL__TIME_FORWARD": { "message": "Fast forward" },
-  "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
-  "LABEL__LOOP": { "message": "Repeat" },
-  "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
-  "META__PERCENTAGE": { "message": "%" },
-  "ARIA__RUNTIME__LABEL": {
-    "message": "Total runtime is $MINUTES$ minutes and $SECONDS$ seconds" ,
-    "placeholders": {
-      "minutes": {
-        "content": "$1",
-        "example": "5"
-      },
-      "seconds": {
-        "content": "$2",
-        "example": "30"
-      }
-    }
-  },
   "ARIA__APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
-  "ARIA__LOGO_LINK": { "message": "Support Plume on Ko-fi" },
+  "ARIA__LOGO_LINK": { "message": "Learn more about Plume" },
   "ARIA__TRACK": {
     "message": "The track $TRACK_TITLE$ is currently playing",
     "placeholders": {
@@ -240,90 +112,248 @@
       }
     }
   },
+
+  "ARIA__TRACK_LINK": { "message": "Go to track page" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Track link element not found, disabling link" },
+
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "Runtime could not be calculated" },
+  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Track list not found, skipping runtime calculation" },
+  "INFO__RUNTIME__CALCULATED": { "message": "Total runtime calculated:" },
+  "LABEL__RUNTIME": {
+    "message": "$MINUTES$ min $SECONDS$ s$PLAYABLE$",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "seconds": {
+        "content": "$2",
+        "example": "30"
+      },
+      "playable": {
+        "content": "$3",
+        "example": " playable"
+      }
+    }
+  },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " playable" },
+  "ARIA__RUNTIME__LABEL": {
+    "message": "Total runtime is $MINUTES$ minutes and $SECONDS$ seconds",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "seconds": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+
+  "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Play/Pause button not found" },
+  "WARN__PREV_TRACK__NOT_FOUND": { "message": "Previous track button not found" },
+  "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Play/Pause button not found" },
+  "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Next track button not found" },
+  "DEBUG__PREV_TRACK__CLICKED": { "message": "Previous track button clicked" },
+  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Previous track event dispatched" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Current track restarted" },
+  "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Play/Pause button clicked" },
+  "DEBUG__NEXT_TRACK__CLICKED": { "message": "Next track button clicked" },
+  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Next track event dispatched" },
+  "LABEL__TRACK_BACKWARD": { "message": "Restart track / Go to previous track" },
+  "LABEL__PLAY_PAUSE": { "message": "Play/Pause" },
+  "LABEL__TRACK_FORWARD": { "message": "Go to next track" },
+
+  "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Progress slider element not found" },
+  "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elapsed display element not found" },
+  "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Duration display element not found" },
+  "INFO__DURATION_DISPLAY_METHOD__APPLIED": {
+    "message": "Duration display method applied: $METHOD$",
+    "placeholders": {
+      "method": {
+        "content": "$1",
+        "example": "remaining"
+      }
+    }
+  },
+  "DEBUG__REWIND_TIME__CLICKED": { "message": "Rewind button clicked" },
+  "DEBUG__REWIND_TIME__DISPATCHED": {
+    "message": "Time rewound to: $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
+  "DEBUG__FORWARD_TIME__CLICKED": { "message": "Forward button clicked" },
+  "DEBUG__FORWARD_TIME__DISPATCHED": {
+    "message": "Time forwarded to: $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Progress slider moved: $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
+  "LABEL__TIME_BACKWARD": { "message": "Rewind" },
+  "LABEL__TIME_FORWARD": { "message": "Fast forward" },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Switch to remaining/duration display" },
   "ARIA__PROGRESS_SLIDER": { "message": "Audio progress slider" },
+  "ARIA__DURATION_DISPLAY": { "message": "Toggle between remaining and total duration display" },
+  "ARIA__PROGRESS_VALUETEXT": {
+    "message": "$ELAPSED$ of $DURATION$",
+    "placeholders": {
+      "ELAPSED": { "content": "$1" },
+      "DURATION": { "content": "$2" }
+    }
+  },
+
+  "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
+  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Invalid volume value:" },
+  "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
+    "message": "Adjusting volume with a null delta may indicate a logic error in the code"
+  },
+  "INFO__VOLUME__LOADED": { "message": "Volume loaded from storage:" },
+  "INFO__VOLUME__FOUND": {
+    "message": "Restored volume: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
+  "INFO__VOLUME__APPLIED": {
+    "message": "Volume applied to new audio: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
+  "META__PERCENTAGE": { "message": "%" },
+  "ARIA__VOLUME_SLIDER": { "message": "Volume slider" },
+  "ARIA__MUTE": { "message": "Mute" },
+  "ARIA__UNMUTE": { "message": "Unmute" },
+
+  "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Loop button not found" },
+  "INFO__LOOP_MODE__COERCED": { "message": "Loop mode loaded as album repeat but applied as track repeat (single-track page)" },
+  "DEBUG__LOOP__CYCLED": { "message": "Loop mode cycled" },
+  "LABEL__LOOP": { "message": "Repeat" },
   "ARIA__LOOP__OFF": { "message": "Repeat: off" },
   "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Repeat: album" },
   "ARIA__LOOP__COLLECTION_TRACK": { "message": "Repeat: track" },
   "ARIA__LOOP__ONE_TRACK": { "message": "Repeat: on" },
-  "ARIA__VOLUME_SLIDER": { "message": "Volume slider" },
-  "ARIA__MUTE": { "message": "Mute" },
-  "ARIA__UNMUTE": { "message": "Unmute" },
-  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
-  "ARIA__COVER_ART": { "message": "Cover Art Image" },
 
-  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Failed to parse toast icon SVG" },
-  "WARN__TOAST__ICON_SVG_INVALID": {
-    "message": "Invalid toast icon SVG provided for label '$LABEL$'",
-    "placeholders": { "label": { "content": "$1", "example": "release update" } }
-  },
-  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
-    "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
-    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
-  },
-  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": { "message": "Plume won't be able to function properly. Please check the console for details." },
-  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
-    "message": "Track $TRACK_NUMBER$ is not playable",
-    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
-  },
-  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
-    "message": "\"$TRACK_TITLE$\" can't be streamed. It will be skipped during playback.",
-    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
-  },
-  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
-    "message": "$COUNT$ tracks are not playable",
-    "placeholders": { "count": { "content": "$1", "example": "2" } }
-  },
-  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
-    "message": "The following tracks are not playable: $TITLES_LIST$. They will be skipped during playback.",
-    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
-  },
-  "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
-  "LABEL__TOAST__RELEASE__DESCRIPTION": {
-    "message": "Plume $RELEASE$ is now available.",
+  "INFO__HOTKEYS__REGISTERED": { "message": "Hotkeys registered" },
+
+  "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
+
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Tracklist: current track is unknown, can't navigate" },
+  "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
+    "message": "Tracklist: track index $INDEX$ is out of bounds",
     "placeholders": {
-      "release": {
-        "content": "$1",
-        "example": "1.3.3"
-      }
+      "index": { "content": "$1", "example": "10" }
     }
   },
-  "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
-  "META__TOAST__HEALTH_CHECK": { "message": "health check" },
-  "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
-  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" },
-  "META__TOAST__RELEASE": { "message": "release update" },
-  "INFO__TOAST__SHOWN": {
-    "message": "Toast shown ($LABEL$)",
-    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  "WARN__TRACKLIST__TRACK_UNPLAYABLE": {
+    "message": "Tracklist: track $NUMBER$ is not playable",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
   },
-  "INFO__TOAST__DISMISSED": {
-    "message": "Toast dismissed ($LABEL$)",
-    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  "DEBUG__TRACKLIST__NAVIGATED": {
+    "message": "Tracklist: navigated to track $NUMBER$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
   },
-  "INFO__RELEASE__PERSISTED": { "message": "Last release observation was persisted to storage" },
-  "ARIA__TOAST__CONTAINER": {
-    "message": "Extension $LABEL$ notification",
-    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  "ARIA__TRACKLIST__TOGGLE_OPEN": { "message": "Open tracklist" },
+  "ARIA__TRACKLIST__TOGGLE_CLOSE": { "message": "Close tracklist" },
+  "ARIA__TRACKLIST__PANEL": { "message": "Track list" },
+  "ARIA__TRACKLIST__ITEM": {
+    "message": "Track $NUMBER$: $TITLE$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
   },
-  "ARIA__TOAST__DISMISS": {
-    "message": "Dismiss $LABEL$ notification",
-    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  "ARIA__TRACKLIST__ITEM_CURRENT": {
+    "message": "Track $NUMBER$: $TITLE$, currently playing",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
   },
+  "ARIA__TRACKLIST__ITEM_UNPLAYABLE": {
+    "message": "Track $NUMBER$: $TITLE$, unavailable",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+
+  "WARN__COVER_ART__NOT_FOUND": { "message": "Cover art not found" },
+  "WARN__INFO_SECTION__NOT_FOUND": { "message": "Info section not found for fullscreen mode" },
+  "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Plume container not found for fullscreen mode" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Entered fullscreen mode" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
+  "ARIA__FULLSCREEN__ENTERED": { "message": "Entered fullscreen mode" },
+  "ARIA__FULLSCREEN__EXITED": { "message": "Exited fullscreen mode" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Exit Fullscreen" },
+  "ARIA__COVER_ART": { "message": "Cover Art Image" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Cover art for $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
 
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
 
+  "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
+  "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Failed to save language preference" },
+  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": { "message": "Refresh the page for the language change to take effect" },
+  "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Language" },
+  "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Display language override" },
+  "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
+  "LABEL__LANGUAGE__EN": { "message": "English" },
+  "LABEL__LANGUAGE__ES": { "message": "Spanish" },
+  "LABEL__LANGUAGE__FR": { "message": "French" },
+
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
-  "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
-  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
-  "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
-  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
-  "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
-  "ERROR__HOTKEYS__UNHANDLED_ACTION": { "message": "Unhandled hotkey action: $ACTION$", "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } } },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": {
+    "message": "Unhandled hotkey action: $ACTION$",
+    "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } }
+  },
   "ERROR__HOTKEYS__PERSISTENCE": { "message": "Failed to persist hotkey bindings" },
-  "WARN__HOTKEYS__STORAGE_UNAVAILABLE": { "message": "Hotkey bindings storage unavailable, falling back to defaults" },
-  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": { "message": "Hotkey bindings cache entry is invalid, falling back to defaults" },
+  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": {
+    "message": "Hotkey bindings cache entry is invalid, falling back to defaults"
+  },
   "WARN__HOTKEYS__CONFLICT": {
     "message": "Already assigned to: $ACTION$",
     "placeholders": {
@@ -344,6 +374,11 @@
   "LABEL__HOTKEY__MUTE": { "message": "Mute / Unmute" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cycle loop mode" },
   "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Seek to 0%–90% (digit keys)" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
+  "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Remap $ACTION$ hotkey — currently $BINDING$",
     "placeholders": {
@@ -367,31 +402,110 @@
     }
   },
 
-  "POPUP__PLAYBACK__TAB_LABEL": { "message": "Playback" },
-  "ERROR__PLAYBACK__NOT_INTEGER": { "message": "Must be a whole number" },
-  "LABEL__PLAYBACK__RESET": { "message": "Reset" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
+  "LABEL__GENERAL__RESET": { "message": "Reset" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
 
-  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Seek buttons step" },
-  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Seek buttons step duration in seconds" },
-  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Failed to save seek duration" },
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },
+  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Failed to save seek duration" },
   "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Invalid seek duration value, using default" },
   "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Seek duration loaded:" },
+  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Seek buttons step" },
+  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Seek buttons step duration in seconds" },
 
-  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Volume hotkey step" },
-  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Volume step percentage per hotkey press" },
   "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Must be between 1 and 20" },
   "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Failed to save volume step" },
   "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Invalid volume step value, using default" },
   "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Volume step loaded:" },
+  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Volume hotkey step" },
+  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Volume step percentage per hotkey press" },
 
-  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Track restart threshold" },
-  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": { "message": "Seconds within which the previous track button restarts the current track instead" },
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Must be between 0 and 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Failed to save track restart threshold" },
   "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Invalid track restart threshold value, using default" },
-  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Track restart threshold loaded:" }
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Track restart threshold loaded:" },
+  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Track restart threshold" },
+  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
+    "message": "Seconds within which the previous track button restarts the current track instead"
+  },
+
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Failed to parse toast icon SVG" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "Invalid toast icon SVG provided for label '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__TOAST__SHOWN": {
+    "message": "Toast shown ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Toast dismissed ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Extension $LABEL$ notification",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Dismiss $LABEL$ notification",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+
+  "INFO__RELEASE__PERSISTED": { "message": "Last release observation was persisted to storage" },
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "An update was rolled out!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ is now available.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "See what's new" },
+  "META__TOAST__RELEASE": { "message": "release update" },
+
+  "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume couldn't load" },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "No suitable player container was found on this page." },
+  "META__TOAST__INJECTION_FAILED": { "message": "injection failure" },
+
+  "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Waiting for audio" },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "No audio element detected yet. Playback controls are inactive." },
+  "META__TOAST__AUDIO_NOT_FOUND": { "message": "audio not found" },
+
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Fullscreen unavailable" },
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION": {
+    "message": "Required page elements are missing. Check the console for details."
+  },
+  "META__TOAST__FULLSCREEN_UNAVAILABLE": { "message": "fullscreen unavailable" },
+
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Health check: $MISSING_REQUIRED$ required element(s) missing",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": {
+    "message": "Plume won't be able to function properly. Please check the console for details."
+  },
+  "META__TOAST__HEALTH_CHECK": { "message": "health check" },
+
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "Track $TRACK_NUMBER$ is not playable",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "\"$TRACK_TITLE$\" can't be streamed. It will be skipped during playback.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ tracks are not playable",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "The following tracks are not playable: $TITLES_LIST$. They will be skipped during playback.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" }
 }

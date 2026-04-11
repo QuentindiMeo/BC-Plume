@@ -4,7 +4,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const ROOT = path.join(__dirname, "..");
-const OUTPUT = path.join(ROOT, "Plume-sources.zip");
+const { version } = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+const versionTag = version.replaceAll(".", "-");
 
 const SOURCES = [
   "_locales/",
@@ -18,8 +19,21 @@ const SOURCES = [
   "tsconfig.json",
 ];
 
-if (fs.existsSync(OUTPUT)) fs.rmSync(OUTPUT);
+const zip = (filename, args, cwd) => {
+  const absOutput = path.join(ROOT, filename);
+  if (fs.existsSync(absOutput)) fs.rmSync(absOutput);
+  const relOutput = path.relative(cwd, absOutput);
+  execSync(`zip --quiet -r ${relOutput} ${args}`, { cwd, stdio: "inherit" });
+  console.log(`✅ Zipped to ${filename}`);
+};
 
-execSync(`zip --quiet -r Plume-sources.zip ${SOURCES.join(" ")}`, { cwd: ROOT, stdio: "inherit" });
+zip("Plume-sources.zip", SOURCES.join(" "), ROOT);
 
-console.log("✅ Sources zipped to Plume-sources.zip");
+for (const browser of ["chrome", "firefox"]) {
+  const buildDir = path.join(ROOT, "build", browser);
+  if (!fs.existsSync(buildDir)) {
+    console.warn(`⚠️  build/${browser} not found, skipping`);
+    continue;
+  }
+  zip(`build/plume_${versionTag}--${browser}.zip`, ".", buildDir);
+}

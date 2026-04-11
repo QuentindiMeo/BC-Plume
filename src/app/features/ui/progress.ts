@@ -1,13 +1,13 @@
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { seekToProgress, toggleDurationDisplay } from "@/app/use-cases";
 import { INITIAL_TIME_DISPLAY, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
-import { getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { seekToProgress, toggleDurationDisplay } from "@/app/use-cases";
 
 const { PROGRESS_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
@@ -45,10 +45,11 @@ export const createProgressBar = (): HTMLDivElement => {
   elapsed.id = PLUME_ELEM_SELECTORS.elapsedDisplay.split("#")[1];
   elapsed.textContent = INITIAL_TIME_DISPLAY;
 
-  const duration = document.createElement("span");
+  const duration = document.createElement("button");
   duration.id = PLUME_ELEM_SELECTORS.durationDisplay.split("#")[1];
   duration.textContent = INITIAL_TIME_DISPLAY;
   duration.title = getString("LABEL__TIME_DISPLAY__INVERT");
+  duration.ariaLabel = getString("ARIA__DURATION_DISPLAY");
 
   progressSlider.addEventListener("input", function (this: HTMLInputElement) {
     const musicPlayer = getMusicPlayerInstance();

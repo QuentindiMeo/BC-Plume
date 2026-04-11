@@ -1,0 +1,238 @@
+import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { navigateToTrack } from "@/app/use-cases";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getString } from "@/shared/i18n";
+import { setSvgContent } from "@/shared/svg";
+import { PLUME_SVG } from "@/svg/icons";
+
+const DROPDOWN_ID = PLUME_ELEM_SELECTORS.tracklistDropdown.split("#")[1];
+const TOGGLE_BTN_ID = PLUME_ELEM_SELECTORS.tracklistToggleBtn.split("#")[1];
+const ITEM_CLASS = PLUME_ELEM_SELECTORS.tracklistItem.split(".")[1];
+const ITEM_ACTIVE_CLASS = `${ITEM_CLASS}--active`;
+const ITEM_UNPLAYABLE_CLASS = `${ITEM_CLASS}--unplayable`;
+const EDGE_TRACK_COUNT = 2; // Tracks within this many positions of either end are not centered (first/last 2 tracks)
+
+export const createTracklistToggle = (): {
+  toggleBtn: HTMLButtonElement;
+  dropdownEl: HTMLDivElement;
+  cleanup: () => void;
+} => {
+  const toggleBtn = document.createElement("button");
+  toggleBtn.id = TOGGLE_BTN_ID;
+  toggleBtn.type = "button";
+  setSvgContent(toggleBtn, PLUME_SVG.chevronDown);
+  toggleBtn.ariaExpanded = "false";
+  toggleBtn.setAttribute("aria-controls", DROPDOWN_ID);
+  toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
+  toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
+
+  const dropdownEl = document.createElement("div");
+  dropdownEl.id = DROPDOWN_ID;
+  dropdownEl.role = "listbox";
+  dropdownEl.ariaLabel = getString("ARIA__TRACKLIST__PANEL");
+  dropdownEl.ariaHidden = "true";
+
+  let isOpen = false;
+
+  const close = (refocus = true): void => {
+    dropdownEl.classList.remove("is-open");
+    dropdownEl.ariaHidden = "true";
+    toggleBtn.ariaExpanded = "false";
+    toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
+    toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
+    isOpen = false;
+    if (refocus) toggleBtn.focus();
+  };
+
+  const getPlayableItems = (): HTMLDivElement[] =>
+    Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
+
+  // Scrolls the active (playing) track into the center of the visible dropdown area.
+  const scrollActiveItemToCenter = (): void => {
+    const allItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+    if (allItems.length === 0) return;
+
+    const activeItem = dropdownEl.querySelector<HTMLDivElement>(`.${ITEM_ACTIVE_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`);
+    if (!activeItem) return;
+
+    const idx = Number(activeItem.dataset["index"]);
+    const total = allItems.length;
+
+    if (idx < EDGE_TRACK_COUNT) {
+      dropdownEl.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (idx >= total - EDGE_TRACK_COUNT) {
+      dropdownEl.scrollTo({ top: dropdownEl.scrollHeight, behavior: "smooth" });
+    } else {
+      // Use idx * itemHeight instead of offsetTop: offsetTop is relative to offsetParent,
+      // which varies between the main view and the fullscreen clone (different positioned ancestors).
+      // All items are uniform height, so idx * itemHeight is the exact content offset, context-independent.
+      const itemHeight = activeItem.offsetHeight;
+      const scrollTop = idx * itemHeight - (dropdownEl.clientHeight - itemHeight) / 2;
+      dropdownEl.scrollTo({ top: Math.max(0, scrollTop), behavior: "smooth" });
+    }
+  };
+
+  const updateActiveItem = (): void => {
+    const currentTitle = getAppCoreInstance().getState().trackTitle;
+    const tracklistItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
+
+    Array.from(tracklistItems).forEach((trackItem) => {
+      const idx = Number(trackItem.dataset["index"]);
+      const title = trackItem.dataset["title"] ?? "";
+      const isActive = currentTitle !== null && title === currentTitle;
+      const wasActive = trackItem.classList.contains(ITEM_ACTIVE_CLASS);
+      if (isActive === wasActive) return;
+
+      trackItem.classList.toggle(ITEM_ACTIVE_CLASS, isActive);
+      trackItem.ariaSelected = String(isActive);
+
+      if (!trackItem.classList.contains(ITEM_UNPLAYABLE_CLASS)) {
+        trackItem.ariaLabel = isActive
+          ? getString("ARIA__TRACKLIST__ITEM_CURRENT", [String(idx + 1), title])
+          : getString("ARIA__TRACKLIST__ITEM", [String(idx + 1), title]);
+      }
+    });
+
+    scrollActiveItemToCenter();
+  };
+
+  const renderItems = (): void => {
+    const bcPlayer = getBcPlayerInstance();
+    const rows = bcPlayer.getTrackRows();
+    const titles = bcPlayer.getTrackRowTitles();
+    const durations = bcPlayer.getTrackRowDurations();
+    const playabilityMap = bcPlayer.getTrackPlayabilityMap();
+    const currentTitle = getAppCoreInstance().getState().trackTitle;
+
+    dropdownEl.innerHTML = "";
+
+    rows.forEach((_row, idx) => {
+      const isPlayable = playabilityMap[idx];
+      const title = titles[idx] ?? "";
+      const duration = durations[idx] ?? "----";
+      const isActive = currentTitle !== null && title === currentTitle;
+
+      const item = document.createElement("div");
+      item.className = ITEM_CLASS;
+      if (isActive) item.classList.add(ITEM_ACTIVE_CLASS);
+      if (!isPlayable) item.classList.add(ITEM_UNPLAYABLE_CLASS);
+      item.role = "option";
+      item.ariaSelected = String(isActive);
+      item.dataset["index"] = String(idx);
+      item.dataset["title"] = title;
+
+      if (!isPlayable) {
+        item.ariaDisabled = "true";
+        item.ariaLabel = getString("ARIA__TRACKLIST__ITEM_UNPLAYABLE", [String(idx + 1), title]);
+      } else {
+        item.tabIndex = -1;
+        item.ariaLabel = isActive
+          ? getString("ARIA__TRACKLIST__ITEM_CURRENT", [String(idx + 1), title])
+          : getString("ARIA__TRACKLIST__ITEM", [String(idx + 1), title]);
+        item.addEventListener("click", () => {
+          navigateToTrack(idx, bcPlayer);
+        });
+      }
+
+      const numSpan = document.createElement("span");
+      numSpan.className = `${ITEM_CLASS}__number`;
+      numSpan.textContent = `${idx + 1}.`;
+      numSpan.ariaHidden = "true";
+
+      const titleSpan = document.createElement("span");
+      titleSpan.className = `${ITEM_CLASS}__title`;
+      titleSpan.textContent = title;
+      titleSpan.ariaHidden = "true";
+
+      const durationSpan = document.createElement("span");
+      durationSpan.className = `${ITEM_CLASS}__duration`;
+      durationSpan.textContent = duration;
+      durationSpan.ariaHidden = "true";
+
+      item.appendChild(numSpan);
+      item.appendChild(titleSpan);
+      item.appendChild(durationSpan);
+      dropdownEl.appendChild(item);
+    });
+  };
+
+  const open = (): void => {
+    renderItems();
+    dropdownEl.classList.add("is-open");
+    dropdownEl.ariaHidden = "false";
+    toggleBtn.ariaExpanded = "true";
+    toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
+    toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
+    isOpen = true;
+
+    const activePlayableItem = dropdownEl.querySelector<HTMLDivElement>(
+      `.${ITEM_ACTIVE_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`
+    );
+    const firstPlayable = dropdownEl.querySelector<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`);
+    const focusTarget = activePlayableItem ?? firstPlayable;
+    // preventScroll: let the transition-end handler do the centering scroll instead
+    focusTarget?.focus({ preventScroll: true });
+
+    // Center after the max-height transition completes so clientHeight is final
+    const onTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName !== "max-height") return;
+      if (isOpen) scrollActiveItemToCenter();
+    };
+    dropdownEl.addEventListener("transitionend", onTransitionEnd, { once: true });
+  };
+
+  toggleBtn.addEventListener("click", () => {
+    if (isOpen) close();
+    else open();
+  });
+
+  dropdownEl.addEventListener("keydown", (e: KeyboardEvent) => {
+    const playableItems = getPlayableItems();
+    const focused = document.activeElement as HTMLDivElement | null;
+    const currentIdx = focused ? playableItems.indexOf(focused) : -1;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        playableItems[currentIdx + 1]?.focus();
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        playableItems[currentIdx - 1]?.focus();
+        break;
+      case "Home":
+        e.preventDefault();
+        playableItems[0]?.focus();
+        break;
+      case "End":
+        e.preventDefault();
+        playableItems.at(-1)?.focus();
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        if (focused && playableItems.includes(focused)) focused.click();
+        break;
+    }
+  });
+
+  dropdownEl.addEventListener("mouseleave", () => {
+    if (!isOpen) return;
+    const onTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName !== "max-height") return;
+      if (isOpen) scrollActiveItemToCenter();
+    };
+    dropdownEl.addEventListener("transitionend", onTransitionEnd);
+  });
+
+  const unsubscribeTrackTitle = getAppCoreInstance().subscribe("trackTitle", () => {
+    if (isOpen) updateActiveItem();
+  });
+
+  const cleanup = (): void => {
+    unsubscribeTrackTitle();
+  };
+
+  return { toggleBtn, dropdownEl, cleanup };
+};

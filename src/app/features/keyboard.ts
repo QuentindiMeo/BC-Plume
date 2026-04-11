@@ -6,6 +6,7 @@ import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
 import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
 import { PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { NoArgFunction } from "@/shared/types";
@@ -95,6 +96,13 @@ export const setupHotkeys = (
 
     const action = codeToAction.get(eventKey(e));
     if (!action) return;
+
+    const focusInTracklist = (e.target as HTMLElement)?.closest?.(PLUME_ELEM_SELECTORS.tracklistDropdown);
+    if (
+      focusInTracklist &&
+      (e.code === "ArrowUp" || e.code === "ArrowDown" || e.code === "Space" || e.code === "Enter")
+    )
+      return;
 
     e.preventDefault();
     e.stopPropagation();

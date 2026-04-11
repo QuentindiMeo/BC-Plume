@@ -3,9 +3,8 @@ export type BcPageType = "album" | "track";
 export interface BcPlayerPort {
   isPlayerPresent(): boolean;
 
-  // Track data — plain values, no DOM leakage
-  getTrackTitle(pageType: BcPageType): string | null;
-  getAlbumContext(): string | null;
+  getCurrentTrackUrl(): string | null;
+  getTrackTitle(pageType: BcPageType): string | null; // Track data — plain values, no DOM leakage
   getArtworkUrl(): string | null;
   getTrackDuration(): number | null;
   isPlaying(): boolean;
@@ -14,6 +13,7 @@ export interface BcPlayerPort {
 
   // Track list data — data-centric access to album track table
   getTrackRows(): HTMLTableRowElement[];
+  getTrackPlayabilityMap(): boolean[];
   getTrackRowTitles(): string[];
   getTrackRowDurations(): (string | null)[];
 

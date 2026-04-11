@@ -1,10 +1,12 @@
 import type { BcPageType, BcPlayerPort } from "@/domain/ports/bc-player";
 
 /**
- * Minimal BcPlayerPort stub for tests. Only implements the three methods that updateTrackMetadata calls;
- * all others are left unimplemented.
+ * Minimal BcPlayerPort stub for tests.
+ * Only implements the methods that updateTrackMetadata calls; others are unimplemented.
  */
-export class FakeBcPlayer implements Pick<BcPlayerPort, "getTrackTitle" | "getTrackRows" | "getTrackRowTitles"> {
+export class FakeBcPlayer
+  implements Pick<BcPlayerPort, "getTrackTitle" | "getTrackRows" | "getTrackPlayabilityMap" | "getTrackRowTitles">
+{
   constructor(private readonly trackTitle: string | null = "Some Track") {}
 
   getTrackTitle(_pageType: BcPageType): string | null {
@@ -12,6 +14,10 @@ export class FakeBcPlayer implements Pick<BcPlayerPort, "getTrackTitle" | "getTr
   }
 
   getTrackRows(): HTMLTableRowElement[] {
+    return [];
+  }
+
+  getTrackPlayabilityMap(): boolean[] {
     return [];
   }
 

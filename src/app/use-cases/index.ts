@@ -7,3 +7,4 @@ export { toggleDurationDisplay } from "@/app/use-cases/toggle-duration-display";
 export { togglePlayback } from "@/app/use-cases/toggle-playback";
 export { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
 export { shouldShowReleaseToast } from "@/app/use-cases/check-release-toast";
+export { navigateToTrack } from "@/app/use-cases/navigate-to-track";

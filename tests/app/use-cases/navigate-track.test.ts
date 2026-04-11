@@ -14,7 +14,6 @@ const makeFakeBcPlayer = (overrides: Partial<BcPlayerPort> = {}): BcPlayerPort =
     getPreviousTrackButton: vi.fn(() => null),
     getNextTrackButton: vi.fn(() => null),
     isPlayerPresent: vi.fn(() => true),
-    getAlbumContext: vi.fn(() => null),
     getArtworkUrl: vi.fn(() => null),
     getTrackDuration: vi.fn(() => null),
     isPlaying: vi.fn(() => false),
