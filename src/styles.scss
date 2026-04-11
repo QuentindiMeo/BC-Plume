@@ -474,6 +474,9 @@ div.name-section__titling h2 {
 #bpe-fullscreen-clone #bpe-header-container {
   @apply max-w-[25em];
 }
+#bpe-fullscreen-clone #bpe-tracklist-dropdown {
+  @apply w-0 min-w-full;
+}
 
 #bpe-fullscreen-clone #bpe-header-container #bpe-header-logo {
   @apply hidden;
