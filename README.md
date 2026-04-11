@@ -58,6 +58,8 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Playback controls**: Play/Pause button, previous/next track, and seek backward/forward in a track
   - **... with fine-tuning in popup**: Configure seek jump duration, volume hotkey step, and track restart threshold
 - **Loop mode**: Cycle through no loop, track loop, and collection loop (remembered across pages)
+- **Tracklist dropdown**: Browse collection tracks from the header and jump directly to any of them
+  - **Go to track**: A link button docked to the track title opens the current track's Bandcamp page
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
 - **Keyboard shortcuts**: Control playback, volume, seeking, and more without touching the mouse
   - **Customizable hotkeys**: Remap every shortcut to your liking via the extension popup
@@ -65,6 +67,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Sticky player behavior**: Player sticks visually while scrolling for quicker access
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
   - **Responsive design**: Adapts to different screen sizes and devices
+- **Accessibility-minded**: Visible focus outlines, ARIA semantics, reduced-motion and contrast preferences, screen reader support
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
 - **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more on demand!)
 
@@ -112,12 +115,19 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
-- _**[1.10.0]** Mar 30 2026_: latest — **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
+- _**[1.11.0]** Apr 11 2026_: latest — **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
+- _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106) | [Promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8) release.
+- _**[1.8.0]** Feb 23 2026_: **Silent Robert, Spread The Word!** [#081](https://github.com/QuentindiMeo/BC-Plume/pull/81)
+- _**[1.7.0]** Feb 01 2026_: **Tell Me Quick, What Time Is It?** [#076](https://github.com/QuentindiMeo/BC-Plume/pull/76)
 - _**[1.6.0]** Jan 18 2026_: **Pedal To The Metal** [#067](https://github.com/QuentindiMeo/BC-Plume/pull/67)
-- _**[1.4.0]** Sep 08 2025_: **Sticky Sherlock** [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48) | Word is spread on Reddit: Plume is ready for use.
+- _**[1.5.0]** Nov 10 2025_: **"Demi-tour, slide !"** [#060](https://github.com/QuentindiMeo/BC-Plume/pull/60)
+- _**[1.4.0]** Sep 08 2025_: **Sticky Sherlock** [#048](https://github.com/QuentindiMeo/BC-Plume/pull/48) | Reddit hears: Plume is ready for use.
+- _**[1.3.0]** Sep 04 2025_: **Fiat Lux Numeris** [#042](https://github.com/QuentindiMeo/BC-Plume/pull/42)
+- _**[1.2.0]** Aug 19 2025_: **Whatchu Say?** [#038](https://github.com/QuentindiMeo/BC-Plume/pull/38)
 - _**[1.1.0]** Jul 30 2025_: **Pretty Boy** [#028](https://github.com/QuentindiMeo/BC-Plume/pull/28)
 - _**[1.0.0]** Jul 28 2025_: **First Release** [#018](https://github.com/QuentindiMeo/BC-Plume/pull/18)
+- _**[0.1.0]** Jul 28 2025_: Project configuration, song title display and playback. [#013](https://github.com/QuentindiMeo/BC-Plume/pull/13)
 - _**[0.0.0]** Jul 28 2025_: **Hello World!**
 
 ### 🔮 Possible future improvements

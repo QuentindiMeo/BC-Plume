@@ -5,15 +5,23 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+- _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)  
+An interactive tracklist dropdown is added to the header: browse a collection's tracks and jump directly to any of them.  
+A "go to track" link button docked to the track title allows navigation to a specific track's single page, on collections.  
+The Playback popup tab becomes General, and allows forcing Plume's display language.  
+Deep accessibility overhaul: focus outlines, reduced-motion and contrast preferences, sliders, a live region, cover art ARIA label, semantics, and the `lang` attribute matching the active locale. `axe-core` is integrated for deep a11y testing.  
+Significant errors and warnings are surfaced, failed hotkey changes show an inline error.  
+The Ko-fi tip link is replaced with the link to the [Plume Linktree](https://linktr.ee/bc_plume).
+
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)  
 The settings popup gains a tabbed layout (Hotkeys / Playback), with three new entries in the Playback tab to configure seek jumps, volume control and track restart.  
 Custom hotkeys can now include modifier keys (Ctrl, Shift, Alt) in any combination.  
-The album runtime is adjusted to tell if some tracks are unplayable.  
+The collection runtime is adjusted to tell if some tracks are unplayable.  
 A full Vitest-based unit test suite is introduced covering domain logic, use-cases, shared utilities, and popup use-cases.  
 Various bugs are fixed: layout is now independent on hotkeys, track pages don't throw a diagnostic error, toast container doesn't block the fullscreen exit button.
 
   - _**[1.9.2]** Mar 24 2026_: Health Check Fix, Unavailable Tracks, SVGs Security [#116](https://github.com/QuentindiMeo/BC-Plume/pull/116)  
-  Loop mode bugs are fixed: the penultimate track of an album no longer gets stuck repeating, and collection loop mode is no longer available on single track pages.  
+  Loop mode bugs are fixed: the penultimate track of a collection no longer gets stuck repeating, and collection loop mode is no longer available on single track pages.  
   Unplayable tracks in a collection are now detected and surfaced to the user via toast notifications.  
   The health check diagnostic replaces its `alert()` with the toast system and correctly handles standalone single track pages.  
   The progress seek bar no longer shows a not-allowed cursor when dragging.  
@@ -50,9 +58,9 @@ The app is bundled using esbuild, a pre-commit hook is added to ensure Prettier 
 
 - _**[1.7.0]** Feb 01 2026_: **Tell Me Quick, What Time Is It?** [#076](https://github.com/QuentindiMeo/BC-Plume/pull/76)  
 Hotkeys are added (`Ctrl+Alt+...`) for play/pause (`space`), rewind/forward seeking (`←`/`→`), previous/next track (`PgUp`/`PgDown`), volume control (`↑`/`↓`), and fullscreen toggle (`F`).  
-The album and title are displayed in fullscreen mode.  
+The collection/track title and artist name are displayed in fullscreen mode.  
 The total runtime of collections is displayed inside Bandcamp's track display—also on the fullscreen view.  
-The cover art and presentation section (left side) are made selectable, allowing users to easily copy the album title and artist name, or extract the cover art.
+The cover art and presentation section (left side) are made selectable, allowing users to easily copy the collection title and artist name, or extract the cover art.
 
 - _**[1.6.0]** Jan 18 2026_: **Pedal To The Metal** [#067](https://github.com/QuentindiMeo/BC-Plume/pull/67)  
 The fullscreen mode is implemented, allowing users to enjoy the music with an immersive experience.  
