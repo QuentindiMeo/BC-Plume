@@ -886,14 +886,16 @@ div.name-section__titling h2 {
 
   animation: bpe-toast-enter 0.3s ease-out;
   overflow: hidden;
-}
-.bpe-toast:hover {
-  background: rgba(10, 10, 15, 0.9);
-  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(32, 160, 195, 0.25);
-}
-.bpe-toast--exiting {
-  animation: bpe-toast-exit 0.25s ease-in forwards;
-  pointer-events: none;
+
+  &:hover {
+    background: rgba(10, 10, 15, 0.9);
+    box-shadow: 0 6px 32px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(32, 160, 195, 0.25);
+  }
+
+  &--exiting {
+    animation: bpe-toast-exit 0.25s ease-in forwards;
+    pointer-events: none;
+  }
 }
 
 .bpe-toast__icon {

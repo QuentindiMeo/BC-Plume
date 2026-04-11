@@ -15,7 +15,6 @@ const SOURCES = [
   "eslint.config.js",
   "manifest.json",
   "package.json",
-  "styles.css",
   "tsconfig.json",
 ];
 

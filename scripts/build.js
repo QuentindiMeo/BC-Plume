@@ -2,6 +2,10 @@
 const esbuild = require("esbuild");
 const fs = require("node:fs");
 const path = require("node:path");
+const sass = require("sass");
+const postcss = require("postcss");
+const tailwindcss = require("tailwindcss");
+const autoprefixer = require("autoprefixer");
 
 const isDev = process.argv.includes("--dev");
 const isTest = process.argv.includes("--test");
@@ -47,6 +51,51 @@ const popupBuildOptions = {
   outfile: path.join(distDir, "popup.js"),
 };
 
+const tailwindConfig = path.join(__dirname, "..", "tailwind.config.js");
+
+const styleEntries = [
+  {
+    input: path.join(__dirname, "..", "src", "tailwind.scss"),
+    output: path.join(distDir, "tailwind.css"),
+  },
+  {
+    input: path.join(__dirname, "..", "src", "styles.scss"),
+    output: path.join(distDir, "styles.css"),
+  },
+];
+
+const postcssProcessor = postcss([
+  tailwindcss({ config: tailwindConfig }),
+  autoprefixer(),
+]);
+
+const buildStyleEntry = async ({ input, output }) => {
+  const sassResult = sass.compile(input, {
+    style: !isDev && !isTest ? "compressed" : "expanded",
+    loadPaths: [path.join(__dirname, "..", "src")],
+  });
+  const postcssResult = await postcssProcessor.process(sassResult.css, {
+    from: input,
+    to: output,
+  });
+  fs.writeFileSync(output, postcssResult.css);
+  postcssResult.warnings().forEach((w) => console.warn(`⚠️  ${w.toString()}`));
+};
+
+const buildStyles = () => Promise.all(styleEntries.map(buildStyleEntry));
+
+const watchStyles = () => {
+  const srcDir = path.join(__dirname, "..", "src");
+  try {
+    fs.watch(srcDir, { recursive: true }, (_, filename) => {
+      if (!filename || !filename.endsWith(".scss")) return;
+      buildStyles().catch((err) => console.error("❌ Style rebuild failed:", err));
+    });
+  } catch (err) {
+    console.error("❌ Failed to start watcher for styles:", err);
+  }
+};
+
 const popupSrcDir = path.join(__dirname, "..", "src", "popup");
 const watchPopupAssets = () => {
   try {
@@ -75,12 +124,17 @@ async function build() {
     if (isWatch) {
       const contentCtx = await esbuild.context(contentBuildOptions);
       const popupCtx = await esbuild.context(popupBuildOptions);
-      await Promise.all([contentCtx.watch(), popupCtx.watch()]);
+      await Promise.all([contentCtx.watch(), popupCtx.watch(), buildStyles()]);
+      watchStyles();
       copyPopupAssets();
       watchPopupAssets();
       console.log("👀 Watching for changes...");
     } else {
-      await Promise.all([esbuild.build(contentBuildOptions), esbuild.build(popupBuildOptions)]);
+      await Promise.all([
+        esbuild.build(contentBuildOptions),
+        esbuild.build(popupBuildOptions),
+        buildStyles(),
+      ]);
       copyPopupAssets();
       console.log("✅ Build complete!");
     }
