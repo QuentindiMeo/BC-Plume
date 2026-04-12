@@ -269,6 +269,7 @@
 
   #plume-progress-slider {
     @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
+    -webkit-appearance: none;
 
     &:active {
       @apply cursor-grabbing;
@@ -283,6 +284,7 @@
         size-3 bg-white rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
+      -webkit-appearance: none;
 
       &:hover {
         @apply bg-[lightgray] scale-[120%];
@@ -296,6 +298,7 @@
         size-3 bg-white border-none rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
+      -webkit-appearance: none;
 
       &:hover {
         @apply bg-[lightgray] scale-[120%];
@@ -359,7 +362,7 @@
 
     &:hover {
       @apply bg-plume-40;
-      box-shadow: 0 0.25rem 1.25rem var(--color-plume-50) !important;
+      box-shadow: 0 0.25rem 1.25rem var(--color-plume-50);
     }
 
     @media (prefers-contrast: more) {
@@ -397,6 +400,7 @@
 
   #plume-volume-slider {
     @apply relative h-2 bg-white/20 m-0 rounded flex-1 cursor-pointer appearance-none;
+    -webkit-appearance: none;
 
     &:active {
       @apply cursor-grabbing;
@@ -411,6 +415,7 @@
         size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
+      -webkit-appearance: none;
 
       &:hover {
         @apply scale-[115%] bg-plume-light;
@@ -424,6 +429,7 @@
         size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
+      -webkit-appearance: none;
 
       &:hover {
         @apply scale-[110%] bg-plume-light;
