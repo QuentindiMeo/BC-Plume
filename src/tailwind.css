@@ -25,7 +25,9 @@
   --color-toast-bg: rgba(15, 15, 20, 0.8);
 
   --radius-focusable: 0.25rem;
-  --leading-title: 1.75;
+  --leading-title: 1.75; /* ? arbitrary: tall enough for all alphabets */
   --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5);
   --shadow-thumb-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --tracklist-max-height--folded: 6.5rem; /* ? arbitrary: 3 tracks tall */
+  --tracklist-max-height--unfolded: 10rem; /* ? arbitrary: 5 tracks tall */
 }

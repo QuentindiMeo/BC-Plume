@@ -4,11 +4,9 @@
 
 @layer plume.base; // NOTE when Bandcamp can be easily overridden (buttons), declare and use component and override layers
 
-/* compound shorthand — references @theme color, can't be a single-namespace token */
-:root {
-  --focusable-outline: 0.125rem solid var(--color-plume);
-  --tracklist-max-height--folded: 6.5rem;
-  --tracklist-max-height--unfolded: 10rem;
+/* Visually hidden but accessible to screen readers */
+.sr-live {
+  @apply sr-only;
 }
 
 /*********** Bandcamp native element overrides ***********/
@@ -79,13 +77,15 @@
   @apply bg-black/60 rounded-lg border border-white/10;
 
   *:focus-visible {
-    outline: var(--focusable-outline);
+    @apply outline-2 outline-plume;
   }
 
   @media (prefers-contrast: more) {
     @apply bg-white/25 border-contrast-border;
   }
 }
+
+/* Kept flat — specificity must stay at (1,0,0) so that they're wired correctly and fullscreen clone overrides win */
 
 #plume-header-container {
   @apply flex justify-end p-3 bg-glass-bg rounded-lg;
@@ -97,39 +97,62 @@
   @media (prefers-contrast: more) {
     @apply border-contrast-border;
   }
-}
 
+  #plume-header-current {
+    @apply w-3/4 flex flex-col items-end;
+
+    &:focus-visible {
+      @apply rounded-focusable outline-offset-2;
+    }
+  }
+
+  #plume-header-title-pretext {
+    @apply pr-1 italic text-right;
+
+    @media (prefers-contrast: more) {
+      @apply text-white;
+    }
+  }
+
+  .plume-header-title-row {
+    @apply flex items-center w-full min-w-0;
+  }
+
+  #plume-tracklist-toggle-btn {
+    @apply
+      shrink-0 size-5 p-0 pt-1 bg-transparent! m-0 border-none!
+      flex items-center justify-center
+      text-white/70! cursor-pointer
+    ;
+
+    &:hover {
+      @apply text-white;
+    }
+
+    &:focus-visible {
+      @apply rounded-focusable -outline-offset-1;
+    }
+
+    svg {
+      @apply pointer-events-none transition-transform;
+    }
+
+    &[aria-expanded="true"] svg {
+      @apply rotate-180;
+    }
+  }
+}
 #plume-header-logo {
   @apply absolute top-0 left-0 flex flex-col items-end pt-3 px-8 pb-0 scale-[0.25] origin-top-left;
 
   &:focus-visible {
     @apply rounded-focusable outline-8 outline-offset-[1rem];
   }
-}
-#plume-header-logo__version {
-  @apply m-0! mt-2 font-sans font-bold text-5xl italic text-plume;
-}
 
-#plume-header-current {
-  @apply w-3/4 flex flex-col items-end;
-
-  &:focus-visible {
-    @apply rounded-focusable outline-offset-2;
+  #plume-header-logo__version {
+    @apply m-0! mt-2 font-sans font-bold text-5xl italic text-plume;
   }
 }
-
-#plume-header-title-pretext {
-  @apply pr-1 italic text-right;
-
-  @media (prefers-contrast: more) {
-    @apply text-white;
-  }
-}
-
-.plume-header-title-row {
-  @apply flex items-center w-full min-w-0;
-}
-
 #plume-header-track-link {
   @apply shrink-0 inline-flex items-center justify-center size-5 ml-auto mr-1;
 
@@ -141,37 +164,12 @@
     @apply size-3;
   }
 }
-
 #plume-header-title {
   @apply flex-auto min-w-0 mr-1 text-sm text-white text-right font-sans truncate leading-title;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 
   #plume-header-track-link + & {
     @apply flex-initial mr-0;
-  }
-}
-
-#plume-tracklist-toggle-btn {
-  @apply
-    shrink-0 size-5 p-0 pt-1 bg-transparent! m-0 border-none!
-    flex items-center justify-center
-    text-white/70! cursor-pointer
-  ;
-
-  &:hover {
-    @apply text-white;
-  }
-
-  &:focus-visible {
-    @apply rounded-focusable -outline-offset-1;
-  }
-
-  svg {
-    @apply pointer-events-none transition-transform;
-  }
-
-  &[aria-expanded="true"] svg {
-    @apply rotate-180;
   }
 }
 
@@ -211,55 +209,55 @@
   @media (prefers-contrast: more) {
     @apply border-contrast-border;
   }
-}
 
-.plume-tracklist-item {
-  @apply py-1.5 px-3 outline-none flex items-center gap-2 font-sans text-xs text-white/85 cursor-pointer;
-  transition: background 0.15s ease;
+  .plume-tracklist-item {
+    @apply py-1.5 px-3 flex items-center gap-2 font-sans text-xs text-white/85 cursor-pointer;
+    transition: background 0.15s ease;
 
-  &:hover {
-    @apply bg-item-hover-bg;
-  }
+    &:hover {
+      @apply bg-item-hover-bg;
+    }
 
-  &:focus {
-    @apply bg-item-hover-bg inset-shadow-2xs shadow-plume;
-  }
-
-  &--active {
-    @apply font-semibold text-plume-light;
-
-    &:hover,
     &:focus {
-      @apply bg-plume/10;
+      @apply bg-item-hover-bg inset-shadow-2xs shadow-plume;
     }
-    &:focus {
-      @apply inset-shadow-2xs shadow-plume;
+
+    &--active {
+      @apply font-semibold text-plume-light;
+
+      &:hover,
+      &:focus {
+        @apply bg-plume/10;
+      }
+      &:focus {
+        @apply inset-shadow-2xs shadow-plume;
+      }
+    }
+
+    &--unplayable {
+      @apply opacity-35 cursor-default pointer-events-none;
+    }
+
+    @media (prefers-contrast: more) {
+      &:hover, &:focus {
+        @apply bg-white/15;
+      }
+    }
+
+    &__number {
+      @apply shrink-0 min-w-6 text-right text-xs text-text-muted;
+
+      .plume-tracklist-item--active & {
+        @apply text-plume-light;
+      }
+    }
+    &__title {
+      @apply flex-auto min-w-0 truncate leading-title;
+    }
+    &__duration {
+      @apply shrink-0 text-xs tabular-nums text-text-muted;
     }
   }
-
-  &--unplayable {
-    @apply opacity-35 cursor-default pointer-events-none;
-  }
-
-  @media (prefers-contrast: more) {
-    &:hover, &:focus {
-      @apply bg-white/15;
-    }
-  }
-}
-
-.plume-tracklist-item__number {
-  @apply shrink-0 min-w-6 text-right text-xs text-text-muted;
-
-  .plume-tracklist-item--active & {
-    @apply text-plume-light;
-  }
-}
-.plume-tracklist-item__title {
-  @apply flex-auto min-w-0 truncate leading-title;
-}
-.plume-tracklist-item__duration {
-  @apply shrink-0 text-xs tabular-nums text-text-muted;
 }
 
 #plume-playback-manager {
@@ -268,61 +266,61 @@
 
 #plume-progress-container {
   @apply relative m-0;
-}
 
-#plume-progress-slider {
-  @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
+  #plume-progress-slider {
+    @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
 
-  &:active {
-    @apply cursor-grabbing;
-  }
-
-  &:focus-visible {
-    @apply outline-offset-4;
-  }
-
-  &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
-    @apply
-      size-3 bg-white rounded-full shadow-thumb
-      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-    ;
-
-    &:hover {
-      @apply bg-[lightgray] scale-[120%];
-    }
     &:active {
       @apply cursor-grabbing;
     }
-  }
-  &::-moz-range-thumb {
-    @apply
-      size-3 bg-white border-none rounded-full shadow-thumb
-      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-    ;
 
-    &:hover {
-      @apply bg-[lightgray] scale-[120%];
+    &:focus-visible {
+      @apply outline-offset-4;
     }
-    &:active {
-      @apply cursor-grabbing;
+
+    &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
+      @apply
+        size-3 bg-white rounded-full shadow-thumb
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+      ;
+
+      &:hover {
+        @apply bg-[lightgray] scale-[120%];
+      }
+      &:active {
+        @apply cursor-grabbing;
+      }
+    }
+    &::-moz-range-thumb {
+      @apply
+        size-3 bg-white border-none rounded-full shadow-thumb
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+      ;
+
+      &:hover {
+        @apply bg-[lightgray] scale-[120%];
+      }
+      &:active {
+        @apply cursor-grabbing;
+      }
     }
   }
-}
 
-#plume-time-display {
-  @apply flex justify-between font-sans text-xs text-white/80;
+  #plume-time-display {
+    @apply flex justify-between font-sans text-xs text-white/80;
 
-  @media (prefers-contrast: more) {
-    @apply text-white;
-  }
-}
+    @media (prefers-contrast: more) {
+      @apply text-white;
+    }
 
-#plume-duration-display {
-  @apply cursor-pointer bg-transparent! border-none! p-0! m-0! outline-offset-2 text-inherit!;
-  font: inherit !important;
+    #plume-duration-display {
+      @apply cursor-pointer bg-transparent! border-none! p-0! m-0! outline-offset-2 text-inherit!;
+      font: inherit !important;
 
-  &:focus-visible {
-    @apply rounded-focusable;
+      &:focus-visible {
+        @apply rounded-focusable;
+      }
+    }
   }
 }
 
@@ -355,259 +353,254 @@
       }
     }
   }
-}
 
-#plume-play-pause-btn {
-  @apply size-14! bg-plume-20 border-plume-dimmed;
+  #plume-play-pause-btn {
+    @apply size-14! bg-plume-20 border-plume-dimmed;
 
-  &:hover {
-    @apply bg-plume-40;
-    box-shadow: 0 0.25rem 1.25rem var(--color-plume-50) !important;
-  }
+    &:hover {
+      @apply bg-plume-40;
+      box-shadow: 0 0.25rem 1.25rem var(--color-plume-50) !important;
+    }
 
-  @media (prefers-contrast: more) {
-    @apply bg-plume-40 border-plume;
+    @media (prefers-contrast: more) {
+      @apply bg-plume-40 border-plume;
+    }
   }
 }
 
 #plume-volume-container {
   @apply relative py-3 px-4 m-0 flex items-center gap-3 rounded-lg bg-glass-bg;
-}
 
-#plume-mute-btn {
-  @apply
-    size-8 p-0 m-0 bg-transparent! border-none!
-    flex shrink-0 items-center justify-center
-    text-white! transition-[color,opacity]
-  ;
+  #plume-mute-btn {
+    @apply
+      size-8 p-0 m-0 bg-transparent! border-none!
+      flex shrink-0 items-center justify-center
+      text-white! transition-[color,opacity]
+    ;
 
-  &:hover {
-    @apply text-plume-light!;
+    &:hover {
+      @apply text-plume-light!;
+    }
+
+    &:focus-visible {
+      @apply rounded-focusable;
+    }
+
+    &.muted {
+      @apply opacity-50;
+
+      @media (prefers-contrast: more) {
+        @apply opacity-70;
+      }
+    }
   }
 
-  &:focus-visible {
-    @apply rounded-focusable;
-  }
+  #plume-volume-slider {
+    @apply relative h-2 bg-white/20 m-0 rounded flex-1 cursor-pointer appearance-none;
 
-  &.muted {
-    @apply opacity-50;
+    &:active {
+      @apply cursor-grabbing;
+    }
+
+    &:focus-visible {
+      @apply outline-offset-8;
+    }
+
+    &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
+      @apply
+        size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+      ;
+
+      &:hover {
+        @apply scale-[115%] bg-plume-light;
+      }
+      &:active {
+        @apply cursor-grabbing;
+      }
+    }
+    &::-moz-range-thumb {
+      @apply
+        size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+      ;
+
+      &:hover {
+        @apply scale-[110%] bg-plume-light;
+      }
+      &:active {
+        @apply cursor-grabbing;
+      }
+    }
 
     @media (prefers-contrast: more) {
-      @apply opacity-70;
-    }
-  }
-}
-
-#plume-volume-slider {
-  @apply relative h-2 bg-white/20 m-0 rounded flex-1 cursor-pointer appearance-none;
-
-  &:active {
-    @apply cursor-grabbing;
-  }
-
-  &:focus-visible {
-    @apply outline-offset-8;
-  }
-
-  &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
-    @apply
-      size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
-      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-    ;
-
-    &:hover {
-      @apply scale-[115%] bg-plume-light;
-    }
-    &:active {
-      @apply cursor-grabbing;
-    }
-  }
-  &::-moz-range-thumb {
-    @apply
-      size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
-      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-    ;
-
-    &:hover {
-      @apply scale-[110%] bg-plume-light;
-    }
-    &:active {
-      @apply cursor-grabbing;
+      @apply bg-white/40;
     }
   }
 
-  @media (prefers-contrast: more) {
-    @apply bg-white/40;
-  }
-}
+  #plume-volume-value {
+    @apply w-8 text-right text-xs font-sans font-semibold text-plume-dimmed;
 
-#plume-volume-value {
-  @apply w-8 text-right text-xs font-sans font-semibold text-plume-dimmed;
-
-  @media (prefers-contrast: more) {
-    @apply text-white;
+    @media (prefers-contrast: more) {
+      @apply text-white;
+    }
   }
 }
 
 #plume-fullscreen-btn-container {
   @apply flex justify-center py-2;
-}
-#plume-fullscreen-btn {
-  @apply
-    z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg border border-white/15!
-    flex items-center gap-2
-    text-white! backdrop-blur-sm transition-transform
-  ;
 
-  &:hover {
-    @apply scale-[102.5%] bg-white/15! border-white/30!;
+  #plume-fullscreen-btn {
+    @apply
+      z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg border border-white/15!
+      flex items-center gap-2
+      text-white! backdrop-blur-sm transition-transform
+    ;
+
+    &:hover {
+      @apply scale-[102.5%] bg-white/15! border-white/30!;
+    }
+    &:active {
+      @apply scale-100;
+    }
+
+    @media (prefers-contrast: more) {
+      @apply bg-white/15! border-white/50!;
+    }
+
+    #plume-fullscreen-btn-label {
+      @apply ml-1 font-sans font-medium text-xs;
+    }
   }
-  &:active {
-    @apply scale-100;
-  }
-
-  @media (prefers-contrast: more) {
-    @apply bg-white/15! border-white/50!;
-  }
-}
-#plume-fullscreen-btn-label {
-  @apply ml-1 font-sans font-medium text-xs;
 }
 
-/* Fullscreen Mode Styles */
-
+/* Fullscreen Mode */
 #plume-fullscreen-overlay {
   @apply fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-9999;
   animation: fadeIn 0.3s ease-in-out;
 
   *:focus-visible {
-    outline: var(--focusable-outline);
-  }
-}
-
-#plume-fullscreen-background {
-  @apply absolute top-0 left-0 w-screen h-screen scale-110 /* because blur shrinks the opaque zone */
-    bg-black bg-cover bg-center bg-no-repeat blur-xl brightness-50 /* Heavy blur and dimming */
-    pointer-events-none select-none;
-}
-
-#plume-fullscreen-content {
-  @apply relative flex items-center justify-center gap-12 pointer-events-auto z-10000;
-
-  @media (max-width: 768px) {
-    @apply h-auto flex-col gap-4;
-  }
-}
-
-#plume-fullscreen-presentation {
-  @apply relative flex flex-col items-center justify-center;
-
-  #name-section {
-    @apply text-white;
+    @apply outline-2 outline-plume;
   }
 
-  @media (max-width: 768px) {
-    @apply gap-1;
-  }
-}
-
-#plume-fullscreen-cover-art {
-  @apply min-w-[25vw] max-w-[30vw] max-h-[60vh] rounded-lg;
-  box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
-  animation: slideInLeft 0.5s ease-out;
-
-  @media (max-width: 768px) {
-    @apply max-w-[70vw] max-h-[40vh];
-  }
-}
-
-.plume-fullscreen-titling {
-  @apply absolute bottom-[-8vh] flex flex-col items-center gap-1;
-  animation: slideInRight 0.5s ease-out;
-
-  h2,
-  h3 {
-    @apply m-0 text-center;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  #plume-fullscreen-background {
+    @apply absolute top-0 left-0 w-screen h-screen scale-110 /* because blur shrinks the opaque zone */
+      bg-black bg-cover bg-center bg-no-repeat blur-xl brightness-50 /* Heavy blur and dimming */
+      pointer-events-none select-none;
   }
 
-  .name-section__titling {
-    @apply italic;
+  #plume-fullscreen-content {
+    @apply relative flex items-center justify-center gap-12 pointer-events-auto z-10000;
 
-    span.runtime {
-      @apply text-xs font-medium not-italic text-white/70!;
+    @media (max-width: 768px) {
+      @apply h-auto flex-col gap-4;
+    }
+
+    #plume-fullscreen-presentation {
+      @apply relative flex flex-col items-center justify-center;
+
+      #name-section {
+        @apply text-white;
+      }
+
+      @media (max-width: 768px) {
+        @apply gap-1;
+      }
+
+      #plume-fullscreen-cover-art {
+        @apply min-w-[25vw] max-w-[30vw] max-h-[60vh] rounded-lg;
+        box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
+        animation: slideInLeft 0.5s ease-out;
+
+        @media (max-width: 768px) {
+          @apply max-w-[70vw] max-h-[40vh];
+        }
+      }
+
+      .plume-fullscreen-titling {
+        @apply absolute bottom-[-8vh] flex flex-col items-center gap-1;
+        animation: slideInRight 0.5s ease-out;
+
+        h2,
+        h3 {
+          @apply m-0 text-center;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .name-section__titling {
+          @apply italic;
+
+          span.runtime {
+            @apply text-xs font-medium not-italic text-white/70!;
+          }
+        }
+
+        @media (max-width: 768px) {
+          position: unset;
+        }
+      }
+    }
+
+    #plume-fullscreen-clone {
+      @apply rounded-lg flex flex-col justify-center bg-white/3;
+      box-shadow: rgba(0, 0, 0, 0.2) 0 0 0.25rem;
+
+      > #plume-header-logo {
+        @apply relative h-24 p-0 mb-4 items-center scale-100;
+
+        &:focus-visible {
+          @apply outline-2 outline-offset-0;
+        }
+
+        p {
+          @apply m-0 text-base;
+        }
+      }
+
+      #plume-header-container {
+        @apply max-w-[25em];
+
+        #plume-header-logo {
+          @apply hidden;
+        }
+        #plume-header-current {
+          @apply w-full;
+        }
+        #plume-header-title {
+          @apply whitespace-nowrap;
+        }
+      }
+
+      #plume-tracklist-dropdown {
+        @apply w-0 min-w-full; // ? makes it full-width while forcing text ellipse
+      }
     }
   }
 
-  @media (max-width: 768px) {
-    position: unset;
+  #plume-fullscreen-exit-btn {
+    @apply
+      z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full border-2 border-white/30
+      flex items-center justify-center
+      text-white backdrop-blur-sm
+      transition-[transform,background,border-color,box-shadow,opacity]
+    ;
+    animation: fadeIn 0.3s ease-out;
+
+    &:hover {
+      @apply scale-110 bg-black/90 border-plume-dimmed;
+      box-shadow: 0 4px 20px var(--color-plume-50);
+    }
+    &:active {
+      @apply scale-95;
+    }
+
+    @media (prefers-contrast: more) {
+      @apply border-contrast-border;
+    }
   }
 }
 
-#plume-fullscreen-clone {
-  @apply rounded-lg flex flex-col justify-center bg-white/3;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 0 0.25rem;
-
-  > #plume-header-logo {
-    @apply relative h-24 p-0 mb-4 items-center scale-100;
-
-    &:focus-visible {
-      @apply outline-2 outline-offset-0;
-    }
-
-    p {
-      @apply m-0 text-base;
-    }
-  }
-
-  #plume-header-container {
-    @apply max-w-[25em];
-
-    #plume-header-logo {
-      @apply hidden;
-    }
-    #plume-header-current {
-      @apply w-full;
-    }
-    #plume-header-title {
-      @apply whitespace-nowrap;
-    }
-  }
-
-  #plume-tracklist-dropdown {
-    @apply w-0 min-w-full; // makes it full-width while forcing text ellipse
-  }
-}
-
-#plume-fullscreen-exit-btn {
-  @apply
-    z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full border-2 border-white/30
-    flex items-center justify-center
-    text-white backdrop-blur-sm
-    transition-[transform,background,border-color,box-shadow,opacity]
-  ;
-  animation: fadeIn 0.3s ease-out;
-
-  &:hover {
-    @apply scale-110 bg-black/90 border-plume-dimmed;
-    box-shadow: 0 4px 20px var(--color-plume-50);
-  }
-  &:active {
-    @apply scale-95;
-  }
-
-  @media (prefers-contrast: more) {
-    @apply border-contrast-border;
-  }
-}
-
-/* Visually hidden but accessible to screen readers */
-.sr-live {
-  @apply sr-only;
-}
-
-/* Toast Notification */
-
+/* Toast Notifications */
 #plume-toast-container {
   @apply fixed top-5 right-5 flex flex-col gap-3 z-11000;
 
@@ -618,88 +611,88 @@
   @media (max-width: 480px) {
     @apply top-auto right-auto bottom-4 left-1/2 items-center -translate-x-1/2;
   }
-}
 
-.plume-toast {
-  @apply
-    relative overflow-hidden
-    w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg bg-toast-bg border-toast-accent
-    flex items-start
-    font-sans backdrop-blur-sm transition-[background,box-shadow]
-  ;
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.5),
-    0 0 0 1px var(--color-plume-15);
-  animation: plume-toast-enter 0.3s ease-out;
-
-  &:hover {
-    @apply bg-black/80;
+  .plume-toast {
+    @apply
+      relative overflow-hidden
+      w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg bg-toast-bg border-toast-accent
+      flex items-start
+      font-sans backdrop-blur-sm transition-[background,box-shadow]
+    ;
     box-shadow:
-      0 6px 32px rgba(0, 0, 0, 0.65),
-      0 0 0 1px var(--color-plume-25);
-  }
+      0 4px 24px rgba(0, 0, 0, 0.5),
+      0 0 0 1px var(--color-plume-15);
+    animation: plume-toast-enter 0.3s ease-out;
 
-  &--exiting {
-    @apply pointer-events-none;
-    animation: plume-toast-exit 0.25s ease-in forwards;
-  }
-
-  &--paused .plume-toast__timer {
-    animation-play-state: paused;
-  }
-
-  @media (max-width: 480px) {
-    animation: plume-toast-enter-mobile 0.3s ease-out;
+    &:hover {
+      @apply bg-black/80;
+      box-shadow:
+        0 6px 32px rgba(0, 0, 0, 0.65),
+        0 0 0 1px var(--color-plume-25);
+    }
 
     &--exiting {
+      @apply pointer-events-none;
       animation: plume-toast-exit 0.25s ease-in forwards;
     }
+
+    &--paused .plume-toast__timer {
+      animation-play-state: paused;
+    }
+
+    @media (max-width: 480px) {
+      animation: plume-toast-enter-mobile 0.3s ease-out;
+
+      &--exiting {
+        animation: plume-toast-exit 0.25s ease-in forwards;
+      }
+    }
+
+    &__icon {
+      @apply shrink-0 w-[15%] h-auto place-self-center -mt-2;
+    }
+
+    &__body {
+      @apply flex-1 flex flex-col gap-1 min-w-0 ml-4;
+
+      * {
+        @apply w-fit;
+      }
+
+      .plume-toast__title {
+        @apply m-0 text-sm font-semibold text-white leading-[1.3];
+      }
+
+      .plume-toast__description {
+        @apply m-0 font-normal leading-[1.4] text-xs text-white/70;
+      }
+
+      .plume-toast__cta {
+        @apply block pt-1.5 font-medium text-xs text-plume-light whitespace-nowrap no-underline;
+
+        &:hover {
+          @apply underline;
+        }
+      }
+    }
+
+    &__dismiss {
+      @apply
+        shrink-0 size-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
+        flex items-center justify-center
+        leading-none text-xl text-white/50
+        cursor-pointer transition-colors
+      ;
+
+      &:hover {
+        @apply text-white;
+      }
+    }
+
+    &__timer {
+      @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
+      background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed));
+      animation: plume-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
+    }
   }
-}
-
-.plume-toast__icon {
-  @apply shrink-0 w-[15%] h-auto place-self-center -mt-2;
-}
-
-.plume-toast__body {
-  @apply flex-1 flex flex-col gap-1 min-w-0 ml-4;
-
-  * {
-    @apply w-fit;
-  }
-}
-
-.plume-toast__title {
-  @apply m-0 text-sm font-semibold text-white leading-[1.3];
-}
-
-.plume-toast__description {
-  @apply m-0 font-normal leading-[1.4] text-xs text-white/70;
-}
-
-.plume-toast__cta {
-  @apply block pt-1.5 font-medium text-xs text-plume-light whitespace-nowrap no-underline;
-
-  &:hover {
-    @apply underline;
-  }
-}
-
-.plume-toast__dismiss {
-  @apply
-    shrink-0 size-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
-    flex items-center justify-center
-    leading-none text-xl text-white/50
-    cursor-pointer transition-colors
-  ;
-
-  &:hover {
-    @apply text-white;
-  }
-}
-
-.plume-toast__timer {
-  @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
-  background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed));
-  animation: plume-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
 }
