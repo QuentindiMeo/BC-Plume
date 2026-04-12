@@ -1,2 +1,23 @@
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";
+
+@theme {
+  --color-plume: #20a0c3;
+  --color-plume-warning: #ffc107;
+  --color-plume-error: #dc3545;
+  --color-progbar-bg: rgba(0, 0, 0, 0.85);
+  --color-progbar-fill-left: #2bb8db;
+  --color-progbar-fill-right: #1da0c3;
+  --color-tracklist-scrollbar: #2bb8dbd9;
+  --color-glass-bg: rgba(0, 0, 0, 0.2);
+  --color-text-muted: rgba(255, 255, 255, 0.45);
+  --color-item-hover-bg: rgba(255, 255, 255, 0.07);
+  --color-contrast-border: rgba(255, 255, 255, 0.6);
+  --color-toast-accent: rgba(32, 160, 195, 0.35);
+  --color-toast-bg: rgba(15, 15, 20, 0.8);
+
+  --radius-focusable: 0.25rem;
+  --leading-title: 1.75;
+  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-thumb-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+}

@@ -12,11 +12,11 @@ export interface ToastCta {
 const getToastBorderColor = (borderType: ToastBorderType): string => {
   switch (borderType) {
     case "default":
-      return "var(--plume)";
+      return "var(--color-plume)";
     case "warning":
-      return "var(--plume-warning)";
+      return "var(--color-plume-warning)";
     case "error":
-      return "var(--plume-error)";
+      return "var(--color-plume-error)";
     default:
       borderType satisfies never; // exhaustiveness check
       return borderType; // allow custom CSS color values
@@ -32,7 +32,7 @@ export interface ToastConfig {
   duration?: number; // in seconds, defaults to PLUME_CONSTANTS.TOAST_AUTO_DISMISS
   cta?: ToastCta;
   onDismissed?: () => void; // side-effect callback, called after the toast is dismissed
-  borderType?: ToastBorderType; // CSS color for the left border, defaults to var(--plume)
+  borderType?: ToastBorderType; // CSS color for the left border, defaults to var(--color-plume)
 }
 
 export interface ToastHandle {
