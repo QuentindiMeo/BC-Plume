@@ -10,7 +10,7 @@
   --progbar-fill-bg-right: #1da0c3;
   --tracklist-scrollbar-thumb: #2bb8dbd9;
 
-  --focusable-outline: 2px solid var(--plume);
+  --focusable-outline: 0.125rem solid var(--plume);
   --focusable-outline-border-radius: 0.25rem;
   --title-line-height: 1.75; /* fixed across all scripts — prevents height jump when switching script heights. */
 }
@@ -68,10 +68,14 @@ div.name-section__titling {
 
 /**************** Plume styling ****************/
 
-#plume-plume {
+#plume-root {
   @apply rounded-lg border;
   background: rgba(0, 0, 0, 0.6);
   border-color: rgba(255, 255, 255, 0.1);
+
+  *:focus-visible {
+    outline: var(--focusable-outline);
+  }
 
   @media (prefers-contrast: more) {
     background: rgba(255, 255, 255, 0.25) !important;
@@ -81,9 +85,9 @@ div.name-section__titling {
 
 /* Global reduced-motion override for all Plume descendants */
 @media (prefers-reduced-motion: reduce) {
-  #plume-plume *,
-  #plume-plume *::before,
-  #plume-plume *::after {
+  #plume-root *,
+  #plume-root *::before,
+  #plume-root *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -122,7 +126,6 @@ div.name-section__titling {
 
   &:focus-visible {
     border-radius: var(--focusable-outline-border-radius);
-    outline: var(--focusable-outline);
     outline-offset: 2px;
   }
 }
@@ -144,7 +147,6 @@ div.name-section__titling {
 
   &:focus-visible {
     border-radius: var(--focusable-outline-border-radius);
-    outline: var(--focusable-outline);
     outline-offset: 1px;
   }
 
@@ -173,7 +175,6 @@ div.name-section__titling {
 
   &:focus-visible {
     border-radius: var(--focusable-outline-border-radius);
-    outline: var(--focusable-outline);
     outline-offset: -1px;
   }
 
@@ -220,7 +221,6 @@ div.name-section__titling {
 
     &:focus-visible {
       border-radius: var(--focusable-outline-border-radius);
-      outline: var(--focusable-outline);
       outline-offset: -1px;
     }
   }
@@ -300,7 +300,6 @@ div.name-section__titling {
   -webkit-appearance: none;
 
   &:focus-visible {
-    outline: var(--focusable-outline);
     outline-offset: 0.25rem;
   }
 
@@ -339,7 +338,6 @@ div.name-section__titling {
 
   &:focus-visible {
     border-radius: var(--focusable-outline-border-radius);
-    outline: var(--focusable-outline);
   }
 }
 
@@ -360,9 +358,6 @@ div.name-section__titling {
     }
     &:active {
       @apply scale-95;
-    }
-    &:focus-visible {
-      outline: var(--focusable-outline);
     }
     &:disabled {
       @apply opacity-40 pointer-events-none;
@@ -409,7 +404,6 @@ div.name-section__titling {
 
   &:focus-visible {
     border-radius: var(--focusable-outline-border-radius);
-    outline: var(--focusable-outline);
   }
 
   &.muted {
@@ -427,7 +421,6 @@ div.name-section__titling {
   -webkit-appearance: none;
 
   &:focus-visible {
-    outline: var(--focusable-outline);
     outline-offset: 0.5rem;
   }
 
@@ -481,9 +474,6 @@ div.name-section__titling {
     background: rgba(255, 255, 255, 0.15) !important;
     border-color: rgba(255, 255, 255, 0.3) !important;
   }
-  &:focus-visible {
-    outline: var(--focusable-outline);
-  }
   &:active {
     @apply scale-100;
   }
@@ -532,6 +522,10 @@ div.name-section__titling {
 #plume-fullscreen-overlay {
   @apply fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-9999;
   animation: fadeIn 0.3s ease-in-out;
+
+  *:focus-visible {
+    outline: var(--focusable-outline);
+  }
 }
 
 #plume-fullscreen-background {
@@ -646,9 +640,6 @@ div.name-section__titling {
     background: rgba(0, 0, 0, 0.9);
     border-color: var(--progbar-fill-bg-right);
     box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5);
-  }
-  &:focus-visible {
-    outline: var(--focusable-outline);
   }
   &:active {
     @apply scale-95;

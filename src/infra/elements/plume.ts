@@ -1,7 +1,7 @@
 // CSS selectors for Plume's own injected DOM elements.
 export enum PLUME_ELEM_SELECTORS {
   bcElements = "div#plume-hidden-original",
-  plumeContainer = "div#plume-plume",
+  plumeContainer = "div#plume-root",
 
   headerContainer = "div#plume-header-container",
   headerLogo = "a#plume-header-logo",

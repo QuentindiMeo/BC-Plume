@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
-    plumeContainer: "div#plume-plume",
+    plumeContainer: "div#plume-root",
     headerContainer: "div#plume-header-container",
     headerLogo: "a#plume-header-logo",
     headerCurrent: "div#plume-header-current",
