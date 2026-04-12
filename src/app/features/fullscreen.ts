@@ -153,7 +153,7 @@ const renderProgressSlider = (elements: FullscreenElements, progressPercentage: 
     return;
   }
 
-  const bgImg = `linear-gradient(90deg, var(--color-progbar-fill-left) ${progressPercentage.toFixed(1)}%, var(--color-progbar-bg) 0%)`;
+  const bgImg = `linear-gradient(90deg, var(--color-plume-light) ${progressPercentage.toFixed(1)}%, var(--color-progbar-bg) 0%)`;
   elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
   elements.progressSlider.style.backgroundImage = bgImg;
 

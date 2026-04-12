@@ -3,11 +3,12 @@
 
 @theme {
   --color-plume: #20a0c3;
+  --color-plume-light: #2bb8db;
+  --color-plume-dimmed: #1da0c3;
   --color-plume-warning: #ffc107;
   --color-plume-error: #dc3545;
+
   --color-progbar-bg: rgba(0, 0, 0, 0.85);
-  --color-progbar-fill-left: #2bb8db;
-  --color-progbar-fill-right: #1da0c3;
   --color-tracklist-scrollbar: #2bb8dbd9;
   --color-glass-bg: rgba(0, 0, 0, 0.2);
   --color-text-muted: rgba(255, 255, 255, 0.45);

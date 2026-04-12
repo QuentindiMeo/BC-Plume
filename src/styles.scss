@@ -47,7 +47,7 @@
     @apply h-2! rounded! cursor-pointer!;
   }
   .progbar {
-    background: linear-gradient(90deg, var(--color-progbar-fill-left), var(--color-progbar-fill-right)) !important;
+    background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed)) !important;
     box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
   }
   .progbar_empty {
@@ -228,7 +228,7 @@
   }
 
   &--active {
-    @apply font-semibold text-progbar-fill-left;
+    @apply font-semibold text-plume-light;
 
     &:hover,
     &:focus {
@@ -255,7 +255,7 @@
   @apply shrink-0 min-w-6 text-right text-xs text-text-muted;
 
   .plume-tracklist-item--active & {
-    @apply text-progbar-fill-left;
+    @apply text-plume-light;
   }
 }
 .plume-tracklist-item__title {
@@ -274,7 +274,8 @@
 }
 
 #plume-progress-slider {
-  @apply w-full h-2 m-0 rounded cursor-pointer relative appearance-none;
+  @apply relative w-full h-2 m-0 rounded cursor-pointer;
+  appearance: none;
   -webkit-user-drag: none;
   -webkit-appearance: none;
 
@@ -283,20 +284,30 @@
   }
 
   &::-webkit-slider-thumb {
-    @apply w-3 h-3 bg-white rounded-full cursor-pointer appearance-none transition-all shadow-thumb;
+    @apply w-3 h-3 bg-white rounded-full cursor-grab appearance-none transition-all shadow-thumb;
     -webkit-appearance: none;
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
     }
+    &:active {
+      @apply cursor-grabbing;
+    }
   }
 
   &::-moz-range-thumb {
-    @apply w-3 h-3 border-none bg-white rounded-full cursor-pointer transition-all shadow-thumb;
+    @apply w-3 h-3 border-none bg-white rounded-full cursor-grab transition-all shadow-thumb;
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
     }
+    &:active {
+      @apply cursor-grabbing;
+    }
+  }
+
+  &:active {
+    @apply cursor-grabbing;
   }
 }
 
@@ -327,7 +338,7 @@
     border: 2px solid rgba(255, 255, 255, 0.2) !important;
 
     &:hover {
-      @apply scale-110 border-progbar-fill-right!;
+      @apply scale-110 border-plume-dimmed!;
       background: rgba(255, 255, 255, 0.2) !important;
       box-shadow: 0 0.25rem 0.5rem rgba(29, 160, 195, 0.3);
     }
@@ -350,7 +361,7 @@
 }
 
 #plume-play-pause-btn {
-  @apply size-14! border-progbar-fill-right;
+  @apply size-14! border-plume-dimmed;
   background: rgba(29, 160, 195, 0.2);
 
   &:hover {
@@ -372,7 +383,7 @@
   @apply shrink-0 size-8 p-0 m-0 bg-transparent! border-none! flex items-center justify-center text-white! transition-all;
 
   &:hover {
-    @apply text-progbar-fill-left!;
+    @apply text-plume-light!;
   }
 
   &:focus-visible {
@@ -389,7 +400,7 @@
 }
 
 #plume-volume-slider {
-  @apply flex-1 h-2 m-0 rounded cursor-pointer relative;
+  @apply relative flex-1 h-2 m-0 rounded cursor-pointer;
   background: rgba(255, 255, 255, 0.2);
   appearance: none;
   -webkit-appearance: none;
@@ -399,20 +410,30 @@
   }
 
   &::-webkit-slider-thumb {
-    @apply w-4 h-4 border-none rounded-[25%] appearance-none transition-all bg-progbar-fill-right shadow-thumb-sm;
+    @apply size-4 border-none rounded-[25%] cursor-grab appearance-none transition-all bg-plume-dimmed shadow-thumb-sm;
     -webkit-appearance: none;
 
     &:hover {
-      @apply scale-[115%] bg-progbar-fill-left;
+      @apply scale-[115%] bg-plume-light;
+    }
+    &:active {
+      @apply cursor-grabbing;
     }
   }
 
   &::-moz-range-thumb {
-    @apply w-4 h-4 border-none rounded-[25%] transition-all bg-progbar-fill-right shadow-thumb-sm;
+    @apply size-4 border-none rounded-[25%] cursor-grab transition-all bg-plume-dimmed shadow-thumb-sm;
 
     &:hover {
-      @apply scale-[110%] bg-progbar-fill-left;
+      @apply scale-[110%] bg-plume-light;
     }
+    &:active {
+      @apply cursor-grabbing;
+    }
+  }
+
+  &:active {
+    @apply cursor-grabbing;
   }
 
   @media (prefers-contrast: more) {
@@ -421,7 +442,7 @@
 }
 
 #plume-volume-value {
-  @apply w-8 text-right text-xs font-sans font-semibold text-progbar-fill-right;
+  @apply w-8 text-right text-xs font-sans font-semibold text-plume-dimmed;
 
   @media (prefers-contrast: more) {
     @apply text-white;
@@ -606,7 +627,7 @@
   animation: fadeIn 0.3s ease-out;
 
   &:hover {
-    @apply scale-110 border-progbar-fill-right;
+    @apply scale-110 border-plume-dimmed;
     background: rgba(0, 0, 0, 0.9);
     box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5);
   }
@@ -741,7 +762,7 @@
 }
 
 .plume-toast__cta {
-  @apply block pt-1.5 font-medium text-xs text-progbar-fill-left whitespace-nowrap no-underline;
+  @apply block pt-1.5 font-medium text-xs text-plume-light whitespace-nowrap no-underline;
 
   &:hover {
     @apply underline;
@@ -764,6 +785,6 @@
 
 .plume-toast__timer {
   @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
-  background: linear-gradient(90deg, var(--color-progbar-fill-left), var(--color-progbar-fill-right));
+  background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed));
   animation: plume-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
 }
