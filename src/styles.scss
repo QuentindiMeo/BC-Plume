@@ -15,6 +15,15 @@
   --focusable-outline: 0.125rem solid var(--plume);
   --focusable-outline-border-radius: 0.25rem;
   --title-line-height: 1.75; /* fixed across all scripts — prevents height jump when switching script heights. */
+
+  --glass-bg: rgba(0, 0, 0, 0.2);
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --item-hover-bg: rgba(255, 255, 255, 0.07);
+  --contrast-border: rgba(255, 255, 255, 0.6);
+  --thumb-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --thumb-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --toast-accent: rgba(32, 160, 195, 0.35);
+  --toast-bg: rgba(15, 15, 20, 0.8);
 }
 
 /*********** Bandcamp native element overrides ***********/
@@ -92,20 +101,20 @@
 
   @media (prefers-contrast: more) {
     background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.6);
+    border-color: var(--contrast-border);
   }
 }
 
 #plume-header-container {
   @apply flex justify-end p-3 rounded-lg;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--glass-bg);
 
   &:has(+ #plume-tracklist-dropdown.is-open) {
     @apply rounded-b-none;
   }
 
   @media (prefers-contrast: more) {
-    border-color: rgba(255, 255, 255, 0.6);
+    border-color: var(--contrast-border);
   }
 }
 
@@ -194,7 +203,7 @@
   transition:
     max-height 0.25s ease,
     opacity 0.2s ease;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--glass-bg);
   scrollbar-width: thin;
   scrollbar-color: var(--tracklist-scrollbar-thumb) transparent;
 
@@ -228,7 +237,7 @@
   }
 
   @media (prefers-contrast: more) {
-    border-color: rgba(255, 255, 255, 0.6);
+    border-color: var(--contrast-border);
   }
 }
 
@@ -238,11 +247,11 @@
   color: rgba(255, 255, 255, 0.85);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--item-hover-bg);
   }
 
   &:focus {
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--item-hover-bg);
     box-shadow: inset 0 0 0 1px var(--plume);
   }
 
@@ -273,7 +282,7 @@
 
 .plume-tracklist-item__number {
   @apply shrink-0 min-w-6 text-right text-xs;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--text-muted);
 
   .plume-tracklist-item--active & {
     color: var(--progbar-fill-bg-left);
@@ -285,7 +294,7 @@
 }
 .plume-tracklist-item__duration {
   @apply shrink-0 text-xs tabular-nums;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--text-muted);
 }
 
 #plume-playback-manager {
@@ -307,7 +316,7 @@
 
   &::-webkit-slider-thumb {
     @apply w-3 h-3 bg-white rounded-full cursor-pointer appearance-none transition-all;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--thumb-shadow);
     -webkit-appearance: none;
 
     &:hover {
@@ -317,7 +326,7 @@
 
   &::-moz-range-thumb {
     @apply w-3 h-3 border-none bg-white rounded-full cursor-pointer transition-all;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--thumb-shadow);
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
@@ -367,7 +376,7 @@
 
     @media (prefers-contrast: more) {
       background: rgba(255, 255, 255, 0.25);
-      border-color: rgba(255, 255, 255, 0.6);
+      border-color: var(--contrast-border);
 
       &:disabled {
         opacity: 0.6;
@@ -394,7 +403,7 @@
 
 #plume-volume-container {
   @apply relative py-3 px-4 m-0 flex items-center gap-3 rounded-lg;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--glass-bg);
 }
 
 #plume-mute-btn {
@@ -429,7 +438,7 @@
   &::-webkit-slider-thumb {
     @apply w-4 h-4 border-none rounded-[25%] appearance-none transition-all;
     background: var(--progbar-fill-bg-right);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--thumb-shadow-sm);
     -webkit-appearance: none;
 
     &:hover {
@@ -441,7 +450,7 @@
   &::-moz-range-thumb {
     @apply w-4 h-4 border-none rounded-[25%] transition-all;
     background: var(--progbar-fill-bg-right);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--thumb-shadow-sm);
 
     &:hover {
       @apply scale-[1.1];
@@ -648,7 +657,7 @@
   }
 
   @media (prefers-contrast: more) {
-    border-color: rgba(255, 255, 255, 0.6);
+    border-color: var(--contrast-border);
   }
 }
 
@@ -719,8 +728,8 @@
     flex items-start
     font-sans backdrop-blur-sm;
 
-  background: rgba(15, 15, 20, 0.8);
-  border: 1px solid rgba(32, 160, 195, 0.35);
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-accent);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(32, 160, 195, 0.15);
