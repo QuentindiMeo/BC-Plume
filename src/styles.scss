@@ -1,11 +1,14 @@
+@use "animations";
 @reference "tailwindcss";
 @import "./tailwind.css";
 
-@layer plume.base; // FIXME when Bandcamp can be easily overridden (buttons), declare and use component and override layers
+@layer plume.base; // NOTE when Bandcamp can be easily overridden (buttons), declare and use component and override layers
 
 /* compound shorthand — references @theme color, can't be a single-namespace token */
 :root {
   --focusable-outline: 0.125rem solid var(--color-plume);
+  --tracklist-max-height--folded: 6.5rem;
+  --tracklist-max-height--unfolded: 10rem;
 }
 
 /*********** Bandcamp native element overrides ***********/
@@ -29,16 +32,17 @@
 
   .inline_player {
     /* parent component */
-    @apply sticky! top-0 rounded-lg my-4! mx-0!;
-    z-index: 9; /* ensure it stays above other contents, especially the album collection promotion */
+    @apply
+      z-9 /* ensure it stays above other contents, especially the album collection promotion */
+      sticky! top-0 rounded-lg my-4! mx-0!
+    ;
     transition:
       background-color 0.2s ease,
       margin 0.2s ease !important;
 
     /* when the user scrolls low enough, Plume becomes sticky */
     &.scrolled {
-      @apply top-2 m-0!;
-      background-color: rgba(0, 0, 0, 0.5);
+      @apply top-2 bg-black/50 m-0!;
     }
   }
 
@@ -51,8 +55,7 @@
     box-shadow: 0 1px 3px var(--color-plume-40) !important;
   }
   .progbar_empty {
-    @apply bg-white/15!;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    @apply bg-white/15! border border-white/10!;
   }
 
   #plume-hidden-original {
@@ -73,30 +76,26 @@
 
 /**************** Plume styling ****************/
 #plume-root {
-  @apply rounded-lg border;
-  background: rgba(0, 0, 0, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
+  @apply bg-black/60 rounded-lg border border-white/10;
 
   *:focus-visible {
     outline: var(--focusable-outline);
   }
 
   @media (prefers-contrast: more) {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: var(--color-contrast-border);
+    @apply bg-white/25 border-contrast-border;
   }
 }
 
 #plume-header-container {
-  @apply flex justify-end p-3 rounded-lg;
-  background: var(--color-glass-bg);
+  @apply flex justify-end p-3 bg-glass-bg rounded-lg;
 
   &:has(+ #plume-tracklist-dropdown.is-open) {
     @apply rounded-b-none;
   }
 
   @media (prefers-contrast: more) {
-    border-color: var(--color-contrast-border);
+    @apply border-contrast-border;
   }
 }
 
@@ -104,12 +103,11 @@
   @apply absolute top-0 left-0 flex flex-col items-end pt-3 px-8 pb-0 scale-[0.25] origin-top-left;
 
   &:focus-visible {
-    @apply rounded-focusable outline-offset-[1rem];
-    outline: 8px solid var(--color-plume);
+    @apply rounded-focusable outline-8 outline-offset-[1rem];
   }
 }
 #plume-header-logo__version {
-  @apply m-0! mt-2 text-5xl font-bold font-sans italic text-plume;
+  @apply m-0! mt-2 font-sans font-bold text-5xl italic text-plume;
 }
 
 #plume-header-current {
@@ -154,8 +152,11 @@
 }
 
 #plume-tracklist-toggle-btn {
-  @apply shrink-0 size-5 p-0 pt-1 m-0 bg-transparent! border-none! flex items-center justify-center cursor-pointer;
-  color: rgba(255, 255, 255, 0.7) !important;
+  @apply
+    shrink-0 size-5 p-0 pt-1 bg-transparent! m-0 border-none!
+    flex items-center justify-center
+    text-white/70! cursor-pointer
+  ;
 
   &:hover {
     @apply text-white;
@@ -193,12 +194,13 @@
   }
 
   &.is-open {
-    @apply overflow-y-auto opacity-100 transition-all;
-    max-height: 6.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    @apply
+      max-h-(--tracklist-max-height--folded) border-t border-t-white/8 overflow-y-auto
+      opacity-100 transition-[max-height,opacity]
+    ;
 
     &:hover {
-      max-height: 10rem;
+      @apply max-h-(--tracklist-max-height--unfolded);
     }
 
     &:focus-visible {
@@ -212,9 +214,8 @@
 }
 
 .plume-tracklist-item {
-  @apply flex items-center gap-2 py-1.5 px-3 text-xs font-sans cursor-pointer outline-none;
+  @apply py-1.5 px-3 outline-none flex items-center gap-2 font-sans text-xs text-white/85 cursor-pointer;
   transition: background 0.15s ease;
-  color: rgba(255, 255, 255, 0.85);
 
   &:hover {
     @apply bg-item-hover-bg;
@@ -272,12 +273,19 @@
 #plume-progress-slider {
   @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
 
+  &:active {
+    @apply cursor-grabbing;
+  }
+
   &:focus-visible {
     @apply outline-offset-4;
   }
 
-  &::-webkit-slider-thumb {
-    @apply size-3 bg-white rounded-full cursor-grab appearance-none transition-all shadow-thumb;
+  &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
+    @apply
+      size-3 bg-white rounded-full shadow-thumb
+      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+    ;
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
@@ -286,9 +294,11 @@
       @apply cursor-grabbing;
     }
   }
-
   &::-moz-range-thumb {
-    @apply size-3 border-none bg-white rounded-full cursor-grab transition-all shadow-thumb;
+    @apply
+      size-3 bg-white border-none rounded-full shadow-thumb
+      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+    ;
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
@@ -296,16 +306,11 @@
     &:active {
       @apply cursor-grabbing;
     }
-  }
-
-  &:active {
-    @apply cursor-grabbing;
   }
 }
 
 #plume-time-display {
-  @apply flex justify-between text-xs font-sans;
-  color: rgba(255, 255, 255, 0.8);
+  @apply flex justify-between font-sans text-xs text-white/80;
 
   @media (prefers-contrast: more) {
     @apply text-white;
@@ -325,8 +330,11 @@
   @apply mb-1 flex justify-center items-center gap-3;
 
   button {
-    @apply size-10 rounded-full bg-white/10! mr-0! flex items-center justify-center text-white! transition-all backdrop-blur-[10px];
-    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    @apply
+      size-10 bg-white/10! rounded-full mr-0! border-2 border-white/20!
+      flex items-center justify-center
+      text-white! transition-[transform,background,border-color,box-shadow,opacity] backdrop-blur-[10px]
+    ;
 
     &:hover {
       @apply scale-110 bg-white/15! border-plume-dimmed!;
@@ -340,8 +348,7 @@
     }
 
     @media (prefers-contrast: more) {
-      @apply border-contrast-border;
-      background: rgba(255, 255, 255, 0.25);
+      @apply bg-white/25 border-contrast-border;
 
       &:disabled {
         @apply opacity-60;
@@ -368,7 +375,11 @@
 }
 
 #plume-mute-btn {
-  @apply shrink-0 size-8 p-0 m-0 bg-transparent! border-none! flex items-center justify-center text-white! transition-all;
+  @apply
+    size-8 p-0 m-0 bg-transparent! border-none!
+    flex shrink-0 items-center justify-center
+    text-white! transition-[color,opacity]
+  ;
 
   &:hover {
     @apply text-plume-light!;
@@ -388,15 +399,21 @@
 }
 
 #plume-volume-slider {
-  @apply relative flex-1 h-2 m-0 rounded cursor-pointer appearance-none;
-  background: rgba(255, 255, 255, 0.2);
+  @apply relative h-2 bg-white/20 m-0 rounded flex-1 cursor-pointer appearance-none;
+
+  &:active {
+    @apply cursor-grabbing;
+  }
 
   &:focus-visible {
     @apply outline-offset-8;
   }
 
-  &::-webkit-slider-thumb {
-    @apply size-4 border-none rounded-[25%] cursor-grab appearance-none transition-all bg-plume-dimmed shadow-thumb-sm;
+  &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
+    @apply
+      size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
+      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+    ;
 
     &:hover {
       @apply scale-[115%] bg-plume-light;
@@ -405,9 +422,11 @@
       @apply cursor-grabbing;
     }
   }
-
   &::-moz-range-thumb {
-    @apply size-4 border-none rounded-[25%] cursor-grab transition-all bg-plume-dimmed shadow-thumb-sm;
+    @apply
+      size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
+      cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
+    ;
 
     &:hover {
       @apply scale-[110%] bg-plume-light;
@@ -417,12 +436,8 @@
     }
   }
 
-  &:active {
-    @apply cursor-grabbing;
-  }
-
   @media (prefers-contrast: more) {
-    background: rgba(255, 255, 255, 0.4);
+    @apply bg-white/40;
   }
 }
 
@@ -439,11 +454,10 @@
 }
 #plume-fullscreen-btn {
   @apply
-    z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg
+    z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg border border-white/15!
     flex items-center gap-2
     text-white! backdrop-blur-sm transition-transform
   ;
-  border: 0.0625rem solid rgba(255, 255, 255, 0.15) !important;
 
   &:hover {
     @apply scale-[102.5%] bg-white/15! border-white/30!;
@@ -457,40 +471,10 @@
   }
 }
 #plume-fullscreen-btn-label {
-  @apply text-xs font-medium text-white font-sans ml-1;
+  @apply ml-1 font-sans font-medium text-xs;
 }
 
 /* Fullscreen Mode Styles */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-3rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(3rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 
 #plume-fullscreen-overlay {
   @apply fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-9999;
@@ -551,7 +535,7 @@
     @apply italic;
 
     span.runtime {
-      @apply text-xs font-medium not-italic text-[#ffffffaf]!;
+      @apply text-xs font-medium not-italic text-white/70!;
     }
   }
 
@@ -566,8 +550,6 @@
 
   > #plume-header-logo {
     @apply relative h-24 p-0 mb-4 items-center scale-100;
-    transform: unset;
-    transform-origin: unset;
 
     &:focus-visible {
       @apply outline-2 outline-offset-0;
@@ -599,12 +581,11 @@
 
 #plume-fullscreen-exit-btn {
   @apply
-    z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full
+    z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full border-2 border-white/30
     flex items-center justify-center
     text-white backdrop-blur-sm
-    transition-all
+    transition-[transform,background,border-color,box-shadow,opacity]
   ;
-  border: 0.125rem solid rgba(255, 255, 255, 0.3);
   animation: fadeIn 0.3s ease-out;
 
   &:hover {
@@ -627,48 +608,6 @@
 
 /* Toast Notification */
 
-@keyframes plume-toast-enter {
-  from {
-    opacity: 0;
-    transform: translateX(calc(100% + 1.5rem));
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes plume-toast-exit {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(calc(100% + 1.5rem));
-  }
-}
-
-@keyframes plume-toast-enter-mobile {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(calc(100% + 1.5rem));
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-@keyframes plume-toast-timer-drain {
-  from {
-    width: var(--timer-start-width, 100%);
-  }
-  to {
-    width: 0%;
-  }
-}
-
 #plume-toast-container {
   @apply fixed top-5 right-5 flex flex-col gap-3 z-11000;
 
@@ -686,20 +625,18 @@
     relative overflow-hidden
     w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg bg-toast-bg border-toast-accent
     flex items-start
-    font-sans backdrop-blur-sm
+    font-sans backdrop-blur-sm transition-[background,box-shadow]
   ;
-
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(32, 160, 195, 0.15);
-
+    0 0 0 1px var(--color-plume-15);
   animation: plume-toast-enter 0.3s ease-out;
 
   &:hover {
-    background: rgba(10, 10, 15, 0.9);
+    @apply bg-black/80;
     box-shadow:
       0 6px 32px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(32, 160, 195, 0.25);
+      0 0 0 1px var(--color-plume-25);
   }
 
   &--exiting {
@@ -737,8 +674,7 @@
 }
 
 .plume-toast__description {
-  @apply m-0 text-xs font-normal leading-[1.4];
-  color: rgba(255, 255, 255, 0.7);
+  @apply m-0 font-normal leading-[1.4] text-xs text-white/70;
 }
 
 .plume-toast__cta {
@@ -753,10 +689,9 @@
   @apply
     shrink-0 size-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
     flex items-center justify-center
-    text-xl leading-none
+    leading-none text-xl text-white/50
     cursor-pointer transition-colors
   ;
-  color: rgba(255, 255, 255, 0.5);
 
   &:hover {
     @apply text-white;
