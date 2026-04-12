@@ -1,5 +1,7 @@
 @reference "tailwindcss";
 
+@layer plume.base;
+
 /* declare variables */
 :root {
   --plume: #20a0c3;
@@ -15,59 +17,70 @@
   --title-line-height: 1.75; /* fixed across all scripts — prevents height jump when switching script heights. */
 }
 
-/*********** Native elements styling ***********/
-
-div#name-section {
-  h3 {
-    font-weight: unset;
+/*********** Bandcamp native element overrides ***********/
+@layer plume.base {
+  div#name-section {
+    h3 {
+      font-weight: unset;
+    }
+    span.fromAlbum {
+      @apply italic;
+    }
   }
-  span.fromAlbum {
-    @apply italic;
+
+  div.name-section__titling {
+    @apply flex items-baseline gap-1.5;
+
+    h2 {
+      @apply mr-0!;
+    }
   }
-}
 
-div.name-section__titling {
-  @apply flex items-baseline gap-1.5;
+  .inline_player {
+    /* parent component */
+    @apply sticky! top-0 rounded-lg my-4! mx-0!;
+    z-index: 9; /* ensure it stays above other contents, especially the album collection promotion */
+    transition:
+      background-color 0.2s ease,
+      margin 0.2s ease !important;
 
-  h2 {
-    @apply mr-0!;
+    /* when the user scrolls low enough, Plume becomes sticky */
+    &.scrolled {
+      @apply top-2 m-0!;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
   }
-}
 
-.inline_player {
-  /* parent component */
-  @apply sticky! top-0 rounded-lg my-4! mx-0!;
-  z-index: 9; /* ensure it stays above other contents, especially the album collection promotion */
-  transition:
-    background-color 0.2s ease,
-    margin 0.2s ease !important;
-
-  /* when the user scrolls low enough, Plume becomes sticky */
-  &.scrolled {
-    @apply top-2 m-0!;
-    background-color: rgba(0, 0, 0, 0.5);
+  .progbar,
+  .progbar_empty {
+    @apply h-2! rounded! cursor-pointer!;
   }
-}
+  .progbar {
+    background: linear-gradient(90deg, var(--progbar-fill-bg-left), var(--progbar-fill-bg-right)) !important;
+    box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
+  }
+  .progbar_empty {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
 
-.progbar,
-.progbar_empty {
-  @apply h-2! rounded! cursor-pointer!;
-}
-.progbar {
-  background: linear-gradient(90deg, var(--progbar-fill-bg-left), var(--progbar-fill-bg-right)) !important;
-  box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
-}
-.progbar_empty {
-  background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
+  #plume-hidden-original {
+    @apply hidden! invisible!;
+  }
 
-#plume-hidden-original {
-  @apply hidden! invisible!;
+  /* first-declared layer → highest !important priority in the cascade */
+  @media (prefers-reduced-motion: reduce) {
+    #plume-root *,
+    #plume-root *::before,
+    #plume-root *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 /**************** Plume styling ****************/
-
 #plume-root {
   @apply rounded-lg border;
   background: rgba(0, 0, 0, 0.6);
@@ -78,19 +91,8 @@ div.name-section__titling {
   }
 
   @media (prefers-contrast: more) {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.6) !important;
-  }
-}
-
-/* Global reduced-motion override for all Plume descendants */
-@media (prefers-reduced-motion: reduce) {
-  #plume-root *,
-  #plume-root *::before,
-  #plume-root *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -103,7 +105,7 @@ div.name-section__titling {
   }
 
   @media (prefers-contrast: more) {
-    border-color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -134,7 +136,7 @@ div.name-section__titling {
   @apply pr-1 italic text-right;
 
   @media (prefers-contrast: more) {
-    @apply text-white!;
+    @apply text-white;
   }
 }
 
@@ -166,8 +168,8 @@ div.name-section__titling {
 }
 
 #plume-tracklist-toggle-btn {
-  @apply shrink-0 w-5 h-5 p-0 pt-1 m-0 bg-transparent border-none flex items-center justify-center cursor-pointer;
-  color: rgba(255, 255, 255, 0.7);
+  @apply shrink-0 w-5 h-5 p-0 pt-1 m-0 bg-transparent! border-none! flex items-center justify-center cursor-pointer;
+  color: rgba(255, 255, 255, 0.7) !important;
 
   &:hover {
     @apply text-white;
@@ -226,7 +228,7 @@ div.name-section__titling {
   }
 
   @media (prefers-contrast: more) {
-    border-color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -264,7 +266,7 @@ div.name-section__titling {
   @media (prefers-contrast: more) {
     &:hover,
     &:focus {
-      background: rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.15);
     }
   }
 }
@@ -328,13 +330,13 @@ div.name-section__titling {
   color: rgba(255, 255, 255, 0.8);
 
   @media (prefers-contrast: more) {
-    @apply text-white!;
+    @apply text-white;
   }
 }
 
 #plume-duration-display {
-  @apply cursor-pointer bg-transparent border-none p-0 m-0 outline-offset-2 text-inherit;
-  font: inherit;
+  @apply cursor-pointer bg-transparent! border-none! p-0! m-0! outline-offset-2 text-inherit!;
+  font: inherit !important;
 
   &:focus-visible {
     border-radius: var(--focusable-outline-border-radius);
@@ -345,15 +347,15 @@ div.name-section__titling {
   @apply mb-1 flex justify-center items-center gap-3;
 
   button {
-    @apply w-10 h-10 rounded-full mr-0! flex items-center justify-center text-white transition-all;
-    background: rgba(255, 255, 255, 0.1);
+    @apply size-10 rounded-full mr-0! flex items-center justify-center text-white! transition-all;
+    background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(0.625rem);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
 
     &:hover {
       @apply scale-110;
-      background: rgba(255, 255, 255, 0.2);
-      border-color: var(--progbar-fill-bg-right);
+      background: rgba(255, 255, 255, 0.2) !important;
+      border-color: var(--progbar-fill-bg-right) !important;
       box-shadow: 0 0.25rem 0.5rem rgba(29, 160, 195, 0.3);
     }
     &:active {
@@ -364,11 +366,11 @@ div.name-section__titling {
     }
 
     @media (prefers-contrast: more) {
-      background: rgba(255, 255, 255, 0.25) !important;
-      border-color: rgba(255, 255, 255, 0.6) !important;
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.6);
 
       &:disabled {
-        opacity: 0.6 !important;
+        opacity: 0.6;
       }
     }
   }
@@ -376,17 +378,17 @@ div.name-section__titling {
 
 #plume-play-pause-btn {
   @apply size-14!;
-  background: rgba(29, 160, 195, 0.2) !important;
-  border-color: var(--progbar-fill-bg-right) !important;
+  background: rgba(29, 160, 195, 0.2);
+  border-color: var(--progbar-fill-bg-right);
 
   &:hover {
-    background: rgba(29, 160, 195, 0.4) !important;
-    box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5) !important;
+    background: rgba(29, 160, 195, 0.4);
+    box-shadow: 0 0.25rem 1.25rem rgba(29, 160, 195, 0.5) !important;
   }
 
   @media (prefers-contrast: more) {
-    background: rgba(29, 160, 195, 0.4) !important;
-    border-color: var(--plume) !important;
+    background: rgba(29, 160, 195, 0.4);
+    border-color: var(--plume);
   }
 }
 
@@ -396,10 +398,10 @@ div.name-section__titling {
 }
 
 #plume-mute-btn {
-  @apply shrink-0 w-8 h-8 p-0 m-0 bg-transparent border-none flex items-center justify-center text-white transition-all;
+  @apply shrink-0 size-8 p-0 m-0 bg-transparent! border-none! flex items-center justify-center text-white! transition-all;
 
   &:hover {
-    color: var(--progbar-fill-bg-left);
+    color: var(--progbar-fill-bg-left) !important;
   }
 
   &:focus-visible {
@@ -410,7 +412,7 @@ div.name-section__titling {
     @apply opacity-50;
 
     @media (prefers-contrast: more) {
-      opacity: 0.7 !important;
+      opacity: 0.7;
     }
   }
 }
@@ -448,7 +450,7 @@ div.name-section__titling {
   }
 
   @media (prefers-contrast: more) {
-    background: rgba(255, 255, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -457,7 +459,7 @@ div.name-section__titling {
   color: var(--progbar-fill-bg-right);
 
   @media (prefers-contrast: more) {
-    @apply text-white!;
+    @apply text-white;
   }
 }
 
@@ -465,7 +467,7 @@ div.name-section__titling {
   @apply flex justify-center py-2;
 }
 #plume-fullscreen-btn {
-  @apply h-8! w-min! rounded-lg text-white flex items-center gap-2 py-0 px-2 m-0 z-10 backdrop-blur-sm transition-transform;
+  @apply h-8! w-min! rounded-lg text-white! flex items-center gap-2 py-0 px-2 m-0 z-10 backdrop-blur-sm transition-transform;
   background: rgba(255, 255, 255, 0.05) !important;
   border: 0.0625rem solid rgba(255, 255, 255, 0.15) !important;
 
@@ -646,7 +648,7 @@ div.name-section__titling {
   }
 
   @media (prefers-contrast: more) {
-    border-color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.6);
   }
 }
 
