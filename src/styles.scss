@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 @import "./tailwind.css";
 
-@layer plume.base; // < <...
+@layer plume.base; // FIXME when Bandcamp can be easily overridden (buttons), declare and use component and override layers
 
 /* compound shorthand — references @theme color, can't be a single-namespace token */
 :root {
@@ -48,10 +48,10 @@
   }
   .progbar {
     background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed)) !important;
-    box-shadow: 0 1px 3px rgba(29, 160, 195, 0.4) !important;
+    box-shadow: 0 1px 3px var(--color-plume-40) !important;
   }
   .progbar_empty {
-    background: rgba(255, 255, 255, 0.15) !important;
+    @apply bg-white/15!;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 
@@ -104,9 +104,8 @@
   @apply absolute top-0 left-0 flex flex-col items-end pt-3 px-8 pb-0 scale-[0.25] origin-top-left;
 
   &:focus-visible {
-    border-radius: var(--radius-focusable);
+    @apply rounded-focusable outline-offset-[1rem];
     outline: 8px solid var(--color-plume);
-    outline-offset: 1rem;
   }
 }
 #plume-header-logo__version {
@@ -117,8 +116,7 @@
   @apply w-3/4 flex flex-col items-end;
 
   &:focus-visible {
-    @apply outline-offset-2;
-    border-radius: var(--radius-focusable);
+    @apply rounded-focusable outline-offset-2;
   }
 }
 
@@ -135,7 +133,7 @@
 }
 
 #plume-header-track-link {
-  @apply shrink-0 inline-flex items-center justify-center w-5 h-5 ml-auto mr-1;
+  @apply shrink-0 inline-flex items-center justify-center size-5 ml-auto mr-1;
 
   &:focus-visible {
     @apply rounded-focusable outline-offset-1;
@@ -223,8 +221,7 @@
   }
 
   &:focus {
-    @apply bg-item-hover-bg;
-    box-shadow: inset 0 0 0 1px var(--color-plume);
+    @apply bg-item-hover-bg inset-shadow-2xs shadow-plume;
   }
 
   &--active {
@@ -232,10 +229,10 @@
 
     &:hover,
     &:focus {
-      background: rgba(32, 160, 195, 0.1);
+      @apply bg-plume/10;
     }
     &:focus {
-      box-shadow: inset 0 0 0 1px var(--color-plume);
+      @apply inset-shadow-2xs shadow-plume;
     }
   }
 
@@ -244,9 +241,8 @@
   }
 
   @media (prefers-contrast: more) {
-    &:hover,
-    &:focus {
-      background: rgba(255, 255, 255, 0.15);
+    &:hover, &:focus {
+      @apply bg-white/15;
     }
   }
 }
@@ -274,18 +270,14 @@
 }
 
 #plume-progress-slider {
-  @apply relative w-full h-2 m-0 rounded cursor-pointer;
-  appearance: none;
-  -webkit-user-drag: none;
-  -webkit-appearance: none;
+  @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
 
   &:focus-visible {
     @apply outline-offset-4;
   }
 
   &::-webkit-slider-thumb {
-    @apply w-3 h-3 bg-white rounded-full cursor-grab appearance-none transition-all shadow-thumb;
-    -webkit-appearance: none;
+    @apply size-3 bg-white rounded-full cursor-grab appearance-none transition-all shadow-thumb;
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
@@ -296,7 +288,7 @@
   }
 
   &::-moz-range-thumb {
-    @apply w-3 h-3 border-none bg-white rounded-full cursor-grab transition-all shadow-thumb;
+    @apply size-3 border-none bg-white rounded-full cursor-grab transition-all shadow-thumb;
 
     &:hover {
       @apply bg-[lightgray] scale-[120%];
@@ -333,14 +325,12 @@
   @apply mb-1 flex justify-center items-center gap-3;
 
   button {
-    @apply size-10 rounded-full mr-0! flex items-center justify-center text-white! transition-all backdrop-blur-[10px];
-    background: rgba(255, 255, 255, 0.1) !important;
+    @apply size-10 rounded-full bg-white/10! mr-0! flex items-center justify-center text-white! transition-all backdrop-blur-[10px];
     border: 2px solid rgba(255, 255, 255, 0.2) !important;
 
     &:hover {
-      @apply scale-110 border-plume-dimmed!;
-      background: rgba(255, 255, 255, 0.2) !important;
-      box-shadow: 0 0.25rem 0.5rem rgba(29, 160, 195, 0.3);
+      @apply scale-110 bg-white/15! border-plume-dimmed!;
+      box-shadow: 0 0.25rem 0.5rem var(--color-plume-30);
     }
     &:active {
       @apply scale-95;
@@ -361,17 +351,15 @@
 }
 
 #plume-play-pause-btn {
-  @apply size-14! border-plume-dimmed;
-  background: rgba(29, 160, 195, 0.2);
+  @apply size-14! bg-plume-20 border-plume-dimmed;
 
   &:hover {
-    background: rgba(29, 160, 195, 0.4);
-    box-shadow: 0 0.25rem 1.25rem rgba(29, 160, 195, 0.5) !important;
+    @apply bg-plume-40;
+    box-shadow: 0 0.25rem 1.25rem var(--color-plume-50) !important;
   }
 
   @media (prefers-contrast: more) {
-    @apply border-plume;
-    background: rgba(29, 160, 195, 0.4);
+    @apply bg-plume-40 border-plume;
   }
 }
 
@@ -400,10 +388,8 @@
 }
 
 #plume-volume-slider {
-  @apply relative flex-1 h-2 m-0 rounded cursor-pointer;
+  @apply relative flex-1 h-2 m-0 rounded cursor-pointer appearance-none;
   background: rgba(255, 255, 255, 0.2);
-  appearance: none;
-  -webkit-appearance: none;
 
   &:focus-visible {
     @apply outline-offset-8;
@@ -411,7 +397,6 @@
 
   &::-webkit-slider-thumb {
     @apply size-4 border-none rounded-[25%] cursor-grab appearance-none transition-all bg-plume-dimmed shadow-thumb-sm;
-    -webkit-appearance: none;
 
     &:hover {
       @apply scale-[115%] bg-plume-light;
@@ -454,25 +439,21 @@
 }
 #plume-fullscreen-btn {
   @apply
-    z-10 h-8! w-min! py-0 px-2 m-0 rounded-lg
+    z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg
     flex items-center gap-2
     text-white! backdrop-blur-sm transition-transform
   ;
-  background: rgba(255, 255, 255, 0.05) !important;
   border: 0.0625rem solid rgba(255, 255, 255, 0.15) !important;
 
   &:hover {
-    @apply scale-[102.5%];
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    @apply scale-[102.5%] bg-white/15! border-white/30!;
   }
   &:active {
     @apply scale-100;
   }
 
   @media (prefers-contrast: more) {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
+    @apply bg-white/15! border-white/50!;
   }
 }
 #plume-fullscreen-btn-label {
@@ -580,8 +561,7 @@
 }
 
 #plume-fullscreen-clone {
-  @apply rounded-lg flex flex-col justify-center;
-  background: rgba(255, 255, 255, 0.03);
+  @apply rounded-lg flex flex-col justify-center bg-white/3;
   box-shadow: rgba(0, 0, 0, 0.2) 0 0 0.25rem;
 
   > #plume-header-logo {
@@ -613,23 +593,23 @@
   }
 
   #plume-tracklist-dropdown {
-    @apply w-0 min-w-full;
+    @apply w-0 min-w-full; // makes it full-width while forcing text ellipse
   }
 }
 
 #plume-fullscreen-exit-btn {
-  @apply z-10001 fixed top-6 right-6 w-12 h-12 rounded-full
+  @apply
+    z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full
     flex items-center justify-center
     text-white backdrop-blur-sm
-    transition-all;
-  background: rgba(0, 0, 0, 0.7);
+    transition-all
+  ;
   border: 0.125rem solid rgba(255, 255, 255, 0.3);
   animation: fadeIn 0.3s ease-out;
 
   &:hover {
-    @apply scale-110 border-plume-dimmed;
-    background: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5);
+    @apply scale-110 bg-black/90 border-plume-dimmed;
+    box-shadow: 0 4px 20px var(--color-plume-50);
   }
   &:active {
     @apply scale-95;
@@ -771,7 +751,7 @@
 
 .plume-toast__dismiss {
   @apply
-    shrink-0 w-11 h-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
+    shrink-0 size-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
     flex items-center justify-center
     text-xl leading-none
     cursor-pointer transition-colors

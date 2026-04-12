@@ -3,6 +3,11 @@
 
 @theme {
   --color-plume: #20a0c3;
+  --color-plume-10: #20a0c31a;
+  --color-plume-20: #20a0c333;
+  --color-plume-30: #20a0c34d;
+  --color-plume-40: #20a0c366;
+  --color-plume-50: #20a0c37f;
   --color-plume-light: #2bb8db;
   --color-plume-dimmed: #1da0c3;
   --color-plume-warning: #ffc107;
