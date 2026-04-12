@@ -62,13 +62,13 @@ div.name-section__titling {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-#bpe-hidden-original {
+#plume-hidden-original {
   @apply hidden! invisible!;
 }
 
 /**************** Plume styling ****************/
 
-#bpe-plume {
+#plume-plume {
   @apply rounded-lg border;
   background: rgba(0, 0, 0, 0.6);
   border-color: rgba(255, 255, 255, 0.1);
@@ -81,20 +81,20 @@ div.name-section__titling {
 
 /* Global reduced-motion override for all Plume descendants */
 @media (prefers-reduced-motion: reduce) {
-  #bpe-plume *,
-  #bpe-plume *::before,
-  #bpe-plume *::after {
+  #plume-plume *,
+  #plume-plume *::before,
+  #plume-plume *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-#bpe-header-container {
+#plume-header-container {
   @apply flex justify-end p-3 rounded-lg;
   background: rgba(0, 0, 0, 0.2);
 
-  &:has(+ #bpe-tracklist-dropdown.is-open) {
+  &:has(+ #plume-tracklist-dropdown.is-open) {
     @apply rounded-b-none;
   }
 
@@ -103,7 +103,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-header-logo {
+#plume-header-logo {
   @apply absolute top-0 left-0 flex flex-col items-end pt-3 px-8 pb-0 scale-[0.25] origin-top-left;
 
   &:focus-visible {
@@ -112,12 +112,12 @@ div.name-section__titling {
     outline-offset: 1rem;
   }
 }
-#bpe-header-logo__version {
+#plume-header-logo__version {
   @apply m-0! mt-2 text-5xl font-bold font-sans italic;
   color: var(--plume);
 }
 
-#bpe-header-current {
+#plume-header-current {
   @apply w-3/4 flex flex-col items-end;
 
   &:focus-visible {
@@ -127,7 +127,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-header-title-pretext {
+#plume-header-title-pretext {
   @apply pr-1 italic text-right;
 
   @media (prefers-contrast: more) {
@@ -135,11 +135,11 @@ div.name-section__titling {
   }
 }
 
-.bpe-header-title-row {
+.plume-header-title-row {
   @apply flex items-center w-full min-w-0;
 }
 
-#bpe-header-track-link {
+#plume-header-track-link {
   @apply shrink-0 inline-flex items-center justify-center w-5 h-5 ml-auto mr-1;
 
   &:focus-visible {
@@ -153,17 +153,17 @@ div.name-section__titling {
   }
 }
 
-#bpe-header-title {
+#plume-header-title {
   @apply flex-auto min-w-0 mr-1 text-sm text-white text-right font-sans truncate;
   line-height: var(--title-line-height);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 
-  #bpe-header-track-link + & {
+  #plume-header-track-link + & {
     @apply flex-initial mr-0;
   }
 }
 
-#bpe-tracklist-toggle-btn {
+#plume-tracklist-toggle-btn {
   @apply shrink-0 w-5 h-5 p-0 pt-1 m-0 bg-transparent border-none flex items-center justify-center cursor-pointer;
   color: rgba(255, 255, 255, 0.7);
 
@@ -186,7 +186,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-tracklist-dropdown {
+#plume-tracklist-dropdown {
   @apply max-h-0 overflow-hidden opacity-0 rounded-b-lg;
   transition:
     max-height 0.25s ease,
@@ -230,7 +230,7 @@ div.name-section__titling {
   }
 }
 
-.bpe-tracklist-item {
+.plume-tracklist-item {
   @apply flex items-center gap-2 py-1.5 px-3 text-xs font-sans cursor-pointer outline-none;
   transition: background 0.15s ease;
   color: rgba(255, 255, 255, 0.85);
@@ -269,32 +269,32 @@ div.name-section__titling {
   }
 }
 
-.bpe-tracklist-item__number {
+.plume-tracklist-item__number {
   @apply shrink-0 min-w-6 text-right text-xs;
   color: rgba(255, 255, 255, 0.45);
 
-  .bpe-tracklist-item--active & {
+  .plume-tracklist-item--active & {
     color: var(--progbar-fill-bg-left);
   }
 }
-.bpe-tracklist-item__title {
+.plume-tracklist-item__title {
   @apply flex-auto min-w-0 truncate;
   line-height: var(--title-line-height);
 }
-.bpe-tracklist-item__duration {
+.plume-tracklist-item__duration {
   @apply shrink-0 text-xs tabular-nums;
   color: rgba(255, 255, 255, 0.45);
 }
 
-#bpe-playback-manager {
+#plume-playback-manager {
   @apply relative py-2 px-4 mt-px flex flex-col gap-1;
 }
 
-#bpe-progress-container {
+#plume-progress-container {
   @apply relative m-0;
 }
 
-#bpe-progress-slider {
+#plume-progress-slider {
   @apply w-full h-2 m-0 rounded cursor-pointer relative appearance-none;
   -webkit-user-drag: none;
   -webkit-appearance: none;
@@ -310,8 +310,7 @@ div.name-section__titling {
     -webkit-appearance: none;
 
     &:hover {
-      transform: scale(1.2);
-      background: lightgray;
+      @apply bg-[lightgray] scale-[120%];
     }
   }
 
@@ -320,13 +319,12 @@ div.name-section__titling {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 
     &:hover {
-      @apply bg-[lightgray];
-      transform: scale(1.2);
+      @apply bg-[lightgray] scale-[120%];
     }
   }
 }
 
-#bpe-time-display {
+#plume-time-display {
   @apply flex justify-between text-xs font-sans;
   color: rgba(255, 255, 255, 0.8);
 
@@ -335,7 +333,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-duration-display {
+#plume-duration-display {
   @apply cursor-pointer bg-transparent border-none p-0 m-0 outline-offset-2 text-inherit;
   font: inherit;
 
@@ -345,7 +343,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-playback-controls {
+#plume-playback-controls {
   @apply mb-1 flex justify-center items-center gap-3;
 
   button {
@@ -355,13 +353,13 @@ div.name-section__titling {
     border: 2px solid rgba(255, 255, 255, 0.2);
 
     &:hover {
-      transform: scale(1.1);
+      @apply scale-110;
       background: rgba(255, 255, 255, 0.2);
       border-color: var(--progbar-fill-bg-right);
       box-shadow: 0 0.25rem 0.5rem rgba(29, 160, 195, 0.3);
     }
     &:active {
-      transform: scale(0.95);
+      @apply scale-95;
     }
     &:focus-visible {
       outline: var(--focusable-outline);
@@ -381,7 +379,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-play-pause-btn {
+#plume-play-pause-btn {
   @apply size-14!;
   background: rgba(29, 160, 195, 0.2) !important;
   border-color: var(--progbar-fill-bg-right) !important;
@@ -397,12 +395,12 @@ div.name-section__titling {
   }
 }
 
-#bpe-volume-container {
+#plume-volume-container {
   @apply relative py-3 px-4 m-0 flex items-center gap-3 rounded-lg;
   background: rgba(0, 0, 0, 0.2);
 }
 
-#bpe-mute-btn {
+#plume-mute-btn {
   @apply shrink-0 w-8 h-8 p-0 m-0 bg-transparent border-none flex items-center justify-center text-white transition-all;
 
   &:hover {
@@ -423,7 +421,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-volume-slider {
+#plume-volume-slider {
   @apply flex-1 h-2 m-0 rounded cursor-pointer relative appearance-none;
   background: rgba(255, 255, 255, 0.2);
   -webkit-appearance: none;
@@ -461,7 +459,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-volume-value {
+#plume-volume-value {
   @apply w-8 text-right text-xs font-sans font-semibold;
   color: var(--progbar-fill-bg-right);
 
@@ -470,16 +468,16 @@ div.name-section__titling {
   }
 }
 
-#bpe-fullscreen-btn-container {
+#plume-fullscreen-btn-container {
   @apply flex justify-center py-2;
 }
-#bpe-fullscreen-btn {
+#plume-fullscreen-btn {
   @apply h-8! w-min! rounded-lg text-white flex items-center gap-2 py-0 px-2 m-0 z-10 backdrop-blur-sm transition-transform;
   background: rgba(255, 255, 255, 0.05) !important;
   border: 0.0625rem solid rgba(255, 255, 255, 0.15) !important;
 
   &:hover {
-    transform: scale(1.025);
+    @apply scale-[1.025];
     background: rgba(255, 255, 255, 0.15) !important;
     border-color: rgba(255, 255, 255, 0.3) !important;
   }
@@ -487,7 +485,7 @@ div.name-section__titling {
     outline: var(--focusable-outline);
   }
   &:active {
-    transform: scale(1);
+    @apply scale-100;
   }
 
   @media (prefers-contrast: more) {
@@ -495,7 +493,7 @@ div.name-section__titling {
     border-color: rgba(255, 255, 255, 0.5) !important;
   }
 }
-#bpe-fullscreen-btn-label {
+#plume-fullscreen-btn-label {
   @apply text-xs font-medium text-white font-sans ml-1;
 }
 
@@ -531,18 +529,18 @@ div.name-section__titling {
   }
 }
 
-#bpe-fullscreen-overlay {
+#plume-fullscreen-overlay {
   @apply fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-9999;
   animation: fadeIn 0.3s ease-in-out;
 }
 
-#bpe-fullscreen-background {
+#plume-fullscreen-background {
   @apply absolute top-0 left-0 w-screen h-screen scale-110 /* because blur shrinks the opaque zone */
     bg-black bg-cover bg-center bg-no-repeat blur-xl brightness-50 /* Heavy blur and dimming */
     pointer-events-none select-none;
 }
 
-#bpe-fullscreen-content {
+#plume-fullscreen-content {
   @apply relative flex items-center justify-center gap-12 pointer-events-auto z-10000;
 
   @media (max-width: 768px) {
@@ -550,7 +548,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-fullscreen-presentation {
+#plume-fullscreen-presentation {
   @apply relative flex flex-col items-center justify-center;
 
   #name-section {
@@ -562,7 +560,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-fullscreen-cover-art {
+#plume-fullscreen-cover-art {
   @apply min-w-[25vw] max-w-[30vw] max-h-[60vh] rounded-lg;
   box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.8);
   animation: slideInLeft 0.5s ease-out;
@@ -572,7 +570,7 @@ div.name-section__titling {
   }
 }
 
-.bpe-fullscreen-titling {
+.plume-fullscreen-titling {
   @apply absolute bottom-[-8vh] flex flex-col items-center gap-1;
   animation: slideInRight 0.5s ease-out;
 
@@ -595,12 +593,12 @@ div.name-section__titling {
   }
 }
 
-#bpe-fullscreen-clone {
+#plume-fullscreen-clone {
   @apply rounded-lg flex flex-col justify-center;
   background: rgba(255, 255, 255, 0.03);
   box-shadow: rgba(0, 0, 0, 0.2) 0 0 0.25rem;
 
-  > #bpe-header-logo {
+  > #plume-header-logo {
     @apply relative h-24 p-0 mb-4 items-center scale-100;
     transform: unset;
     transform-origin: unset;
@@ -615,26 +613,26 @@ div.name-section__titling {
     }
   }
 
-  #bpe-header-container {
+  #plume-header-container {
     @apply max-w-[25em];
 
-    #bpe-header-logo {
+    #plume-header-logo {
       @apply hidden;
     }
-    #bpe-header-current {
+    #plume-header-current {
       @apply w-full;
     }
-    #bpe-header-title {
+    #plume-header-title {
       @apply whitespace-nowrap;
     }
   }
 
-  #bpe-tracklist-dropdown {
+  #plume-tracklist-dropdown {
     @apply w-0 min-w-full;
   }
 }
 
-#bpe-fullscreen-exit-btn {
+#plume-fullscreen-exit-btn {
   @apply z-10001 fixed top-6 right-6 w-12 h-12 rounded-full
     flex items-center justify-center
     text-white backdrop-blur-sm
@@ -644,7 +642,7 @@ div.name-section__titling {
   animation: fadeIn 0.3s ease-out;
 
   &:hover {
-    transform: scale(1.1);
+    @apply scale-110;
     background: rgba(0, 0, 0, 0.9);
     border-color: var(--progbar-fill-bg-right);
     box-shadow: 0 4px 20px rgba(29, 160, 195, 0.5);
@@ -653,7 +651,7 @@ div.name-section__titling {
     outline: var(--focusable-outline);
   }
   &:active {
-    transform: scale(0.95);
+    @apply scale-95;
   }
 
   @media (prefers-contrast: more) {
@@ -668,7 +666,7 @@ div.name-section__titling {
 
 /* Toast Notification */
 
-@keyframes bpe-toast-enter {
+@keyframes plume-toast-enter {
   from {
     opacity: 0;
     transform: translateX(calc(100% + 1.5rem));
@@ -679,7 +677,7 @@ div.name-section__titling {
   }
 }
 
-@keyframes bpe-toast-exit {
+@keyframes plume-toast-exit {
   from {
     opacity: 1;
     transform: translateX(0);
@@ -690,7 +688,7 @@ div.name-section__titling {
   }
 }
 
-@keyframes bpe-toast-enter-mobile {
+@keyframes plume-toast-enter-mobile {
   from {
     opacity: 0;
     transform: translateX(-50%) translateY(calc(100% + 1.5rem));
@@ -701,7 +699,7 @@ div.name-section__titling {
   }
 }
 
-@keyframes bpe-toast-timer-drain {
+@keyframes plume-toast-timer-drain {
   from {
     width: var(--timer-start-width, 100%);
   }
@@ -710,7 +708,7 @@ div.name-section__titling {
   }
 }
 
-#bpe-toast-container {
+#plume-toast-container {
   @apply fixed top-5 right-5 flex flex-col gap-3 z-11000;
 
   &:empty {
@@ -718,12 +716,11 @@ div.name-section__titling {
   }
 
   @media (max-width: 480px) {
-    @apply top-auto right-auto bottom-4 left-1/2 items-center;
-    transform: translateX(-50%);
+    @apply top-auto right-auto bottom-4 left-1/2 items-center -translate-x-1/2;
   }
 }
 
-.bpe-toast {
+.plume-toast {
   @apply relative overflow-hidden
     w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg
     flex items-start
@@ -735,7 +732,7 @@ div.name-section__titling {
     0 4px 24px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(32, 160, 195, 0.15);
 
-  animation: bpe-toast-enter 0.3s ease-out;
+  animation: plume-toast-enter 0.3s ease-out;
 
   &:hover {
     background: rgba(10, 10, 15, 0.9);
@@ -746,27 +743,27 @@ div.name-section__titling {
 
   &--exiting {
     @apply pointer-events-none;
-    animation: bpe-toast-exit 0.25s ease-in forwards;
+    animation: plume-toast-exit 0.25s ease-in forwards;
   }
 
-  &--paused .bpe-toast__timer {
+  &--paused .plume-toast__timer {
     animation-play-state: paused;
   }
 
   @media (max-width: 480px) {
-    animation: bpe-toast-enter-mobile 0.3s ease-out;
+    animation: plume-toast-enter-mobile 0.3s ease-out;
 
     &--exiting {
-      animation: bpe-toast-exit 0.25s ease-in forwards;
+      animation: plume-toast-exit 0.25s ease-in forwards;
     }
   }
 }
 
-.bpe-toast__icon {
+.plume-toast__icon {
   @apply shrink-0 w-[15%] h-auto place-self-center -mt-2;
 }
 
-.bpe-toast__body {
+.plume-toast__body {
   @apply flex-1 flex flex-col gap-1 min-w-0 ml-4;
 
   * {
@@ -774,16 +771,16 @@ div.name-section__titling {
   }
 }
 
-.bpe-toast__title {
+.plume-toast__title {
   @apply m-0 text-sm font-semibold text-white leading-[1.3];
 }
 
-.bpe-toast__description {
+.plume-toast__description {
   @apply m-0 text-xs font-normal leading-[1.4];
   color: rgba(255, 255, 255, 0.7);
 }
 
-.bpe-toast__cta {
+.plume-toast__cta {
   @apply block pt-1.5 text-xs font-medium whitespace-nowrap no-underline;
   color: var(--progbar-fill-bg-left);
 
@@ -792,7 +789,7 @@ div.name-section__titling {
   }
 }
 
-.bpe-toast__dismiss {
+.plume-toast__dismiss {
   @apply shrink-0 w-11 h-11 border-none mx-0 -my-3
     flex items-center justify-center
     bg-transparent
@@ -806,8 +803,8 @@ div.name-section__titling {
   }
 }
 
-.bpe-toast__timer {
+.plume-toast__timer {
   @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
   background: linear-gradient(90deg, var(--progbar-fill-bg-left), var(--progbar-fill-bg-right));
-  animation: bpe-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
+  animation: plume-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
 }

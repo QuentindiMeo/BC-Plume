@@ -3,18 +3,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
-    plumeContainer: "div#bpe-plume",
-    headerContainer: "div#bpe-header-container",
-    headerLogo: "a#bpe-header-logo",
-    headerCurrent: "div#bpe-header-current",
-    headerTitlePretext: "span#bpe-header-title-pretext",
-    headerTitle: "span#bpe-header-title",
-    headerTrackLink: "a#bpe-header-track-link",
-    tracklistToggleBtn: "button#bpe-tracklist-toggle-btn",
-    tracklistDropdown: "div#bpe-tracklist-dropdown",
-    playbackManager: "div#bpe-playback-manager",
-    progressContainer: "div#bpe-progress-container",
-    fullscreenBtnContainer: "div#bpe-fullscreen-btn-container",
+    plumeContainer: "div#plume-plume",
+    headerContainer: "div#plume-header-container",
+    headerLogo: "a#plume-header-logo",
+    headerCurrent: "div#plume-header-current",
+    headerTitlePretext: "span#plume-header-title-pretext",
+    headerTitle: "span#plume-header-title",
+    headerTrackLink: "a#plume-header-track-link",
+    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
+    tracklistDropdown: "div#plume-tracklist-dropdown",
+    playbackManager: "div#plume-playback-manager",
+    progressContainer: "div#plume-progress-container",
+    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
@@ -96,9 +96,9 @@ describe("track link in injection", () => {
     const { ok } = await injectEnhancements();
     expect(ok).toBe(true);
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink).not.toBeNull();
-    expect(trackLink.id).toBe("bpe-header-track-link");
+    expect(trackLink.id).toBe("plume-header-track-link");
   });
 
   it("does not create a track link element on track pages", async () => {
@@ -106,14 +106,14 @@ describe("track link in injection", () => {
     const { ok } = await injectEnhancements();
     expect(ok).toBe(true);
 
-    const trackLink = document.querySelector("a#bpe-header-track-link");
+    const trackLink = document.querySelector("a#plume-header-track-link");
     expect(trackLink).toBeNull();
   });
 
   it("sets the href from getCurrentTrackUrl when available", async () => {
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink.href).toContain("/track/test-track");
     expect(trackLink.ariaDisabled).toBe("false");
     expect(trackLink.tabIndex).toBe(0);
@@ -123,7 +123,7 @@ describe("track link in injection", () => {
     mockTrackUrl = null;
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink).not.toBeNull();
     expect(trackLink.hasAttribute("href")).toBe(false);
     expect(trackLink.ariaDisabled).toBe("true");
@@ -134,7 +134,7 @@ describe("track link in injection", () => {
   it("sets correct ARIA attributes on the track link", async () => {
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink.ariaLabel).toBe("ARIA__TRACK_LINK");
     expect(trackLink.title).toBe("ARIA__TRACK_LINK");
   });
@@ -142,7 +142,7 @@ describe("track link in injection", () => {
   it("contains an SVG icon inside the track link", async () => {
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     const svg = trackLink.querySelector("svg");
     expect(svg).not.toBeNull();
   });
@@ -150,10 +150,10 @@ describe("track link in injection", () => {
   it("places the track link before the title span in the title row", async () => {
     await injectEnhancements();
 
-    const titleRow = document.querySelector(".bpe-header-title-row") as HTMLDivElement;
+    const titleRow = document.querySelector(".plume-header-title-row") as HTMLDivElement;
     const children = Array.from(titleRow.children);
-    const linkIdx = children.findIndex((el) => el.id === "bpe-header-track-link");
-    const titleIdx = children.findIndex((el) => el.id === "bpe-header-title");
+    const linkIdx = children.findIndex((el) => el.id === "plume-header-track-link");
+    const titleIdx = children.findIndex((el) => el.id === "plume-header-title");
     expect(linkIdx).toBeLessThan(titleIdx);
   });
 });

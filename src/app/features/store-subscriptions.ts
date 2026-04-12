@@ -21,7 +21,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
   const storeSubscriptions: Array<SubscriptionCallback> = [];
   const plume = getGuiInstance().getState();
 
-  // Cached once at setup time since bpe-volume-value is a static node.
+  // Cached once at setup time since plume-volume-value is a static node.
   const volumeValueDisplay = plume.volumeSlider.parentElement?.querySelector(
     PLUME_ELEM_SELECTORS.volumeValue
   ) as HTMLDivElement | null;

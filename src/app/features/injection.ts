@@ -122,7 +122,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
   const titleRow = document.createElement("div");
-  titleRow.className = "bpe-header-title-row";
+  titleRow.className = "plume-header-title-row";
 
   if (isAlbumPage) {
     const trackLink = document.createElement("a");

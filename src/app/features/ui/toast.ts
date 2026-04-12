@@ -41,17 +41,17 @@ export interface ToastHandle {
 }
 
 const getToastContainer = (): HTMLElement => {
-  const existing = document.getElementById("bpe-toast-container");
+  const existing = document.getElementById("plume-toast-container");
   if (existing) return existing;
 
   const container = document.createElement("div");
-  container.id = "bpe-toast-container";
+  container.id = "plume-toast-container";
   document.body.appendChild(container);
   return container;
 };
 const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTMLElement => {
   const toast = document.createElement("div");
-  toast.className = "bpe-toast";
+  toast.className = "plume-toast";
   toast.role = "status";
   toast.ariaLabel = getString("ARIA__TOAST__CONTAINER", [config.label]);
   toast.ariaLive = "polite";
@@ -61,7 +61,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   toast.style.setProperty("border-left-color", toastBorderColor);
 
   const icon = document.createElement("div");
-  icon.className = "bpe-toast__icon";
+  icon.className = "plume-toast__icon";
   if (config.iconSvg instanceof SVGElement) {
     icon.appendChild(config.iconSvg.cloneNode(true));
   } else if (config.iconSvg !== undefined) {
@@ -74,23 +74,23 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   }
 
   const body = document.createElement("div");
-  body.className = "bpe-toast__body";
+  body.className = "plume-toast__body";
 
   const title = document.createElement("p");
-  title.className = "bpe-toast__title";
+  title.className = "plume-toast__title";
   title.textContent = config.title;
   body.appendChild(title);
 
   if (config.description) {
     const message = document.createElement("p");
-    message.className = "bpe-toast__description";
+    message.className = "plume-toast__description";
     message.textContent = config.description;
     body.appendChild(message);
   }
 
   if (config.cta) {
     const cta = document.createElement("a");
-    cta.className = "bpe-toast__cta";
+    cta.className = "plume-toast__cta";
     cta.href = config.cta.href;
     cta.target = "_blank";
     cta.rel = "noopener noreferrer";
@@ -99,14 +99,14 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   }
 
   const dismiss = document.createElement("button");
-  dismiss.className = "bpe-toast__dismiss";
+  dismiss.className = "plume-toast__dismiss";
   dismiss.type = "button";
   dismiss.ariaLabel = getString("ARIA__TOAST__DISMISS", [config.label]);
   dismiss.textContent = "×";
   dismiss.addEventListener("click", onDismissClick);
 
   const timer = document.createElement("div");
-  timer.className = "bpe-toast__timer";
+  timer.className = "plume-toast__timer";
   timer.ariaHidden = "true";
   timer.style.setProperty("--toast-timer-duration", `${config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS}s`);
 
@@ -138,10 +138,10 @@ export const createToast = (config: ToastConfig): ToastHandle => {
     if (dismissed) return;
     dismissed = true;
     clearTimer();
-    el.classList.add("bpe-toast--exiting");
+    el.classList.add("plume-toast--exiting");
 
     const onExitEnd = (e: AnimationEvent): void => {
-      if (e.animationName !== "bpe-toast-exit") return;
+      if (e.animationName !== "plume-toast-exit") return;
       el.removeEventListener("animationend", onExitEnd);
       el.remove();
       if (container.children.length === 0) container.remove();
@@ -169,15 +169,15 @@ export const createToast = (config: ToastConfig): ToastHandle => {
   el.addEventListener("mouseenter", () => {
     remaining = Math.max(0, remaining - (Date.now() - segmentStart));
     clearTimer();
-    el.classList.add("bpe-toast--paused");
+    el.classList.add("plume-toast--paused");
   });
 
   el.addEventListener("mouseleave", () => {
     segmentStart = Date.now();
-    el.classList.remove("bpe-toast--paused");
+    el.classList.remove("plume-toast--paused");
     timerId = setTimeout(() => dismiss(), remaining);
 
-    const timer = el.querySelector(".bpe-toast__timer") as HTMLElement | null;
+    const timer = el.querySelector(".plume-toast__timer") as HTMLElement | null;
     if (timer) {
       const progressionPercentage = (remaining / durationMs) * 100;
       timer.style.setProperty("--timer-start-width", `${progressionPercentage}%`);
