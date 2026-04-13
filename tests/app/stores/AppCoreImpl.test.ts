@@ -342,6 +342,28 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
+  describe("SET_FEATURE_FLAGS", () => {
+    it("updates featureFlags", () => {
+      const flags = { ...PLUME_DEFAULTS.featureFlags, fullscreen: false };
+      appCore.dispatch(coreActions.setFeatureFlags(flags));
+      expect(appCore.getState().featureFlags).toEqual(flags);
+    });
+
+    it("merges with defaults so new flags get their default value", () => {
+      // Dispatch a partial object (simulating a stored value missing a key)
+      appCore.dispatch(coreActions.setFeatureFlags({ loopModes: false } as any));
+      const result = appCore.getState().featureFlags;
+      expect(result.loopModes).toBe(false);
+      expect(result.goToTrack).toBe(true);
+      expect(result.fullscreen).toBe(true);
+      expect(result.runtime).toBe(true);
+    });
+
+    it("starts with all flags enabled by default", () => {
+      expect(appCore.getState().featureFlags).toEqual(PLUME_DEFAULTS.featureFlags);
+    });
+  });
+
   describe("subscribe", () => {
     it("calls listener when subscribed key changes", () => {
       const listener = vi.fn();

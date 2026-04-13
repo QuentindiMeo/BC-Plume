@@ -16,7 +16,9 @@ vi.mock("@/infra/elements/plume", () => ({
 }));
 
 import { bindingKey, setupHotkeys } from "@/app/features/keyboard";
+import { seekToProgress } from "@/app/use-cases/seek-to-progress";
 import { type KeyBinding, DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import { PLUME_DEFAULTS, type FeatureFlags } from "@/domain/plume";
 
 const binding = (
   code: string,
@@ -145,5 +147,69 @@ describe("setupHotkeys — arrow keys inside tracklist", () => {
     item.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(true);
     expect(noopHandlers.handleMuteToggle).toHaveBeenCalled();
+  });
+});
+
+describe("setupHotkeys — feature flag guards", () => {
+  const noopHandlers = {
+    handlePlayPause: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handleTimeForward: vi.fn(),
+    handleTrackBackward: vi.fn(),
+    handleTrackForward: vi.fn(),
+    handleMuteToggle: vi.fn(),
+    toggleFullscreenMode: vi.fn(),
+    handleLoopCycle: vi.fn(),
+  };
+
+  let cleanup: () => void;
+
+  const setupWithFlags = (overrides: Partial<FeatureFlags>) => {
+    const flags = { ...PLUME_DEFAULTS.featureFlags, ...overrides };
+    fakeAppCore = new FakeAppCore({ featureFlags: flags });
+    cleanup = setupHotkeys(noopHandlers, DEFAULT_HOTKEYS);
+  };
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it("blocks quick-seek digit keys when quickSeek flag is off", () => {
+    setupWithFlags({ quickSeek: false });
+    const event = new KeyboardEvent("keydown", { code: "Digit5", key: "5", bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(vi.mocked(seekToProgress)).not.toHaveBeenCalled();
+  });
+
+  it("allows quick-seek digit keys when quickSeek flag is on", () => {
+    setupWithFlags({ quickSeek: true });
+    const event = new KeyboardEvent("keydown", { code: "Digit5", key: "5", bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(vi.mocked(seekToProgress)).toHaveBeenCalled();
+  });
+
+  it("blocks fullscreen hotkey when fullscreen flag is off", () => {
+    setupWithFlags({ fullscreen: false });
+    const { code, label: key } = DEFAULT_HOTKEYS.FULLSCREEN;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(noopHandlers.toggleFullscreenMode).not.toHaveBeenCalled();
+  });
+
+  it("blocks loop cycle hotkey when loopModes flag is off", () => {
+    setupWithFlags({ loopModes: false });
+    const { code, label: key } = DEFAULT_HOTKEYS.LOOP_CYCLE;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(noopHandlers.handleLoopCycle).not.toHaveBeenCalled();
+  });
+
+  it("allows loop cycle hotkey when loopModes flag is on", () => {
+    setupWithFlags({ loopModes: true });
+    const { code, label: key } = DEFAULT_HOTKEYS.LOOP_CYCLE;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(noopHandlers.handleLoopCycle).toHaveBeenCalled();
   });
 });

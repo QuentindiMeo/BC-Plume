@@ -1,6 +1,7 @@
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding } from "@/domain/hotkeys";
-import { PLUME_SUPPORTED_LANGUAGES, PlumeLanguage } from "@/domain/plume";
+import { FeatureFlags, PLUME_DEFAULTS, PLUME_SUPPORTED_LANGUAGES, PlumeLanguage } from "@/domain/plume";
+import { loadFeatureFlags } from "@/popup/use-cases/loadFeatureFlags";
 import { loadForcedLanguage } from "@/popup/use-cases/loadForcedLanguage";
 import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
@@ -158,5 +159,36 @@ describe("loadHotkeys", () => {
 
   it("returns undefined when key is absent", async () => {
     expect(await loadHotkeys()).toBeUndefined();
+  });
+});
+
+describe("loadFeatureFlags", () => {
+  it("returns defaults when key is absent", async () => {
+    expect(await loadFeatureFlags()).toEqual(PLUME_DEFAULTS.featureFlags);
+  });
+
+  it("returns stored flags when present", async () => {
+    const custom: FeatureFlags = { ...PLUME_DEFAULTS.featureFlags, fullscreen: false };
+    fakeStorage.store[PLUME_CACHE_KEYS.FEATURE_FLAGS] = custom;
+    expect(await loadFeatureFlags()).toEqual(custom);
+  });
+
+  it("merges with defaults when stored object is partial (forward-compat)", async () => {
+    // Simulate a stored object missing a newly-added flag
+    fakeStorage.store[PLUME_CACHE_KEYS.FEATURE_FLAGS] = { loopModes: false };
+    const result = await loadFeatureFlags();
+    expect(result.loopModes).toBe(false);
+    expect(result.goToTrack).toBe(true);
+    expect(result.fullscreen).toBe(true);
+  });
+
+  it("returns defaults when stored value is not an object", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.FEATURE_FLAGS] = "invalid";
+    expect(await loadFeatureFlags()).toEqual(PLUME_DEFAULTS.featureFlags);
+  });
+
+  it("returns defaults when stored value is null", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.FEATURE_FLAGS] = null;
+    expect(await loadFeatureFlags()).toEqual(PLUME_DEFAULTS.featureFlags);
   });
 });
