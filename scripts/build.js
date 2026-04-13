@@ -62,6 +62,11 @@ const styleEntries = [
     output: path.join(distDir, "styles.css"),
     useSass: true,
   },
+  {
+    input: path.join(__dirname, "..", "src", "popup", "popup.scss"),
+    output: path.join(distDir, "popup.css"),
+    useSass: true,
+  },
 ];
 
 const postcssProcessor = postcss([
@@ -107,7 +112,7 @@ const watchPopupAssets = () => {
   try {
     fs.watch(popupSrcDir, (_, filename) => {
       if (!filename) return;
-      if (filename === "popup.html" || filename === "popup.css") {
+      if (filename === "popup.html") {
         try {
           copyPopupAssets();
           console.log(`📄 Updated popup asset copied: ${filename}`);
@@ -122,7 +127,6 @@ const watchPopupAssets = () => {
 };
 const copyPopupAssets = () => {
   fs.copyFileSync(path.join(popupSrcDir, "popup.html"), path.join(distDir, "popup.html"));
-  fs.copyFileSync(path.join(popupSrcDir, "popup.css"), path.join(distDir, "popup.css"));
 };
 
 async function build() {

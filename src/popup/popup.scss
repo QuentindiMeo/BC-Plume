@@ -1,0 +1,307 @@
+@reference "../tailwind.css";
+
+*,
+*::before,
+*::after {
+  @apply box-border m-0 p-0;
+}
+
+body {
+  @apply leading-normal font-popup text-popup-text bg-popup-bg;
+  width: 360px;
+  font-size: 14px;
+
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-popup-accent;
+  }
+}
+
+/* Visually hidden but accessible to screen readers */
+.sr-live {
+  @apply sr-only;
+}
+
+#app {
+  @apply pb-2;
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  .popup__header {
+    @apply pt-3.5 px-4 pb-3 border-b border-popup-border flex items-center justify-between;
+
+    h1 {
+      @apply text-base font-semibold tracking-wide text-popup-text;
+    }
+
+    .popup__header-logo {
+      @apply size-8 flex items-center shrink-0 text-popup-accent;
+      margin-top: -0.25rem; /* optical alignment with text */
+    }
+  }
+
+  .popup__tablist {
+    @apply flex border-b border-popup-border;
+
+    .popup__tab {
+      @apply
+        flex-1 py-2 px-4 bg-transparent border-b-2 border-b-transparent
+        font-sans text-center text-popup-text-muted whitespace-nowrap
+      ;
+      margin-bottom: -1px; /* overlap container border so active underline replaces it */
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition:
+        color 0.15s,
+        background 0.15s,
+        border-bottom-color 0.15s;
+
+      &:hover:not(.active) {
+        @apply bg-popup-surface-alt text-popup-text;
+      }
+
+      &:focus-visible {
+        @apply -outline-offset-2;
+      }
+
+      &.active {
+        @apply text-popup-text border-b-popup-accent cursor-default;
+        border-bottom-style: solid;
+      }
+    }
+  }
+
+  .popup__tab-panel[hidden] {
+    @apply hidden;
+  }
+}
+
+/* Settings sections (shared by both tabs) */
+.settings__section {
+  padding: 0.5rem 1rem 0;
+
+  .settings__section-title {
+    @apply uppercase text-popup-text-muted;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.375rem;
+  }
+}
+
+.setting-row {
+  @apply flex items-start justify-between gap-3 border-b border-popup-border;
+  padding: 0.375rem 0;
+
+  &:last-of-type {
+    @apply border-b-0;
+  }
+
+  .setting-row__label {
+    @apply flex-1 min-w-0 text-popup-text;
+    font-size: 13px;
+    padding-top: 0.25rem;
+
+    &--info {
+      @apply italic text-popup-text-muted;
+    }
+  }
+
+  .setting-row__value {
+    @apply flex flex-col items-end gap-1 shrink-0;
+  }
+
+  .setting-row__btn {
+    @apply text-center whitespace-nowrap font-popup text-popup-text bg-popup-surface border border-popup-border rounded-popup;
+    min-width: 96px;
+    padding: 0.1875rem 1.125rem;
+    font-size: 10px;
+    font-weight: 500;
+    transition:
+      border-color 0.15s,
+      background 0.15s;
+
+    &:hover:not(:disabled) {
+      @apply bg-popup-surface-alt border-popup-accent-dim;
+    }
+
+    &--capturing {
+      @apply bg-popup-surface-alt border-popup-accent text-popup-accent;
+
+      @keyframes pulse-border {
+        from { border-color: var(--color-popup-accent-dim); }
+        to { border-color: var(--color-popup-accent); }
+      }
+      animation: pulse-border 1s ease-in-out infinite alternate;
+    }
+
+    &--info {
+      @apply cursor-default;
+      opacity: 0.6;
+      min-width: unset;
+    }
+
+    &:disabled {
+      @apply cursor-not-allowed;
+      opacity: 0.45;
+    }
+  }
+
+  .setting-row__badge {
+    @apply whitespace-nowrap text-popup-text-muted bg-popup-surface border border-popup-border rounded-popup;
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .setting-row__conflict {
+    @apply flex flex-col gap-1 text-right text-popup-danger;
+    font-size: 11px;
+    max-width: 180px;
+
+    .setting-row__conflict-msg {
+      line-height: 1.3;
+    }
+
+    .setting-row__conflict-actions {
+      @apply flex gap-1 justify-end;
+
+      .setting-row__conflict-btn {
+        @apply font-popup rounded-popup;
+        padding: 0.125rem 0.5rem;
+        font-size: 11px;
+        border: 1px solid;
+        transition: background 0.12s;
+
+        &--confirm {
+          @apply bg-popup-danger-dim border-popup-danger text-popup-text;
+
+          &:hover {
+            @apply bg-popup-danger;
+          }
+        }
+
+        &--cancel {
+          @apply bg-popup-surface border-popup-border text-popup-text-muted;
+
+          &:hover {
+            @apply bg-popup-surface-alt;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Footer (hotkeys tab reset section) */
+.popup__footer {
+  @apply flex justify-end items-center gap-2;
+  padding: 1.25rem 1rem 0.5rem;
+
+  .popup__reset-confirm-text {
+    @apply text-popup-text-muted;
+    font-size: 12px;
+  }
+
+  .popup__reset-btn {
+    @apply bg-transparent font-popup text-popup-text-muted border border-popup-border rounded-popup;
+    padding: 0.3125rem 0.875rem;
+    font-size: 12px;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+
+    &:hover {
+      @apply border-popup-danger text-popup-danger;
+    }
+
+    &--confirm {
+      @apply bg-popup-danger-dim border-popup-danger text-popup-text;
+      transition: background 0.12s;
+
+      &:hover {
+        @apply bg-popup-danger;
+      }
+    }
+
+    &--cancel {
+      @apply bg-transparent border border-popup-border text-popup-text-muted;
+
+      &:hover {
+        @apply bg-popup-surface-alt;
+      }
+    }
+  }
+}
+
+/* General tab — numeric input rows */
+.general-row__input-row {
+  @apply flex items-center gap-1;
+}
+
+.general-row__input {
+  @apply text-center font-popup text-popup-text bg-popup-surface border border-popup-border rounded-popup;
+  width: 60px;
+  padding: 0.1875rem 0.375rem;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 0.15s;
+
+  /* Hide spinner arrows */
+  appearance: textfield;
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  &:focus-visible {
+    @apply border-popup-accent-dim;
+  }
+
+  &.is-invalid {
+    @apply border-popup-danger;
+  }
+}
+
+.general-row__select {
+  @apply cursor-pointer font-popup text-popup-text bg-popup-surface border border-popup-border rounded-popup;
+  padding: 0.1875rem 0.375rem;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 0.15s;
+
+  &:focus-visible {
+    @apply border-popup-accent-dim;
+  }
+}
+
+.general-row__unit {
+  @apply text-center text-popup-text-muted;
+  min-width: 0.75rem;
+  font-size: 12px;
+}
+
+.general-row__error {
+  @apply text-right text-popup-danger;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.general-row__reset-link {
+  @apply p-0 bg-transparent border-none underline text-right font-popup text-popup-text-muted;
+  font-size: 11px;
+
+  &:hover {
+    @apply text-popup-text;
+  }
+}
+
+.general-row__refresh-notice {
+  @apply text-popup-accent;
+  font-size: 11px;
+  line-height: 1.3;
+  padding: 0.25rem 0 0.125rem;
+}

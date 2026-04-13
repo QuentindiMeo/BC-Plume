@@ -30,4 +30,17 @@
   --shadow-thumb-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
   --tracklist-max-height--folded: 6.5rem; /* ? arbitrary: 3 tracks tall */
   --tracklist-max-height--unfolded: 10rem; /* ? arbitrary: 5 tracks tall */
+
+  /* Popup theme */
+  --color-popup-bg: #1a1a1a;
+  --color-popup-surface: #242424;
+  --color-popup-surface-alt: #2e2e2e;
+  --color-popup-border: #3a3a3a;
+  --color-popup-text: #e8e8e8;
+  --color-popup-text-muted: #9a9a9a;
+  --color-popup-accent: #c8a96e;
+  --color-popup-accent-dim: #8a7248;
+  --color-popup-danger: #c0392b;
+  --color-popup-danger-dim: #922b21;
+  --radius-popup: 0.375rem;
 }
