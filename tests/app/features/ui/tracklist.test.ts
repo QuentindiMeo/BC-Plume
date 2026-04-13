@@ -4,9 +4,9 @@ import { FakeAppCore } from "../../../fakes/FakeAppCore";
 
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
-    tracklistDropdown: "div#bpe-tracklist-dropdown",
-    tracklistToggleBtn: "button#bpe-tracklist-toggle-btn",
-    tracklistItem: "div.bpe-tracklist-item",
+    tracklistDropdown: "div#plume-tracklist-dropdown",
+    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
+    tracklistItem: "div.plume-tracklist-item",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
@@ -91,18 +91,18 @@ describe("createTracklistToggle", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
     const all = items(dropdownEl);
-    const active = all.find((i) => i.classList.contains("bpe-tracklist-item--active"));
+    const active = all.find((i) => i.classList.contains("plume-tracklist-item--active"));
     expect(active).toBeDefined();
     expect(active!.ariaSelected).toBe("true");
     all
-      .filter((i) => !i.classList.contains("bpe-tracklist-item--active"))
+      .filter((i) => !i.classList.contains("plume-tracklist-item--active"))
       .forEach((i) => expect(i.ariaSelected).toBe("false"));
   });
 
   it("an unplayable track item has aria-disabled=true and fires no navigation", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
-    const unplayable = items(dropdownEl).find((i) => i.classList.contains("bpe-tracklist-item--unplayable"));
+    const unplayable = items(dropdownEl).find((i) => i.classList.contains("plume-tracklist-item--unplayable"));
     expect(unplayable).toBeDefined();
     expect(unplayable!.ariaDisabled).toBe("true");
     unplayable!.click();
@@ -112,7 +112,7 @@ describe("createTracklistToggle", () => {
   it("clicking a playable item navigates to the correct index and keeps the panel open", () => {
     const { toggleBtn, dropdownEl } = setup();
     toggleBtn.click();
-    const playable = items(dropdownEl).filter((i) => !i.classList.contains("bpe-tracklist-item--unplayable"));
+    const playable = items(dropdownEl).filter((i) => !i.classList.contains("plume-tracklist-item--unplayable"));
     playable[1].click(); // second playable item → track index 1
     expect(vi.mocked(navigateToTrack)).toHaveBeenCalledWith(1, fakeBcPlayer);
     expect(dropdownEl.classList.contains("is-open")).toBe(true);

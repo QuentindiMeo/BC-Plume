@@ -1,0 +1,48 @@
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+
+@theme {
+  --color-plume: #20a0c3;
+  --color-plume-10: #20a0c31a;
+  --color-plume-15: #20a0c32b;
+  --color-plume-20: #20a0c333;
+  --color-plume-25: #20a0c340;
+  --color-plume-30: #20a0c34d;
+  --color-plume-40: #20a0c366;
+  --color-plume-50: #20a0c37f;
+  --color-plume-light: #2bb8db;
+  --color-plume-dimmed: #1da0c3;
+  --color-plume-warning: #ffc107;
+  --color-plume-error: #dc3545;
+
+  --color-progbar-bg: rgba(0, 0, 0, 0.85);
+  --color-tracklist-scrollbar: #2bb8dbd9;
+  --color-glass-bg: rgba(0, 0, 0, 0.2);
+  --color-text-muted: rgba(255, 255, 255, 0.45);
+  --color-item-hover-bg: rgba(255, 255, 255, 0.07);
+  --color-contrast-border: rgba(255, 255, 255, 0.6);
+  --color-toast-accent: rgba(32, 160, 195, 0.35);
+  --color-toast-bg: rgba(15, 15, 20, 0.8);
+
+  --radius-focusable: 0.25rem;
+  --leading-title: 1.75; /* ? arbitrary: tall enough for all alphabets */
+  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-thumb-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --tracklist-max-height--folded: 6.5rem; /* ? arbitrary: 3 tracks tall */
+  --tracklist-max-height--unfolded: 10rem; /* ? arbitrary: 5 tracks tall */
+
+  /* Popup theme */
+  --color-popup-bg: #1a1a1a;
+  --color-popup-surface: #242424;
+  --color-popup-surface-alt: #2e2e2e;
+  --color-popup-border: #3a3a3a;
+  --color-popup-text: #e8e8e8;
+  --color-popup-text-muted: #9a9a9a;
+  --color-popup-accent: #c8a96e;
+  --color-popup-accent-dim: #8a7248;
+  --color-popup-danger: #c0392b;
+  --color-popup-danger-dim: #922b21;
+  --font-popup: system-ui, -apple-system, sans-serif;
+  --radius-popup: 0.375rem;
+  --text-2xs: 10px;
+}

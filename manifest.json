@@ -25,7 +25,8 @@
         "dist/content.js"
       ],
       "css": [
-        "styles.css"
+        "dist/styles.css",
+        "dist/tailwind.css"
       ],
       "run_at": "document_end"
     }

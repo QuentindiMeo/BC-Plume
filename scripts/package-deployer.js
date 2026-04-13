@@ -4,20 +4,16 @@ const path = require("node:path");
 
 const VALID_BROWSERS = ["chrome", "firefox"];
 
-const toTitleCase = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
-const deployPackage = (browser, withNewline) => {
+const deployPackage = (browser) => {
   if (!VALID_BROWSERS.includes(browser)) {
     console.error(`❌ Invalid browser specified. Use one of: ${VALID_BROWSERS.join(", ")}`);
     process.exit(1);
   }
 
   if (browser === "chrome") {
-    console.log("📦 Deploying Chrome extension package...");
+    console.debug("📦 Deploying Chrome extension package...");
   } else if (browser === "firefox") {
-    console.log("🦊 Deploying Firefox extension package...");
+    console.debug("🦊 Deploying Firefox extension package...");
   }
 
   // Read version from package.json (single source of truth)
@@ -32,7 +28,7 @@ const deployPackage = (browser, withNewline) => {
 
   // Copy compiled JavaScript files
   const distDir = path.join(__dirname, "..", "dist");
-  const srcFiles = ["content.js", "popup.js", "popup.html", "popup.css"];
+  const srcFiles = ["content.js", "popup.js", "popup.html", "popup.css", "tailwind.css", "styles.css"];
 
   srcFiles.forEach((file) => {
     const srcPath = path.join(distDir, file);
@@ -46,7 +42,7 @@ const deployPackage = (browser, withNewline) => {
   });
 
   // Copy static files
-  const staticFiles = ["styles.css", "README.md"];
+  const staticFiles = ["README.md"];
   const staticDirs = ["icons", "_locales"];
 
   staticFiles.forEach((file) => {
@@ -74,7 +70,7 @@ const deployPackage = (browser, withNewline) => {
       {
         matches: rootManifest.content_scripts[0].matches,
         js: ["content.js"],
-        css: rootManifest.content_scripts[0].css,
+        css: rootManifest.content_scripts[0].css.map((p) => path.basename(p)),
         run_at: rootManifest.content_scripts[0].run_at,
       },
     ],
@@ -87,10 +83,8 @@ const deployPackage = (browser, withNewline) => {
 
   fs.writeFileSync(path.join(deployDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
-  console.log(`🎉 Deployed ${toTitleCase(browser)} package version ${packageVersion} to build/${browser}/`);
-  if (withNewline)
-    console.log(); // newline for readability
+  console.log(`🎉 Deployed Plume v${packageVersion} to build/${browser}/`);
 };
 
-deployPackage("chrome", true);
+deployPackage("chrome");
 deployPackage("firefox");

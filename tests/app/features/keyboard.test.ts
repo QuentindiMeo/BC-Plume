@@ -12,7 +12,7 @@ vi.mock("@/app/use-cases/seek-to-progress", () => ({ seekToProgress: vi.fn() }))
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: {}, logger: vi.fn() }));
 vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: { tracklistDropdown: "div#bpe-tracklist-dropdown" },
+  PLUME_ELEM_SELECTORS: { tracklistDropdown: "div#plume-tracklist-dropdown" },
 }));
 
 import { bindingKey, setupHotkeys } from "@/app/features/keyboard";
@@ -97,7 +97,7 @@ describe("setupHotkeys — arrow keys inside tracklist", () => {
   beforeEach(() => {
     fakeAppCore = new FakeAppCore();
     dropdown = document.createElement("div");
-    dropdown.id = "bpe-tracklist-dropdown";
+    dropdown.id = "plume-tracklist-dropdown";
     item = document.createElement("div");
     dropdown.appendChild(item);
     document.body.appendChild(dropdown);

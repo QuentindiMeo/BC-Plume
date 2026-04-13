@@ -21,7 +21,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
   const storeSubscriptions: Array<SubscriptionCallback> = [];
   const plume = getGuiInstance().getState();
 
-  // Cached once at setup time since bpe-volume-value is a static node.
+  // Cached once at setup time since plume-volume-value is a static node.
   const volumeValueDisplay = plume.volumeSlider.parentElement?.querySelector(
     PLUME_ELEM_SELECTORS.volumeValue
   ) as HTMLDivElement | null;
@@ -38,7 +38,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (Number.isNaN(elapsed) || Number.isNaN(duration) || duration === 0) return;
 
       const progressPercentage = (elapsed / duration) * 100;
-      const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
+      const bgImg = `linear-gradient(90deg, var(--color-plume-light) ${progressPercentage.toFixed(1)}%, var(--color-progbar-bg) 0%)`;
 
       plume.progressSlider.value = `${progressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
       plume.progressSlider.style.backgroundImage = bgImg;

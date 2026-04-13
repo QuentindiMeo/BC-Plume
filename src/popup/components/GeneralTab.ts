@@ -325,8 +325,8 @@ export const createGeneralTab = (
       onSave: (value) => saveTrackRestartThreshold(value, sender),
     });
 
-    section.appendChild(languageRow);
     section.appendChild(refreshNotice);
+    section.appendChild(languageRow);
     section.appendChild(seekJumpRow);
     section.appendChild(volumeStepRow);
     section.appendChild(trackRestartRow);
