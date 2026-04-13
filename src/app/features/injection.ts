@@ -78,6 +78,9 @@ const addRuntime = () => {
 };
 
 const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
+  const appCore = getAppCoreInstance();
+  const flags = appCore.getState().featureFlags;
+
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
   plumeContainer.lang = getActiveLocale();
@@ -124,7 +127,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const titleRow = document.createElement("div");
   titleRow.className = "plume-header-title-row";
 
-  if (isAlbumPage) {
+  if (flags.goToTrack && isAlbumPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
 
@@ -162,7 +165,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
   let pendingDropdown: HTMLDivElement | undefined;
-  if (isAlbumPage) {
+  if (flags.tracklist && isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
     titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
@@ -187,8 +190,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const volumeContainer = await createVolumeControlSection();
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
 
-  const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
-  plumeContainer.appendChild(fullscreenBtnSection);
+  if (flags.fullscreen) {
+    const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
+    plumeContainer.appendChild(fullscreenBtnSection);
+  }
 
   return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
 };
@@ -233,7 +238,8 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
   if (isAlbumPage) {
-    addRuntime();
+    const withRuntime = appCore.getState().featureFlags.runtime;
+    if (withRuntime) addRuntime();
     notifyUnplayableTracks();
   }
 
