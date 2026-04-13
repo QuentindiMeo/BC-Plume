@@ -1,3 +1,4 @@
+import { cleanupFullscreenMode } from "@/app/features/fullscreen";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncLoopBtn } from "@/app/features/ui/loop";
@@ -5,7 +6,8 @@ import { syncMuteBtn } from "@/app/features/ui/volume";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { PLUME_CONSTANTS } from "@/domain/plume";
+import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
@@ -107,6 +109,42 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.playPauseBtns.forEach((btn) => {
         setSvgContent(btn, isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay);
       });
+    }),
+    appCore.subscribe("featureFlags", (flags, prevFlags) => {
+      // Tracklist: toggle button + dropdown visibility
+      if (flags.tracklist !== prevFlags.tracklist) {
+        const btn = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
+        const dd = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
+        if (btn) btn.hidden = !flags.tracklist;
+        if (dd) dd.hidden = !flags.tracklist;
+      }
+
+      // Loop modes: toggle button visibility, reset to NONE when disabled
+      if (flags.loopModes !== prevFlags.loopModes) {
+        const plumeUi = getGuiInstance();
+        plumeUi.getState().loopBtns.forEach((btn) => (btn.hidden = !flags.loopModes));
+        if (!flags.loopModes) {
+          appCore.dispatch(coreActions.setLoopMode(LOOP_MODE.NONE));
+          getMusicPlayerInstance().setLoop(false);
+        }
+      }
+
+      // Fullscreen: toggle button container visibility, exit fullscreen if active
+      if (flags.fullscreen !== prevFlags.fullscreen) {
+        const section = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.fullscreenBtnContainer);
+        if (section) section.hidden = !flags.fullscreen;
+        if (!flags.fullscreen && appCore.getState().isFullscreen) {
+          cleanupFullscreenMode();
+        }
+      }
+
+      // Go-to-track: toggle link visibility
+      if (flags.goToTrack !== prevFlags.goToTrack) {
+        const el = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.headerTrackLink);
+        if (el) el.hidden = !flags.goToTrack;
+      }
+
+      // Quick seek + runtime: flag is read on trigger (key / button)
     })
   );
 
