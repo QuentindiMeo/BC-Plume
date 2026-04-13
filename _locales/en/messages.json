@@ -343,6 +343,10 @@
   "LABEL__LANGUAGE__EN": { "message": "English" },
   "LABEL__LANGUAGE__ES": { "message": "Spanish" },
   "LABEL__LANGUAGE__FR": { "message": "French" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
+  "LABEL__GENERAL__RESET": { "message": "Reset" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
@@ -402,10 +406,15 @@
     }
   },
 
-  "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
-  "LABEL__GENERAL__RESET": { "message": "Reset" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Features" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Go to track" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Tracklist" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Loop modes" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
+  "LABEL__FEATURES__RESET": { "message": "Reset all" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },

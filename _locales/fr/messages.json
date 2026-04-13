@@ -355,6 +355,10 @@
   "LABEL__LANGUAGE__EN": { "message": "Anglais" },
   "LABEL__LANGUAGE__ES": { "message": "Espagnol" },
   "LABEL__LANGUAGE__FR": { "message": "Français" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
+  "LABEL__GENERAL__RESET": { "message": "Réinitialiser" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
@@ -414,10 +418,15 @@
     }
   },
 
-  "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
-  "LABEL__GENERAL__RESET": { "message": "Réinitialiser" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Fonctionnalités" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Aller à la piste" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Recherche rapide (0–9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
+  "LABEL__FEATURES__RESET": { "message": "Tout réinitialiser" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Doit valoir entre 1 et 300" },

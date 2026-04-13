@@ -359,6 +359,10 @@
   "LABEL__LANGUAGE__EN": { "message": "Inglés" },
   "LABEL__LANGUAGE__ES": { "message": "Español" },
   "LABEL__LANGUAGE__FR": { "message": "Francés" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
+  "LABEL__GENERAL__RESET": { "message": "Restablecer" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
@@ -418,10 +422,15 @@
     }
   },
 
-  "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
-  "LABEL__GENERAL__RESET": { "message": "Restablecer" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Funciones" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Ir a la pista" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Lista de pistas" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modos de bucle" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Modo pantalla completa" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Búsqueda rápida (0–9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Duración total" },
+  "LABEL__FEATURES__RESET": { "message": "Restablecer todo" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 300" },
