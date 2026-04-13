@@ -12,6 +12,8 @@ const DEFAULT_STATE: AppCore = {
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
   trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
+  featureFlags: { ...PLUME_DEFAULTS.featureFlags },
+
   pageType: null,
   trackTitle: null,
   trackNumber: null,
