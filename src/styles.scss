@@ -621,7 +621,7 @@
   .plume-toast {
     @apply
       relative overflow-hidden
-      w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg bg-toast-bg border-toast-accent
+      w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg bg-toast-bg border border-toast-accent
       flex items-start
       font-sans backdrop-blur-sm transition-[background,box-shadow]
     ;

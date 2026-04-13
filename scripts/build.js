@@ -94,8 +94,7 @@ const watchStyles = () => {
   const srcDir = path.join(__dirname, "..", "src");
   try {
     fs.watch(srcDir, { recursive: true }, (_, filename) => {
-      if (!filename) return;
-      if (!filename.endsWith(".scss") && filename !== "tailwind.css") return;
+      if (!filename || (!filename.endsWith(".scss") && filename !== "tailwind.css")) return;
       buildStyles().catch((err) => console.error("❌ Style rebuild failed:", err));
     });
   } catch (err) {
