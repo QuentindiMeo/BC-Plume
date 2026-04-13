@@ -390,7 +390,7 @@
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmer" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Annuler" },
-  "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
+  "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser " },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Réassigner le raccourci $ACTION$ — actuellement $BINDING$",
     "placeholders": {

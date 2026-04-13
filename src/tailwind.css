@@ -42,5 +42,7 @@
   --color-popup-accent-dim: #8a7248;
   --color-popup-danger: #c0392b;
   --color-popup-danger-dim: #922b21;
+  --font-popup: system-ui, -apple-system, sans-serif;
   --radius-popup: 0.375rem;
+  --text-2xs: 10px;
 }
