@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { PLUME_DEFAULTS } from "@/domain/plume";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeMessageSender } from "../fakes/FakeMessageSender";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
@@ -191,6 +192,7 @@ describe("popup accessibility", () => {
             volumeHotkeyStep: undefined,
             trackRestartThreshold: undefined,
             hotkeyBindings: undefined,
+            featureFlags: { ...PLUME_DEFAULTS.featureFlags },
           },
           sender
         );
@@ -211,6 +213,7 @@ describe("popup accessibility", () => {
           volumeHotkeyStep: undefined,
           trackRestartThreshold: undefined,
           hotkeyBindings: undefined,
+          featureFlags: { ...PLUME_DEFAULTS.featureFlags },
         },
         sender
       );
