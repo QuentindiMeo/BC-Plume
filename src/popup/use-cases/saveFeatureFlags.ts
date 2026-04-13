@@ -4,7 +4,7 @@ import { FeatureFlags } from "@/domain/plume";
 import type { IMessageSender } from "@/domain/ports/messaging";
 import { inferBrowserApi } from "@/shared/browser";
 
-export const saveFeatureFlags = async (flags: FeatureFlags, sender: IMessageSender): Promise<void> => {
+export const saveFeatureFlags = async (flags: FeatureFlags, sender: IMessageSender) => {
   const browserApi = inferBrowserApi();
 
   await browserApi.storage.local.set({ [PLUME_CACHE_KEYS.FEATURE_FLAGS]: flags });
