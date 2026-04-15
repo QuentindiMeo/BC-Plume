@@ -5,6 +5,10 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+- _**[1.12.0]** Apr ?? 2026_: **À la carte** [#1??](https://github.com/QuentindiMeo/BC-Plume/pull/1??)  
+The new Features popup tab allows toggling features on or off: tracklist dropdown, loop modes (including its button), fullscreen mode, quick seek digit keys, runtime display, and the go-to-track link.  
+Tailwind and Sass are introduced for more efficient and maintainable styling.
+
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)  
 An interactive tracklist dropdown is added to the header: browse a collection's tracks and jump directly to any of them.  
 A "go to track" link button docked to the track title allows navigation to a specific track's single page, on collections.  

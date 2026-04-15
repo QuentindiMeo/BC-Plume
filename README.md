@@ -14,7 +14,7 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.11.0-blue?logo=semver" /></a>
+  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.12.0-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
@@ -61,12 +61,13 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Tracklist dropdown**: Browse collection tracks from the header and jump directly to any of them
   - **Go to track**: A link button docked to the track title opens the current track's Bandcamp page
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
+- **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
+  - **Responsive design**: Adapts to different screen sizes and devices
 - **Keyboard shortcuts**: Control playback, volume, seeking, and more without touching the mouse
   - **Customizable hotkeys**: Remap every shortcut to your liking via the extension popup
   - Digit row (0–9), Numpad (0–9 with NumLock), and letter keys all supported
+- **Feature flags**: Toggle individual features on or off from the popup's Features tab
 - **Sticky player behavior**: Player sticks visually while scrolling for quicker access
-- **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
-  - **Responsive design**: Adapts to different screen sizes and devices
 - **Accessibility-minded**: Visible focus outlines, ARIA semantics, reduced-motion and contrast preferences, screen reader support
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
 - **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more on demand!)
@@ -115,7 +116,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
 
-- _**[1.11.0]** Apr 11 2026_: latest — **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
+- _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106) | [Promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8) release.
 - _**[1.8.0]** Feb 23 2026_: **Silent Robert, Spread The Word!** [#081](https://github.com/QuentindiMeo/BC-Plume/pull/81)
