@@ -79,8 +79,11 @@ export const setupHotkeys = (
       (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
     if (userIsTypingInInput) return;
 
+    const flags = appCore.getState().featureFlags;
+
     const isModifierKey = e.ctrlKey || e.shiftKey || e.altKey;
     if (DIGIT_CODES.has(e.code) && !isModifierKey) {
+      if (!flags.quickSeek) return;
       if (!e.getModifierState("NumLock") && e.code.startsWith("Numpad")) return;
 
       e.preventDefault();
@@ -140,13 +143,13 @@ export const setupHotkeys = (
         handlers.handleTrackForward();
         break;
       case HotkeyAction.FULLSCREEN:
-        handlers.toggleFullscreenMode();
+        if (flags.fullscreen) handlers.toggleFullscreenMode();
         break;
       case HotkeyAction.MUTE:
         handlers.handleMuteToggle();
         break;
       case HotkeyAction.LOOP_CYCLE:
-        handlers.handleLoopCycle();
+        if (flags.loopModes) handlers.handleLoopCycle();
         break;
       default:
         action satisfies never; // Ensure all cases are handled
@@ -167,6 +170,8 @@ export const setupHotkeys = (
       appCore.dispatch(coreActions.setVolumeHotkeyStep(message.volumeHotkeyStep));
     } else if (message.type === PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED) {
       appCore.dispatch(coreActions.setTrackRestartThreshold(message.trackRestartThreshold));
+    } else if (message.type === PLUME_MESSAGE_TYPE.FEATURE_FLAGS_UPDATED) {
+      appCore.dispatch(coreActions.setFeatureFlags(message.featureFlags));
     }
   });
 

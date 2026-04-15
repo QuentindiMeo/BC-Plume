@@ -1,5 +1,7 @@
-import { PlumeLanguage, WholeNumber } from "@/domain/plume";
+import { KeyBindingMap } from "@/domain/hotkeys";
+import { FeatureFlags, PlumeLanguage, WholeNumber } from "@/domain/plume";
 import type { IMessageSender } from "@/domain/ports/messaging";
+import { createFeatureTab } from "@/popup/components/FeatureFlippingTab";
 import { createGeneralTab } from "@/popup/components/GeneralTab";
 import { createHotkeyTab } from "@/popup/components/HotkeyTab";
 import { createTabBar, TabDefinition } from "@/popup/components/TabBar";
@@ -14,7 +16,8 @@ export interface StoredSettings {
   seekJumpDuration: WholeNumber | undefined;
   volumeHotkeyStep: WholeNumber | undefined;
   trackRestartThreshold: WholeNumber | undefined;
-  hotkeyBindings: Parameters<typeof createHotkeyTab>[0];
+  hotkeyBindings: KeyBindingMap | undefined;
+  featureFlags: FeatureFlags;
 }
 
 export const createSettingsPanel = (stored: StoredSettings, sender: IMessageSender): SettingsPanelInstance => {
@@ -58,6 +61,11 @@ export const createSettingsPanel = (stored: StoredSettings, sender: IMessageSend
         id: "hotkeys",
         label: getString("POPUP__HOTKEYS__TAB_LABEL"),
         buildPanel: createHotkeyTab(stored.hotkeyBindings, sender),
+      },
+      {
+        id: "features",
+        label: getString("POPUP__FEATURES__TAB_LABEL"),
+        buildPanel: createFeatureTab(stored.featureFlags, sender),
       },
     ];
     el.appendChild(createTabBar(tabs).el);

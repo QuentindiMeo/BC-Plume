@@ -280,10 +280,13 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       renderTrackNumber(elements, trackNumber);
     }),
     appCore.subscribe("loopMode", (loopMode) => {
-      renderLoopButton(elements, loopMode);
+      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      if (withLoopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("pageType", () => {
-      renderLoopButton(elements, appCore.getState().loopMode);
+      // because available loop modes depend on the page type
+      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      if (withLoopModes) renderLoopButton(elements, appCore.getState().loopMode);
     })
   );
 
@@ -311,7 +314,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.trackForwardBtn.addEventListener("click", handleTrackForward);
   elements.volumeSlider.addEventListener("input", handleVolumeInput);
   elements.muteBtn.addEventListener("click", handleMuteToggle);
-  elements.loopBtn.addEventListener("click", handleLoopCycle);
+
+  const flags = appCore.getState().featureFlags;
+  if (flags.loopModes && elements.loopBtn) {
+    elements.loopBtn.addEventListener("click", handleLoopCycle);
+  }
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
@@ -323,7 +330,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   });
 
   // Apply the Bandcamp theme color to the track link in the fullscreen clone
-  if (isAlbumPage) {
+  if (flags.goToTrack && isAlbumPage) {
     const fsTrackLink = elements.headerContainer.querySelector(
       PLUME_ELEM_SELECTORS.headerTrackLink
     ) as HTMLAnchorElement;
@@ -333,7 +340,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   // Re-initialize the tracklist for the fullscreen clone.
   // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another
   // inert clone of the toggle button. Replace both inert elements with a fresh instance.
-  if (isAlbumPage) {
+  if (flags.tracklist && isAlbumPage) {
     const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup: tracklistCleanup } = createTracklistToggle();
     subscriptions.push(tracklistCleanup);
 
@@ -359,7 +366,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderMuteButton(elements, state.isMuted);
   renderTrackTitle(elements, state.trackTitle);
   renderTrackNumber(elements, state.trackNumber);
-  renderLoopButton(elements, state.loopMode);
+  if (flags.loopModes) renderLoopButton(elements, state.loopMode);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
@@ -547,7 +554,9 @@ export const toggleFullscreenMode = (): void => {
   const fsElements = getFullscreenElements(plumeClone);
   plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));
-  plumeUi.dispatch(guiActions.setLoopBtns([...plume.loopBtns, fsElements.loopBtn]));
+  if (appCore.getState().featureFlags.loopModes && fsElements.loopBtn) {
+    plumeUi.dispatch(guiActions.setLoopBtns([...plume.loopBtns, fsElements.loopBtn]));
+  }
 
   // Mount overlay to DOM and record it in the store
   document.body.appendChild(overlay);

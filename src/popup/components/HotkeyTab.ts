@@ -134,7 +134,7 @@ export const createHotkeyTab = (
 
     const confirmResetBtn = document.createElement("button");
     confirmResetBtn.className = "popup__reset-btn popup__reset-btn--confirm";
-    confirmResetBtn.textContent = getString("POPUP__HOTKEYS__RESET_ALL");
+    confirmResetBtn.textContent = getString("LABEL__TAB__RESET");
     confirmResetBtn.hidden = true;
     confirmResetBtn.addEventListener("click", async () => {
       await resetHotkeys(sender);
@@ -150,10 +150,10 @@ export const createHotkeyTab = (
 
     const resetBtn = document.createElement("button");
     resetBtn.className = "popup__reset-btn";
-    resetBtn.textContent = getString("POPUP__HOTKEYS__RESET_ALL");
+    resetBtn.textContent = getString("LABEL__TAB__RESET");
     resetBtn.addEventListener("click", () => {
       resetBtn.hidden = true;
-      confirmText.textContent = getString("POPUP__HOTKEYS__RESET_ALL") + "?";
+      confirmText.textContent = getString("LABEL__TAB__RESET") + "?";
       confirmText.hidden = false;
       cancelBtn.hidden = false;
       confirmResetBtn.hidden = false;

@@ -1,7 +1,7 @@
 import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
-import { LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
-import { IAction, IScenarioView, IStore } from "@/domain/store";
+import { FeatureFlags, LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
 import { BcPageType } from "@/domain/ports/bc-player";
+import { IAction, IScenarioView, IStore } from "@/domain/store";
 
 export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;
@@ -12,6 +12,7 @@ export interface AppPersistedState {
   seekJumpDuration: number;
   volumeHotkeyStep: number;
   trackRestartThreshold: number;
+  featureFlags: FeatureFlags;
 }
 
 export interface AppTransientState {
@@ -47,6 +48,7 @@ export enum CORE_ACTIONS {
   SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
   SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
   SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
+  SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
 }
 
 export type CoreAction =
@@ -66,9 +68,11 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
   | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
-  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>;
+  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
+  | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
 
 interface ICoreActions {
+  // State
   setPageType: (pageType: BcPageType | null) => CoreAction;
   setTrackTitle: (title: string | null) => CoreAction;
   setTrackNumber: (number: string | null) => CoreAction;
@@ -83,10 +87,12 @@ interface ICoreActions {
   setVolume: (volume: number) => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
+  // Settings
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setSeekJumpDuration: (duration: number) => CoreAction;
   setVolumeHotkeyStep: (step: number) => CoreAction;
   setTrackRestartThreshold: (threshold: number) => CoreAction;
+  setFeatureFlags: (flags: FeatureFlags) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -128,6 +134,10 @@ export const coreActions: ICoreActions = {
   setTrackRestartThreshold: (threshold: number): CoreAction => ({
     type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
     payload: threshold,
+  }),
+  setFeatureFlags: (flags: FeatureFlags): CoreAction => ({
+    type: CORE_ACTIONS.SET_FEATURE_FLAGS,
+    payload: flags,
   }),
 } as const;
 

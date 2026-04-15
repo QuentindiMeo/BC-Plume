@@ -53,8 +53,16 @@ export const PLUME_DEFAULTS = {
   trackRestartThreshold: 5 as WholeNumber, // in seconds
   seekJumpDuration: 10 as WholeNumber, // in seconds
   loopMode: LOOP_MODE.NONE,
-  savedVolume: 0.5,
+  savedVolume: 50 / PLUME_CONSTANTS.VOLUME_SLIDER_GRANULARITY, // normalized 0–1
   volumeHotkeyStep: 5 as WholeNumber, // in percent
+  featureFlags: {
+    goToTrack: true,
+    tracklist: true,
+    loopModes: true,
+    fullscreen: true,
+    quickSeek: true,
+    runtime: true,
+  } as const,
 } as const;
 
 export interface TimeState {
@@ -62,3 +70,13 @@ export interface TimeState {
   duration: number;
   durationDisplayMethod: TimeDisplayMethodType;
 }
+
+export type FeatureFlags = {
+  goToTrack: boolean;
+  tracklist: boolean;
+  loopModes: boolean;
+  fullscreen: boolean;
+  quickSeek: boolean;
+  runtime: boolean;
+};
+export type FeatureFlagKey = keyof FeatureFlags;

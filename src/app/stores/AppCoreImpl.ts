@@ -44,6 +44,7 @@ const INITIAL_STATE: AppCore = {
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
   trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
+  featureFlags: { ...PLUME_DEFAULTS.featureFlags },
 };
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
@@ -55,6 +56,7 @@ const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
   "seekJumpDuration",
   "volumeHotkeyStep",
   "trackRestartThreshold",
+  "featureFlags",
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
@@ -283,6 +285,9 @@ const createAppCoreInstance = (): IAppCore => {
         }
         break;
       }
+      case CORE_ACTIONS.SET_FEATURE_FLAGS:
+        updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
+        break;
       default:
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);
@@ -300,6 +305,7 @@ const createAppCoreInstance = (): IAppCore => {
         PLUME_CACHE_KEYS.SEEK_JUMP_DURATION,
         PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP,
         PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD,
+        PLUME_CACHE_KEYS.FEATURE_FLAGS,
       ];
       const result = await browserCache.get(keys);
 
@@ -399,6 +405,11 @@ const createAppCoreInstance = (): IAppCore => {
           const defaultThreshold = PLUME_DEFAULTS.trackRestartThreshold;
           dispatch(coreActions.setTrackRestartThreshold(defaultThreshold));
         }
+      }
+
+      const storedFlags = result[PLUME_CACHE_KEYS.FEATURE_FLAGS];
+      if (storedFlags !== undefined && typeof storedFlags === "object" && storedFlags !== null) {
+        dispatch(coreActions.setFeatureFlags(storedFlags));
       }
     } catch (error) {
       logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);

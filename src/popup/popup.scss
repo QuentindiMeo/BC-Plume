@@ -273,3 +273,36 @@ body {
   @apply pt-1 px-0 pb-0.5 text-2xs text-popup-accent;
   line-height: 1.3;
 }
+
+/* Features tab — toggle switch */
+.feature-toggle {
+  @apply
+    relative inline-flex items-center shrink-0
+    w-9 h-5 p-0 rounded-full border border-popup-border
+    bg-popup-surface
+    transition-[background-color,border-color] duration-150
+    cursor-pointer
+  ;
+
+  &[aria-checked="true"] {
+    @apply bg-popup-accent border-popup-accent;
+
+    .feature-toggle__thumb {
+      @apply translate-x-4 bg-popup-text;
+    }
+  }
+
+  &[aria-checked="false"] {
+    .feature-toggle__thumb {
+      @apply translate-x-0.5 bg-popup-text-muted;
+    }
+  }
+
+  &:hover {
+    @apply border-popup-accent-dim;
+  }
+}
+
+.feature-toggle__thumb {
+  @apply block size-3.5 rounded-full transition-transform duration-150;
+}
