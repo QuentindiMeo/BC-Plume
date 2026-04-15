@@ -333,10 +333,14 @@
 
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
+  "INFO__SETTING__REFRESH_REQUIRED": { "message": "Refresh the page for the change to take effect." },
+  "LABEL__SETTING__RESET": { "message": "Reset" },
+  "LABEL__TAB__RESET": { "message": "Reset all" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Failed to save language preference" },
-  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": { "message": "Refresh the page for the language change to take effect" },
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Language" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Display language override" },
   "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
@@ -344,9 +348,6 @@
   "LABEL__LANGUAGE__ES": { "message": "Spanish" },
   "LABEL__LANGUAGE__FR": { "message": "French" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
-  "LABEL__GENERAL__RESET": { "message": "Reset" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
@@ -382,7 +383,6 @@
   "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
-  "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Remap $ACTION$ hotkey — currently $BINDING$",
     "placeholders": {
@@ -413,7 +413,6 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
-  "LABEL__FEATURES__RESET": { "message": "Reset all" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },

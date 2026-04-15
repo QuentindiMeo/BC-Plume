@@ -27,12 +27,14 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
   const toggleBtns = new Map<FeatureFlagKey, HTMLButtonElement>();
 
   let resetBtn: HTMLButtonElement | null = null;
+  let refreshNotice: HTMLParagraphElement | null = null;
 
   const syncResetVisibility = (): void => {
     if (resetBtn) resetBtn.hidden = areAllDefaults(currentFlags);
   };
 
   const persist = (flags: FeatureFlags): void => {
+    if (refreshNotice) refreshNotice.hidden = false;
     saveFeatureFlags(flags, sender).catch(() => {
       logger(CPL.ERROR, getString("ERROR__FEATURE_FLAGS__PERSISTENCE"));
     });
@@ -81,6 +83,12 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     section.className = "settings__section";
     section.ariaLabel = getString("POPUP__FEATURES__TAB_LABEL");
 
+    refreshNotice = document.createElement("p");
+    refreshNotice.className = "general-row__refresh-notice";
+    refreshNotice.textContent = getString("INFO__SETTING__REFRESH_REQUIRED");
+    refreshNotice.hidden = true;
+    section.appendChild(refreshNotice);
+
     for (const config of FLAG_ORDER) section.appendChild(buildToggleRow(config));
 
     return section;
@@ -92,7 +100,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
 
     resetBtn = document.createElement("button");
     resetBtn.className = "popup__reset-btn";
-    resetBtn.textContent = getString("LABEL__FEATURES__RESET");
+    resetBtn.textContent = getString("LABEL__TAB__RESET");
     resetBtn.hidden = areAllDefaults(currentFlags);
     resetBtn.addEventListener("click", () => {
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);

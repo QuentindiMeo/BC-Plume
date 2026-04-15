@@ -347,12 +347,16 @@
 
   "POPUP_TITLE": { "message": "Panel de configuración" },
   "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },
+  "INFO__SETTING__REFRESH_REQUIRED": {
+    "message": "Recarga la página para que el cambio tenga efecto."
+  },
+  "LABEL__SETTING__RESET": { "message": "Restablecer" },
+  "LABEL__TAB__RESET": { "message": "Restablecer todo" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Error al guardar la preferencia de idioma" },
-  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": {
-    "message": "Recarga la página para que el cambio de idioma tenga efecto"
-  },
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Idioma" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Anulación del idioma de la interfaz" },
   "LABEL__LANGUAGE__AUTO": { "message": "Automático" },
@@ -360,9 +364,6 @@
   "LABEL__LANGUAGE__ES": { "message": "Español" },
   "LABEL__LANGUAGE__FR": { "message": "Francés" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
-  "LABEL__GENERAL__RESET": { "message": "Restablecer" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
@@ -398,7 +399,6 @@
   "POPUP__HOTKEYS__DISABLED": { "message": "Desactivado" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmar" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Cancelar" },
-  "POPUP__HOTKEYS__RESET_ALL": { "message": "Restablecer todo" },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Reasignar atajo de $ACTION$ — actualmente $BINDING$",
     "placeholders": {
@@ -429,7 +429,6 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Modo pantalla completa" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Búsqueda rápida (0–9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Duración total" },
-  "LABEL__FEATURES__RESET": { "message": "Restablecer todo" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
