@@ -2,14 +2,22 @@ import { cleanupFullscreenMode } from "@/app/features/fullscreen";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncLoopBtn } from "@/app/features/ui/loop";
+import { createToast } from "@/app/features/ui/toast";
 import { syncMuteBtn } from "@/app/features/ui/volume";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
+import {
+  LOOP_MODE,
+  PLAYBACK_SPEED_DEFAULT,
+  PLAYBACK_SPEED_SAFARI_MAX,
+  PLAYBACK_SPEED_SAFARI_MIN,
+  PLUME_CONSTANTS,
+} from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { isSafariBrowser } from "@/shared/browser";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
@@ -17,6 +25,8 @@ import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+
+let safariSpeedWarningShown = false;
 
 export const setupStoreSubscriptions = (): CleanupCallback => {
   const appCore = getAppCoreInstance();
@@ -108,6 +118,28 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         setSvgContent(btn, isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay);
       });
     }),
+    appCore.subscribe("playbackSpeed", (speed) => {
+      const musicPlayer = getMusicPlayerInstance();
+      const plume = getGuiInstance().getState();
+
+      musicPlayer.setPlaybackRate(speed);
+      plume.speedBtns.forEach((btn) => {
+        btn.textContent = `${speed}×`;
+      });
+
+      if (
+        !safariSpeedWarningShown &&
+        isSafariBrowser() &&
+        (speed < PLAYBACK_SPEED_SAFARI_MIN || speed > PLAYBACK_SPEED_SAFARI_MAX)
+      ) {
+        safariSpeedWarningShown = true;
+        createToast({
+          label: "safari-speed-warning",
+          title: getString("WARN__SPEED__SAFARI_UNSUPPORTED"),
+          borderType: "warning",
+        });
+      }
+    }),
     appCore.subscribe("featureFlags", (flags, prevFlags) => {
       // Tracklist: toggle button + dropdown visibility
       if (flags.tracklist !== prevFlags.tracklist) {
@@ -140,6 +172,16 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (flags.goToTrack !== prevFlags.goToTrack) {
         const el = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.headerTrackLink);
         if (el) el.hidden = !flags.goToTrack;
+      }
+
+      // Speed control: toggle button visibility, reset to 1× when disabled
+      if (flags.speedControl !== prevFlags.speedControl) {
+        getGuiInstance()
+          .getState()
+          .speedBtns.forEach((btn) => (btn.hidden = !flags.speedControl));
+        if (!flags.speedControl) {
+          appCore.dispatch(coreActions.setPlaybackSpeed(PLAYBACK_SPEED_DEFAULT));
+        }
       }
 
       // Quick seek + runtime: flag is read on trigger (key / button)

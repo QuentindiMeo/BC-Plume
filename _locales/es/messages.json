@@ -278,6 +278,16 @@
   "ARIA__LOOP__COLLECTION_TRACK": { "message": "Repetición: pista" },
   "ARIA__LOOP__ONE_TRACK": { "message": "Repetición: activada" },
 
+  "LABEL__SPEED": { "message": "Velocidad de reproducción" },
+  "ARIA__SPEED_BTN": {
+    "message": "Velocidad: $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Botón de velocidad pulsado" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocidad de reproducción cargada:" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Velocidad no válida — restableciendo a 1×" },
+  "WARN__SPEED__SAFARI_UNSUPPORTED": { "message": "Safari limita la velocidad a 0,5×–2×. Tu selección será ajustada." },
+
   "INFO__HOTKEYS__REGISTERED": { "message": "Atajos de teclado registrados" },
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Pasar a pantalla completa" },
@@ -394,6 +404,7 @@
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Pantalla completa" },
   "LABEL__HOTKEY__MUTE": { "message": "Silenciar / Activar sonido" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cambiar modo de repetición" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Cambiar velocidad de reproducción" },
   "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Ir al 0%–90% (teclas numéricas)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Pulsa una tecla..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Desactivado" },
@@ -429,6 +440,7 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Modo pantalla completa" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Búsqueda rápida (0–9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Duración total" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Control de velocidad de reproducción" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },

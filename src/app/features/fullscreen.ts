@@ -3,6 +3,7 @@ import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   handlePlayPause,
+  handleSpeedCycle,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
@@ -33,15 +34,16 @@ interface FullscreenElements {
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
   durationDisplay: HTMLButtonElement;
-  playPauseBtn: HTMLButtonElement;
-  volumeSlider: HTMLInputElement;
-  volumeDisplay: HTMLDivElement;
-  muteBtn: HTMLButtonElement;
+  speedBtn: HTMLButtonElement;
   trackBackwardBtn: HTMLButtonElement;
   timeBackwardBtn: HTMLButtonElement;
+  playPauseBtn: HTMLButtonElement;
   timeForwardBtn: HTMLButtonElement;
   trackForwardBtn: HTMLButtonElement;
   loopBtn: HTMLButtonElement;
+  muteBtn: HTMLButtonElement;
+  volumeSlider: HTMLInputElement;
+  volumeDisplay: HTMLDivElement;
 }
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
@@ -78,6 +80,7 @@ const exitFullscreenMode = (): void => {
 
   // Clear the fullscreen-specific buttons from the store arrays before removing the DOM
   const plume = plumeUi.getState();
+  plumeUi.dispatch(guiActions.setSpeedBtns(plume.speedBtns.filter((btn) => existingOverlay.contains(btn) === false)));
   plumeUi.dispatch(
     guiActions.setPlayPauseBtns(plume.playPauseBtns.filter((btn) => existingOverlay.contains(btn) === false))
   );
@@ -222,15 +225,16 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
     durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLButtonElement,
-    playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
-    volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
-    volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
-    muteBtn: clone.querySelector(PLUME_ELEM_SELECTORS.muteBtn) as HTMLButtonElement,
+    speedBtn: clone.querySelector(PLUME_ELEM_SELECTORS.speedBtn) as HTMLButtonElement,
     trackBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackBwdBtn) as HTMLButtonElement,
     timeBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeBwdBtn) as HTMLButtonElement,
+    playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
     timeForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeFwdBtn) as HTMLButtonElement,
     trackForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackFwdBtn) as HTMLButtonElement,
     loopBtn: clone.querySelector(PLUME_ELEM_SELECTORS.loopBtn) as HTMLButtonElement,
+    muteBtn: clone.querySelector(PLUME_ELEM_SELECTORS.muteBtn) as HTMLButtonElement,
+    volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
+    volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
   };
 };
 
@@ -316,9 +320,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.muteBtn.addEventListener("click", handleMuteToggle);
 
   const flags = appCore.getState().featureFlags;
-  if (flags.loopModes && elements.loopBtn) {
-    elements.loopBtn.addEventListener("click", handleLoopCycle);
-  }
+  if (flags.speedControl) elements.speedBtn?.addEventListener("click", handleSpeedCycle);
+  if (flags.loopModes) elements.loopBtn?.addEventListener("click", handleLoopCycle);
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
@@ -552,6 +555,9 @@ export const toggleFullscreenMode = (): void => {
 
   // Register the fullscreen buttons in the store alongside the main-panel buttons
   const fsElements = getFullscreenElements(plumeClone);
+  if (appCore.getState().featureFlags.speedControl && fsElements.speedBtn) {
+    plumeUi.dispatch(guiActions.setSpeedBtns([...plume.speedBtns, fsElements.speedBtn]));
+  }
   plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));
   if (appCore.getState().featureFlags.loopModes && fsElements.loopBtn) {

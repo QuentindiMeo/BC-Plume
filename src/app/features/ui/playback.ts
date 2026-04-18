@@ -3,6 +3,7 @@ import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapte
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
 import {
+  cyclePlaybackSpeed,
   navigateTrackBackward,
   navigateTrackForward,
   seekBackward,
@@ -16,11 +17,11 @@ import { CPL, logger } from "@/shared/logger";
 import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
-export const handlePlayPause = (): void => {
-  logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
+export const handleSpeedCycle = (): void => {
+  logger(CPL.DEBUG, getString("DEBUG__SPEED__CLICKED"));
 
   const appCore = getAppCoreInstance();
-  togglePlayback(appCore);
+  cyclePlaybackSpeed(appCore);
 };
 
 export const handleTrackBackward = (): void => {
@@ -32,15 +33,6 @@ export const handleTrackBackward = (): void => {
   navigateTrackBackward(appCore, musicPlayer, bcPlayer);
 };
 
-export const handleTrackForward = (): void => {
-  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
-
-  const appCore = getAppCoreInstance();
-  const musicPlayer = getMusicPlayerInstance();
-  const bcPlayer = getBcPlayerInstance();
-  navigateTrackForward(appCore, musicPlayer, bcPlayer);
-};
-
 export const handleTimeBackward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__REWIND_TIME__CLICKED"));
 
@@ -49,12 +41,28 @@ export const handleTimeBackward = (): void => {
   seekBackward(appCore, musicPlayer);
 };
 
+export const handlePlayPause = (): void => {
+  logger(CPL.DEBUG, getString("DEBUG__PLAY_PAUSE__CLICKED"));
+
+  const appCore = getAppCoreInstance();
+  togglePlayback(appCore);
+};
+
 export const handleTimeForward = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__FORWARD_TIME__CLICKED"));
 
   const appCore = getAppCoreInstance();
   const musicPlayer = getMusicPlayerInstance();
   seekForward(appCore, musicPlayer);
+};
+
+export const handleTrackForward = (): void => {
+  logger(CPL.DEBUG, getString("DEBUG__NEXT_TRACK__CLICKED"));
+
+  const appCore = getAppCoreInstance();
+  const musicPlayer = getMusicPlayerInstance();
+  const bcPlayer = getBcPlayerInstance();
+  navigateTrackForward(appCore, musicPlayer, bcPlayer);
 };
 
 export const createPlaybackControlPanel = (): HTMLDivElement => {
@@ -102,6 +110,20 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   trackForwardBtn.title = getString("LABEL__TRACK_FORWARD");
   trackForwardBtn.ariaLabel = getString("LABEL__TRACK_FORWARD");
   trackForwardBtn.addEventListener("click", handleTrackForward);
+
+  const withSpeedControl = appState.featureFlags.speedControl;
+  if (withSpeedControl) {
+    const speedBtn = document.createElement("button");
+    speedBtn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
+    speedBtn.type = "button";
+    speedBtn.textContent = `${appState.playbackSpeed}×`;
+    speedBtn.title = getString("LABEL__SPEED");
+    speedBtn.ariaLabel = getString("LABEL__SPEED");
+    speedBtn.addEventListener("click", handleSpeedCycle);
+
+    container.appendChild(speedBtn);
+    plumeUi.dispatch(guiActions.setSpeedBtns([speedBtn]));
+  }
 
   container.appendChild(trackBackwardBtn);
   container.appendChild(timeBackwardBtn);

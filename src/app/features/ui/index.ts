@@ -2,6 +2,7 @@ export { createFullscreenButtonSection } from "@/app/features/ui/fullscreen-butt
 export {
   createPlaybackControlPanel,
   handlePlayPause,
+  handleSpeedCycle,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,

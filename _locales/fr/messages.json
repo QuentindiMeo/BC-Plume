@@ -274,6 +274,16 @@
   "ARIA__LOOP__COLLECTION_TRACK": { "message": "Répétition : piste" },
   "ARIA__LOOP__ONE_TRACK": { "message": "Répétition : activée" },
 
+  "LABEL__SPEED": { "message": "Vitesse de lecture" },
+  "ARIA__SPEED_BTN": {
+    "message": "Vitesse : $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1,5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Bouton de vitesse cliqué" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Vitesse de lecture chargée :" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Vitesse invalide — réinitialisation à 1×" },
+  "WARN__SPEED__SAFARI_UNSUPPORTED": { "message": "Safari limite la vitesse à 0,5×–2×. Votre sélection sera ajustée." },
+
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
@@ -390,6 +400,7 @@
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Plein écran" },
   "LABEL__HOTKEY__MUTE": { "message": "Couper / Rétablir le son" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Changer le mode de répétition" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Changer la vitesse de lecture" },
   "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0% – 90% (touches numériques)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
@@ -425,6 +436,7 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },

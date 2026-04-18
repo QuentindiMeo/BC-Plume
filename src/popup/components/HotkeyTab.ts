@@ -18,6 +18,7 @@ const ACTION_ORDER: HotkeyAction[] = [
   HotkeyAction.FULLSCREEN,
   HotkeyAction.MUTE,
   HotkeyAction.LOOP_CYCLE,
+  HotkeyAction.SPEED_CYCLE,
 ];
 
 /**
