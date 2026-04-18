@@ -12,6 +12,7 @@ import {
   PLAYBACK_SPEED_DEFAULT,
   PLAYBACK_SPEED_SAFARI_MAX,
   PLAYBACK_SPEED_SAFARI_MIN,
+  PLAYBACK_SPEED_STEPS,
   PLUME_CONSTANTS,
 } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
@@ -123,8 +124,16 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plume = getGuiInstance().getState();
 
       musicPlayer.setPlaybackRate(speed);
-      plume.speedBtns.forEach((btn) => {
-        btn.textContent = `${speed}×`;
+      const speedIdx = String(PLAYBACK_SPEED_STEPS.indexOf(speed));
+      const speedText = `${speed}×`;
+      plume.speedBtns.forEach((wrapper) => {
+        const label = wrapper.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.speedLabel);
+        const slider = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedSlider);
+        if (label) label.textContent = speedText;
+        if (slider) {
+          slider.value = speedIdx;
+          slider.setAttribute("aria-valuetext", speedText);
+        }
       });
 
       if (

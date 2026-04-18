@@ -4,10 +4,12 @@ import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   handlePlayPause,
   handleSpeedCycle,
+  handleSpeedSlider,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
   handleTrackForward,
+  setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
@@ -34,7 +36,9 @@ interface FullscreenElements {
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
   durationDisplay: HTMLButtonElement;
+  speedWrapper: HTMLDivElement;
   speedBtn: HTMLButtonElement;
+  speedSlider: HTMLInputElement;
   trackBackwardBtn: HTMLButtonElement;
   timeBackwardBtn: HTMLButtonElement;
   playPauseBtn: HTMLButtonElement;
@@ -80,7 +84,7 @@ const exitFullscreenMode = (): void => {
 
   // Clear the fullscreen-specific buttons from the store arrays before removing the DOM
   const plume = plumeUi.getState();
-  plumeUi.dispatch(guiActions.setSpeedBtns(plume.speedBtns.filter((btn) => existingOverlay.contains(btn) === false)));
+  plumeUi.dispatch(guiActions.setSpeedBtns(plume.speedBtns.filter((w) => existingOverlay.contains(w) === false)));
   plumeUi.dispatch(
     guiActions.setPlayPauseBtns(plume.playPauseBtns.filter((btn) => existingOverlay.contains(btn) === false))
   );
@@ -225,7 +229,9 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
     durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLButtonElement,
+    speedWrapper: clone.querySelector(PLUME_ELEM_SELECTORS.speedWrapper) as HTMLDivElement,
     speedBtn: clone.querySelector(PLUME_ELEM_SELECTORS.speedBtn) as HTMLButtonElement,
+    speedSlider: clone.querySelector(PLUME_ELEM_SELECTORS.speedSlider) as HTMLInputElement,
     trackBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackBwdBtn) as HTMLButtonElement,
     timeBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeBwdBtn) as HTMLButtonElement,
     playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
@@ -320,7 +326,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.muteBtn.addEventListener("click", handleMuteToggle);
 
   const flags = appCore.getState().featureFlags;
-  if (flags.speedControl) elements.speedBtn?.addEventListener("click", handleSpeedCycle);
+  if (flags.speedControl) {
+    elements.speedBtn?.addEventListener("click", handleSpeedCycle);
+    elements.speedSlider?.addEventListener("input", handleSpeedSlider);
+    if (elements.speedWrapper) subscriptions.push(setupSpeedPopoverBehavior(elements.speedWrapper));
+  }
   if (flags.loopModes) elements.loopBtn?.addEventListener("click", handleLoopCycle);
 
   // Initialize fullscreen UI with current state using the same rendering functions
@@ -555,8 +565,9 @@ export const toggleFullscreenMode = (): void => {
 
   // Register the fullscreen buttons in the store alongside the main-panel buttons
   const fsElements = getFullscreenElements(plumeClone);
-  if (appCore.getState().featureFlags.speedControl && fsElements.speedBtn) {
-    plumeUi.dispatch(guiActions.setSpeedBtns([...plume.speedBtns, fsElements.speedBtn]));
+  const withSpeedControl = appCore.getState().featureFlags.speedControl;
+  if (withSpeedControl && fsElements.speedWrapper) {
+    plumeUi.dispatch(guiActions.setSpeedBtns([...plume.speedBtns, fsElements.speedWrapper]));
   }
   plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));

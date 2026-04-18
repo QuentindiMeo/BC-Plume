@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
 
@@ -26,21 +27,47 @@ vi.mock("@/app/features/fullscreen", () => ({ cleanupFullscreenMode: vi.fn() }))
 vi.mock("@/app/features/observers", () => ({ updateTrackForwardBtnState: vi.fn() }));
 vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
-vi.mock("@/infra/elements/plume", () => ({ PLUME_ELEM_SELECTORS: {} }));
+vi.mock("@/infra/elements/plume", () => ({
+  PLUME_ELEM_SELECTORS: {
+    speedLabel: PLUME_ELEM_SELECTORS.speedLabel,
+    speedSlider: PLUME_ELEM_SELECTORS.speedSlider,
+  },
+}));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: {}, logger: vi.fn() }));
 vi.mock("@/shared/presenters", () => ({ presentFormattedTime: () => "0:00" }));
 vi.mock("@/shared/svg", () => ({ setSvgContent: vi.fn() }));
 vi.mock("@/svg/icons", () => ({ PLUME_SVG: {} }));
 
-const makeSpeedBtn = (): HTMLButtonElement => {
+const makeSpeedWrapper = (): HTMLDivElement => {
+  const wrapper = document.createElement("div");
   const btn = document.createElement("button");
-  btn.textContent = "1×";
-  return btn;
+  const popover = document.createElement("div");
+  popover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
+  const label = document.createElement("span");
+  label.className = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
+  label.textContent = "1×";
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.className = PLUME_ELEM_SELECTORS.speedSlider.split(".")[1];
+  slider.min = "0";
+  slider.max = "8";
+  slider.step = "1";
+  slider.value = "3"; // index of 1× in PLAYBACK_SPEED_STEPS
+  popover.appendChild(label);
+  popover.appendChild(slider);
+  wrapper.appendChild(btn);
+  wrapper.appendChild(popover);
+  return wrapper;
 };
 
-// Build a minimal plume GUI state with a speed button
-const makeGuiState = (speedBtns: HTMLButtonElement[]) => ({
+const speedLabel = (wrapper: HTMLDivElement) =>
+  wrapper.querySelector<HTMLElement>("." + PLUME_ELEM_SELECTORS.speedLabel.split(".")[1]);
+const speedSlider = (wrapper: HTMLDivElement) =>
+  wrapper.querySelector<HTMLInputElement>("." + PLUME_ELEM_SELECTORS.speedSlider.split(".")[1]);
+
+// Build a minimal plume GUI state with a speed wrapper
+const makeGuiState = (speedBtns: HTMLDivElement[]) => ({
   speedBtns,
   loopBtns: [],
   playPauseBtns: [],
@@ -50,14 +77,14 @@ const makeGuiState = (speedBtns: HTMLButtonElement[]) => ({
 
 describe("playbackSpeed store subscription", () => {
   let cleanup: () => void;
-  let speedBtn: HTMLButtonElement;
+  let speedWrapper: HTMLDivElement;
 
   beforeEach(async () => {
     vi.resetModules();
     fakeAppCore = new FakeAppCore();
     fakeMusicPlayer = new FakeMusicPlayer();
-    speedBtn = makeSpeedBtn();
-    mockGetState.mockReturnValue(makeGuiState([speedBtn]));
+    speedWrapper = makeSpeedWrapper();
+    mockGetState.mockReturnValue(makeGuiState([speedWrapper]));
     fakeToast.mockReset();
 
     const { setupStoreSubscriptions } = await import("@/app/features/store-subscriptions");
@@ -74,19 +101,26 @@ describe("playbackSpeed store subscription", () => {
     expect(fakeMusicPlayer.playbackRate).toBe(1.5);
   });
 
-  it("updates speed button text when speed changes", () => {
+  it("updates the label text when speed changes", () => {
     fakeAppCore.dispatch({ type: "SET_PLAYBACK_SPEED" as never, payload: 2 as never });
-    expect(speedBtn.textContent).toBe("2×");
+    expect(speedLabel(speedWrapper)?.textContent).toBe("2×");
   });
 
-  it("updates all speed buttons when multiple exist", () => {
-    const btn2 = makeSpeedBtn();
-    mockGetState.mockReturnValue(makeGuiState([speedBtn, btn2]));
+  it("updates the slider value when speed changes", () => {
+    fakeAppCore.dispatch({ type: "SET_PLAYBACK_SPEED" as never, payload: 2 as never });
+    expect(speedSlider(speedWrapper)?.value).toBe("6"); // index of 2 in PLAYBACK_SPEED_STEPS
+  });
+
+  it("updates all wrappers when multiple exist", () => {
+    const wrapper2 = makeSpeedWrapper();
+    mockGetState.mockReturnValue(makeGuiState([speedWrapper, wrapper2]));
 
     fakeAppCore.dispatch({ type: "SET_PLAYBACK_SPEED" as never, payload: 0.5 as never });
 
-    expect(speedBtn.textContent).toBe("0.5×");
-    expect(btn2.textContent).toBe("0.5×");
+    expect(speedLabel(speedWrapper)?.textContent).toBe("0.5×");
+    expect(speedLabel(wrapper2)?.textContent).toBe("0.5×");
+    expect(speedSlider(speedWrapper)?.value).toBe("1"); // index of 0.5
+    expect(speedSlider(wrapper2)?.value).toBe("1");
   });
 
   describe("Safari speed warning toast", () => {
@@ -130,14 +164,14 @@ describe("playbackSpeed store subscription", () => {
 
 describe("speedControl feature flag subscription", () => {
   let cleanup: () => void;
-  let speedBtn: HTMLButtonElement;
+  let speedWrapper: HTMLDivElement;
 
   beforeEach(async () => {
     vi.resetModules();
     fakeAppCore = new FakeAppCore();
     fakeMusicPlayer = new FakeMusicPlayer();
-    speedBtn = makeSpeedBtn();
-    mockGetState.mockReturnValue(makeGuiState([speedBtn]));
+    speedWrapper = makeSpeedWrapper();
+    mockGetState.mockReturnValue(makeGuiState([speedWrapper]));
     fakeToast.mockReset();
 
     const { setupStoreSubscriptions } = await import("@/app/features/store-subscriptions");
@@ -148,19 +182,19 @@ describe("speedControl feature flag subscription", () => {
     cleanup();
   });
 
-  it("hides speed buttons when speedControl flag is disabled", () => {
+  it("hides the speed wrapper when speedControl flag is disabled", () => {
     const flags = { ...fakeAppCore.getState().featureFlags, speedControl: false };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
-    expect(speedBtn.hidden).toBe(true);
+    expect(speedWrapper.hidden).toBe(true);
   });
 
-  it("shows speed buttons when speedControl flag is re-enabled", () => {
+  it("shows the speed wrapper when speedControl flag is re-enabled", () => {
     const disabledFlags = { ...fakeAppCore.getState().featureFlags, speedControl: false };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
 
     const enabledFlags = { ...fakeAppCore.getState().featureFlags, speedControl: true };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
-    expect(speedBtn.hidden).toBe(false);
+    expect(speedWrapper.hidden).toBe(false);
   });
 
   it("resets playback speed to 1× when speedControl is disabled", () => {

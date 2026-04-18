@@ -21,7 +21,11 @@ export enum PLUME_ELEM_SELECTORS {
   elapsedDisplay = "span#plume-elapsed-display",
   durationDisplay = "button#plume-duration-display",
 
+  speedWrapper = "div#plume-speed-wrapper",
   speedBtn = "button#plume-speed-btn",
+  speedPopover = "div.plume-speed-popover",
+  speedSlider = "input.plume-speed-slider",
+  speedLabel = "span.plume-speed-label",
   trackBwdBtn = "button#plume-track-bwd-btn",
   timeBwdBtn = "button#plume-time-bwd-btn",
   playPauseBtn = "button#plume-play-pause-btn",

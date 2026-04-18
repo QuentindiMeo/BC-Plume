@@ -279,6 +279,7 @@
   "ARIA__LOOP__ONE_TRACK": { "message": "Repetición: activada" },
 
   "LABEL__SPEED": { "message": "Velocidad de reproducción" },
+  "ARIA__SPEED_SLIDER": { "message": "Control deslizante de velocidad de reproducción" },
   "ARIA__SPEED_BTN": {
     "message": "Velocidad: $SPEED$",
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }

@@ -267,6 +267,7 @@
   "ARIA__LOOP__ONE_TRACK": { "message": "Repeat: on" },
 
   "LABEL__SPEED": { "message": "Playback speed" },
+  "ARIA__SPEED_SLIDER": { "message": "Playback speed slider" },
   "ARIA__SPEED_BTN": {
     "message": "Playback speed: $SPEED$",
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }

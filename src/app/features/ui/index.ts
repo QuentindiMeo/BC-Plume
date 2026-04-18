@@ -3,10 +3,12 @@ export {
   createPlaybackControlPanel,
   handlePlayPause,
   handleSpeedCycle,
+  handleSpeedSlider,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
   handleTrackForward,
+  setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
 export { setupPlayerStickiness } from "@/app/features/ui/player-stickiness";
 export { createProgressBar, dispatchAudioProgressToStore as syncProgressToStore } from "@/app/features/ui/progress";

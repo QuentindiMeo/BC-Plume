@@ -25,12 +25,16 @@ vi.mock("@/svg/icons", () => ({
     volumeOn: "",
     volumeMuted: "",
     fullscreen: "",
+    speedGauge: "",
   },
 }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
     playbackControls: "div#plume-playback-controls",
+    speedWrapper: "div#plume-speed-wrapper",
     speedBtn: "button#plume-speed-btn",
+    speedLabel: "span.plume-speed-label",
+    speedSlider: "input.plume-speed-slider",
     trackBwdBtn: "button#plume-track-bwd-btn",
     timeBwdBtn: "button#plume-time-bwd-btn",
     playPauseBtn: "button#plume-play-pause-btn",

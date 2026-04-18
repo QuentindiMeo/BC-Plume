@@ -275,6 +275,7 @@
   "ARIA__LOOP__ONE_TRACK": { "message": "Répétition : activée" },
 
   "LABEL__SPEED": { "message": "Vitesse de lecture" },
+  "ARIA__SPEED_SLIDER": { "message": "Curseur de vitesse de lecture" },
   "ARIA__SPEED_BTN": {
     "message": "Vitesse : $SPEED$",
     "placeholders": { "speed": { "content": "$1", "example": "1,5×" } }

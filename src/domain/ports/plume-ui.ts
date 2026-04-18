@@ -9,7 +9,7 @@ export interface Gui {
   progressSlider: HTMLInputElement | null;
   elapsedDisplay: HTMLSpanElement | null;
   durationDisplay: HTMLButtonElement | null;
-  speedBtns: HTMLButtonElement[]; // Array because it exists in both main and fullscreen views
+  speedBtns: HTMLDivElement[]; // Array because it exists in both main and fullscreen views
   playPauseBtns: HTMLButtonElement[]; // Array because it exists in both main and fullscreen views
   trackFwdBtns: HTMLButtonElement[]; // Array because it exists in both main and fullscreen views
   loopBtns: HTMLButtonElement[]; // Array because it exists in both main and fullscreen views
@@ -33,7 +33,7 @@ export interface DefinedGui {
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
   durationDisplay: HTMLButtonElement;
-  speedBtns: HTMLButtonElement[];
+  speedBtns: HTMLDivElement[];
   playPauseBtns: HTMLButtonElement[];
   trackFwdBtns: HTMLButtonElement[];
   loopBtns: HTMLButtonElement[];
@@ -73,7 +73,7 @@ export type GuiAction =
   | IAction<GUI_ACTIONS.SET_PROGRESS_SLIDER, HTMLInputElement | null>
   | IAction<GUI_ACTIONS.SET_ELAPSED_DISPLAY, HTMLSpanElement | null>
   | IAction<GUI_ACTIONS.SET_DURATION_DISPLAY, HTMLButtonElement | null>
-  | IAction<GUI_ACTIONS.SET_SPEED_BTNS, HTMLButtonElement[]>
+  | IAction<GUI_ACTIONS.SET_SPEED_BTNS, HTMLDivElement[]>
   | IAction<GUI_ACTIONS.SET_PLAY_PAUSE_BTNS, HTMLButtonElement[]>
   | IAction<GUI_ACTIONS.SET_TRACK_FWD_BTNS, HTMLButtonElement[]>
   | IAction<GUI_ACTIONS.SET_LOOP_BTNS, HTMLButtonElement[]>
@@ -91,7 +91,7 @@ interface IGuiActions {
   setProgressSlider: (element: HTMLInputElement | null) => GuiAction;
   setElapsedDisplay: (element: HTMLSpanElement | null) => GuiAction;
   setDurationDisplay: (element: HTMLButtonElement | null) => GuiAction;
-  setSpeedBtns: (buttons: HTMLButtonElement[]) => GuiAction;
+  setSpeedBtns: (wrappers: HTMLDivElement[]) => GuiAction;
   setPlayPauseBtns: (buttons: HTMLButtonElement[]) => GuiAction;
   setTrackFwdBtns: (buttons: HTMLButtonElement[]) => GuiAction;
   setLoopBtns: (buttons: HTMLButtonElement[]) => GuiAction;
@@ -133,9 +133,9 @@ export const guiActions: IGuiActions = {
     type: GUI_ACTIONS.SET_DURATION_DISPLAY,
     payload: element,
   }),
-  setSpeedBtns: (buttons: HTMLButtonElement[]): GuiAction => ({
+  setSpeedBtns: (wrappers: HTMLDivElement[]): GuiAction => ({
     type: GUI_ACTIONS.SET_SPEED_BTNS,
-    payload: buttons,
+    payload: wrappers,
   }),
   setPlayPauseBtns: (buttons: HTMLButtonElement[]): GuiAction => ({
     type: GUI_ACTIONS.SET_PLAY_PAUSE_BTNS,

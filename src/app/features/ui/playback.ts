@@ -10,6 +10,8 @@ import {
   seekForward,
   togglePlayback,
 } from "@/app/use-cases";
+import { PLAYBACK_SPEED_STEPS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
@@ -17,11 +19,58 @@ import { CPL, logger } from "@/shared/logger";
 import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
+export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void) => {
+  const popoverClassName = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
+  const popover = wrapper.querySelector<HTMLDivElement>(`.${popoverClassName}`);
+  if (!popover) return () => {};
+
+  let hideTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const show = (): void => {
+    if (hideTimer !== null) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+    popover.classList.add(popoverClassName + "--visible");
+  };
+
+  const scheduleHide = (): void => {
+    hideTimer = setTimeout(() => {
+      popover.classList.remove(popoverClassName + "--visible");
+      hideTimer = null;
+    }, 700);
+  };
+
+  const onFocusOut = (e: FocusEvent): void => {
+    if (!wrapper.contains(e.relatedTarget as Node)) scheduleHide();
+  };
+
+  wrapper.addEventListener("mouseenter", show);
+  wrapper.addEventListener("mouseleave", scheduleHide);
+  wrapper.addEventListener("focusin", show);
+  wrapper.addEventListener("focusout", onFocusOut);
+
+  return (): void => {
+    if (hideTimer !== null) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+    wrapper.removeEventListener("mouseenter", show);
+    wrapper.removeEventListener("mouseleave", scheduleHide);
+    wrapper.removeEventListener("focusin", show);
+    wrapper.removeEventListener("focusout", onFocusOut);
+  };
+};
+
 export const handleSpeedCycle = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__SPEED__CLICKED"));
+  cyclePlaybackSpeed(getAppCoreInstance());
+};
 
-  const appCore = getAppCoreInstance();
-  cyclePlaybackSpeed(appCore);
+export const handleSpeedSlider = (e: Event): void => {
+  const slider = e.currentTarget as HTMLInputElement;
+  const speed = PLAYBACK_SPEED_STEPS[Number.parseInt(slider.value)];
+  if (speed !== undefined) getAppCoreInstance().dispatch(coreActions.setPlaybackSpeed(speed));
 };
 
 export const handleTrackBackward = (): void => {
@@ -113,16 +162,50 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
 
   const withSpeedControl = appState.featureFlags.speedControl;
   if (withSpeedControl) {
+    const speedWrapper = document.createElement("div");
+    speedWrapper.id = PLUME_ELEM_SELECTORS.speedWrapper.split("#")[1];
+
     const speedBtn = document.createElement("button");
     speedBtn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
     speedBtn.type = "button";
-    speedBtn.textContent = `${appState.playbackSpeed}×`;
+    setSvgContent(speedBtn, PLUME_SVG.speedGauge);
     speedBtn.title = getString("LABEL__SPEED");
     speedBtn.ariaLabel = getString("LABEL__SPEED");
     speedBtn.addEventListener("click", handleSpeedCycle);
 
-    container.appendChild(speedBtn);
-    plumeUi.dispatch(guiActions.setSpeedBtns([speedBtn]));
+    const speedPopover = document.createElement("div");
+    speedPopover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
+    speedPopover.ariaHidden = "true";
+
+    const speedLabel = document.createElement("span");
+    speedLabel.className = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
+    speedLabel.textContent = `${appState.playbackSpeed}×`;
+
+    const speedSlider = document.createElement("input");
+    speedSlider.type = "range";
+    speedSlider.className = PLUME_ELEM_SELECTORS.speedSlider.split(".")[1];
+    speedSlider.min = "0";
+    speedSlider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
+    speedSlider.step = "1";
+    speedSlider.value = String(PLAYBACK_SPEED_STEPS.indexOf(appState.playbackSpeed));
+    speedSlider.ariaLabel = getString("ARIA__SPEED_SLIDER");
+    speedSlider.setAttribute("aria-valuetext", `${appState.playbackSpeed}×`);
+    speedSlider.addEventListener("input", handleSpeedSlider);
+
+    const speedTicks = document.createElement("div");
+    speedTicks.className = "plume-speed-ticks";
+    speedTicks.ariaHidden = "true";
+    for (let i = 0; i < PLAYBACK_SPEED_STEPS.length; i++) speedTicks.appendChild(document.createElement("span"));
+
+    speedPopover.appendChild(speedLabel);
+    speedPopover.appendChild(speedSlider);
+    speedPopover.appendChild(speedTicks);
+    speedWrapper.appendChild(speedBtn);
+    speedWrapper.appendChild(speedPopover);
+
+    setupSpeedPopoverBehavior(speedWrapper);
+    container.appendChild(speedWrapper);
+    plumeUi.dispatch(guiActions.setSpeedBtns([speedWrapper]));
   }
 
   container.appendChild(trackBackwardBtn);
