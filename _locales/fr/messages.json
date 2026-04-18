@@ -390,7 +390,7 @@
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Plein écran" },
   "LABEL__HOTKEY__MUTE": { "message": "Couper / Rétablir le son" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Changer le mode de répétition" },
-  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0%–90% (touches numériques)" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0% – 90% (touches numériques)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmer" },
@@ -423,7 +423,7 @@
   "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Recherche rapide (0–9)" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 

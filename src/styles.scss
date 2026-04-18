@@ -154,7 +154,11 @@
   }
 }
 #plume-header-track-link {
-  @apply shrink-0 inline-flex items-center justify-center size-5 ml-auto mr-1;
+  @apply size-5 border-b-0 border-[currentColor] ml-auto mr-1 shrink-0 inline-flex items-center justify-center;
+
+  &:hover {
+    @apply border-b;
+  }
 
   &:focus-visible {
     @apply rounded-focusable outline-offset-1;
@@ -268,8 +272,17 @@
   @apply relative m-0;
 
   #plume-progress-slider {
-    @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
+  --thumb-size: 0.75rem;
+
+  @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
     -webkit-appearance: none;
+    // Gradient stop follows the knob center: thumb-radius + fraction × (track − thumb-diameter).
+    // This compensates for the browser offsetting the thumb inward by half its width on each end.
+    background-image: linear-gradient(
+      90deg,
+      var(--color-plume-light) calc(var(--thumb-size) / 2 + (100% - var(--thumb-size)) * var(--progress-fraction, 0)),
+      var(--color-progbar-bg) 0%
+    );
 
     &:active {
       @apply cursor-grabbing;
@@ -281,7 +294,7 @@
 
     &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
       @apply
-        size-3 bg-white rounded-full shadow-thumb
+        size-(--thumb-size) bg-white rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
       -webkit-appearance: none;
@@ -295,7 +308,7 @@
     }
     &::-moz-range-thumb {
       @apply
-        size-3 bg-white border-none rounded-full shadow-thumb
+        size-(--thumb-size) bg-white border-none rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
       -webkit-appearance: none;

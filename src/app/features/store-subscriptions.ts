@@ -39,11 +39,9 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       if (Number.isNaN(elapsed) || Number.isNaN(duration) || duration === 0) return;
 
-      const progressPercentage = (elapsed / duration) * 100;
-      const bgImg = `linear-gradient(90deg, var(--color-plume-light) ${progressPercentage.toFixed(1)}%, var(--color-progbar-bg) 0%)`;
-
-      plume.progressSlider.value = `${progressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
-      plume.progressSlider.style.backgroundImage = bgImg;
+      const progressFraction = elapsed / duration;
+      plume.progressSlider.value = `${progressFraction * PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY}`;
+      plume.progressSlider.style.setProperty("--progress-fraction", progressFraction.toString());
       plume.progressSlider.setAttribute(
         "aria-valuetext",
         getString("ARIA__PROGRESS_VALUETEXT", [presentFormattedTime(elapsed), presentFormattedTime(duration)])
