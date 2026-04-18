@@ -21,6 +21,7 @@ export enum PLUME_ELEM_SELECTORS {
   elapsedDisplay = "span#plume-elapsed-display",
   durationDisplay = "button#plume-duration-display",
 
+  speedBtn = "button#plume-speed-btn",
   trackBwdBtn = "button#plume-track-bwd-btn",
   timeBwdBtn = "button#plume-time-bwd-btn",
   playPauseBtn = "button#plume-play-pause-btn",

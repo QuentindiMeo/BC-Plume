@@ -1,5 +1,4 @@
 import type { PlumeLanguage } from "@/domain/plume";
-import { CPL, logger } from "@/shared/logger";
 import enMessages from "../../_locales/en/messages.json";
 import esMessages from "../../_locales/es/messages.json";
 import frMessages from "../../_locales/fr/messages.json";
@@ -83,13 +82,4 @@ export const getString = (key: string, substitutions?: string[]): string => {
 
   console.warn(`[Plume i18n] Key "${key}" not found in any locale`);
   return key;
-};
-
-export const logDetectedBrowser = (): void => {
-  const chromeApi = (globalThis as any).chrome;
-  logger(
-    CPL.INFO,
-    getString("INFO__BROWSER__DETECTED"),
-    chromeApi === undefined || (globalThis as any).browser !== undefined ? "Firefox-based" : "Chromium-based"
-  );
 };

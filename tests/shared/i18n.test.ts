@@ -1,4 +1,5 @@
-import { getActiveLocale, getString, logDetectedBrowser, setForcedLanguage } from "@/shared/i18n";
+import { logDetectedBrowser } from "@/shared/browser";
+import { getActiveLocale, getString, setForcedLanguage } from "@/shared/i18n";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("getString", () => {
