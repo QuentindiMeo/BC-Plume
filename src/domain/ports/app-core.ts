@@ -7,6 +7,7 @@ export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;
   loopMode: LoopModeType;
   volume: number;
+  playbackSpeed: number;
 
   hotkeyBindings: Record<HotkeyAction, KeyBinding>;
   seekJumpDuration: number;
@@ -37,6 +38,7 @@ export enum CORE_ACTIONS {
   SET_CURRENT_TIME = "SET_CURRENT_TIME",
   SET_IS_PLAYING = "SET_IS_PLAYING",
   SET_DURATION_DISPLAY_METHOD = "SET_DURATION_DISPLAY_METHOD",
+  SET_PLAYBACK_SPEED = "SET_PLAYBACK_SPEED",
   SET_LOOP_MODE = "SET_LOOP_MODE",
   CYCLE_LOOP_MODE = "CYCLE_LOOP_MODE",
   SET_IS_MUTED = "SET_IS_MUTED",
@@ -44,10 +46,10 @@ export enum CORE_ACTIONS {
   SET_VOLUME = "SET_VOLUME",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
 
-  SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
   SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
   SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
+  SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
 }
 
@@ -59,16 +61,17 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_CURRENT_TIME, number>
   | IAction<CORE_ACTIONS.SET_IS_PLAYING, boolean>
   | IAction<CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
+  | IAction<CORE_ACTIONS.SET_PLAYBACK_SPEED, number>
   | IAction<CORE_ACTIONS.SET_LOOP_MODE, LoopModeType>
   | IAction<CORE_ACTIONS.CYCLE_LOOP_MODE>
   | IAction<CORE_ACTIONS.SET_IS_MUTED, boolean>
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
-  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
   | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
   | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
+  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
   | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
 
 interface ICoreActions {
@@ -80,6 +83,7 @@ interface ICoreActions {
   setCurrentTime: (time: number) => CoreAction;
   setIsPlaying: (isPlaying: boolean) => CoreAction;
   setDurationDisplayMethod: (method: TimeDisplayMethodType) => CoreAction;
+  setPlaybackSpeed: (speed: number) => CoreAction;
   setLoopMode: (mode: LoopModeType) => CoreAction;
   cycleLoopMode: () => CoreAction;
   setIsMuted: (isMuted: boolean) => CoreAction;
@@ -88,10 +92,10 @@ interface ICoreActions {
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
   // Settings
-  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setSeekJumpDuration: (duration: number) => CoreAction;
   setVolumeHotkeyStep: (step: number) => CoreAction;
   setTrackRestartThreshold: (threshold: number) => CoreAction;
+  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setFeatureFlags: (flags: FeatureFlags) => CoreAction;
 }
 
@@ -105,6 +109,10 @@ export const coreActions: ICoreActions = {
   setDurationDisplayMethod: (method: TimeDisplayMethodType): CoreAction => ({
     type: CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
     payload: method,
+  }),
+  setPlaybackSpeed: (speed: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_PLAYBACK_SPEED,
+    payload: speed,
   }),
   setLoopMode: (mode: LoopModeType): CoreAction => ({
     type: CORE_ACTIONS.SET_LOOP_MODE,

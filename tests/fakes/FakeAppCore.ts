@@ -6,12 +6,14 @@ import type { Thunk } from "@/domain/store";
 
 const DEFAULT_STATE: AppCore = {
   durationDisplayMethod: PLUME_DEFAULTS.durationDisplayMethod,
+  playbackSpeed: PLUME_DEFAULTS.playbackSpeed,
   loopMode: PLUME_DEFAULTS.loopMode,
   volume: PLUME_DEFAULTS.savedVolume,
-  hotkeyBindings: DEFAULT_HOTKEYS,
+
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
   trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
+  hotkeyBindings: DEFAULT_HOTKEYS,
   featureFlags: { ...PLUME_DEFAULTS.featureFlags },
 
   pageType: null,
@@ -57,6 +59,9 @@ export class FakeAppCore implements IAppCore {
         break;
       case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         this.state = { ...this.state, durationDisplayMethod: action.payload };
+        break;
+      case CORE_ACTIONS.SET_PLAYBACK_SPEED:
+        this.state = { ...this.state, playbackSpeed: action.payload };
         break;
       case CORE_ACTIONS.SET_PAGE_TYPE:
         this.state = { ...this.state, pageType: action.payload };

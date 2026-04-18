@@ -9,6 +9,7 @@ export enum HotkeyAction {
   FULLSCREEN = "FULLSCREEN",
   MUTE = "MUTE",
   LOOP_CYCLE = "LOOP_CYCLE",
+  SPEED_CYCLE = "SPEED_CYCLE",
 }
 
 export type HotkeyCode = string;
@@ -34,4 +35,5 @@ export const DEFAULT_HOTKEYS: Record<HotkeyAction, KeyBinding> = {
   [HotkeyAction.FULLSCREEN]: { code: "KeyF", label: "F" },
   [HotkeyAction.MUTE]: { code: "KeyM", label: "M" },
   [HotkeyAction.LOOP_CYCLE]: { code: "KeyL", label: "L" },
+  [HotkeyAction.SPEED_CYCLE]: { code: "KeyS", label: "S" },
 };

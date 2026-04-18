@@ -47,6 +47,11 @@ export const VOLUME_HOTKEY_STEP_MAX = 20 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MIN = 0 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MAX = 10 as WholeNumber;
 
+export const PLAYBACK_SPEED_STEPS: readonly number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 5];
+export const PLAYBACK_SPEED_DEFAULT = 1 as const;
+export const PLAYBACK_SPEED_SAFARI_MIN = 0.5 as const;
+export const PLAYBACK_SPEED_SAFARI_MAX = 2.0 as const;
+
 export const PLUME_DEFAULTS = {
   language: PLUME_SUPPORTED_LANGUAGES[0],
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
@@ -55,6 +60,7 @@ export const PLUME_DEFAULTS = {
   loopMode: LOOP_MODE.NONE,
   savedVolume: 50 / PLUME_CONSTANTS.VOLUME_SLIDER_GRANULARITY, // normalized 0–1
   volumeHotkeyStep: 5 as WholeNumber, // in percent
+  playbackSpeed: PLAYBACK_SPEED_DEFAULT,
   featureFlags: {
     goToTrack: true,
     tracklist: true,
@@ -62,6 +68,7 @@ export const PLUME_DEFAULTS = {
     fullscreen: true,
     quickSeek: true,
     runtime: true,
+    speedControl: true,
   } as const,
 } as const;
 
@@ -78,5 +85,6 @@ export type FeatureFlags = {
   fullscreen: boolean;
   quickSeek: boolean;
   runtime: boolean;
+  speedControl: boolean;
 };
 export type FeatureFlagKey = keyof FeatureFlags;
