@@ -1,6 +1,8 @@
 import {
   LOOP_MODE,
   LOOP_MODE_CYCLE,
+  PLAYBACK_SPEED_DEFAULT,
+  PLAYBACK_SPEED_STEPS,
   PLUME_DEFAULTS,
   SEEK_JUMP_DURATION_MAX,
   SEEK_JUMP_DURATION_MIN,
@@ -9,8 +11,11 @@ import {
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
 } from "@/domain/plume";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
+import { BROWSER_ACTIONS } from "@/domain/ports/browser";
 import { coreActions, type IAppCore } from "@/domain/ports/app-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
 
 vi.mock("@/app/stores/BrowserImpl", () => ({
   getBrowserInstance: vi.fn(() => ({
@@ -342,6 +347,37 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
+  describe("SET_PLAYBACK_SPEED", () => {
+    it("starts at the default speed", () => {
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it.each(PLAYBACK_SPEED_STEPS)("accepts valid step %s×", (speed: number) => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(speed));
+      expect(appCore.getState().playbackSpeed).toBe(speed);
+    });
+
+    it("resets to default for a value not in PLAYBACK_SPEED_STEPS", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(1.7));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it("resets to default for a negative value", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(-1));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it("resets to default for zero", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(0));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it("resets to default for a value above all steps", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(100));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+  });
+
   describe("SET_FEATURE_FLAGS", () => {
     it("updates featureFlags", () => {
       const flags = { ...PLUME_DEFAULTS.featureFlags, fullscreen: false };
@@ -443,5 +479,87 @@ describe("AppCoreImpl reducer", () => {
       appCore.dispatch(coreActions.setCurrentTime(50));
       expect(appCore.computed.progressPercentage()).toBe(25);
     });
+  });
+});
+
+describe("AppCoreImpl — playbackSpeed persist/load integration", () => {
+  const seedStorage = (data: Record<string, unknown>) => {
+    vi.mocked(getBrowserInstance).mockReturnValue({
+      dispatch: vi.fn(),
+      getState: vi.fn(() => ({
+        cache: {
+          get: vi.fn().mockResolvedValue(data),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
+      })),
+    } as unknown as ReturnType<typeof getBrowserInstance>);
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    // Restore the default empty-storage mock for other tests
+    vi.mocked(getBrowserInstance).mockReturnValue({
+      dispatch: vi.fn(),
+      getState: vi.fn(() => ({
+        cache: {
+          get: vi.fn().mockResolvedValue({}),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
+      })),
+    } as unknown as ReturnType<typeof getBrowserInstance>);
+  });
+
+  it("loads a valid persisted speed on startup", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 1.5 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(1.5);
+  });
+
+  it("falls back to default when the persisted value is not a valid step", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 99 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+  });
+
+  it("starts at default when no speed was persisted", async () => {
+    seedStorage({});
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+  });
+
+  it("persists the speed after dispatch", async () => {
+    const dispatchMock = vi.fn();
+    vi.mocked(getBrowserInstance).mockReturnValue({
+      dispatch: dispatchMock,
+      getState: vi.fn(() => ({
+        cache: {
+          get: vi.fn().mockResolvedValue({}),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
+      })),
+    } as unknown as ReturnType<typeof getBrowserInstance>);
+
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+
+    appCore.dispatch(coreActions.setPlaybackSpeed(2));
+    await vi.runAllTimersAsync(); // flush 200ms PERSISTENCE_DELAY_MS debounce
+
+    expect(dispatchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: BROWSER_ACTIONS.SET_CACHE_VALUES,
+        payload: expect.objectContaining({
+          keys: expect.arrayContaining([PLUME_CACHE_KEYS.PLAYBACK_SPEED]),
+          values: expect.arrayContaining([2]),
+        }),
+      })
+    );
   });
 });

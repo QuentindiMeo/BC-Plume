@@ -30,9 +30,13 @@ const DEFAULT_STATE: AppCore = {
 /**
  * In-memory IAppCore for tests. Applies a minimal reducer so tests can assert
  * on observable state rather than on dispatch call arguments.
+ * Subscriber notifications are supported: listeners registered via subscribe()
+ * are called whenever the corresponding key changes via dispatch().
  */
 export class FakeAppCore implements IAppCore {
   private state: AppCore;
+  private listeners = new Map<keyof AppCore, Set<AppCoreListener<any>>>();
+  private globalListeners = new Set<(state: AppCore) => void>();
 
   constructor(overrides: Partial<AppCore> = {}) {
     this.state = { ...DEFAULT_STATE, ...overrides };
@@ -42,48 +46,71 @@ export class FakeAppCore implements IAppCore {
     return this.state;
   }
 
+  private updateState<K extends keyof AppCore>(key: K, value: AppCore[K]): void {
+    const prevValue = this.state[key];
+    if (prevValue === value) return;
+    this.state = { ...this.state, [key]: value };
+    const keyListeners = this.listeners.get(key);
+    if (keyListeners) keyListeners.forEach((l) => l(this.state[key], prevValue));
+    this.globalListeners.forEach((l) => l(this.state));
+  }
+
   dispatch(action: CoreAction | Thunk<AppCore, CoreAction>): void {
     if (typeof action === "function") return;
     switch (action.type) {
       case CORE_ACTIONS.SET_CURRENT_TIME:
-        this.state = { ...this.state, currentTime: action.payload };
+        this.updateState("currentTime", action.payload);
         break;
       case CORE_ACTIONS.SET_VOLUME:
-        this.state = { ...this.state, volume: action.payload };
+        this.updateState("volume", action.payload);
         break;
       case CORE_ACTIONS.SET_IS_MUTED:
-        this.state = { ...this.state, isMuted: action.payload };
+        this.updateState("isMuted", action.payload);
         break;
       case CORE_ACTIONS.SET_IS_PLAYING:
-        this.state = { ...this.state, isPlaying: action.payload };
+        this.updateState("isPlaying", action.payload);
         break;
       case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
-        this.state = { ...this.state, durationDisplayMethod: action.payload };
+        this.updateState("durationDisplayMethod", action.payload);
         break;
       case CORE_ACTIONS.SET_PLAYBACK_SPEED:
-        this.state = { ...this.state, playbackSpeed: action.payload };
+        this.updateState("playbackSpeed", action.payload);
         break;
       case CORE_ACTIONS.SET_PAGE_TYPE:
-        this.state = { ...this.state, pageType: action.payload };
+        this.updateState("pageType", action.payload);
         break;
       case CORE_ACTIONS.SET_LOOP_MODE:
-        this.state = { ...this.state, loopMode: action.payload };
+        this.updateState("loopMode", action.payload);
         break;
       case CORE_ACTIONS.SET_TRACK_TITLE:
-        this.state = { ...this.state, trackTitle: action.payload };
+        this.updateState("trackTitle", action.payload);
         break;
       case CORE_ACTIONS.SET_TRACK_NUMBER:
-        this.state = { ...this.state, trackNumber: action.payload };
+        this.updateState("trackNumber", action.payload);
+        break;
+      case CORE_ACTIONS.SET_FEATURE_FLAGS:
+        this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
         break;
     }
   }
 
-  subscribe<K extends keyof AppCore>(_key: K, _listener: AppCoreListener<K>): () => void {
-    return () => {};
+  subscribe<K extends keyof AppCore>(key: K, listener: AppCoreListener<K>): () => void {
+    if (!this.listeners.has(key)) this.listeners.set(key, new Set());
+    this.listeners.get(key)!.add(listener);
+    return () => {
+      const set = this.listeners.get(key);
+      if (set) {
+        set.delete(listener);
+        if (set.size === 0) this.listeners.delete(key);
+      }
+    };
   }
 
-  subscribeAll(_listener: (state: AppCore) => void): () => void {
-    return () => {};
+  subscribeAll(listener: (state: AppCore) => void): () => void {
+    this.globalListeners.add(listener);
+    return () => {
+      this.globalListeners.delete(listener);
+    };
   }
 
   async loadPersistedState(): Promise<void> {}

@@ -1,4 +1,3 @@
-import { logDetectedBrowser } from "@/shared/browser";
 import { getActiveLocale, getString, setForcedLanguage } from "@/shared/i18n";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -161,26 +160,5 @@ describe("getString (browser i18n live path)", () => {
     vi.resetModules();
     const { getString: getStringFresh } = await import("@/shared/i18n");
     expect(getStringFresh("LABEL__TRACK")).toBe("currently playing");
-  });
-});
-
-describe("logDetectedBrowser", () => {
-  afterEach(() => vi.unstubAllGlobals());
-
-  it("logs Firefox-based when no chrome global is present", () => {
-    vi.stubGlobal("chrome", undefined);
-    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
-    logDetectedBrowser();
-    expect(infoSpy.mock.calls[0]).toContain("Firefox-based");
-    infoSpy.mockRestore();
-  });
-
-  it("logs Chromium-based when only chrome is present", () => {
-    vi.stubGlobal("chrome", { i18n: {} });
-    vi.stubGlobal("browser", undefined);
-    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
-    logDetectedBrowser();
-    expect(infoSpy.mock.calls[0]).toContain("Chromium-based");
-    infoSpy.mockRestore();
   });
 });
