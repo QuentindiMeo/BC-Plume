@@ -31,6 +31,7 @@ export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => vo
     const currentSpeed = getAppCoreInstance().getState().playbackSpeed;
     customInput.value = String(currentSpeed);
     customInput.removeAttribute("aria-invalid");
+    label.ariaExpanded = "true";
     label.hidden = true;
     customInput.hidden = false;
     customInput.select();
@@ -39,6 +40,7 @@ export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => vo
 
   const closeInput = (): void => {
     customInput.hidden = true;
+    label.ariaExpanded = "false";
     label.hidden = false;
   };
 
@@ -57,6 +59,7 @@ export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => vo
       if (parsed !== null) {
         getAppCoreInstance().dispatch(coreActions.setPlaybackSpeed(parsed));
         closeInput();
+        label.focus();
       } else {
         customInput.setAttribute("aria-invalid", "true");
         logger(CPL.DEBUG, getString("DEBUG__SPEED__CUSTOM_INPUT__INVALID"));
@@ -90,6 +93,7 @@ export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => vo
   label.role = "button";
   label.tabIndex = 0;
   label.title = getString("LABEL__SPEED__CLICK_TO_EDIT");
+  label.ariaExpanded = "false";
   label.addEventListener("click", onLabelClick);
   label.addEventListener("keydown", onLabelKeydown);
   customInput.addEventListener("keydown", onInputKeydown);
@@ -117,7 +121,8 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
       clearTimeout(hideTimer);
       hideTimer = null;
     }
-    popover.classList.add(popoverClassName + "--visible");
+    popover.classList.add(`${popoverClassName}--visible`);
+    popover.ariaHidden = "false";
   };
 
   const scheduleHide = (): void => {
@@ -125,7 +130,8 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
     const customInput = wrapper.querySelector<HTMLInputElement>(`.${customInputClass}`);
     if (customInput && !customInput.hidden) return;
     hideTimer = setTimeout(() => {
-      popover.classList.remove(popoverClassName + "--visible");
+      popover.classList.remove(`${popoverClassName}--visible`);
+      popover.ariaHidden = "true";
       hideTimer = null;
     }, 700);
   };
@@ -172,10 +178,10 @@ export const handleSpeedSlider = (e: Event): void => {
 export const handleSpeedSliderKeydown = (e: KeyboardEvent): void => {
   const slider = e.currentTarget as HTMLInputElement;
   const pos = parseFloat(slider.value);
+  if (!Number.isFinite(pos)) return;
+
   const lastIdx = PLAYBACK_SPEED_STEPS.length - 1;
   let nextIdx: number;
-
-  e.preventDefault();
 
   switch (e.key) {
     case "ArrowRight":
@@ -195,6 +201,8 @@ export const handleSpeedSliderKeydown = (e: KeyboardEvent): void => {
     default:
       return;
   }
+  e.preventDefault();
+
   slider.value = String(nextIdx);
   const speed = PLAYBACK_SPEED_STEPS[nextIdx];
   if (speed !== undefined) {
@@ -326,6 +334,8 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
     speedSlider.step = "any";
     speedSlider.value = String(speedToSliderPosition(appState.playbackSpeed));
     speedSlider.ariaLabel = getString("ARIA__SPEED_SLIDER");
+    speedSlider.setAttribute("aria-valuemin", "0");
+    speedSlider.setAttribute("aria-valuemax", String(PLAYBACK_SPEED_STEPS.length - 1));
     speedSlider.setAttribute("aria-valuetext", `${appState.playbackSpeed}×`);
     speedSlider.addEventListener("input", handleSpeedSlider);
     speedSlider.addEventListener("keydown", handleSpeedSliderKeydown);

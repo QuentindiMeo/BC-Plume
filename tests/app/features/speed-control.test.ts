@@ -44,6 +44,7 @@ vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
+    speedBtn: "button#plume-speed-btn",
     speedLabel: "span.plume-speed-label",
     speedSlider: "input.plume-speed-slider",
     speedCustomInput: "input.plume-speed-custom-input",
@@ -63,6 +64,7 @@ vi.mock("@/svg/icons", () => ({ PLUME_SVG: {} }));
 const makeSpeedWrapper = (): HTMLDivElement => {
   const wrapper = document.createElement("div");
   const btn = document.createElement("button");
+  btn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
   const popover = document.createElement("div");
   popover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
   const label = document.createElement("span");
@@ -93,6 +95,8 @@ const speedSlider = (wrapper: HTMLDivElement) =>
   wrapper.querySelector<HTMLInputElement>("." + PLUME_ELEM_SELECTORS.speedSlider.split(".")[1]);
 const speedCustomInput = (wrapper: HTMLDivElement) =>
   wrapper.querySelector<HTMLInputElement>("." + PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1]);
+const speedBtn = (wrapper: HTMLDivElement) =>
+  wrapper.querySelector<HTMLButtonElement>("#" + PLUME_ELEM_SELECTORS.speedBtn.split("#")[1]);
 
 // Build a minimal plume GUI state with a speed wrapper
 const makeGuiState = (speedBtns: HTMLDivElement[]) => ({
@@ -158,6 +162,11 @@ describe("playbackSpeed store subscription", () => {
     fakeAppCore.dispatch({ type: "SET_PLAYBACK_SPEED" as never, payload: 1.3 as never });
     expect(parseFloat(slider.value)).toBeCloseTo(4.2, 5);
     expect(slider.getAttribute("aria-valuetext")).toBe("1.3×");
+  });
+
+  it("updates the speed button aria-label with the current speed", () => {
+    fakeAppCore.dispatch({ type: "SET_PLAYBACK_SPEED" as never, payload: 1.5 as never });
+    expect(speedBtn(speedWrapper)?.ariaLabel).toBe("ARIA__SPEED_BTN");
   });
 
   it("closes the custom input and restores the label when speed changes externally", () => {
@@ -374,6 +383,30 @@ describe("speed label click-to-edit", () => {
     expect(label.getAttribute("tabindex")).toBe("0");
   });
 
+  it("label starts with aria-expanded=false", () => {
+    expect(label.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("label aria-expanded becomes true when input opens", () => {
+    label.click();
+    expect(label.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("label aria-expanded returns to false when input closes", () => {
+    label.click();
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(label.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("pressing Enter with a valid value returns focus to the label", () => {
+    document.body.appendChild(wrapper);
+    label.click();
+    input.value = "2";
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    expect(document.activeElement).toBe(label);
+    document.body.removeChild(wrapper);
+  });
+
   it("pressing Enter on the label opens the input", () => {
     label.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     expect(input.hidden).toBe(false);
@@ -521,6 +554,29 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
 
     await new Promise((r) => setTimeout(r, 750));
     expect(popover.classList.contains(visibleClass)).toBe(false);
+    cleanup();
+  });
+
+  it("sets aria-hidden=false on mouseenter", () => {
+    const { wrapper, popover } = makeWrapperWithPopover();
+    popover.ariaHidden = "true";
+    const cleanup = setupSpeedPopoverBehavior(wrapper);
+
+    wrapper.dispatchEvent(new MouseEvent("mouseenter"));
+    expect(popover.ariaHidden).toBe("false");
+    cleanup();
+  });
+
+  it("sets aria-hidden=true after the hide timer fires", async () => {
+    const { wrapper, popover } = makeWrapperWithPopover();
+    popover.ariaHidden = "false";
+    const cleanup = setupSpeedPopoverBehavior(wrapper);
+
+    wrapper.dispatchEvent(new MouseEvent("mouseenter"));
+    wrapper.dispatchEvent(new MouseEvent("mouseleave"));
+
+    await new Promise((r) => setTimeout(r, 750));
+    expect(popover.ariaHidden).toBe("true");
     cleanup();
   });
 });

@@ -126,10 +126,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       musicPlayer.setPlaybackRate(speed);
       const speedText = `${speed}×`;
       const sliderPos = String(speedToSliderPosition(speed));
+      const speedBtnLabel = getString("ARIA__SPEED_BTN", [speedText]);
+
       plume.speedBtns.forEach((wrapper) => {
         const label = wrapper.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.speedLabel);
         const slider = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedSlider);
         const customInput = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedCustomInput);
+        const speedBtn = wrapper.querySelector<HTMLButtonElement>(PLUME_ELEM_SELECTORS.speedBtn);
+
         if (customInput && !customInput.hidden) {
           customInput.hidden = true;
           if (label) label.hidden = false;
@@ -138,6 +142,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (slider) {
           slider.value = sliderPos;
           slider.setAttribute("aria-valuetext", speedText);
+        }
+        if (speedBtn) {
+          speedBtn.ariaLabel = speedBtnLabel;
+          speedBtn.title = speedBtnLabel;
         }
       });
 
