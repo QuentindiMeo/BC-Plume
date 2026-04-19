@@ -63,8 +63,7 @@ describe("cyclePlaybackSpeed", () => {
     });
   });
 
-  it("covers all 9 steps before wrapping", () => {
-    expect(PLAYBACK_SPEED_STEPS).toHaveLength(9);
+  it("covers all steps before wrapping", () => {
     let speed: number = PLUME_DEFAULTS.playbackSpeed;
 
     const visited = new Set<number>();

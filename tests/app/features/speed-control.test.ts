@@ -11,6 +11,7 @@ import {
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
+import { PLAYBACK_SPEED_STEPS } from "@/domain/plume";
 
 const fakeToast = vi.fn();
 vi.mock("@/app/features/ui/toast", () => ({ createToast: (...args: unknown[]) => fakeToast(...args) }));
@@ -79,7 +80,7 @@ const makeSpeedWrapper = (): HTMLDivElement => {
   slider.type = "range";
   slider.className = PLUME_ELEM_SELECTORS.speedSlider.split(".")[1];
   slider.min = "0";
-  slider.max = "8";
+  slider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
   slider.step = "1";
   slider.value = "3"; // index of 1× in PLAYBACK_SPEED_STEPS
   popover.appendChild(label);
@@ -418,7 +419,7 @@ describe("handleSpeedSlider — tick snapping", () => {
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = "0";
-    slider.max = "8";
+    slider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
     slider.step = "any";
     slider.value = value;
     return slider;
@@ -464,8 +465,8 @@ describe("handleSpeedSlider — tick snapping", () => {
   it("clamps to the last tick when position is above the maximum index", () => {
     const slider = makeSlider("9");
     fireInput(slider);
-    expect(slider.value).toBe("8");
-    expect(fakeAppCore.getState().playbackSpeed).toBe(5);
+    expect(slider.value).toBe(String(PLAYBACK_SPEED_STEPS.length - 1));
+    expect(fakeAppCore.getState().playbackSpeed).toBe(3);
   });
 });
 
@@ -617,7 +618,7 @@ describe("handleSpeedSliderKeydown — keyboard navigation", () => {
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = "0";
-    slider.max = "8";
+    slider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
     slider.step = "any";
     slider.value = value;
     return slider;
@@ -672,8 +673,8 @@ describe("handleSpeedSliderKeydown — keyboard navigation", () => {
   it("End jumps to the last tick", () => {
     const slider = makeSlider("3");
     fireKey(slider, "End");
-    expect(slider.value).toBe("8");
-    expect(fakeAppCore.getState().playbackSpeed).toBe(5);
+    expect(slider.value).toBe(String(PLAYBACK_SPEED_STEPS.length - 1));
+    expect(fakeAppCore.getState().playbackSpeed).toBe(3);
   });
 
   it("ArrowRight from a fractional position moves to the tick above", () => {
@@ -698,10 +699,10 @@ describe("handleSpeedSliderKeydown — keyboard navigation", () => {
   });
 
   it("ArrowRight clamps at the last tick", () => {
-    const slider = makeSlider("8");
+    const slider = makeSlider(String(PLAYBACK_SPEED_STEPS.length - 1));
     fireKey(slider, "ArrowRight");
-    expect(slider.value).toBe("8");
-    expect(fakeAppCore.getState().playbackSpeed).toBe(5);
+    expect(slider.value).toBe(String(PLAYBACK_SPEED_STEPS.length - 1));
+    expect(fakeAppCore.getState().playbackSpeed).toBe(3);
   });
 
   it("calls preventDefault for handled keys", () => {

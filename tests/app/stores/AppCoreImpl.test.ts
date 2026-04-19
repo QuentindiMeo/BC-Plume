@@ -372,9 +372,9 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.getState().playbackSpeed).toBe(0.25);
     });
 
-    it("accepts the maximum bound (5)", () => {
-      appCore.dispatch(coreActions.setPlaybackSpeed(5));
-      expect(appCore.getState().playbackSpeed).toBe(5);
+    it("accepts the maximum bound (3)", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(3));
+      expect(appCore.getState().playbackSpeed).toBe(3);
     });
 
     it("resets to default for a negative value", () => {
