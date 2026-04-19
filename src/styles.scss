@@ -32,7 +32,7 @@
     /* parent component */
     @apply
       z-9 /* ensure it stays above other contents, especially the album collection promotion */
-      sticky! top-0 rounded-lg my-4! mx-0!
+      sticky! top-0 my-4! mx-0! rounded-lg
     ;
     transition:
       background-color 0.2s ease,
@@ -390,21 +390,54 @@
 
   .plume-speed-popover {
     @apply
-      absolute left-1/2 -translate-x-1/2
-      w-32 px-3 py-2 rounded-lg border border-white/15 bg-black/85 backdrop-blur-sm
-      flex flex-col items-center gap-2
-      opacity-0 pointer-events-none z-50
+      z-50 absolute left-1/2 -translate-x-1/2
+      w-32 px-3 py-2 bg-black/85 border border-white/15 rounded-lg backdrop-blur-sm
+      flex flex-col gap-2 items-center
+      opacity-0 pointer-events-none transition-opacity
     ;
-    top: calc(100% + 0.4rem);
-    transition: opacity 0.15s ease;
-  }
+    top: calc(100% + 0.5rem);
 
-  .plume-speed-popover.plume-speed-popover--visible {
-    @apply opacity-100 pointer-events-auto;
+    &--visible {
+      @apply opacity-100 pointer-events-auto;
+    }
   }
 
   .plume-speed-label {
-    @apply text-xs font-semibold font-sans tabular-nums text-plume-light;
+    @apply font-semibold font-sans text-xs tabular-nums text-plume-light;
+  }
+
+  .plume-speed-slider {
+    @apply w-full h-1.5 bg-white/20 rounded appearance-none cursor-pointer outline-offset-4;
+    -webkit-appearance: none;
+
+    &::-webkit-slider-thumb {
+      @apply
+        size-3 bg-plume-dimmed border-none rounded-full
+        appearance-none cursor-grab transition-[transform,background]
+      ;
+      -webkit-appearance: none;
+
+      &:hover {
+        @apply scale-110 bg-plume-light;
+      }
+      &:active {
+        @apply cursor-grabbing;
+      }
+    }
+    &::-moz-range-thumb {
+      @apply size-3 bg-plume-dimmed border-none rounded-full cursor-grab transition-[transform,background];
+
+      &:hover {
+        @apply scale-110 bg-plume-light;
+      }
+      &:active {
+        @apply cursor-grabbing;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      @apply bg-white/40;
+    }
   }
 
   .plume-speed-ticks {
@@ -412,27 +445,6 @@
 
     span {
       @apply block w-px h-1 rounded-full bg-white/30;
-    }
-  }
-
-  .plume-speed-slider {
-    @apply w-full h-1.5 rounded appearance-none cursor-pointer bg-white/20;
-    -webkit-appearance: none;
-
-    &::-webkit-slider-thumb {
-      @apply size-3 bg-plume-dimmed border-none rounded-full appearance-none cursor-grab transition-[transform,background];
-      -webkit-appearance: none;
-      &:hover { @apply scale-110 bg-plume-light; }
-      &:active { @apply cursor-grabbing; }
-    }
-    &::-moz-range-thumb {
-      @apply size-3 bg-plume-dimmed border-none rounded-full cursor-grab transition-[transform,background];
-      &:hover { @apply scale-110 bg-plume-light; }
-      &:active { @apply cursor-grabbing; }
-    }
-
-    @media (prefers-contrast: more) {
-      @apply bg-white/40;
     }
   }
 }
