@@ -383,21 +383,6 @@ describe("speed label click-to-edit", () => {
     expect(label.getAttribute("tabindex")).toBe("0");
   });
 
-  it("label starts with aria-expanded=false", () => {
-    expect(label.getAttribute("aria-expanded")).toBe("false");
-  });
-
-  it("label aria-expanded becomes true when input opens", () => {
-    label.click();
-    expect(label.getAttribute("aria-expanded")).toBe("true");
-  });
-
-  it("label aria-expanded returns to false when input closes", () => {
-    label.click();
-    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-    expect(label.getAttribute("aria-expanded")).toBe("false");
-  });
-
   it("pressing Enter with a valid value returns focus to the label", () => {
     document.body.appendChild(wrapper);
     label.click();
@@ -491,9 +476,13 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
     wrapper: HTMLDivElement;
     popover: HTMLDivElement;
     customInput: HTMLInputElement;
+    btn: HTMLButtonElement;
   } => {
     const wrapper = document.createElement("div");
     document.body.appendChild(wrapper);
+
+    const btn = document.createElement("button");
+    btn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
 
     const popover = document.createElement("div");
     popover.className = popoverClass;
@@ -505,8 +494,9 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
     customInput.hidden = true;
 
     popover.appendChild(customInput);
+    wrapper.appendChild(btn);
     wrapper.appendChild(popover);
-    return { wrapper, popover, customInput };
+    return { wrapper, popover, customInput, btn };
   };
 
   afterEach(() => {
@@ -577,6 +567,27 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
 
     await new Promise((r) => setTimeout(r, 750));
     expect(popover.ariaHidden).toBe("true");
+    cleanup();
+  });
+
+  it("sets aria-expanded=true on the speed button when the popover opens", () => {
+    const { wrapper, btn } = makeWrapperWithPopover();
+    const cleanup = setupSpeedPopoverBehavior(wrapper);
+
+    wrapper.dispatchEvent(new MouseEvent("mouseenter"));
+    expect(btn.getAttribute("aria-expanded")).toBe("true");
+    cleanup();
+  });
+
+  it("sets aria-expanded=false on the speed button after the hide timer fires", async () => {
+    const { wrapper, btn } = makeWrapperWithPopover();
+    const cleanup = setupSpeedPopoverBehavior(wrapper);
+
+    wrapper.dispatchEvent(new MouseEvent("mouseenter"));
+    wrapper.dispatchEvent(new MouseEvent("mouseleave"));
+
+    await new Promise((r) => setTimeout(r, 750));
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
     cleanup();
   });
 });

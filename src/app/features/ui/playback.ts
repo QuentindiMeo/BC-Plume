@@ -114,6 +114,9 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
   const popover = wrapper.querySelector<HTMLDivElement>(`.${popoverClassName}`);
   if (!popover) return () => {};
 
+  const speedBtnId = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
+  const speedBtn = wrapper.querySelector<HTMLButtonElement>(`#${speedBtnId}`);
+
   let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
   const show = (): void => {
@@ -123,6 +126,7 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
     }
     popover.classList.add(`${popoverClassName}--visible`);
     popover.ariaHidden = "false";
+    if (speedBtn) speedBtn.ariaExpanded = "true";
   };
 
   const scheduleHide = (): void => {
@@ -132,6 +136,7 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
     hideTimer = setTimeout(() => {
       popover.classList.remove(`${popoverClassName}--visible`);
       popover.ariaHidden = "true";
+      if (speedBtn) speedBtn.ariaExpanded = "false";
       hideTimer = null;
     }, 700);
   };
@@ -309,6 +314,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
     setSvgContent(speedBtn, PLUME_SVG.speedGauge);
     speedBtn.title = getString("LABEL__SPEED");
     speedBtn.ariaLabel = getString("LABEL__SPEED");
+    speedBtn.ariaExpanded = "false";
     speedBtn.addEventListener("click", handleSpeedCycle);
 
     const speedPopover = document.createElement("div");
