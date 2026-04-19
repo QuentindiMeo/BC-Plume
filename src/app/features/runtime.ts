@@ -86,6 +86,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
 
   const runtimeSpan = document.createElement("span");
   runtimeSpan.className = "runtime";
+  runtimeSpan.id = "plume-runtime-span";
   runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
   runtimeSpan.style.color = runtimeTextColor;
   runtimeSpan.ariaLabel = runtimeInfo.ariaString;

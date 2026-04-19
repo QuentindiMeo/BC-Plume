@@ -55,6 +55,8 @@ vi.mock("@/infra/elements/plume", () => ({
     tracklistDropdown: "div#plume-tracklist-dropdown",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
     headerTrackLink: "a#plume-header-track-link",
+    runtimeSpan: "span#plume-runtime-span",
+    playbackControls: "div#plume-playback-controls",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
@@ -245,7 +247,7 @@ describe("speedControl feature flag subscription", () => {
   it("hides the speed wrapper when speedControl flag is disabled", () => {
     const flags = { ...fakeAppCore.getState().featureFlags, speedControl: false };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
-    expect(speedWrapper.hidden).toBe(true);
+    expect(speedWrapper.classList.contains("plume-feature-hidden")).toBe(true);
   });
 
   it("shows the speed wrapper when speedControl flag is re-enabled", () => {
@@ -254,7 +256,7 @@ describe("speedControl feature flag subscription", () => {
 
     const enabledFlags = { ...fakeAppCore.getState().featureFlags, speedControl: true };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
-    expect(speedWrapper.hidden).toBe(false);
+    expect(speedWrapper.classList.contains("plume-feature-hidden")).toBe(false);
   });
 
   it("resets playback speed to 1× when speedControl is disabled", () => {
@@ -775,5 +777,52 @@ describe("applyPlaybackControlsSize", () => {
     applyPlaybackControlsSize(container);
     expect(container.classList.contains("compact")).toBe(false);
     expect(container.classList.contains("spacious")).toBe(false);
+  });
+});
+
+describe("runtime feature flag subscription", () => {
+  let cleanup: () => void;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    fakeAppCore = new FakeAppCore();
+    fakeMusicPlayer = new FakeMusicPlayer();
+    mockGetState.mockReturnValue(makeGuiState([]));
+
+    const { setupStoreSubscriptions } = await import("@/app/features/store-subscriptions");
+    cleanup = setupStoreSubscriptions();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("hides the runtime span when runtime flag is disabled", () => {
+    const span = document.createElement("span");
+    span.id = "plume-runtime-span";
+    document.body.appendChild(span);
+
+    const flags = { ...fakeAppCore.getState().featureFlags, runtime: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
+
+    expect(span.classList.contains("plume-feature-hidden")).toBe(true);
+    document.body.removeChild(span);
+  });
+
+  it("shows the runtime span when runtime flag is re-enabled", () => {
+    const span = document.createElement("span");
+    span.id = "plume-runtime-span";
+    document.body.appendChild(span);
+
+    // First disable runtime so span becomes hidden
+    const disabledFlags = { ...fakeAppCore.getState().featureFlags, runtime: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
+    expect(span.classList.contains("plume-feature-hidden")).toBe(true);
+
+    // Then re-enable runtime so span becomes visible again
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, runtime: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+    expect(span.classList.contains("plume-feature-hidden")).toBe(false);
+    document.body.removeChild(span);
   });
 });

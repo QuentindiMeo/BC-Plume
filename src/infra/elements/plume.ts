@@ -33,6 +33,7 @@ export enum PLUME_ELEM_SELECTORS {
   timeFwdBtn = "button#plume-time-fwd-btn",
   trackFwdBtn = "button#plume-track-fwd-btn",
   loopBtn = "button#plume-loop-btn",
+  runtimeSpan = "span#plume-runtime-span",
 
   volumeContainer = "div#plume-volume-container",
   muteBtn = "button#plume-mute-btn",

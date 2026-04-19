@@ -169,14 +169,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (flags.tracklist !== prevFlags.tracklist) {
         const btn = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
         const dd = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
-        if (btn) btn.hidden = !flags.tracklist;
-        if (dd) dd.hidden = !flags.tracklist;
+        if (btn) btn.classList.toggle("plume-feature-hidden", !flags.tracklist);
+        if (dd) dd.classList.toggle("plume-feature-hidden", !flags.tracklist);
       }
 
       // Loop modes: toggle button visibility, reset to NONE when disabled
       if (flags.loopModes !== prevFlags.loopModes) {
         const plumeUi = getGuiInstance();
-        plumeUi.getState().loopBtns.forEach((btn) => (btn.hidden = !flags.loopModes));
+        plumeUi.getState().loopBtns.forEach((btn) => btn.classList.toggle("plume-feature-hidden", !flags.loopModes));
         if (!flags.loopModes) {
           appCore.dispatch(coreActions.setLoopMode(LOOP_MODE.NONE));
           getMusicPlayerInstance().setLoop(false);
@@ -186,7 +186,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       // Fullscreen: toggle button container visibility, exit fullscreen if active
       if (flags.fullscreen !== prevFlags.fullscreen) {
         const section = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.fullscreenBtnContainer);
-        if (section) section.hidden = !flags.fullscreen;
+        if (section) section.classList.toggle("plume-feature-hidden", !flags.fullscreen);
         if (!flags.fullscreen && appCore.getState().isFullscreen) {
           cleanupFullscreenMode();
         }
@@ -195,20 +195,26 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       // Go-to-track: toggle link visibility
       if (flags.goToTrack !== prevFlags.goToTrack) {
         const el = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.headerTrackLink);
-        if (el) el.hidden = !flags.goToTrack;
+        if (el) el.classList.toggle("plume-feature-hidden", !flags.goToTrack);
       }
 
       // Speed control: toggle button visibility, reset to 1× when disabled
       if (flags.speedControl !== prevFlags.speedControl) {
         getGuiInstance()
           .getState()
-          .speedBtns.forEach((btn) => (btn.hidden = !flags.speedControl));
+          .speedBtns.forEach((btn) => btn.classList.toggle("plume-feature-hidden", !flags.speedControl));
         if (!flags.speedControl) {
           appCore.dispatch(coreActions.setPlaybackSpeed(PLAYBACK_SPEED_DEFAULT));
         }
       }
 
-      // Quick seek + runtime: flag is read on trigger (key / button)
+      // Runtime: show/hide the runtime span
+      if (flags.runtime !== prevFlags.runtime) {
+        const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
+        if (runtimeSpan) runtimeSpan.classList.toggle("plume-feature-hidden", !flags.runtime);
+      }
+
+      // Quick seek: flag is read on trigger (key)
 
       // Resize playback controls to fit the number of visible children
       const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
