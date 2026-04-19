@@ -381,7 +381,7 @@
   }
 
   #plume-play-pause-btn {
-    @apply size-12! bg-plume-20 border-plume-dimmed;
+    @apply size-13! bg-plume-20 border-plume-dimmed;
 
     &:hover {
       @apply bg-plume-40;
@@ -401,7 +401,7 @@
       @apply size-11;
     }
     #plume-play-pause-btn {
-      @apply size-14!;
+      @apply size-15!;
     }
   }
 
@@ -413,7 +413,7 @@
       @apply size-9;
     }
     #plume-play-pause-btn {
-      @apply size-10!;
+      @apply size-11!;
     }
   }
 }

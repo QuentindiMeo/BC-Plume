@@ -2,6 +2,7 @@ import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
+  applyPlaybackControlsSize,
   handlePlayPause,
   handleSpeedCycle,
   handleSpeedSlider,
@@ -265,6 +266,20 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
   // Subscribe to state changes and use pure rendering functions for updates
   subscriptions.push(
+    appCore.subscribe("featureFlags", (flags, prevFlags) => {
+      if (flags.goToTrack !== prevFlags.goToTrack) {
+        const trackLink = elements.headerContainer?.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.headerTrackLink);
+        if (trackLink) trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
+      }
+      if (isAlbumPage && flags.tracklist !== prevFlags.tracklist) {
+        const btn = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
+        const dd = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
+        if (btn) btn.classList.toggle("plume-feature-hidden", !flags.tracklist);
+        if (dd) dd.classList.toggle("plume-feature-hidden", !flags.tracklist);
+      }
+      const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
+      if (fsControls) applyPlaybackControlsSize(fsControls);
+    }),
     appCore.subscribe("currentTime", () => {
       renderProgressSlider(elements, appCore.computed.progressPercentage());
       renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
@@ -569,15 +584,16 @@ export const toggleFullscreenMode = (): void => {
   const plumeClone = overlay.querySelector(`#${PLUME_ELEM_SELECTORS.fullscreenClone.split("#")[1]}`) as HTMLDivElement;
   fullscreenCleanupCallback = setupFullscreenUi(plumeClone);
 
-  // Register the fullscreen buttons in the store alongside the main-panel buttons
+  // Register the fullscreen buttons in the store alongside the main-panel buttons.
+  // Always register speed/loop elements (even when their flags are off) so the featureFlags
+  // subscription in store-subscriptions.ts can toggle their visibility via the store arrays.
   const fsElements = getFullscreenElements(plumeClone);
-  const withSpeedControl = appCore.getState().featureFlags.speedControl;
-  if (withSpeedControl && fsElements.speedWrapper) {
+  if (fsElements.speedWrapper) {
     plumeUi.dispatch(guiActions.setSpeedBtns([...plume.speedBtns, fsElements.speedWrapper]));
   }
   plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));
-  if (appCore.getState().featureFlags.loopModes && fsElements.loopBtn) {
+  if (fsElements.loopBtn) {
     plumeUi.dispatch(guiActions.setLoopBtns([...plume.loopBtns, fsElements.loopBtn]));
   }
 
