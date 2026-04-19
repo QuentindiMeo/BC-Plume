@@ -139,7 +139,7 @@ describe("speedToSliderPosition", () => {
 
   it("returns the last index for a value at or above the last step", () => {
     const lastIdx = PLAYBACK_SPEED_STEPS.length - 1;
-    expect(speedToSliderPosition(5)).toBe(lastIdx); // exact last step
+    expect(speedToSliderPosition(3)).toBe(lastIdx); // exact last step
     expect(speedToSliderPosition(6)).toBe(lastIdx);
   });
 });
@@ -150,7 +150,7 @@ describe("parseCustomPlaybackSpeed", () => {
   });
 
   it("parses a valid speed at the maximum bound", () => {
-    expect(parseCustomPlaybackSpeed("5")).toBe(5);
+    expect(parseCustomPlaybackSpeed("3")).toBe(3);
   });
 
   it("parses a mid-range value", () => {
@@ -190,7 +190,7 @@ describe("parseCustomPlaybackSpeed", () => {
   });
 
   it("returns null for a value above the maximum", () => {
-    expect(parseCustomPlaybackSpeed("6")).toBeNull();
+    expect(parseCustomPlaybackSpeed("4")).toBeNull();
   });
 
   it("returns null for NaN string", () => {
@@ -205,8 +205,8 @@ describe("parseCustomPlaybackSpeed", () => {
     expect(PLAYBACK_SPEED_MIN).toBe(0.25);
   });
 
-  it("PLAYBACK_SPEED_MAX equals 5", () => {
-    expect(PLAYBACK_SPEED_MAX).toBe(5);
+  it("PLAYBACK_SPEED_MAX equals 3", () => {
+    expect(PLAYBACK_SPEED_MAX).toBe(3);
   });
 });
 

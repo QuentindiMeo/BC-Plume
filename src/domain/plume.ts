@@ -48,10 +48,10 @@ export const isValidVolume = (volume: number): boolean => Number.isFinite(volume
 export const TRACK_RESTART_THRESHOLD_MIN = 0 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MAX = 10 as WholeNumber;
 
-export const PLAYBACK_SPEED_STEPS: readonly number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 5];
+export const PLAYBACK_SPEED_STEPS: readonly number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3];
 export const PLAYBACK_SPEED_DEFAULT = 1 as const;
-export const PLAYBACK_SPEED_MIN = 0.25 as const;
-export const PLAYBACK_SPEED_MAX = 5 as const;
+export const PLAYBACK_SPEED_MIN = PLAYBACK_SPEED_STEPS[0];
+export const PLAYBACK_SPEED_MAX = PLAYBACK_SPEED_STEPS[PLAYBACK_SPEED_STEPS.length - 1];
 export const PLAYBACK_SPEED_SAFARI_MIN = 0.5 as const;
 export const PLAYBACK_SPEED_SAFARI_MAX = 2.0 as const;
 export const isValidPlaybackSpeed = (speed: number): boolean =>
