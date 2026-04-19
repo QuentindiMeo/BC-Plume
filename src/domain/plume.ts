@@ -44,13 +44,42 @@ export const SEEK_JUMP_DURATION_MIN = 1 as WholeNumber;
 export const SEEK_JUMP_DURATION_MAX = 300 as WholeNumber;
 export const VOLUME_HOTKEY_STEP_MIN = 1 as WholeNumber;
 export const VOLUME_HOTKEY_STEP_MAX = 20 as WholeNumber;
+export const isValidVolume = (volume: number): boolean => Number.isFinite(volume) && volume >= 0 && volume <= 1;
 export const TRACK_RESTART_THRESHOLD_MIN = 0 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MAX = 10 as WholeNumber;
 
 export const PLAYBACK_SPEED_STEPS: readonly number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 5];
 export const PLAYBACK_SPEED_DEFAULT = 1 as const;
+export const PLAYBACK_SPEED_MIN = 0.25 as const;
+export const PLAYBACK_SPEED_MAX = 5 as const;
 export const PLAYBACK_SPEED_SAFARI_MIN = 0.5 as const;
 export const PLAYBACK_SPEED_SAFARI_MAX = 2.0 as const;
+export const isValidPlaybackSpeed = (speed: number): boolean =>
+  Number.isFinite(speed) && speed >= PLAYBACK_SPEED_MIN && speed <= PLAYBACK_SPEED_MAX;
+
+// Finds the nearest valid speed tick, or returns the exact value if it's already a tick.
+export const speedToSliderPosition = (speed: number): number => {
+  const idx = PLAYBACK_SPEED_STEPS.indexOf(speed);
+  if (idx !== -1) return idx;
+
+  for (let i = 0; i < PLAYBACK_SPEED_STEPS.length - 1; i++) {
+    const lo = PLAYBACK_SPEED_STEPS[i] as number;
+    const hi = PLAYBACK_SPEED_STEPS[i + 1] as number;
+    if (speed > lo && speed < hi) {
+      return i + (speed - lo) / (hi - lo);
+    }
+  }
+  return speed <= (PLAYBACK_SPEED_STEPS[0] as number) ? 0 : PLAYBACK_SPEED_STEPS.length - 1;
+};
+
+// Returns the value rounded to 2 decimal places, or null if out of range or non-numeric.
+export const parseCustomPlaybackSpeed = (raw: string): number | null => {
+  const trimmedValue = raw.trim();
+  if (trimmedValue === "") return null;
+
+  const value = parseFloat(trimmedValue);
+  return isValidPlaybackSpeed(value) ? Math.round(value * 100) / 100 : null;
+};
 
 export const PLUME_DEFAULTS = {
   language: PLUME_SUPPORTED_LANGUAGES[0],

@@ -5,11 +5,12 @@ import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "@/domain/browser"
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
 import {
   assertBoundedInteger,
+  isValidPlaybackSpeed,
+  isValidVolume,
   LOOP_MODE,
   LOOP_MODE_CYCLE,
   type LoopModeType,
   PLAYBACK_SPEED_DEFAULT,
-  PLAYBACK_SPEED_STEPS,
   PLUME_DEFAULTS,
   SEEK_JUMP_DURATION_MAX,
   SEEK_JUMP_DURATION_MIN,
@@ -202,7 +203,8 @@ const createAppCoreInstance = (): IAppCore => {
         updateState("trackNumber", action.payload);
         break;
       case CORE_ACTIONS.SET_VOLUME:
-        if (action.payload < 0 || action.payload > 1) {
+        const volume = action.payload;
+        if (!isValidVolume(volume)) {
           logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
           return;
         }
@@ -220,14 +222,16 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_IS_PLAYING:
         updateState("isPlaying", action.payload);
         break;
-      case CORE_ACTIONS.SET_PLAYBACK_SPEED:
-        if (!PLAYBACK_SPEED_STEPS.includes(action.payload)) {
+      case CORE_ACTIONS.SET_PLAYBACK_SPEED: {
+        const speed = action.payload;
+        if (!isValidPlaybackSpeed(speed)) {
           logger(CPL.WARN, getString("WARN__PLAYBACK_SPEED__INVALID_VALUE"));
           updateState("playbackSpeed", PLAYBACK_SPEED_DEFAULT);
           return;
         }
-        updateState("playbackSpeed", action.payload);
+        updateState("playbackSpeed", Math.round(speed * 100) / 100);
         break;
+      }
       case CORE_ACTIONS.SET_IS_MUTED:
         updateState("isMuted", action.payload);
         break;
@@ -326,17 +330,17 @@ const createAppCoreInstance = (): IAppCore => {
 
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
         const isValidValue = isPlumeDurationDisplayMethod(result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]);
-        const cachedMethod = isValidValue
+        const value = isValidValue
           ? result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]
           : PLUME_DEFAULTS.durationDisplayMethod;
 
-        dispatch(coreActions.setDurationDisplayMethod(cachedMethod));
-        logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [cachedMethod]));
+        dispatch(coreActions.setDurationDisplayMethod(value));
+        logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [value]));
       }
 
       if (result[PLUME_CACHE_KEYS.PLAYBACK_SPEED] !== undefined) {
         const value = result[PLUME_CACHE_KEYS.PLAYBACK_SPEED];
-        if (PLAYBACK_SPEED_STEPS.includes(value)) {
+        if (isValidPlaybackSpeed(value)) {
           dispatch(coreActions.setPlaybackSpeed(value));
           logger(CPL.INFO, getString("INFO__PLAYBACK_SPEED__LOADED"), `${value}×`);
         } else {

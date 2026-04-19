@@ -5,10 +5,12 @@ import {
   handlePlayPause,
   handleSpeedCycle,
   handleSpeedSlider,
+  handleSpeedSliderKeydown,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
   handleTrackForward,
+  setupSpeedLabelClickBehavior,
   setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
@@ -329,7 +331,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   if (flags.speedControl) {
     elements.speedBtn?.addEventListener("click", handleSpeedCycle);
     elements.speedSlider?.addEventListener("input", handleSpeedSlider);
-    if (elements.speedWrapper) subscriptions.push(setupSpeedPopoverBehavior(elements.speedWrapper));
+    elements.speedSlider?.addEventListener("keydown", handleSpeedSliderKeydown);
+    if (elements.speedWrapper) {
+      subscriptions.push(setupSpeedPopoverBehavior(elements.speedWrapper));
+      subscriptions.push(setupSpeedLabelClickBehavior(elements.speedWrapper));
+    }
   }
   if (flags.loopModes) elements.loopBtn?.addEventListener("click", handleLoopCycle);
 

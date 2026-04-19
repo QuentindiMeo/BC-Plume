@@ -1,3 +1,5 @@
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
 import {
   LOOP_MODE,
   LOOP_MODE_CYCLE,
@@ -11,11 +13,9 @@ import {
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
 } from "@/domain/plume";
-import { PLUME_CACHE_KEYS } from "@/domain/browser";
-import { BROWSER_ACTIONS } from "@/domain/ports/browser";
 import { coreActions, type IAppCore } from "@/domain/ports/app-core";
+import { BROWSER_ACTIONS } from "@/domain/ports/browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getBrowserInstance } from "@/app/stores/BrowserImpl";
 
 vi.mock("@/app/stores/BrowserImpl", () => ({
   getBrowserInstance: vi.fn(() => ({
@@ -352,14 +352,29 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
     });
 
-    it.each(PLAYBACK_SPEED_STEPS)("accepts valid step %s×", (speed: number) => {
+    it.each(PLAYBACK_SPEED_STEPS)("accepts predefined step %s×", (speed: number) => {
       appCore.dispatch(coreActions.setPlaybackSpeed(speed));
       expect(appCore.getState().playbackSpeed).toBe(speed);
     });
 
-    it("resets to default for a value not in PLAYBACK_SPEED_STEPS", () => {
-      appCore.dispatch(coreActions.setPlaybackSpeed(1.7));
-      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    it("accepts a custom in-range float not in PLAYBACK_SPEED_STEPS", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(1.3));
+      expect(appCore.getState().playbackSpeed).toBe(1.3);
+    });
+
+    it("rounds the stored value to 2 decimal places", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(1.555));
+      expect(appCore.getState().playbackSpeed).toBe(1.56);
+    });
+
+    it("accepts the minimum bound (0.25)", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(0.25));
+      expect(appCore.getState().playbackSpeed).toBe(0.25);
+    });
+
+    it("accepts the maximum bound (5)", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(5));
+      expect(appCore.getState().playbackSpeed).toBe(5);
     });
 
     it("resets to default for a negative value", () => {
@@ -372,8 +387,8 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
     });
 
-    it("resets to default for a value above all steps", () => {
-      appCore.dispatch(coreActions.setPlaybackSpeed(100));
+    it("resets to default for a value above the maximum", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(6));
       expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
     });
   });
@@ -513,14 +528,21 @@ describe("AppCoreImpl — playbackSpeed persist/load integration", () => {
     } as unknown as ReturnType<typeof getBrowserInstance>);
   });
 
-  it("loads a valid persisted speed on startup", async () => {
+  it("loads a predefined step persisted speed on startup", async () => {
     seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 1.5 });
     const appCore = createAppCoreInstance();
     await appCore.loadPersistedState();
     expect(appCore.getState().playbackSpeed).toBe(1.5);
   });
 
-  it("falls back to default when the persisted value is not a valid step", async () => {
+  it("loads a custom in-range float persisted speed on startup", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 1.3 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(1.3);
+  });
+
+  it("falls back to default when the persisted value is out of the valid range", async () => {
     seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 99 });
     const appCore = createAppCoreInstance();
     await appCore.loadPersistedState();

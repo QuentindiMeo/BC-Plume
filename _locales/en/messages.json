@@ -273,9 +273,11 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Speed button clicked" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Custom speed input rejected (out of range or non-numeric)" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Custom playback speed" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Click to enter a custom speed" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Playback speed loaded:" },
   "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Invalid playback speed — resetting to 1×" },
-  "WARN__SPEED__SAFARI_UNSUPPORTED": { "message": "Safari limits playback speed to 0.5×–2×. Your selection will be clamped." },
 
   "INFO__HOTKEYS__REGISTERED": { "message": "Hotkeys registered" },
 
@@ -528,5 +530,16 @@
     "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
   },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
-  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" }
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Limited speed control" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari limits playback speed to 0.5×–2×. Your selection will be clamped."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "safari unsupported speed" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Invalid speed value" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Please enter a number between 0.25 and 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "invalid custom input" }
+
 }

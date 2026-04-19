@@ -12,8 +12,8 @@ import {
   PLAYBACK_SPEED_DEFAULT,
   PLAYBACK_SPEED_SAFARI_MAX,
   PLAYBACK_SPEED_SAFARI_MIN,
-  PLAYBACK_SPEED_STEPS,
   PLUME_CONSTANTS,
+  speedToSliderPosition,
 } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
@@ -124,14 +124,19 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const plume = getGuiInstance().getState();
 
       musicPlayer.setPlaybackRate(speed);
-      const speedIdx = String(PLAYBACK_SPEED_STEPS.indexOf(speed));
       const speedText = `${speed}×`;
+      const sliderPos = String(speedToSliderPosition(speed));
       plume.speedBtns.forEach((wrapper) => {
         const label = wrapper.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.speedLabel);
         const slider = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedSlider);
+        const customInput = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedCustomInput);
+        if (customInput && !customInput.hidden) {
+          customInput.hidden = true;
+          if (label) label.hidden = false;
+        }
         if (label) label.textContent = speedText;
         if (slider) {
-          slider.value = speedIdx;
+          slider.value = sliderPos;
           slider.setAttribute("aria-valuetext", speedText);
         }
       });
@@ -143,8 +148,9 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       ) {
         safariSpeedWarningShown = true;
         createToast({
-          label: "safari-speed-warning",
-          title: getString("WARN__SPEED__SAFARI_UNSUPPORTED"),
+          label: getString("META__TOAST__SPEED__SAFARI_UNSUPPORTED"),
+          title: getString("LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE"),
+          description: getString("LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION"),
           borderType: "warning",
         });
       }

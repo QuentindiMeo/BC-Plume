@@ -10,7 +10,7 @@ import {
   seekForward,
   togglePlayback,
 } from "@/app/use-cases";
-import { PLAYBACK_SPEED_STEPS } from "@/domain/plume";
+import { PLAYBACK_SPEED_STEPS, parseCustomPlaybackSpeed, speedToSliderPosition } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
@@ -18,6 +18,92 @@ import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
+import { createToast } from "./toast";
+
+export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => void) => {
+  const labelClass = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
+  const customInputClass = PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1];
+  const label = wrapper.querySelector<HTMLElement>(`.${labelClass}`);
+  const customInput = wrapper.querySelector<HTMLInputElement>(`.${customInputClass}`);
+  if (!label || !customInput) return () => {};
+
+  const openInput = (): void => {
+    const currentSpeed = getAppCoreInstance().getState().playbackSpeed;
+    customInput.value = String(currentSpeed);
+    customInput.removeAttribute("aria-invalid");
+    label.hidden = true;
+    customInput.hidden = false;
+    customInput.select();
+    customInput.focus();
+  };
+
+  const closeInput = (): void => {
+    customInput.hidden = true;
+    label.hidden = false;
+  };
+
+  const onLabelClick = (): void => openInput();
+  const onLabelKeydown = (e: KeyboardEvent): void => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openInput();
+    }
+  };
+  const onInputKeydown = (e: KeyboardEvent): void => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      const parsed = parseCustomPlaybackSpeed(customInput.value);
+      if (parsed !== null) {
+        getAppCoreInstance().dispatch(coreActions.setPlaybackSpeed(parsed));
+        closeInput();
+      } else {
+        customInput.setAttribute("aria-invalid", "true");
+        logger(CPL.DEBUG, getString("DEBUG__SPEED__CUSTOM_INPUT__INVALID"));
+        createToast({
+          label: getString("META__TOAST__CUSTOM_INPUT_INVALID"),
+          title: getString("LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE"),
+          description: getString("LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION"),
+          borderType: "warning",
+        });
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      closeInput();
+    }
+  };
+  const onInputBlur = (): void => {
+    if (customInput.hidden) return;
+
+    const parsed = parseCustomPlaybackSpeed(customInput.value);
+    if (parsed !== null) {
+      const appCore = getAppCoreInstance();
+      appCore.dispatch(coreActions.setPlaybackSpeed(parsed));
+    }
+
+    closeInput();
+  };
+  const onInputInput = (): void => {
+    customInput.removeAttribute("aria-invalid");
+  };
+
+  label.role = "button";
+  label.tabIndex = 0;
+  label.title = getString("LABEL__SPEED__CLICK_TO_EDIT");
+  label.addEventListener("click", onLabelClick);
+  label.addEventListener("keydown", onLabelKeydown);
+  customInput.addEventListener("keydown", onInputKeydown);
+  customInput.addEventListener("blur", onInputBlur);
+  customInput.addEventListener("input", onInputInput);
+
+  return (): void => {
+    label.removeEventListener("click", onLabelClick);
+    label.removeEventListener("keydown", onLabelKeydown);
+    customInput.removeEventListener("keydown", onInputKeydown);
+    customInput.removeEventListener("blur", onInputBlur);
+    customInput.removeEventListener("input", onInputInput);
+  };
+};
 
 export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void) => {
   const popoverClassName = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
@@ -35,6 +121,9 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
   };
 
   const scheduleHide = (): void => {
+    const customInputClass = PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1];
+    const customInput = wrapper.querySelector<HTMLInputElement>(`.${customInputClass}`);
+    if (customInput && !customInput.hidden) return;
     hideTimer = setTimeout(() => {
       popover.classList.remove(popoverClassName + "--visible");
       hideTimer = null;
@@ -64,13 +153,54 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
 
 export const handleSpeedCycle = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__SPEED__CLICKED"));
-  cyclePlaybackSpeed(getAppCoreInstance());
+
+  const appCore = getAppCoreInstance();
+  cyclePlaybackSpeed(appCore);
 };
 
 export const handleSpeedSlider = (e: Event): void => {
   const slider = e.currentTarget as HTMLInputElement;
-  const speed = PLAYBACK_SPEED_STEPS[Number.parseInt(slider.value)];
-  if (speed !== undefined) getAppCoreInstance().dispatch(coreActions.setPlaybackSpeed(speed));
+  const rawIdx = Math.round(parseFloat(slider.value));
+  const clampedIdx = Math.max(0, Math.min(rawIdx, PLAYBACK_SPEED_STEPS.length - 1));
+  slider.value = String(clampedIdx); // snap thumb to nearest tick before next repaint
+
+  const appCore = getAppCoreInstance();
+  const speed = PLAYBACK_SPEED_STEPS[clampedIdx];
+  appCore.dispatch(coreActions.setPlaybackSpeed(speed));
+};
+
+export const handleSpeedSliderKeydown = (e: KeyboardEvent): void => {
+  const slider = e.currentTarget as HTMLInputElement;
+  const pos = parseFloat(slider.value);
+  const lastIdx = PLAYBACK_SPEED_STEPS.length - 1;
+  let nextIdx: number;
+
+  e.preventDefault();
+
+  switch (e.key) {
+    case "ArrowRight":
+    case "ArrowUp":
+      nextIdx = Math.min(Math.floor(pos) + 1, lastIdx);
+      break;
+    case "ArrowLeft":
+    case "ArrowDown":
+      nextIdx = Math.max(Math.ceil(pos) - 1, 0);
+      break;
+    case "Home":
+      nextIdx = 0;
+      break;
+    case "End":
+      nextIdx = lastIdx;
+      break;
+    default:
+      return;
+  }
+  slider.value = String(nextIdx);
+  const speed = PLAYBACK_SPEED_STEPS[nextIdx];
+  if (speed !== undefined) {
+    const appCore = getAppCoreInstance();
+    appCore.dispatch(coreActions.setPlaybackSpeed(speed));
+  }
 };
 
 export const handleTrackBackward = (): void => {
@@ -181,16 +311,24 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
     speedLabel.className = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
     speedLabel.textContent = `${appState.playbackSpeed}×`;
 
+    const speedCustomInput = document.createElement("input");
+    speedCustomInput.type = "text";
+    speedCustomInput.className = PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1];
+    speedCustomInput.hidden = true;
+    speedCustomInput.inputMode = "decimal";
+    speedCustomInput.ariaLabel = getString("ARIA__SPEED_CUSTOM_INPUT");
+
     const speedSlider = document.createElement("input");
     speedSlider.type = "range";
     speedSlider.className = PLUME_ELEM_SELECTORS.speedSlider.split(".")[1];
     speedSlider.min = "0";
     speedSlider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
-    speedSlider.step = "1";
-    speedSlider.value = String(PLAYBACK_SPEED_STEPS.indexOf(appState.playbackSpeed));
+    speedSlider.step = "any";
+    speedSlider.value = String(speedToSliderPosition(appState.playbackSpeed));
     speedSlider.ariaLabel = getString("ARIA__SPEED_SLIDER");
     speedSlider.setAttribute("aria-valuetext", `${appState.playbackSpeed}×`);
     speedSlider.addEventListener("input", handleSpeedSlider);
+    speedSlider.addEventListener("keydown", handleSpeedSliderKeydown);
 
     const speedTicks = document.createElement("div");
     speedTicks.className = "plume-speed-ticks";
@@ -198,12 +336,14 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
     for (let i = 0; i < PLAYBACK_SPEED_STEPS.length; i++) speedTicks.appendChild(document.createElement("span"));
 
     speedPopover.appendChild(speedLabel);
+    speedPopover.appendChild(speedCustomInput);
     speedPopover.appendChild(speedSlider);
     speedPopover.appendChild(speedTicks);
     speedWrapper.appendChild(speedBtn);
     speedWrapper.appendChild(speedPopover);
 
     setupSpeedPopoverBehavior(speedWrapper);
+    setupSpeedLabelClickBehavior(speedWrapper);
     container.appendChild(speedWrapper);
     plumeUi.dispatch(guiActions.setSpeedBtns([speedWrapper]));
   }

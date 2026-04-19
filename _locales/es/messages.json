@@ -285,9 +285,10 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Botón de velocidad pulsado" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Velocidad de reproducción personalizada" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clic para introducir una velocidad personalizada" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocidad de reproducción cargada:" },
   "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Velocidad no válida — restableciendo a 1×" },
-  "WARN__SPEED__SAFARI_UNSUPPORTED": { "message": "Safari limita la velocidad a 0,5×–2×. Tu selección será ajustada." },
 
   "INFO__HOTKEYS__REGISTERED": { "message": "Atajos de teclado registrados" },
 
@@ -556,5 +557,15 @@
     "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
   },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "pista no reproducible" },
-  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistas no reproducibles" }
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistas no reproducibles" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Control de velocidad limitado" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari limita la velocidad de reproducción a 0.5×–2×. Tu selección será ajustada."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "velocidad no soportada por Safari" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Valor de velocidad inválido" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Por favor, ingrese un número entre 0.25 y 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" }
 }
