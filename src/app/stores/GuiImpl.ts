@@ -9,6 +9,7 @@ const INITIAL_STATE: Gui = {
   progressSlider: null,
   elapsedDisplay: null,
   durationDisplay: null,
+  speedBtns: [],
   playPauseBtns: [],
   trackFwdBtns: [],
   loopBtns: [],
@@ -39,6 +40,7 @@ const createGuiInstance = (): IGui => {
         updateState("progressSlider", null);
         updateState("elapsedDisplay", null);
         updateState("durationDisplay", null);
+        updateState("speedBtns", []);
         updateState("playPauseBtns", []);
         updateState("trackFwdBtns", []);
         updateState("loopBtns", []);
@@ -67,6 +69,9 @@ const createGuiInstance = (): IGui => {
         break;
       case GUI_ACTIONS.SET_DURATION_DISPLAY:
         updateState("durationDisplay", action.payload);
+        break;
+      case GUI_ACTIONS.SET_SPEED_BTNS:
+        updateState("speedBtns", action.payload);
         break;
       case GUI_ACTIONS.SET_PLAY_PAUSE_BTNS:
         updateState("playPauseBtns", action.payload);

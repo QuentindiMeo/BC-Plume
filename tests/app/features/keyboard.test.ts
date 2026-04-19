@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 let fakeAppCore = new FakeAppCore();
@@ -17,7 +18,7 @@ vi.mock("@/infra/elements/plume", () => ({
 
 import { bindingKey, setupHotkeys } from "@/app/features/keyboard";
 import { seekToProgress } from "@/app/use-cases/seek-to-progress";
-import { type KeyBinding, DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import { DEFAULT_HOTKEYS, type KeyBinding } from "@/domain/hotkeys";
 import { PLUME_DEFAULTS, type FeatureFlags } from "@/domain/plume";
 
 const binding = (
@@ -82,14 +83,15 @@ describe("bindingKey", () => {
 
 describe("setupHotkeys — arrow keys inside tracklist", () => {
   const noopHandlers = {
-    handlePlayPause: vi.fn(),
-    handleTimeBackward: vi.fn(),
-    handleTimeForward: vi.fn(),
+    handleSpeedCycle: vi.fn(),
     handleTrackBackward: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handlePlayPause: vi.fn(),
+    handleTimeForward: vi.fn(),
     handleTrackForward: vi.fn(),
+    handleLoopCycle: vi.fn(),
     handleMuteToggle: vi.fn(),
     toggleFullscreenMode: vi.fn(),
-    handleLoopCycle: vi.fn(),
   };
 
   let cleanup: () => void;
@@ -152,14 +154,15 @@ describe("setupHotkeys — arrow keys inside tracklist", () => {
 
 describe("setupHotkeys — feature flag guards", () => {
   const noopHandlers = {
-    handlePlayPause: vi.fn(),
-    handleTimeBackward: vi.fn(),
-    handleTimeForward: vi.fn(),
+    handleSpeedCycle: vi.fn(),
     handleTrackBackward: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handlePlayPause: vi.fn(),
+    handleTimeForward: vi.fn(),
     handleTrackForward: vi.fn(),
+    handleLoopCycle: vi.fn(),
     handleMuteToggle: vi.fn(),
     toggleFullscreenMode: vi.fn(),
-    handleLoopCycle: vi.fn(),
   };
 
   let cleanup: () => void;

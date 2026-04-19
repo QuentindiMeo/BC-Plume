@@ -22,6 +22,7 @@ interface KeyboardHandlers {
   handleMuteToggle: NoArgFunction;
   toggleFullscreenMode: NoArgFunction;
   handleLoopCycle: NoArgFunction;
+  handleSpeedCycle: NoArgFunction;
 }
 
 // e.code values for both digit row and numpad
@@ -150,6 +151,9 @@ export const setupHotkeys = (
         break;
       case HotkeyAction.LOOP_CYCLE:
         if (flags.loopModes) handlers.handleLoopCycle();
+        break;
+      case HotkeyAction.SPEED_CYCLE:
+        if (flags.speedControl) handlers.handleSpeedCycle();
         break;
       default:
         action satisfies never; // Ensure all cases are handled

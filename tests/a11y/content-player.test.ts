@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { FakeAppCore } from "../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../fakes/FakeMusicPlayer";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
@@ -25,11 +25,18 @@ vi.mock("@/svg/icons", () => ({
     volumeOn: "",
     volumeMuted: "",
     fullscreen: "",
+    speedGauge: "",
   },
 }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
     playbackControls: "div#plume-playback-controls",
+    speedWrapper: "div#plume-speed-wrapper",
+    speedBtn: "button#plume-speed-btn",
+    speedPopover: "div.plume-speed-popover",
+    speedLabel: "span.plume-speed-label",
+    speedCustomInput: "input.plume-speed-custom-input",
+    speedSlider: "input.plume-speed-slider",
     trackBwdBtn: "button#plume-track-bwd-btn",
     timeBwdBtn: "button#plume-time-bwd-btn",
     playPauseBtn: "button#plume-play-pause-btn",
@@ -113,7 +120,7 @@ describe("content-player accessibility", () => {
       document.body.appendChild(panel);
 
       const buttons = panel.querySelectorAll("button");
-      expect(buttons.length).toBe(6);
+      expect(buttons.length).toBe(7);
       for (const btn of buttons) {
         expect(btn.getAttribute("aria-label")).toBeTruthy();
       }

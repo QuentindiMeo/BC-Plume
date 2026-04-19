@@ -3,9 +3,14 @@ import {
   assertWholeNumber,
   LOOP_MODE,
   LOOP_MODE_CYCLE,
+  parseCustomPlaybackSpeed,
+  PLAYBACK_SPEED_MAX,
+  PLAYBACK_SPEED_MIN,
+  PLAYBACK_SPEED_STEPS,
   PLUME_DEFAULTS,
   SEEK_JUMP_DURATION_MAX,
   SEEK_JUMP_DURATION_MIN,
+  speedToSliderPosition,
   TIME_DISPLAY_METHOD,
   TRACK_RESTART_THRESHOLD_MAX,
   TRACK_RESTART_THRESHOLD_MIN,
@@ -106,6 +111,102 @@ describe("PLUME_DEFAULTS", () => {
 
   it("has the expected volumeHotkeyStep", () => {
     expect(PLUME_DEFAULTS.volumeHotkeyStep).toBe(5);
+  });
+});
+
+describe("speedToSliderPosition", () => {
+  it.each(PLAYBACK_SPEED_STEPS.map((s, i) => [s, i]))(
+    "maps predefined step %s× to integer index %i",
+    (speed: number, expectedIdx: number) => {
+      expect(speedToSliderPosition(speed)).toBe(expectedIdx);
+    }
+  );
+
+  it("places 1.3 between index 4 (1.25×) and index 5 (1.5×)", () => {
+    // t = (1.3 - 1.25) / (1.5 - 1.25) = 0.2  →  4 + 0.2 = 4.2
+    expect(speedToSliderPosition(1.3)).toBeCloseTo(4.2, 10);
+  });
+
+  it("places the midpoint between two steps at exactly N + 0.5", () => {
+    // midpoint of 1× (idx 3) and 1.25× (idx 4) = 1.125
+    expect(speedToSliderPosition(1.125)).toBeCloseTo(3.5, 10);
+  });
+
+  it("returns 0 for a value at or below the first step", () => {
+    expect(speedToSliderPosition(0.1)).toBe(0);
+    expect(speedToSliderPosition(0.25)).toBe(0); // exact first step
+  });
+
+  it("returns the last index for a value at or above the last step", () => {
+    const lastIdx = PLAYBACK_SPEED_STEPS.length - 1;
+    expect(speedToSliderPosition(5)).toBe(lastIdx); // exact last step
+    expect(speedToSliderPosition(6)).toBe(lastIdx);
+  });
+});
+
+describe("parseCustomPlaybackSpeed", () => {
+  it("parses a valid speed at the minimum bound", () => {
+    expect(parseCustomPlaybackSpeed("0.25")).toBe(0.25);
+  });
+
+  it("parses a valid speed at the maximum bound", () => {
+    expect(parseCustomPlaybackSpeed("5")).toBe(5);
+  });
+
+  it("parses a mid-range value", () => {
+    expect(parseCustomPlaybackSpeed("1.5")).toBe(1.5);
+  });
+
+  it("rounds to 2 decimal places", () => {
+    expect(parseCustomPlaybackSpeed("1.555")).toBe(1.56);
+  });
+
+  it("trims surrounding whitespace before parsing", () => {
+    expect(parseCustomPlaybackSpeed("  2  ")).toBe(2);
+  });
+
+  it("returns null for an empty string", () => {
+    expect(parseCustomPlaybackSpeed("")).toBeNull();
+  });
+
+  it("returns null for a whitespace-only string", () => {
+    expect(parseCustomPlaybackSpeed("   ")).toBeNull();
+  });
+
+  it("returns null for a non-numeric string", () => {
+    expect(parseCustomPlaybackSpeed("abc")).toBeNull();
+  });
+
+  it("returns null for a value below the minimum", () => {
+    expect(parseCustomPlaybackSpeed("0.1")).toBeNull();
+  });
+
+  it("returns null for zero", () => {
+    expect(parseCustomPlaybackSpeed("0")).toBeNull();
+  });
+
+  it("returns null for a negative value", () => {
+    expect(parseCustomPlaybackSpeed("-1")).toBeNull();
+  });
+
+  it("returns null for a value above the maximum", () => {
+    expect(parseCustomPlaybackSpeed("6")).toBeNull();
+  });
+
+  it("returns null for NaN string", () => {
+    expect(parseCustomPlaybackSpeed("NaN")).toBeNull();
+  });
+
+  it("returns null for Infinity string", () => {
+    expect(parseCustomPlaybackSpeed("Infinity")).toBeNull();
+  });
+
+  it("PLAYBACK_SPEED_MIN equals 0.25", () => {
+    expect(PLAYBACK_SPEED_MIN).toBe(0.25);
+  });
+
+  it("PLAYBACK_SPEED_MAX equals 5", () => {
+    expect(PLAYBACK_SPEED_MAX).toBe(5);
   });
 });
 

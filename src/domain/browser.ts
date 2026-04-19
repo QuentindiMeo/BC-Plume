@@ -8,6 +8,7 @@ export enum PLUME_CACHE_KEYS {
   DURATION_DISPLAY_METHOD = "plume_duration_display_method",
   VOLUME = "plume_volume",
   LOOP_MODE = "plume_loop_mode",
+  PLAYBACK_SPEED = "plume_playback_speed",
 
   // Settings
   FORCED_LANGUAGE = "plume_forced_language",
@@ -25,6 +26,7 @@ export interface LocalStorage {
   [PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]: TimeDisplayMethodType | undefined;
   [PLUME_CACHE_KEYS.VOLUME]: number | undefined;
   [PLUME_CACHE_KEYS.LOOP_MODE]: LoopModeType | undefined;
+  [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: number | undefined;
 
   [PLUME_CACHE_KEYS.FORCED_LANGUAGE]: PlumeLanguage | undefined;
   [PLUME_CACHE_KEYS.SEEK_JUMP_DURATION]: number | undefined;

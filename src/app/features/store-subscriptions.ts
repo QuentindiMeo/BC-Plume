@@ -2,14 +2,24 @@ import { cleanupFullscreenMode } from "@/app/features/fullscreen";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncLoopBtn } from "@/app/features/ui/loop";
+import { applyPlaybackControlsSize } from "@/app/features/ui/playback";
+import { createToast } from "@/app/features/ui/toast";
 import { syncMuteBtn } from "@/app/features/ui/volume";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
+import {
+  LOOP_MODE,
+  PLAYBACK_SPEED_DEFAULT,
+  PLAYBACK_SPEED_SAFARI_MAX,
+  PLAYBACK_SPEED_SAFARI_MIN,
+  PLUME_CONSTANTS,
+  speedToSliderPosition,
+} from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { isSafariBrowser } from "@/shared/browser";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
@@ -17,6 +27,8 @@ import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
 const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
+
+let safariSpeedWarningShown = false;
 
 export const setupStoreSubscriptions = (): CleanupCallback => {
   const appCore = getAppCoreInstance();
@@ -39,11 +51,9 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       if (Number.isNaN(elapsed) || Number.isNaN(duration) || duration === 0) return;
 
-      const progressPercentage = (elapsed / duration) * 100;
-      const bgImg = `linear-gradient(90deg, var(--color-plume-light) ${progressPercentage.toFixed(1)}%, var(--color-progbar-bg) 0%)`;
-
-      plume.progressSlider.value = `${progressPercentage * (PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY / 100)}`;
-      plume.progressSlider.style.backgroundImage = bgImg;
+      const progressFraction = elapsed / duration;
+      plume.progressSlider.value = `${progressFraction * PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY}`;
+      plume.progressSlider.style.setProperty("--progress-fraction", progressFraction.toString());
       plume.progressSlider.setAttribute(
         "aria-valuetext",
         getString("ARIA__PROGRESS_VALUETEXT", [presentFormattedTime(elapsed), presentFormattedTime(duration)])
@@ -110,6 +120,50 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         setSvgContent(btn, isPlaying ? PLUME_SVG.playPause : PLUME_SVG.playPlay);
       });
     }),
+    appCore.subscribe("playbackSpeed", (speed) => {
+      const musicPlayer = getMusicPlayerInstance();
+      const plume = getGuiInstance().getState();
+
+      musicPlayer.setPlaybackRate(speed);
+      const speedText = `${speed}×`;
+      const sliderPos = String(speedToSliderPosition(speed));
+      const speedBtnLabel = getString("ARIA__SPEED_BTN", [speedText]);
+
+      plume.speedBtns.forEach((wrapper) => {
+        const label = wrapper.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.speedLabel);
+        const slider = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedSlider);
+        const customInput = wrapper.querySelector<HTMLInputElement>(PLUME_ELEM_SELECTORS.speedCustomInput);
+        const speedBtn = wrapper.querySelector<HTMLButtonElement>(PLUME_ELEM_SELECTORS.speedBtn);
+
+        if (customInput && !customInput.hidden) {
+          customInput.hidden = true;
+          if (label) label.hidden = false;
+        }
+        if (label) label.textContent = speedText;
+        if (slider) {
+          slider.value = sliderPos;
+          slider.setAttribute("aria-valuetext", speedText);
+        }
+        if (speedBtn) {
+          speedBtn.ariaLabel = speedBtnLabel;
+          speedBtn.title = speedBtnLabel;
+        }
+      });
+
+      if (
+        !safariSpeedWarningShown &&
+        isSafariBrowser() &&
+        (speed < PLAYBACK_SPEED_SAFARI_MIN || speed > PLAYBACK_SPEED_SAFARI_MAX)
+      ) {
+        safariSpeedWarningShown = true;
+        createToast({
+          label: getString("META__TOAST__SPEED__SAFARI_UNSUPPORTED"),
+          title: getString("LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE"),
+          description: getString("LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION"),
+          borderType: "warning",
+        });
+      }
+    }),
     appCore.subscribe("featureFlags", (flags, prevFlags) => {
       // Tracklist: toggle button + dropdown visibility
       if (flags.tracklist !== prevFlags.tracklist) {
@@ -144,7 +198,21 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (el) el.hidden = !flags.goToTrack;
       }
 
+      // Speed control: toggle button visibility, reset to 1× when disabled
+      if (flags.speedControl !== prevFlags.speedControl) {
+        getGuiInstance()
+          .getState()
+          .speedBtns.forEach((btn) => (btn.hidden = !flags.speedControl));
+        if (!flags.speedControl) {
+          appCore.dispatch(coreActions.setPlaybackSpeed(PLAYBACK_SPEED_DEFAULT));
+        }
+      }
+
       // Quick seek + runtime: flag is read on trigger (key / button)
+
+      // Resize playback controls to fit the number of visible children
+      const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
+      if (controls) applyPlaybackControlsSize(controls);
     })
   );
 

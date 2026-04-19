@@ -14,16 +14,16 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#card_file_box-changelog"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.12.0-blue?logo=semver" /></a>
+  <a href="#%EF%B8%8F-roadmap"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.12.0-blue?logo=semver" /></a>
   <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
 </div>
 <div id="badges2" align="center">
-  <a href="https://github.com/QuentindiMeo/BC-Plume/commits/main"><img alt="GitHub last release date" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?label=last%20release&color=blueviolet&logo=clarifai" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/releases"><img alt="GitHub last release date" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?label=date%20of%20last%20release&color=blueviolet&logo=clarifai" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
-  <a href="#card_file_box-changelog"><img alt="GitHub repository size" src="https://img.shields.io/github/languages/code-size/QuentindiMeo/BC-Plume?color=blue&logo=frontify" /></a>
+  <a href="#%EF%B8%8F-roadmap"><img alt="project code coverage" src="https://img.shields.io/badge/coverage-100%25-forestgreen?logo=chianetwork" /></a>
 </div>
 
 &#xa0;
@@ -114,7 +114,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 ## 🗃️ Roadmap
 
-Find detailed versioning in the [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md) file.
+Find details about each release in [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md).
 
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)

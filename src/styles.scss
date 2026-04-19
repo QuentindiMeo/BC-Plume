@@ -32,7 +32,7 @@
     /* parent component */
     @apply
       z-9 /* ensure it stays above other contents, especially the album collection promotion */
-      sticky! top-0 rounded-lg my-4! mx-0!
+      sticky! top-0 my-4! mx-0! rounded-lg
     ;
     transition:
       background-color 0.2s ease,
@@ -40,7 +40,7 @@
 
     /* when the user scrolls low enough, Plume becomes sticky */
     &.scrolled {
-      @apply top-2 bg-black/50 m-0!;
+      @apply top-2 bg-black/60 m-0!;
     }
   }
 
@@ -154,7 +154,11 @@
   }
 }
 #plume-header-track-link {
-  @apply shrink-0 inline-flex items-center justify-center size-5 ml-auto mr-1;
+  @apply size-5 border-b-0 border-[currentColor] ml-auto mr-1 shrink-0 inline-flex items-center justify-center;
+
+  &:hover {
+    @apply border-b;
+  }
 
   &:focus-visible {
     @apply rounded-focusable outline-offset-1;
@@ -268,8 +272,17 @@
   @apply relative m-0;
 
   #plume-progress-slider {
-    @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
+  --thumb-size: 0.75rem;
+
+  @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
     -webkit-appearance: none;
+    // Gradient stop follows the knob center: thumb-radius + fraction × (track − thumb-diameter).
+    // This compensates for the browser offsetting the thumb inward by half its width on each end.
+    background-image: linear-gradient(
+      90deg,
+      var(--color-plume-light) calc(var(--thumb-size) / 2 + (100% - var(--thumb-size)) * var(--progress-fraction, 0)),
+      var(--color-progbar-bg) 0%
+    );
 
     &:active {
       @apply cursor-grabbing;
@@ -281,7 +294,7 @@
 
     &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
       @apply
-        size-3 bg-white rounded-full shadow-thumb
+        size-(--thumb-size) bg-white rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
       -webkit-appearance: none;
@@ -295,7 +308,7 @@
     }
     &::-moz-range-thumb {
       @apply
-        size-3 bg-white border-none rounded-full shadow-thumb
+        size-(--thumb-size) bg-white border-none rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
       ;
       -webkit-appearance: none;
@@ -367,6 +380,99 @@
 
     @media (prefers-contrast: more) {
       @apply bg-plume-40 border-plume;
+    }
+  }
+
+  /* 5 visible children (neither speed nor loop): larger buttons */
+  &.spacious {
+    @apply gap-4;
+
+    button {
+      @apply size-11;
+    }
+    #plume-play-pause-btn {
+      @apply size-16!;
+    }
+  }
+
+  /* 7 visible children (speed & loop both on): smaller buttons */
+  &.compact {
+    @apply gap-2;
+
+    button {
+      @apply size-9;
+    }
+    #plume-play-pause-btn {
+      @apply size-12!;
+    }
+  }
+}
+
+/* Speed button wrapper + hover popover */
+#plume-speed-wrapper {
+  @apply relative inline-flex items-center justify-center;
+
+  .plume-speed-popover {
+    @apply
+      z-50 absolute left-1/2 -translate-x-1/2
+      w-32 px-3 py-2 bg-black/85 border border-white/15 rounded-lg backdrop-blur-sm
+      flex flex-col gap-2 items-center
+      opacity-0 pointer-events-none transition-opacity
+    ;
+    top: calc(100% + 0.5rem);
+
+    &--visible {
+      @apply opacity-100 pointer-events-auto;
+    }
+
+    .plume-speed-label {
+      @apply font-semibold font-sans text-xs tabular-nums text-plume-light;
+    }
+
+    .plume-speed-slider {
+      @apply w-full h-1.5 bg-white/20 rounded appearance-none cursor-pointer outline-offset-4;
+      -webkit-appearance: none;
+
+      &::-webkit-slider-thumb {
+        @apply
+          size-3 bg-plume-dimmed border-none rounded-full
+          appearance-none cursor-grab transition-[transform,background]
+        ;
+        -webkit-appearance: none;
+
+        &:hover {
+          @apply scale-110 bg-plume-light;
+        }
+        &:active {
+          @apply cursor-grabbing;
+        }
+      }
+      &::-moz-range-thumb {
+        @apply size-3 bg-plume-dimmed border-none rounded-full cursor-grab transition-[transform,background];
+
+        &:hover {
+          @apply scale-110 bg-plume-light;
+        }
+        &:active {
+          @apply cursor-grabbing;
+        }
+      }
+
+      @media (prefers-contrast: more) {
+        @apply bg-white/40;
+      }
+    }
+
+    .plume-speed-custom-input {
+      @apply w-1/3;
+    }
+
+    .plume-speed-ticks {
+      @apply w-9/10 -mt-1 flex justify-between;
+
+      span {
+        @apply block w-px h-1 rounded-full bg-white/30;
+      }
     }
   }
 }

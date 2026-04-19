@@ -11,12 +11,13 @@ interface ToggleRowConfig {
 }
 
 const FLAG_ORDER: ToggleRowConfig[] = [
+  { flagKey: "runtime", labelKey: "LABEL__FEATURES__RUNTIME" },
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
+  { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
+  { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
   { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
-  { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
-  { flagKey: "runtime", labelKey: "LABEL__FEATURES__RUNTIME" },
 ];
 
 const areAllDefaults = (flags: FeatureFlags): boolean =>

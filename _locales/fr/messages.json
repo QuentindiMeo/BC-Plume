@@ -274,6 +274,18 @@
   "ARIA__LOOP__COLLECTION_TRACK": { "message": "Répétition : piste" },
   "ARIA__LOOP__ONE_TRACK": { "message": "Répétition : activée" },
 
+  "LABEL__SPEED": { "message": "Vitesse de lecture" },
+  "ARIA__SPEED_SLIDER": { "message": "Curseur de vitesse de lecture" },
+  "ARIA__SPEED_BTN": {
+    "message": "Vitesse : $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1,5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Bouton de vitesse cliqué" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Vitesse de lecture personnalisée" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Cliquer pour saisir une vitesse personnalisée" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Vitesse de lecture chargée :" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Vitesse invalide — réinitialisation à 1×" },
+
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
@@ -390,7 +402,8 @@
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Plein écran" },
   "LABEL__HOTKEY__MUTE": { "message": "Couper / Rétablir le son" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Changer le mode de répétition" },
-  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0%–90% (touches numériques)" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Changer la vitesse de lecture" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0% – 90% (touches numériques)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmer" },
@@ -423,8 +436,9 @@
   "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Recherche rapide (0–9)" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
@@ -541,5 +555,15 @@
     "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
   },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "piste non lisible" },
-  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" }
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Vitesse de lecture limitée" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari cantonne la vitesse à 0,5×–2×. Votre sélection sera ajustée."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "vitesse non prise en charge par Safari" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Valeur de vitesse invalide" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Veuillez entrer un nombre entre 0,25 et 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrée personnalisée invalide" }
 }
