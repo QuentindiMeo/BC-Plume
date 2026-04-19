@@ -167,6 +167,13 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
   };
 };
 
+export const applyPlaybackControlsSize = (container: HTMLElement): void => {
+  const visibleCount = Array.from(container.children).filter((el) => !(el as HTMLElement).hidden).length;
+  container.classList.remove("compact", "spacious");
+  if (visibleCount <= 5) container.classList.add("spacious");
+  else if (visibleCount >= 7) container.classList.add("compact");
+};
+
 export const handleSpeedCycle = (): void => {
   logger(CPL.DEBUG, getString("DEBUG__SPEED__CLICKED"));
 
@@ -401,5 +408,6 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
     applyLoopBtnState(loopBtn, appState.loopMode);
   }
 
+  applyPlaybackControlsSize(container);
   return container;
 };

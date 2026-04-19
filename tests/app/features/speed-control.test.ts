@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  applyPlaybackControlsSize,
   handleSpeedSlider,
   handleSpeedSliderKeydown,
   setupSpeedLabelClickBehavior,
@@ -719,5 +720,59 @@ describe("handleSpeedSliderKeydown — keyboard navigation", () => {
     const slider = makeSlider("3");
     fireKey(slider, "Tab");
     expect(fakeAppCore.getState().playbackSpeed).toBe(1); // unchanged default
+  });
+});
+
+describe("applyPlaybackControlsSize", () => {
+  const makeContainer = (...counts: number[]): HTMLElement => {
+    const container = document.createElement("div");
+    counts.forEach((hidden) => {
+      const child = document.createElement("button");
+      child.hidden = !!hidden;
+      container.appendChild(child);
+    });
+    return container;
+  };
+
+  // makeContainer args: 0 = visible, 1 = hidden
+  it("adds 'spacious' when there are 5 visible children", () => {
+    const container = makeContainer(0, 0, 0, 0, 0); // 5 visible
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("spacious")).toBe(true);
+    expect(container.classList.contains("compact")).toBe(false);
+  });
+
+  it("adds no modifier class when there are 6 visible children", () => {
+    const container = makeContainer(0, 0, 0, 0, 0, 0); // 6 visible
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("spacious")).toBe(false);
+    expect(container.classList.contains("compact")).toBe(false);
+  });
+
+  it("adds 'compact' when there are 7 visible children", () => {
+    const container = makeContainer(0, 0, 0, 0, 0, 0, 0); // 7 visible
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("compact")).toBe(true);
+    expect(container.classList.contains("spacious")).toBe(false);
+  });
+
+  it("does not count hidden children", () => {
+    // 7 total but 1 hidden → 6 visible → no modifier
+    const container = makeContainer(0, 0, 0, 0, 0, 0, 1);
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("compact")).toBe(false);
+    expect(container.classList.contains("spacious")).toBe(false);
+  });
+
+  it("removes a stale modifier class before applying the new one", () => {
+    const container = makeContainer(0, 0, 0, 0, 0, 0, 0); // 7 → compact
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("compact")).toBe(true);
+
+    // Simulate flag change: one child hidden → 6 visible → no modifier
+    (container.children[6] as HTMLElement).hidden = true;
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("compact")).toBe(false);
+    expect(container.classList.contains("spacious")).toBe(false);
   });
 });

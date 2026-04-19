@@ -382,6 +382,30 @@
       @apply bg-plume-40 border-plume;
     }
   }
+
+  /* 5 visible children (neither speed nor loop): larger buttons */
+  &.spacious {
+    @apply gap-4;
+
+    button {
+      @apply size-11;
+    }
+    #plume-play-pause-btn {
+      @apply size-16!;
+    }
+  }
+
+  /* 7 visible children (speed & loop both on): smaller buttons */
+  &.compact {
+    @apply gap-2;
+
+    button {
+      @apply size-9;
+    }
+    #plume-play-pause-btn {
+      @apply size-12!;
+    }
+  }
 }
 
 /* Speed button wrapper + hover popover */
@@ -400,51 +424,55 @@
     &--visible {
       @apply opacity-100 pointer-events-auto;
     }
-  }
 
-  .plume-speed-label {
-    @apply font-semibold font-sans text-xs tabular-nums text-plume-light;
-  }
+    .plume-speed-label {
+      @apply font-semibold font-sans text-xs tabular-nums text-plume-light;
+    }
 
-  .plume-speed-slider {
-    @apply w-full h-1.5 bg-white/20 rounded appearance-none cursor-pointer outline-offset-4;
-    -webkit-appearance: none;
-
-    &::-webkit-slider-thumb {
-      @apply
-        size-3 bg-plume-dimmed border-none rounded-full
-        appearance-none cursor-grab transition-[transform,background]
-      ;
+    .plume-speed-slider {
+      @apply w-full h-1.5 bg-white/20 rounded appearance-none cursor-pointer outline-offset-4;
       -webkit-appearance: none;
 
-      &:hover {
-        @apply scale-110 bg-plume-light;
+      &::-webkit-slider-thumb {
+        @apply
+          size-3 bg-plume-dimmed border-none rounded-full
+          appearance-none cursor-grab transition-[transform,background]
+        ;
+        -webkit-appearance: none;
+
+        &:hover {
+          @apply scale-110 bg-plume-light;
+        }
+        &:active {
+          @apply cursor-grabbing;
+        }
       }
-      &:active {
-        @apply cursor-grabbing;
+      &::-moz-range-thumb {
+        @apply size-3 bg-plume-dimmed border-none rounded-full cursor-grab transition-[transform,background];
+
+        &:hover {
+          @apply scale-110 bg-plume-light;
+        }
+        &:active {
+          @apply cursor-grabbing;
+        }
+      }
+
+      @media (prefers-contrast: more) {
+        @apply bg-white/40;
       }
     }
-    &::-moz-range-thumb {
-      @apply size-3 bg-plume-dimmed border-none rounded-full cursor-grab transition-[transform,background];
 
-      &:hover {
-        @apply scale-110 bg-plume-light;
-      }
-      &:active {
-        @apply cursor-grabbing;
-      }
+    .plume-speed-custom-input {
+      @apply w-1/3;
     }
 
-    @media (prefers-contrast: more) {
-      @apply bg-white/40;
-    }
-  }
+    .plume-speed-ticks {
+      @apply w-9/10 -mt-1 flex justify-between;
 
-  .plume-speed-ticks {
-    @apply w-9/10 -mt-1 flex justify-between;
-
-    span {
-      @apply block w-px h-1 rounded-full bg-white/30;
+      span {
+        @apply block w-px h-1 rounded-full bg-white/30;
+      }
     }
   }
 }

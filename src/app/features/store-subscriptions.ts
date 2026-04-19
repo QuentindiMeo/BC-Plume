@@ -2,6 +2,7 @@ import { cleanupFullscreenMode } from "@/app/features/fullscreen";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncLoopBtn } from "@/app/features/ui/loop";
+import { applyPlaybackControlsSize } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
 import { syncMuteBtn } from "@/app/features/ui/volume";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
@@ -208,6 +209,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       }
 
       // Quick seek + runtime: flag is read on trigger (key / button)
+
+      // Resize playback controls to fit the number of visible children
+      const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
+      if (controls) applyPlaybackControlsSize(controls);
     })
   );
 
