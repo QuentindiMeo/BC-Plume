@@ -503,6 +503,23 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
     document.body.innerHTML = "";
   });
 
+  it("concurrent scheduleHide calls do not stack timers — popover hides only once after 700ms", async () => {
+    const { wrapper, popover } = makeWrapperWithPopover();
+    const cleanup = setupSpeedPopoverBehavior(wrapper);
+
+    wrapper.dispatchEvent(new MouseEvent("mouseenter"));
+    // Trigger scheduleHide twice in quick succession (mouseleave + focusout)
+    wrapper.dispatchEvent(new MouseEvent("mouseleave"));
+    wrapper.dispatchEvent(new FocusEvent("focusout", { relatedTarget: null }));
+
+    // Still visible while the single timer is pending
+    expect(popover.classList.contains(visibleClass)).toBe(true);
+
+    await new Promise((r) => setTimeout(r, 750));
+    expect(popover.classList.contains(visibleClass)).toBe(false);
+    cleanup();
+  });
+
   it("schedules hide on mouseleave when the custom input is closed", async () => {
     const { wrapper, popover } = makeWrapperWithPopover();
     const cleanup = setupSpeedPopoverBehavior(wrapper);
@@ -547,19 +564,20 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
     cleanup();
   });
 
-  it("sets aria-hidden=false on mouseenter", () => {
+  it("sets aria-hidden=false and removes inert on mouseenter", () => {
     const { wrapper, popover } = makeWrapperWithPopover();
     popover.ariaHidden = "true";
+    popover.inert = true;
     const cleanup = setupSpeedPopoverBehavior(wrapper);
 
     wrapper.dispatchEvent(new MouseEvent("mouseenter"));
     expect(popover.ariaHidden).toBe("false");
+    expect(popover.inert).toBe(false);
     cleanup();
   });
 
-  it("sets aria-hidden=true after the hide timer fires", async () => {
+  it("sets aria-hidden=true and restores inert after the hide timer fires", async () => {
     const { wrapper, popover } = makeWrapperWithPopover();
-    popover.ariaHidden = "false";
     const cleanup = setupSpeedPopoverBehavior(wrapper);
 
     wrapper.dispatchEvent(new MouseEvent("mouseenter"));
@@ -567,6 +585,7 @@ describe("setupSpeedPopoverBehavior — popover hide guard", () => {
 
     await new Promise((r) => setTimeout(r, 750));
     expect(popover.ariaHidden).toBe("true");
+    expect(popover.inert).toBe(true);
     cleanup();
   });
 

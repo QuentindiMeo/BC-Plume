@@ -73,6 +73,7 @@ export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => vo
     } else if (e.key === "Escape") {
       e.preventDefault();
       closeInput();
+      label.focus();
     }
   };
   const onInputBlur = (): void => {
@@ -110,8 +111,9 @@ export const setupSpeedLabelClickBehavior = (wrapper: HTMLDivElement): (() => vo
 };
 
 export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void) => {
-  const popoverClassName = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
-  const popover = wrapper.querySelector<HTMLDivElement>(`.${popoverClassName}`);
+  const popoverClass = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
+  const popoverHiddenClass = `${popoverClass}--visible`;
+  const popover = wrapper.querySelector<HTMLDivElement>(`.${popoverClass}`);
   if (!popover) return () => {};
 
   const speedBtnId = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
@@ -124,19 +126,22 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
       clearTimeout(hideTimer);
       hideTimer = null;
     }
-    popover.classList.add(`${popoverClassName}--visible`);
+    popover.inert = false;
+    popover.classList.add(popoverHiddenClass);
     popover.ariaHidden = "false";
-    if (speedBtn) speedBtn.ariaExpanded = "true";
+    if (speedBtn) speedBtn.setAttribute("aria-expanded", "true");
   };
 
   const scheduleHide = (): void => {
+    if (hideTimer !== null) return;
     const customInputClass = PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1];
     const customInput = wrapper.querySelector<HTMLInputElement>(`.${customInputClass}`);
     if (customInput && !customInput.hidden) return;
     hideTimer = setTimeout(() => {
-      popover.classList.remove(`${popoverClassName}--visible`);
+      popover.inert = true;
+      popover.classList.remove(popoverHiddenClass);
       popover.ariaHidden = "true";
-      if (speedBtn) speedBtn.ariaExpanded = "false";
+      if (speedBtn) speedBtn.setAttribute("aria-expanded", "false");
       hideTimer = null;
     }, 700);
   };
@@ -171,7 +176,10 @@ export const handleSpeedCycle = (): void => {
 
 export const handleSpeedSlider = (e: Event): void => {
   const slider = e.currentTarget as HTMLInputElement;
-  const rawIdx = Math.round(parseFloat(slider.value));
+  const pos = parseFloat(slider.value);
+  if (!Number.isFinite(pos)) return;
+
+  const rawIdx = Math.round(pos);
   const clampedIdx = Math.max(0, Math.min(rawIdx, PLAYBACK_SPEED_STEPS.length - 1));
   slider.value = String(clampedIdx); // snap thumb to nearest tick before next repaint
 
@@ -320,6 +328,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
     const speedPopover = document.createElement("div");
     speedPopover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
     speedPopover.ariaHidden = "true";
+    speedPopover.inert = true;
 
     const speedLabel = document.createElement("span");
     speedLabel.className = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
