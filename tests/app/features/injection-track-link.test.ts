@@ -47,6 +47,7 @@ const fakeBcPlayer = {
 vi.mock("@/app/stores/adapters", () => ({ getBcPlayerInstance: () => fakeBcPlayer }));
 
 import { FakeAppCore } from "../../fakes/FakeAppCore";
+import { PLUME_DEFAULTS } from "@/domain/plume";
 
 let fakeAppCore = new FakeAppCore({ pageType: "album" });
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
@@ -72,12 +73,18 @@ vi.mock("@/app/features/ui", () => ({
   createPlaybackControlPanel: () => document.createElement("div"),
   createProgressBar: () => document.createElement("div"),
   createVolumeControlSection: async () => document.createElement("div"),
-  createFullscreenButtonSection: () => document.createElement("div"),
-  createTracklistToggle: () => ({
-    toggleBtn: document.createElement("button"),
-    dropdownEl: document.createElement("div"),
-    cleanup: () => {},
-  }),
+  createFullscreenButtonSection: () => {
+    const el = document.createElement("div");
+    el.id = "plume-fullscreen-btn-container";
+    return el;
+  },
+  createTracklistToggle: () => {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.id = "plume-tracklist-toggle-btn";
+    const dropdownEl = document.createElement("div");
+    dropdownEl.id = "plume-tracklist-dropdown";
+    return { toggleBtn, dropdownEl, cleanup: () => {} };
+  },
 }));
 vi.mock("@/app/features/fullscreen", () => ({ toggleFullscreenMode: vi.fn() }));
 
@@ -155,5 +162,77 @@ describe("track link in injection", () => {
     const linkIdx = children.findIndex((el) => el.id === "plume-header-track-link");
     const titleIdx = children.findIndex((el) => el.id === "plume-header-title");
     expect(linkIdx).toBeLessThan(titleIdx);
+  });
+
+  it("creates the track link as hidden when goToTrack flag is disabled", async () => {
+    fakeAppCore = new FakeAppCore({
+      pageType: "album",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, goToTrack: false },
+    });
+    await injectEnhancements();
+
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
+    expect(trackLink).not.toBeNull();
+    expect(trackLink.classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
+  it("creates the track link as visible when goToTrack flag is enabled", async () => {
+    await injectEnhancements();
+
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
+    expect(trackLink).not.toBeNull();
+    expect(trackLink.classList.contains("plume-feature-hidden")).toBe(false);
+  });
+});
+
+describe("tracklist toggle in injection", () => {
+  it("creates the tracklist toggle as hidden when tracklist flag is disabled", async () => {
+    fakeAppCore = new FakeAppCore({
+      pageType: "album",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklist: false },
+    });
+    await injectEnhancements();
+
+    const toggleBtn = document.querySelector("button#plume-tracklist-toggle-btn");
+    expect(toggleBtn).not.toBeNull();
+    expect((toggleBtn as HTMLElement).classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
+  it("creates the tracklist toggle as visible when tracklist flag is enabled", async () => {
+    await injectEnhancements();
+
+    const toggleBtn = document.querySelector("button#plume-tracklist-toggle-btn");
+    expect(toggleBtn).not.toBeNull();
+    expect((toggleBtn as HTMLElement).classList.contains("plume-feature-hidden")).toBe(false);
+  });
+
+  it("does not create tracklist toggle on track pages", async () => {
+    fakeAppCore = new FakeAppCore({ pageType: "track" });
+    await injectEnhancements();
+
+    const toggleBtn = document.querySelector("button#plume-tracklist-toggle-btn");
+    expect(toggleBtn).toBeNull();
+  });
+});
+
+describe("fullscreen button section in injection", () => {
+  it("creates the fullscreen section as hidden when fullscreen flag is disabled", async () => {
+    fakeAppCore = new FakeAppCore({
+      pageType: "album",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, fullscreen: false },
+    });
+    await injectEnhancements();
+
+    const section = document.querySelector("div#plume-fullscreen-btn-container");
+    expect(section).not.toBeNull();
+    expect((section as HTMLElement).classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
+  it("creates the fullscreen section as visible when fullscreen flag is enabled", async () => {
+    await injectEnhancements();
+
+    const section = document.querySelector("div#plume-fullscreen-btn-container");
+    expect(section).not.toBeNull();
+    expect((section as HTMLElement).classList.contains("plume-feature-hidden")).toBe(false);
   });
 });

@@ -127,9 +127,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const titleRow = document.createElement("div");
   titleRow.className = "plume-header-title-row";
 
-  if (flags.goToTrack && isAlbumPage) {
+  if (isAlbumPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
+    trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
 
     if (trackLink) {
       const trackUrl = bcPlayer.getCurrentTrackUrl();
@@ -165,8 +166,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
   let pendingDropdown: HTMLDivElement | undefined;
-  if (flags.tracklist && isAlbumPage) {
+  if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
+    toggleBtn.classList.toggle("plume-feature-hidden", !flags.tracklist);
+    dropdownEl.classList.toggle("plume-feature-hidden", !flags.tracklist);
     titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
@@ -190,10 +193,9 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const volumeContainer = await createVolumeControlSection();
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
 
-  if (flags.fullscreen) {
-    const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
-    plumeContainer.appendChild(fullscreenBtnSection);
-  }
+  const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
+  fullscreenBtnSection.classList.toggle("plume-feature-hidden", !flags.fullscreen);
+  plumeContainer.appendChild(fullscreenBtnSection);
 
   return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
 };
@@ -238,8 +240,9 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
   if (isAlbumPage) {
-    const withRuntime = appCore.getState().featureFlags.runtime;
-    if (withRuntime) addRuntime();
+    addRuntime();
+    const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
+    if (runtimeSpan) runtimeSpan.classList.toggle("plume-feature-hidden", !appCore.getState().featureFlags.runtime);
     notifyUnplayableTracks();
   }
 

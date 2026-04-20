@@ -168,7 +168,10 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
 };
 
 export const applyPlaybackControlsSize = (container: HTMLElement): void => {
-  const visibleCount = Array.from(container.children).filter((el) => !(el as HTMLElement).hidden).length;
+  const visibleCount = Array.from(container.children).filter((child) => {
+    const playbackButton = child as HTMLElement;
+    return !playbackButton.hidden && !playbackButton.classList.contains("plume-feature-hidden");
+  }).length;
   container.classList.remove("compact", "spacious");
   if (visibleCount <= 5) container.classList.add("spacious");
   else if (visibleCount >= 7) container.classList.add("compact");
@@ -319,66 +322,66 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   trackForwardBtn.addEventListener("click", handleTrackForward);
 
   const withSpeedControl = appState.featureFlags.speedControl;
-  if (withSpeedControl) {
-    const speedWrapper = document.createElement("div");
-    speedWrapper.id = PLUME_ELEM_SELECTORS.speedWrapper.split("#")[1];
+  const speedWrapper = document.createElement("div");
+  speedWrapper.id = PLUME_ELEM_SELECTORS.speedWrapper.split("#")[1];
+  speedWrapper.classList.toggle("plume-feature-hidden", !withSpeedControl);
 
-    const speedBtn = document.createElement("button");
-    speedBtn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
-    speedBtn.type = "button";
-    setSvgContent(speedBtn, PLUME_SVG.speedGauge);
-    speedBtn.title = getString("LABEL__SPEED");
-    speedBtn.ariaLabel = getString("LABEL__SPEED");
-    speedBtn.ariaExpanded = "false";
-    speedBtn.addEventListener("click", handleSpeedCycle);
+  const speedBtn = document.createElement("button");
+  speedBtn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
+  speedBtn.type = "button";
+  setSvgContent(speedBtn, PLUME_SVG.speedGauge);
+  speedBtn.title = getString("LABEL__SPEED");
+  speedBtn.ariaLabel = getString("LABEL__SPEED");
+  speedBtn.ariaExpanded = "false";
+  speedBtn.addEventListener("click", handleSpeedCycle);
 
-    const speedPopover = document.createElement("div");
-    speedPopover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
-    speedPopover.ariaHidden = "true";
-    speedPopover.inert = true;
+  const speedPopover = document.createElement("div");
+  speedPopover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
+  speedPopover.ariaHidden = "true";
+  speedPopover.inert = true;
 
-    const speedLabel = document.createElement("span");
-    speedLabel.className = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
-    speedLabel.textContent = `${appState.playbackSpeed}×`;
+  const speedLabel = document.createElement("span");
+  speedLabel.className = PLUME_ELEM_SELECTORS.speedLabel.split(".")[1];
+  speedLabel.textContent = `${appState.playbackSpeed}×`;
 
-    const speedCustomInput = document.createElement("input");
-    speedCustomInput.type = "text";
-    speedCustomInput.className = PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1];
-    speedCustomInput.hidden = true;
-    speedCustomInput.inputMode = "decimal";
-    speedCustomInput.ariaLabel = getString("ARIA__SPEED_CUSTOM_INPUT");
+  const speedCustomInput = document.createElement("input");
+  speedCustomInput.type = "text";
+  speedCustomInput.className = PLUME_ELEM_SELECTORS.speedCustomInput.split(".")[1];
+  speedCustomInput.hidden = true;
+  speedCustomInput.inputMode = "decimal";
+  speedCustomInput.ariaLabel = getString("ARIA__SPEED_CUSTOM_INPUT");
 
-    const speedSlider = document.createElement("input");
-    speedSlider.type = "range";
-    speedSlider.className = PLUME_ELEM_SELECTORS.speedSlider.split(".")[1];
-    speedSlider.min = "0";
-    speedSlider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
-    speedSlider.step = "any";
-    speedSlider.value = String(speedToSliderPosition(appState.playbackSpeed));
-    speedSlider.ariaLabel = getString("ARIA__SPEED_SLIDER");
-    speedSlider.setAttribute("aria-valuemin", "0");
-    speedSlider.setAttribute("aria-valuemax", String(PLAYBACK_SPEED_STEPS.length - 1));
-    speedSlider.setAttribute("aria-valuetext", `${appState.playbackSpeed}×`);
-    speedSlider.addEventListener("input", handleSpeedSlider);
-    speedSlider.addEventListener("keydown", handleSpeedSliderKeydown);
+  const speedSlider = document.createElement("input");
+  speedSlider.type = "range";
+  speedSlider.className = PLUME_ELEM_SELECTORS.speedSlider.split(".")[1];
+  speedSlider.min = "0";
+  speedSlider.max = String(PLAYBACK_SPEED_STEPS.length - 1);
+  speedSlider.step = "any";
+  speedSlider.value = String(speedToSliderPosition(appState.playbackSpeed));
+  speedSlider.ariaLabel = getString("ARIA__SPEED_SLIDER");
+  speedSlider.setAttribute("aria-valuemin", "0");
+  speedSlider.setAttribute("aria-valuemax", String(PLAYBACK_SPEED_STEPS.length - 1));
+  speedSlider.setAttribute("aria-valuetext", `${appState.playbackSpeed}×`);
+  speedSlider.addEventListener("input", handleSpeedSlider);
+  speedSlider.addEventListener("keydown", handleSpeedSliderKeydown);
 
-    const speedTicks = document.createElement("div");
-    speedTicks.className = "plume-speed-ticks";
-    speedTicks.ariaHidden = "true";
-    for (let i = 0; i < PLAYBACK_SPEED_STEPS.length; i++) speedTicks.appendChild(document.createElement("span"));
+  const speedTicks = document.createElement("div");
+  speedTicks.className = "plume-speed-ticks";
+  speedTicks.ariaHidden = "true";
+  for (let i = 0; i < PLAYBACK_SPEED_STEPS.length; i++) speedTicks.appendChild(document.createElement("span"));
 
-    speedPopover.appendChild(speedLabel);
-    speedPopover.appendChild(speedCustomInput);
-    speedPopover.appendChild(speedSlider);
-    speedPopover.appendChild(speedTicks);
-    speedWrapper.appendChild(speedBtn);
-    speedWrapper.appendChild(speedPopover);
+  speedPopover.appendChild(speedLabel);
+  speedPopover.appendChild(speedCustomInput);
+  speedPopover.appendChild(speedSlider);
+  speedPopover.appendChild(speedTicks);
+  speedWrapper.appendChild(speedBtn);
+  speedWrapper.appendChild(speedPopover);
 
-    setupSpeedPopoverBehavior(speedWrapper);
-    setupSpeedLabelClickBehavior(speedWrapper);
-    container.appendChild(speedWrapper);
-    plumeUi.dispatch(guiActions.setSpeedBtns([speedWrapper]));
-  }
+  setupSpeedPopoverBehavior(speedWrapper);
+  setupSpeedLabelClickBehavior(speedWrapper);
+
+  container.appendChild(speedWrapper);
+  plumeUi.dispatch(guiActions.setSpeedBtns([speedWrapper]));
 
   container.appendChild(trackBackwardBtn);
   container.appendChild(timeBackwardBtn);
@@ -391,22 +394,21 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   plumeUi.dispatch(guiActions.setTrackFwdBtns([trackForwardBtn]));
 
   const withLoopModes = appState.featureFlags.loopModes;
-  if (withLoopModes) {
-    const loopBtn = document.createElement("button");
-    loopBtn.id = PLUME_ELEM_SELECTORS.loopBtn.split("#")[1];
-    loopBtn.type = "button";
-    setSvgContent(loopBtn, PLUME_SVG.loopNone);
-    loopBtn.title = getString("ARIA__LOOP__OFF");
-    loopBtn.ariaLabel = getString("ARIA__LOOP__OFF");
-    loopBtn.ariaPressed = "false";
-    loopBtn.addEventListener("click", handleLoopCycle);
+  const loopBtn = document.createElement("button");
+  loopBtn.id = PLUME_ELEM_SELECTORS.loopBtn.split("#")[1];
+  loopBtn.type = "button";
+  loopBtn.classList.toggle("plume-feature-hidden", !withLoopModes);
+  setSvgContent(loopBtn, PLUME_SVG.loopNone);
+  loopBtn.title = getString("ARIA__LOOP__OFF");
+  loopBtn.ariaLabel = getString("ARIA__LOOP__OFF");
+  loopBtn.ariaPressed = "false";
+  loopBtn.addEventListener("click", handleLoopCycle);
 
-    container.appendChild(loopBtn);
-    plumeUi.dispatch(guiActions.setLoopBtns([loopBtn]));
+  container.appendChild(loopBtn);
+  plumeUi.dispatch(guiActions.setLoopBtns([loopBtn]));
 
-    // Apply persisted loop state immediately so button reflects loaded state
-    applyLoopBtnState(loopBtn, appState.loopMode);
-  }
+  // Apply persisted loop state immediately so button reflects loaded state
+  if (withLoopModes) applyLoopBtnState(loopBtn, appState.loopMode);
 
   applyPlaybackControlsSize(container);
   return container;

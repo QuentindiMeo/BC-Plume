@@ -9,6 +9,11 @@
   @apply sr-only;
 }
 
+/* Feature flag visibility: beats ID-selector display rules (specificity 0,1,0,0) */
+.plume-feature-hidden {
+  display: none !important;
+}
+
 /*********** Bandcamp native element overrides ***********/
 @layer plume.base {
   div#name-section {
@@ -116,6 +121,11 @@
 
   .plume-header-title-row {
     @apply flex items-center w-full min-w-0;
+
+    &:has(#plume-header-track-link.plume-feature-hidden),
+    &:not(:has(#plume-header-track-link)) {
+      @apply justify-end;
+    }
   }
 
   #plume-tracklist-toggle-btn {
@@ -371,7 +381,7 @@
   }
 
   #plume-play-pause-btn {
-    @apply size-14! bg-plume-20 border-plume-dimmed;
+    @apply size-13! bg-plume-20 border-plume-dimmed;
 
     &:hover {
       @apply bg-plume-40;
@@ -391,7 +401,7 @@
       @apply size-11;
     }
     #plume-play-pause-btn {
-      @apply size-16!;
+      @apply size-15!;
     }
   }
 
@@ -403,7 +413,7 @@
       @apply size-9;
     }
     #plume-play-pause-btn {
-      @apply size-12!;
+      @apply size-11!;
     }
   }
 }

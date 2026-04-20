@@ -8,10 +8,10 @@ import {
   setupSpeedLabelClickBehavior,
   setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
+import { PLAYBACK_SPEED_STEPS } from "@/domain/plume";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../../fakes/FakeMusicPlayer";
-import { PLAYBACK_SPEED_STEPS } from "@/domain/plume";
 
 const fakeToast = vi.fn();
 vi.mock("@/app/features/ui/toast", () => ({ createToast: (...args: unknown[]) => fakeToast(...args) }));
@@ -46,15 +46,17 @@ vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
+    runtimeSpan: "span#plume-runtime-span",
+    headerTrackLink: "a#plume-header-track-link",
+    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
+    tracklistDropdown: "div#plume-tracklist-dropdown",
+    playbackControls: "div#plume-playback-controls",
     speedBtn: "button#plume-speed-btn",
     speedLabel: "span.plume-speed-label",
     speedSlider: "input.plume-speed-slider",
     speedCustomInput: "input.plume-speed-custom-input",
     speedPopover: "div.plume-speed-popover",
-    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
-    tracklistDropdown: "div#plume-tracklist-dropdown",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
-    headerTrackLink: "a#plume-header-track-link",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
@@ -245,7 +247,7 @@ describe("speedControl feature flag subscription", () => {
   it("hides the speed wrapper when speedControl flag is disabled", () => {
     const flags = { ...fakeAppCore.getState().featureFlags, speedControl: false };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
-    expect(speedWrapper.hidden).toBe(true);
+    expect(speedWrapper.classList.contains("plume-feature-hidden")).toBe(true);
   });
 
   it("shows the speed wrapper when speedControl flag is re-enabled", () => {
@@ -254,7 +256,7 @@ describe("speedControl feature flag subscription", () => {
 
     const enabledFlags = { ...fakeAppCore.getState().featureFlags, speedControl: true };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
-    expect(speedWrapper.hidden).toBe(false);
+    expect(speedWrapper.classList.contains("plume-feature-hidden")).toBe(false);
   });
 
   it("resets playback speed to 1× when speedControl is disabled", () => {
@@ -775,5 +777,82 @@ describe("applyPlaybackControlsSize", () => {
     applyPlaybackControlsSize(container);
     expect(container.classList.contains("compact")).toBe(false);
     expect(container.classList.contains("spacious")).toBe(false);
+  });
+
+  it("does not count children with plume-feature-hidden class (without hidden attribute)", () => {
+    // 7 total but 1 hidden via class only → 6 visible → no modifier
+    const container = makeContainer(0, 0, 0, 0, 0, 0, 0);
+    (container.children[6] as HTMLElement).classList.add("plume-feature-hidden");
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("compact")).toBe(false);
+    expect(container.classList.contains("spacious")).toBe(false);
+  });
+
+  it("adds 'spacious' when plume-feature-hidden reduces visible count to 5", () => {
+    // 7 total, 2 hidden via class → 5 visible → spacious
+    const container = makeContainer(0, 0, 0, 0, 0, 0, 0);
+    (container.children[5] as HTMLElement).classList.add("plume-feature-hidden");
+    (container.children[6] as HTMLElement).classList.add("plume-feature-hidden");
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("spacious")).toBe(true);
+    expect(container.classList.contains("compact")).toBe(false);
+  });
+
+  it("treats a child as hidden when both the hidden attribute and plume-feature-hidden class are set", () => {
+    // 7 total, 1 doubly-hidden → 6 visible → no modifier
+    const container = makeContainer(0, 0, 0, 0, 0, 0, 0);
+    const child = container.children[6] as HTMLElement;
+    child.hidden = true;
+    child.classList.add("plume-feature-hidden");
+    applyPlaybackControlsSize(container);
+    expect(container.classList.contains("compact")).toBe(false);
+    expect(container.classList.contains("spacious")).toBe(false);
+  });
+});
+
+describe("runtime feature flag subscription", () => {
+  let cleanup: () => void;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    fakeAppCore = new FakeAppCore();
+    fakeMusicPlayer = new FakeMusicPlayer();
+    mockGetState.mockReturnValue(makeGuiState([]));
+
+    const { setupStoreSubscriptions } = await import("@/app/features/store-subscriptions");
+    cleanup = setupStoreSubscriptions();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("hides the runtime span when runtime flag is disabled", () => {
+    const span = document.createElement("span");
+    span.id = PLUME_ELEM_SELECTORS.runtimeSpan.split("#")[1];
+    document.body.appendChild(span);
+
+    const flags = { ...fakeAppCore.getState().featureFlags, runtime: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
+
+    expect(span.classList.contains("plume-feature-hidden")).toBe(true);
+    document.body.removeChild(span);
+  });
+
+  it("shows the runtime span when runtime flag is re-enabled", () => {
+    const span = document.createElement("span");
+    span.id = PLUME_ELEM_SELECTORS.runtimeSpan.split("#")[1];
+    document.body.appendChild(span);
+
+    // First disable runtime so span becomes hidden
+    const disabledFlags = { ...fakeAppCore.getState().featureFlags, runtime: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
+    expect(span.classList.contains("plume-feature-hidden")).toBe(true);
+
+    // Then re-enable runtime so span becomes visible again
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, runtime: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+    expect(span.classList.contains("plume-feature-hidden")).toBe(false);
+    document.body.removeChild(span);
   });
 });

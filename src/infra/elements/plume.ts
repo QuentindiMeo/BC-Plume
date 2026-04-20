@@ -3,6 +3,7 @@ export enum PLUME_ELEM_SELECTORS {
   bcElements = "div#plume-hidden-original",
   plumeContainer = "div#plume-root",
 
+  runtimeSpan = "span#plume-runtime-span",
   headerContainer = "div#plume-header-container",
   headerLogo = "a#plume-header-logo",
   headerCurrent = "div#plume-header-current",
