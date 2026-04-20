@@ -168,9 +168,9 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
 };
 
 export const applyPlaybackControlsSize = (container: HTMLElement): void => {
-  const visibleCount = Array.from(container.children).filter((el) => {
-    const h = el as HTMLElement;
-    return !h.hidden && !h.classList.contains("plume-feature-hidden");
+  const visibleCount = Array.from(container.children).filter((child) => {
+    const playbackButton = child as HTMLElement;
+    return !playbackButton.hidden && !playbackButton.classList.contains("plume-feature-hidden");
   }).length;
   container.classList.remove("compact", "spacious");
   if (visibleCount <= 5) container.classList.add("spacious");

@@ -210,8 +210,10 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Runtime: show/hide the runtime span
       if (flags.runtime !== prevFlags.runtime) {
-        const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
-        if (runtimeSpan) runtimeSpan.classList.toggle("plume-feature-hidden", !flags.runtime);
+        const runtimeSpans = document.querySelectorAll<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
+        runtimeSpans.forEach((runtimeSpan) => {
+          runtimeSpan.classList.toggle("plume-feature-hidden", !flags.runtime);
+        });
       }
 
       // Quick seek: flag is read on trigger (key)

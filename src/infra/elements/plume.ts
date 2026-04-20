@@ -3,6 +3,7 @@ export enum PLUME_ELEM_SELECTORS {
   bcElements = "div#plume-hidden-original",
   plumeContainer = "div#plume-root",
 
+  runtimeSpan = "span#plume-runtime-span",
   headerContainer = "div#plume-header-container",
   headerLogo = "a#plume-header-logo",
   headerCurrent = "div#plume-header-current",
@@ -33,7 +34,6 @@ export enum PLUME_ELEM_SELECTORS {
   timeFwdBtn = "button#plume-time-fwd-btn",
   trackFwdBtn = "button#plume-track-fwd-btn",
   loopBtn = "button#plume-loop-btn",
-  runtimeSpan = "span#plume-runtime-span",
 
   volumeContainer = "div#plume-volume-container",
   muteBtn = "button#plume-mute-btn",

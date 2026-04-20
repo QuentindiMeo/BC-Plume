@@ -1,4 +1,5 @@
 import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { measureContrastRatioWCAG, WCAG_CONTRAST_LARGE } from "@/shared/colors";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -86,7 +87,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
 
   const runtimeSpan = document.createElement("span");
   runtimeSpan.className = "runtime";
-  runtimeSpan.id = "plume-runtime-span";
+  runtimeSpan.id = PLUME_ELEM_SELECTORS.runtimeSpan.split("#")[1];
   runtimeSpan.textContent = "(" + runtimeInfo.formattedTotalRuntime + ")";
   runtimeSpan.style.color = runtimeTextColor;
   runtimeSpan.ariaLabel = runtimeInfo.ariaString;
