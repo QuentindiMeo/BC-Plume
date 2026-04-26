@@ -22,15 +22,26 @@ import { guiActions } from "@/domain/ports/plume-ui";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-const initPlayback = () => {
-  // BC's native play button is clicked to trigger its own internal playback bootstrap
+/**
+ * Defers Bandcamp's internal player bootstrap to the first user-initiated play.
+ * This avoids triggering Bandcamp's cross-tab audio exclusivity on page load,
+ * which would pause players in other tabs on Plume init.
+ */
+const initPlayback = (audio: HTMLAudioElement) => {
   const bcPlayer = getBcPlayerInstance();
   const playButton = bcPlayer.getPlayPauseButton();
-  if (playButton) {
-    playButton.click();
-  } else {
+  if (!playButton) {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
+    return;
   }
+
+  const bootstrapOnce = () => {
+    audio.removeEventListener("play", bootstrapOnce);
+    // Bandcamp's button click triggers its internal state machine.
+    // The audio is already playing (user intent), so the click acts as a no-op toggle that syncs Bandcamp's UI without interrupting playback.
+    playButton.click(); // BC sees "not playing" → starts playing (already happening)
+  };
+  audio.addEventListener("play", bootstrapOnce);
 };
 
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
@@ -155,7 +166,7 @@ export const launchPlume = (): void => {
     if (await shouldShowReleaseToast(browserCache)) showReleaseToast();
 
     setupListeners(handles);
-    initPlayback();
+    initPlayback(audioElement);
 
     // Debug: show detected controls
     debugBandcampControls();
