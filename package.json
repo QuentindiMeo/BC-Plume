@@ -80,5 +80,8 @@
     "tests/**/*.ts": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "web-audio-beat-detector": "^8.2.36"
   }
 }

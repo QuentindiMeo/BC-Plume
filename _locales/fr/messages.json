@@ -482,6 +482,21 @@
   },
   "WARN__TRALBUM__NOT_FOUND": { "message": "Données de l'album (data-tralbum) non trouvées sur la page" },
   "WARN__TRALBUM__PARSE_ERROR": { "message": "Échec de l'analyse des données de l'album (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "Détection du BPM échouée pour '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Début de la détection du BPM pour '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM détecté : $BPM$ pour '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/un-morceau" }
+    }
+  },
   "INFO__TOAST__SHOWN": {
     "message": "Notification affichée ($LABEL$)",
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }

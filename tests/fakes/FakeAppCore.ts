@@ -25,6 +25,7 @@ const DEFAULT_STATE: AppCore = {
   isMuted: false,
   volumeBeforeMute: 0,
   isFullscreen: false,
+  trackBpms: {},
 };
 
 /**

@@ -16,6 +16,12 @@ export interface AppPersistedState {
   featureFlags: FeatureFlags;
 }
 
+export interface TrackBpmEntry {
+  bpm: number | null;
+  loading: boolean;
+  error: boolean;
+}
+
 export interface AppTransientState {
   pageType: BcPageType | null;
   trackTitle: string | null;
@@ -26,6 +32,7 @@ export interface AppTransientState {
   isMuted: boolean;
   volumeBeforeMute: number;
   isFullscreen: boolean;
+  trackBpms: Record<string, TrackBpmEntry>;
 }
 
 export interface AppCore extends AppPersistedState, AppTransientState {}
@@ -51,6 +58,11 @@ export enum CORE_ACTIONS {
   SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
+
+  SET_TRACK_BPM_LOADING = "SET_TRACK_BPM_LOADING",
+  SET_TRACK_BPM_SUCCESS = "SET_TRACK_BPM_SUCCESS",
+  SET_TRACK_BPM_ERROR = "SET_TRACK_BPM_ERROR",
+  CLEAR_TRACK_BPMS = "CLEAR_TRACK_BPMS",
 }
 
 export type CoreAction =
@@ -72,7 +84,11 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
   | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
   | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
-  | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
+  | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_LOADING, string>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_SUCCESS, { trackUrl: string; bpm: number }>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_ERROR, string>
+  | IAction<CORE_ACTIONS.CLEAR_TRACK_BPMS>;
 
 interface ICoreActions {
   // State
@@ -97,6 +113,12 @@ interface ICoreActions {
   setTrackRestartThreshold: (threshold: number) => CoreAction;
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setFeatureFlags: (flags: FeatureFlags) => CoreAction;
+
+  // BPM
+  setTrackBpmLoading: (trackUrl: string) => CoreAction;
+  setTrackBpmSuccess: (trackUrl: string, bpm: number) => CoreAction;
+  setTrackBpmError: (trackUrl: string) => CoreAction;
+  clearTrackBpms: () => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -147,6 +169,20 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_FEATURE_FLAGS,
     payload: flags,
   }),
+
+  setTrackBpmLoading: (trackUrl: string): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_LOADING,
+    payload: trackUrl,
+  }),
+  setTrackBpmSuccess: (trackUrl: string, bpm: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_SUCCESS,
+    payload: { trackUrl, bpm },
+  }),
+  setTrackBpmError: (trackUrl: string): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_ERROR,
+    payload: trackUrl,
+  }),
+  clearTrackBpms: (): CoreAction => ({ type: CORE_ACTIONS.CLEAR_TRACK_BPMS }),
 } as const;
 
 export type AppCoreListener<AppCoreProp extends keyof AppCore = keyof AppCore> = (

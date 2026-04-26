@@ -43,6 +43,7 @@ const INITIAL_STATE: AppCore = {
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
   isFullscreen: false,
+  trackBpms: {},
 
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
@@ -305,6 +306,27 @@ const createAppCoreInstance = (): IAppCore => {
         break;
       case CORE_ACTIONS.SET_FEATURE_FLAGS:
         updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
+        updateState("trackBpms", {
+          ...state.trackBpms,
+          [action.payload]: { bpm: state.trackBpms[action.payload]?.bpm ?? null, loading: true, error: false },
+        });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_SUCCESS:
+        updateState("trackBpms", {
+          ...state.trackBpms,
+          [action.payload.trackUrl]: { bpm: action.payload.bpm, loading: false, error: false },
+        });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_ERROR:
+        updateState("trackBpms", {
+          ...state.trackBpms,
+          [action.payload]: { bpm: state.trackBpms[action.payload]?.bpm ?? null, loading: false, error: true },
+        });
+        break;
+      case CORE_ACTIONS.CLEAR_TRACK_BPMS:
+        updateState("trackBpms", {});
         break;
       default:
         action satisfies never; // Ensure declared all action types are handled
