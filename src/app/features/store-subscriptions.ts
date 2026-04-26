@@ -1,4 +1,5 @@
 import { cleanupFullscreenMode } from "@/app/features/fullscreen";
+import { markPlumeInitiatedPlay } from "@/app/features/lifecycle";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncLoopBtn } from "@/app/features/ui/loop";
@@ -112,8 +113,12 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       const musicPlayer = getMusicPlayerInstance();
-      if (isPlaying && musicPlayer.isPaused()) musicPlayer.play();
-      else if (!isPlaying && !musicPlayer.isPaused()) musicPlayer.pause();
+      if (isPlaying && musicPlayer.isPaused()) {
+        markPlumeInitiatedPlay();
+        musicPlayer.play();
+      } else if (!isPlaying && !musicPlayer.isPaused()) {
+        musicPlayer.pause();
+      }
 
       const plume = getGuiInstance().getState();
       plume.playPauseBtns.forEach((btn) => {

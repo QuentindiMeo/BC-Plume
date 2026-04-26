@@ -41,6 +41,7 @@ vi.mock("@/app/stores/GuiImpl", () => ({
 }));
 
 vi.mock("@/app/features/fullscreen", () => ({ cleanupFullscreenMode: vi.fn() }));
+vi.mock("@/app/features/lifecycle", () => ({ markPlumeInitiatedPlay: vi.fn() }));
 vi.mock("@/app/features/observers", () => ({ updateTrackForwardBtnState: vi.fn() }));
 vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
