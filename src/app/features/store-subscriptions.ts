@@ -5,6 +5,7 @@ import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types
 import { syncLoopBtn } from "@/app/features/ui/loop";
 import { applyPlaybackControlsSize } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
+import { syncBpmDisplay } from "@/app/features/ui/bpm-display";
 import { syncMuteBtn } from "@/app/features/ui/volume";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
@@ -155,6 +156,9 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         }
       });
 
+      // Re-sync BPM display with new speed multiplier
+      syncBpmDisplay(appCore.getState().trackBpms);
+
       if (
         !safariSpeedWarningShown &&
         isSafariBrowser() &&
@@ -221,11 +225,23 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         });
       }
 
+      // BPM detect: toggle container visibility
+      if (flags.bpmDetect !== prevFlags.bpmDetect) {
+        const bpmContainer = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmContainer);
+        if (bpmContainer) bpmContainer.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+      }
+
       // Quick seek: flag is read on trigger (key)
 
       // Resize playback controls to fit the number of visible children
       const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (controls) applyPlaybackControlsSize(controls);
+    }),
+    appCore.subscribe("trackBpms", (trackBpms) => {
+      syncBpmDisplay(trackBpms);
+    }),
+    appCore.subscribe("trackNumber", () => {
+      syncBpmDisplay(appCore.getState().trackBpms);
     })
   );
 

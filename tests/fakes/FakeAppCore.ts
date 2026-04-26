@@ -1,4 +1,5 @@
 import { DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import type { FeatureFlags } from "@/domain/plume";
 import { PLUME_DEFAULTS } from "@/domain/plume";
 import type { AppCore, AppCoreListener, CoreAction, IAppCore } from "@/domain/ports/app-core";
 import { CORE_ACTIONS } from "@/domain/ports/app-core";
@@ -14,7 +15,7 @@ const DEFAULT_STATE: AppCore = {
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
   trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
   hotkeyBindings: DEFAULT_HOTKEYS,
-  featureFlags: { ...PLUME_DEFAULTS.featureFlags },
+  featureFlags: { ...PLUME_DEFAULTS.featureFlags } as FeatureFlags,
 
   pageType: null,
   trackTitle: null,
@@ -91,6 +92,27 @@ export class FakeAppCore implements IAppCore {
         break;
       case CORE_ACTIONS.SET_FEATURE_FLAGS:
         this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
+        this.updateState("trackBpms", {
+          ...this.state.trackBpms,
+          [action.payload]: { bpm: null, loading: true, error: false },
+        });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_SUCCESS:
+        this.updateState("trackBpms", {
+          ...this.state.trackBpms,
+          [action.payload.trackUrl]: { bpm: action.payload.bpm, loading: false, error: false },
+        });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_ERROR:
+        this.updateState("trackBpms", {
+          ...this.state.trackBpms,
+          [action.payload]: { bpm: null, loading: false, error: true },
+        });
+        break;
+      case CORE_ACTIONS.CLEAR_TRACK_BPMS:
+        this.updateState("trackBpms", {});
         break;
     }
   }

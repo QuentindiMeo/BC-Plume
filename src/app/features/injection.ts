@@ -5,6 +5,7 @@ import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
 import { getAppropriateAccentColor, getCurrentTrackTitle } from "@/app/features/track-title";
 import { CleanupCallback } from "@/app/features/types";
 import {
+  createBpmDisplaySection,
   createFullscreenButtonSection,
   createPlaybackControlPanel,
   createProgressBar,
@@ -192,6 +193,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   const volumeContainer = await createVolumeControlSection();
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
+
+  const bpmSection = createBpmDisplaySection(isAlbumPage);
+  bpmSection.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+  plumeContainer.appendChild(bpmSection);
 
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
   fullscreenBtnSection.classList.toggle("plume-feature-hidden", !flags.fullscreen);

@@ -44,6 +44,7 @@ vi.mock("@/app/features/fullscreen", () => ({ cleanupFullscreenMode: vi.fn() }))
 vi.mock("@/app/features/lifecycle", () => ({ markPlumeInitiatedPlay: vi.fn() }));
 vi.mock("@/app/features/observers", () => ({ updateTrackForwardBtnState: vi.fn() }));
 vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
+vi.mock("@/app/features/ui/bpm-display", () => ({ syncBpmDisplay: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
@@ -58,6 +59,8 @@ vi.mock("@/infra/elements/plume", () => ({
     speedCustomInput: "input.plume-speed-custom-input",
     speedPopover: "div.plume-speed-popover",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
+    bpmContainer: "div#plume-bpm-container",
+    bpmBadge: "span.plume-bpm-badge",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));

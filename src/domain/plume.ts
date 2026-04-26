@@ -98,6 +98,7 @@ export const PLUME_DEFAULTS = {
     quickSeek: true,
     runtime: true,
     speedControl: true,
+    bpmDetect: true,
   } as const,
 } as const;
 
@@ -115,5 +116,6 @@ export type FeatureFlags = {
   quickSeek: boolean;
   runtime: boolean;
   speedControl: boolean;
+  bpmDetect: boolean;
 };
 export type FeatureFlagKey = keyof FeatureFlags;

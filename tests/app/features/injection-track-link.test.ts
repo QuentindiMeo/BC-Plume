@@ -15,6 +15,7 @@ vi.mock("@/infra/elements/plume", () => ({
     playbackManager: "div#plume-playback-manager",
     progressContainer: "div#plume-progress-container",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
+    bpmContainer: "div#plume-bpm-container",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
@@ -70,6 +71,11 @@ vi.mock("@/app/features/original-player", () => ({
   hideOriginalPlayerElements: vi.fn(),
 }));
 vi.mock("@/app/features/ui", () => ({
+  createBpmDisplaySection: () => {
+    const el = document.createElement("div");
+    el.id = "plume-bpm-container";
+    return el;
+  },
   createPlaybackControlPanel: () => document.createElement("div"),
   createProgressBar: () => document.createElement("div"),
   createVolumeControlSection: async () => document.createElement("div"),

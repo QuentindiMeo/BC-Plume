@@ -18,6 +18,7 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
   { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
+  { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
 ];
 
 const areAllDefaults = (flags: FeatureFlags): boolean =>

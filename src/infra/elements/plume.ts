@@ -53,4 +53,10 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenTitlingRelease = "h2#plume-fullscreen-titling__release",
   fullscreenTitlingArtist = "h3#plume-fullscreen-titling__artist",
   fullscreenClone = "div#plume-fullscreen-clone",
+
+  bpmContainer = "div#plume-bpm-container",
+  bpmValue = "span#plume-bpm-value",
+  bpmLabel = "span#plume-bpm-label",
+  bpmDetectAllBtn = "button#plume-bpm-detect-all-btn",
+  bpmBadge = "span.plume-bpm-badge",
 }
