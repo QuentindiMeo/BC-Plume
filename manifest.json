@@ -13,8 +13,12 @@
     "tabs"
   ],
   "host_permissions": [
-    "*://*.bandcamp.com/*"
+    "*://*.bandcamp.com/*",
+    "*://*.bcbits.com/*"
   ],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
   "content_scripts": [
     {
       "matches": [
