@@ -459,6 +459,8 @@
     "message": "Invalid toast icon SVG provided for label '$LABEL$'",
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Track album data (data-tralbum) not found on page" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Failed to parse track album data (data-tralbum)" },
   "INFO__TOAST__SHOWN": {
     "message": "Toast shown ($LABEL$)",
     "placeholders": { "label": { "content": "$1", "example": "release update" } }

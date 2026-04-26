@@ -482,6 +482,8 @@
     "message": "SVG del icono del toast inválido para la etiqueta '$LABEL$'",
     "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
   },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Datos del álbum (data-tralbum) no encontrados en la página" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Error al analizar los datos del álbum (data-tralbum)" },
   "INFO__TOAST__SHOWN": {
     "message": "Notificación mostrada ($LABEL$)",
     "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
