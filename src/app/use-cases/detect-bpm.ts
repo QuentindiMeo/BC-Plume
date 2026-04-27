@@ -1,75 +1,24 @@
 import { getTrackAudioInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { BPM_PORT_PREFIX, type BpmAudioMessage } from "@/domain/bpm-audio-messages";
+import { BPM_FETCH_ACTION, type BpmFetchResponse } from "@/domain/bpm-audio-messages";
 import { coreActions } from "@/domain/ports/app-core";
 import { inferBrowserApi } from "@/shared/browser";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-const mergeChunks = (chunks: Uint8Array[]): Uint8Array => {
-  let length = 0;
-  for (const chunk of chunks) length += chunk.length;
-  const merged = new Uint8Array(length);
-  let offset = 0;
-  for (const chunk of chunks) {
-    merged.set(chunk, offset);
-    offset += chunk.length;
+const fetchAudioViaBackground = async (audioStreamUrl: string): Promise<ArrayBuffer> => {
+  const browserApi = inferBrowserApi();
+  const response = (await browserApi.runtime.sendMessage({
+    action: BPM_FETCH_ACTION,
+    url: audioStreamUrl,
+  })) as BpmFetchResponse;
+
+  if (!response?.ok || !response.data) {
+    throw new Error(response?.error ?? "Background audio fetch failed");
   }
-  return merged;
+
+  return new Uint8Array(response.data).buffer as ArrayBuffer;
 };
-
-const fetchAudioViaBackground = (audioStreamUrl: string): Promise<ArrayBuffer> =>
-  new Promise((resolve, reject) => {
-    const browserApi = inferBrowserApi();
-    let port: ReturnType<typeof browserApi.runtime.connect>;
-    try {
-      port = browserApi.runtime.connect({ name: BPM_PORT_PREFIX + audioStreamUrl });
-    } catch (error) {
-      reject(new Error("Failed to connect to background worker"));
-      return;
-    }
-    const chunks: Uint8Array[] = [];
-    let settled = false;
-
-    const cleanup = () => {
-      port.onMessage.removeListener(onMessage);
-      try {
-        port.disconnect();
-      } catch {
-        // Port may already be disconnected
-      }
-    };
-
-    const onDisconnect = () => {
-      if (!settled) {
-        settled = true;
-        cleanup();
-        reject(new Error("Background port disconnected unexpectedly"));
-      }
-    };
-
-    const onMessage = (message: BpmAudioMessage) => {
-      switch (message.type) {
-        case "BPM_AUDIO_START":
-          break;
-        case "BPM_AUDIO_DATA":
-          chunks.push(new Uint8Array(message.data));
-          break;
-        case "BPM_AUDIO_END":
-          settled = true;
-          cleanup();
-          resolve(mergeChunks(chunks).buffer as ArrayBuffer);
-          break;
-        case "BPM_AUDIO_ERROR":
-          settled = true;
-          cleanup();
-          reject(new Error(message.reason));
-          break;
-      }
-    };
-    port.onMessage.addListener(onMessage);
-    port.onDisconnect?.addListener(onDisconnect);
-  });
 
 const analyzeAudioBuffer = async (buffer: ArrayBuffer): Promise<number> => {
   const audioContext = new AudioContext();

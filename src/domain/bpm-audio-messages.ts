@@ -1,29 +1,18 @@
 /**
- * Port-level messages exchanged between the content script and the background
- * service worker over a `runtime.connect()` channel for streaming audio data
- * used in BPM detection.
- *
- * These are NOT PlumeMessages (tab-broadcast); they flow over a dedicated port.
+ * Messages exchanged between the content script and the background service
+ * worker via `runtime.sendMessage` / `onMessage` for fetching cross-origin
+ * audio data used in BPM detection.
  */
 
-export const BPM_PORT_PREFIX = "BpmAnalyze#";
+export const BPM_FETCH_ACTION = "BPM_FETCH_AUDIO";
 
-interface BpmAudioStartMessage {
-  type: "BPM_AUDIO_START";
+export interface BpmFetchRequest {
+  action: typeof BPM_FETCH_ACTION;
+  url: string;
 }
 
-interface BpmAudioDataMessage {
-  type: "BPM_AUDIO_DATA";
-  data: number[];
+export interface BpmFetchResponse {
+  ok: boolean;
+  data?: number[];
+  error?: string;
 }
-
-interface BpmAudioEndMessage {
-  type: "BPM_AUDIO_END";
-}
-
-interface BpmAudioErrorMessage {
-  type: "BPM_AUDIO_ERROR";
-  reason: string;
-}
-
-export type BpmAudioMessage = BpmAudioStartMessage | BpmAudioDataMessage | BpmAudioEndMessage | BpmAudioErrorMessage;

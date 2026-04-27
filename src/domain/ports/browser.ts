@@ -1,17 +1,6 @@
 import { PlumeCacheKey } from "@/domain/browser";
 import { IAction, IStore } from "@/domain/store";
 
-export interface IBrowserPort {
-  onMessage: {
-    addListener: (callback: (message: any) => void) => void;
-    removeListener: (callback: (message: any) => void) => void;
-  };
-  onDisconnect?: {
-    addListener: (callback: () => void) => void;
-  };
-  disconnect: () => void;
-}
-
 export interface IBrowserApi {
   storage: {
     local: {
@@ -25,7 +14,7 @@ export interface IBrowserApi {
       addListener: (handler: (message: unknown) => void) => void;
       removeListener: (handler: (message: unknown) => void) => void;
     };
-    connect: (connectInfo: { name: string }) => IBrowserPort;
+    sendMessage: (message: unknown) => Promise<unknown>;
   };
   tabs?: {
     query: (queryInfo: { url: string }) => Promise<Array<{ id?: number }>>;

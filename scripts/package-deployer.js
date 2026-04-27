@@ -74,10 +74,7 @@ const deployPackage = (browser) => {
         run_at: rootManifest.content_scripts[0].run_at,
       },
     ],
-    background:
-      browser === "firefox"
-        ? { scripts: ["background.js"] }
-        : { service_worker: "background.js" },
+    background: { service_worker: "background.js" },
     icons: {
       16: "icons/icon16.png",
       48: "icons/icon48.png",
