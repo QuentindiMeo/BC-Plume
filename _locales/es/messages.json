@@ -483,23 +483,6 @@
     "message": "SVG del icono del toast inválido para la etiqueta '$LABEL$'",
     "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
   },
-  "WARN__TRALBUM__NOT_FOUND": { "message": "Datos del álbum (data-tralbum) no encontrados en la página" },
-  "WARN__TRALBUM__PARSE_ERROR": { "message": "Error al analizar los datos del álbum (data-tralbum)" },
-  "WARN__BPM__DETECT_FAILED": {
-    "message": "Detección de BPM fallida para '$TRACK_URL$'",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
-  },
-  "INFO__BPM__DETECT_START": {
-    "message": "Iniciando detección de BPM para '$TRACK_URL$'",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
-  },
-  "INFO__BPM__DETECT_SUCCESS": {
-    "message": "BPM detectado: $BPM$ para '$TRACK_URL$'",
-    "placeholders": {
-      "bpm": { "content": "$1", "example": "128" },
-      "track_url": { "content": "$2", "example": "/track/alguna-pista" }
-    }
-  },
   "INFO__TOAST__SHOWN": {
     "message": "Notificación mostrada ($LABEL$)",
     "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
@@ -596,5 +579,22 @@
   "ARIA__BPM__BADGE": {
     "message": "$BPM$ pulsaciones por minuto",
     "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Datos del álbum (data-tralbum) no encontrados en la página" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Error al analizar los datos del álbum (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "Detección de BPM fallida para '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Iniciando detección de BPM para '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM detectado: $BPM$ para '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/alguna-pista" }
+    }
   }
 }

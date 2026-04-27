@@ -6,76 +6,6 @@ import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 
 const BADGE_CLASS = PLUME_ELEM_SELECTORS.bpmBadge.split(".")[1];
-
-export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement => {
-  const container = document.createElement("div");
-  container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
-
-  const label = document.createElement("span");
-  label.id = PLUME_ELEM_SELECTORS.bpmLabel.split("#")[1];
-  label.textContent = getString("LABEL__BPM__DISPLAY");
-  label.ariaHidden = "true";
-  container.appendChild(label);
-
-  const value = document.createElement("span");
-  value.id = PLUME_ELEM_SELECTORS.bpmValue.split("#")[1];
-  value.textContent = "—";
-  value.ariaLabel = getString("ARIA__BPM__DISPLAY");
-  container.appendChild(value);
-
-  if (isAlbumPage) {
-    const detectAllBtn = document.createElement("button");
-    detectAllBtn.id = PLUME_ELEM_SELECTORS.bpmDetectAllBtn.split("#")[1];
-    detectAllBtn.type = "button";
-    detectAllBtn.textContent = getString("LABEL__BPM__DETECT_ALL");
-    detectAllBtn.ariaLabel = getString("ARIA__BPM__DETECT_ALL_BTN");
-    detectAllBtn.addEventListener("click", () => {
-      detectBpmForAllTracks();
-    });
-    container.appendChild(detectAllBtn);
-  }
-
-  return container;
-};
-
-/** Update the main BPM value display and tracklist badges. */
-export const syncBpmDisplay = (trackBpms: Record<string, TrackBpmEntry>): void => {
-  const appCore = getAppCoreInstance();
-  const speed = appCore.getState().playbackSpeed;
-
-  // Update main BPM display for current track
-  const currentUrl = resolveCurrentTrackUrl();
-  const valueEl = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmValue);
-  if (valueEl) {
-    const entry = currentUrl ? trackBpms[currentUrl] : undefined;
-    updateBpmElement(valueEl, entry, speed);
-  }
-
-  // Update tracklist badges
-  syncTracklistBpmBadges(trackBpms, speed);
-};
-
-const updateBpmElement = (el: HTMLElement, entry: TrackBpmEntry | undefined, speed: number): void => {
-  el.classList.remove("detecting", "error");
-
-  if (!entry) {
-    el.textContent = "—";
-    return;
-  }
-
-  if (entry.loading) {
-    el.textContent = getString("LABEL__BPM__DETECTING");
-    el.classList.add("detecting");
-  } else if (entry.error) {
-    el.textContent = getString("LABEL__BPM__ERROR");
-    el.classList.add("error");
-  } else if (entry.bpm !== null) {
-    const adjusted = Math.round(entry.bpm * speed * 10) / 10;
-    el.textContent = String(adjusted);
-    el.ariaLabel = getString("ARIA__BPM__BADGE", [String(adjusted)]);
-  }
-};
-
 const syncTracklistBpmBadges = (trackBpms: Record<string, TrackBpmEntry>, speed: number): void => {
   const trackAudio = getTrackAudioInstance();
   const infos = trackAudio.getTrackAudioInfos();
@@ -120,6 +50,27 @@ const syncTracklistBpmBadges = (trackBpms: Record<string, TrackBpmEntry>, speed:
   });
 };
 
+const updateBpmElement = (el: HTMLElement, entry: TrackBpmEntry | undefined, speed: number): void => {
+  el.classList.remove("detecting", "error");
+
+  if (!entry) {
+    el.textContent = "—";
+    return;
+  }
+
+  if (entry.loading) {
+    el.textContent = getString("LABEL__BPM__DETECTING");
+    el.classList.add("detecting");
+  } else if (entry.error) {
+    el.textContent = getString("LABEL__BPM__ERROR");
+    el.classList.add("error");
+  } else if (entry.bpm !== null) {
+    const adjusted = Math.round(entry.bpm * speed * 10) / 10;
+    el.textContent = String(adjusted);
+    el.ariaLabel = getString("ARIA__BPM__BADGE", [String(adjusted)]);
+  }
+};
+
 const resolveCurrentTrackUrl = (): string | null => {
   const trackAudio = getTrackAudioInstance();
   const infos = trackAudio.getTrackAudioInfos();
@@ -139,4 +90,51 @@ const resolveCurrentTrackUrl = (): string | null => {
   const currentNum = Number(match[1]);
   const info = infos.find((i) => i.trackNumber === currentNum);
   return info?.trackUrl ?? null;
+};
+/** Update the main BPM value display and tracklist badges. */
+export const syncBpmDisplay = (trackBpms: Record<string, TrackBpmEntry>): void => {
+  const appCore = getAppCoreInstance();
+  const speed = appCore.getState().playbackSpeed;
+
+  // Update main BPM display for current track
+  const currentUrl = resolveCurrentTrackUrl();
+  const valueEl = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmValue);
+  if (valueEl) {
+    const entry = currentUrl ? trackBpms[currentUrl] : undefined;
+    updateBpmElement(valueEl, entry, speed);
+  }
+
+  // Update tracklist badges
+  syncTracklistBpmBadges(trackBpms, speed);
+};
+
+export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement => {
+  const container = document.createElement("div");
+  container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
+
+  const label = document.createElement("span");
+  label.id = PLUME_ELEM_SELECTORS.bpmLabel.split("#")[1];
+  label.textContent = getString("LABEL__BPM__DISPLAY");
+  label.ariaHidden = "true";
+  container.appendChild(label);
+
+  const value = document.createElement("span");
+  value.id = PLUME_ELEM_SELECTORS.bpmValue.split("#")[1];
+  value.textContent = "—";
+  value.ariaLabel = getString("ARIA__BPM__DISPLAY");
+  container.appendChild(value);
+
+  if (isAlbumPage) {
+    const detectAllBtn = document.createElement("button");
+    detectAllBtn.id = PLUME_ELEM_SELECTORS.bpmDetectAllBtn.split("#")[1];
+    detectAllBtn.type = "button";
+    detectAllBtn.textContent = getString("LABEL__BPM__DETECT_ALL");
+    detectAllBtn.ariaLabel = getString("ARIA__BPM__DETECT_ALL_BTN");
+    detectAllBtn.addEventListener("click", () => {
+      detectBpmForAllTracks();
+    });
+    container.appendChild(detectAllBtn);
+  }
+
+  return container;
 };

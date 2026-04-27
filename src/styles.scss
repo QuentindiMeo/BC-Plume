@@ -570,14 +570,14 @@
 }
 
 #plume-bpm-container {
-  @apply flex items-center gap-2 px-3 py-1.5;
+  @apply px-3 py-1.5 flex items-center gap-2;
 
   #plume-bpm-label {
-    @apply text-xs font-sans font-semibold text-plume-dimmed uppercase tracking-wider;
+    @apply font-sans font-semibold text-xs text-plume-dimmed uppercase tracking-wider;
   }
 
   #plume-bpm-value {
-    @apply text-sm font-sans font-bold text-white tabular-nums min-w-6 text-center;
+    @apply min-w-6 font-sans font-bold text-sm text-white tabular-nums text-center;
 
     &.detecting {
       @apply text-plume-dimmed animate-pulse;
@@ -589,8 +589,8 @@
 
   #plume-bpm-detect-all-btn {
     @apply
-      ml-auto h-6 px-2 py-0 bg-white/5 border border-white/15 rounded
-      text-xs font-sans font-medium text-plume-dimmed
+      h-6 px-2 py-0 ml-auto bg-white/5 border border-white/15 rounded
+      font-sans font-medium text-xs text-plume-dimmed
       transition-[color,background,border-color]
     ;
 
@@ -608,10 +608,9 @@
 
 .plume-bpm-badge {
   @apply
+    ml-1 px-1.5 py-0 rounded bg-white/5 border border-white/10
     inline-flex items-center justify-center
-    ml-1 px-1.5 py-0 rounded
-    bg-white/5 border border-white/10
-    text-[10px] font-sans font-semibold text-plume-dimmed tabular-nums
+    font-sans font-semibold text-2xs text-plume-dimmed tabular-nums
     leading-tight whitespace-nowrap
   ;
 

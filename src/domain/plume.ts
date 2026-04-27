@@ -93,12 +93,12 @@ export const PLUME_DEFAULTS = {
   featureFlags: {
     goToTrack: true,
     tracklist: true,
+    speedControl: true,
     loopModes: true,
+    bpmDetect: false,
     fullscreen: true,
     quickSeek: true,
     runtime: true,
-    speedControl: true,
-    bpmDetect: true,
   } as const,
 } as const;
 
@@ -111,11 +111,11 @@ export interface TimeState {
 export type FeatureFlags = {
   goToTrack: boolean;
   tracklist: boolean;
+  speedControl: boolean;
   loopModes: boolean;
+  bpmDetect: boolean;
   fullscreen: boolean;
   quickSeek: boolean;
   runtime: boolean;
-  speedControl: boolean;
-  bpmDetect: boolean;
 };
 export type FeatureFlagKey = keyof FeatureFlags;

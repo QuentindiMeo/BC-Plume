@@ -2,10 +2,10 @@ import { cleanupFullscreenMode } from "@/app/features/fullscreen";
 import { markPlumeInitiatedPlay } from "@/app/features/lifecycle";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncBpmDisplay } from "@/app/features/ui/bpm-display";
 import { syncLoopBtn } from "@/app/features/ui/loop";
 import { applyPlaybackControlsSize } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
-import { syncBpmDisplay } from "@/app/features/ui/bpm-display";
 import { syncMuteBtn } from "@/app/features/ui/volume";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
@@ -157,7 +157,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       });
 
       // Re-sync BPM display with new speed multiplier
-      syncBpmDisplay(appCore.getState().trackBpms);
+      const appState = appCore.getState();
+      syncBpmDisplay(appState.trackBpms);
 
       if (
         !safariSpeedWarningShown &&
@@ -231,8 +232,6 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (bpmContainer) bpmContainer.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
       }
 
-      // Quick seek: flag is read on trigger (key)
-
       // Resize playback controls to fit the number of visible children
       const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (controls) applyPlaybackControlsSize(controls);
@@ -241,7 +240,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       syncBpmDisplay(trackBpms);
     }),
     appCore.subscribe("trackNumber", () => {
-      syncBpmDisplay(appCore.getState().trackBpms);
+      const appState = appCore.getState();
+      syncBpmDisplay(appState.trackBpms);
     })
   );
 

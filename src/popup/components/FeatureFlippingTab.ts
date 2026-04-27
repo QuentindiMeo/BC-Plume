@@ -17,9 +17,9 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
   { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
-  { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
   { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
-];
+  { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
+] as const;
 
 const areAllDefaults = (flags: FeatureFlags): boolean =>
   FLAG_ORDER.every(({ flagKey }) => flags[flagKey] === PLUME_DEFAULTS.featureFlags[flagKey]);

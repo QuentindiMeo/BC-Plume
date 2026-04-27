@@ -5,8 +5,7 @@ export interface TrackAudioInfo {
 }
 
 /**
- * Port for extracting track audio metadata from the current Bandcamp page
- * and persisting/retrieving cached BPM values.
+ * Port for extracting track audio metadata from the current Bandcamp page and persisting/retrieving cached BPM values.
  */
 export interface TrackAudioPort {
   /** Parses the page to extract audio stream URLs for all playable tracks. */

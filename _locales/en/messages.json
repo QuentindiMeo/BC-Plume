@@ -460,23 +460,6 @@
     "message": "Invalid toast icon SVG provided for label '$LABEL$'",
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
-  "WARN__TRALBUM__NOT_FOUND": { "message": "Track album data (data-tralbum) not found on page" },
-  "WARN__TRALBUM__PARSE_ERROR": { "message": "Failed to parse track album data (data-tralbum)" },
-  "WARN__BPM__DETECT_FAILED": {
-    "message": "BPM detection failed for '$TRACK_URL$'",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
-  },
-  "INFO__BPM__DETECT_START": {
-    "message": "Starting BPM detection for '$TRACK_URL$'",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
-  },
-  "INFO__BPM__DETECT_SUCCESS": {
-    "message": "BPM detected: $BPM$ for '$TRACK_URL$'",
-    "placeholders": {
-      "bpm": { "content": "$1", "example": "128" },
-      "track_url": { "content": "$2", "example": "/track/some-track" }
-    }
-  },
   "INFO__TOAST__SHOWN": {
     "message": "Toast shown ($LABEL$)",
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
@@ -569,6 +552,22 @@
   "ARIA__BPM__BADGE": {
     "message": "$BPM$ beats per minute",
     "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Track album data (data-tralbum) not found on page" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Failed to parse track album data (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "BPM detection failed for '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Starting BPM detection for '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM detected: $BPM$ for '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/some-track" }
+    }
   }
-
 }

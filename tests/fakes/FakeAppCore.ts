@@ -6,17 +6,7 @@ import { CORE_ACTIONS } from "@/domain/ports/app-core";
 import type { Thunk } from "@/domain/store";
 
 const DEFAULT_STATE: AppCore = {
-  durationDisplayMethod: PLUME_DEFAULTS.durationDisplayMethod,
-  playbackSpeed: PLUME_DEFAULTS.playbackSpeed,
-  loopMode: PLUME_DEFAULTS.loopMode,
-  volume: PLUME_DEFAULTS.savedVolume,
-
-  seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
-  volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
-  trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
-  hotkeyBindings: DEFAULT_HOTKEYS,
-  featureFlags: { ...PLUME_DEFAULTS.featureFlags } as FeatureFlags,
-
+  // Core audio state
   pageType: null,
   trackTitle: null,
   trackNumber: null,
@@ -24,9 +14,22 @@ const DEFAULT_STATE: AppCore = {
   currentTime: 0,
   isPlaying: false,
   isMuted: false,
+
+  // Additional state
+  durationDisplayMethod: PLUME_DEFAULTS.durationDisplayMethod,
+  playbackSpeed: PLUME_DEFAULTS.playbackSpeed,
+  loopMode: PLUME_DEFAULTS.loopMode,
+  volume: PLUME_DEFAULTS.savedVolume,
   volumeBeforeMute: 0,
-  isFullscreen: false,
   trackBpms: {},
+  isFullscreen: false,
+
+  // Persisted settings with defaults
+  seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
+  volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
+  trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
+  hotkeyBindings: DEFAULT_HOTKEYS,
+  featureFlags: { ...PLUME_DEFAULTS.featureFlags } as FeatureFlags,
 };
 
 /**
@@ -60,29 +63,8 @@ export class FakeAppCore implements IAppCore {
   dispatch(action: CoreAction | Thunk<AppCore, CoreAction>): void {
     if (typeof action === "function") return;
     switch (action.type) {
-      case CORE_ACTIONS.SET_CURRENT_TIME:
-        this.updateState("currentTime", action.payload);
-        break;
-      case CORE_ACTIONS.SET_VOLUME:
-        this.updateState("volume", action.payload);
-        break;
-      case CORE_ACTIONS.SET_IS_MUTED:
-        this.updateState("isMuted", action.payload);
-        break;
-      case CORE_ACTIONS.SET_IS_PLAYING:
-        this.updateState("isPlaying", action.payload);
-        break;
-      case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
-        this.updateState("durationDisplayMethod", action.payload);
-        break;
-      case CORE_ACTIONS.SET_PLAYBACK_SPEED:
-        this.updateState("playbackSpeed", action.payload);
-        break;
       case CORE_ACTIONS.SET_PAGE_TYPE:
         this.updateState("pageType", action.payload);
-        break;
-      case CORE_ACTIONS.SET_LOOP_MODE:
-        this.updateState("loopMode", action.payload);
         break;
       case CORE_ACTIONS.SET_TRACK_TITLE:
         this.updateState("trackTitle", action.payload);
@@ -90,8 +72,26 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.SET_TRACK_NUMBER:
         this.updateState("trackNumber", action.payload);
         break;
-      case CORE_ACTIONS.SET_FEATURE_FLAGS:
-        this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
+      case CORE_ACTIONS.SET_CURRENT_TIME:
+        this.updateState("currentTime", action.payload);
+        break;
+      case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
+        this.updateState("durationDisplayMethod", action.payload);
+        break;
+      case CORE_ACTIONS.SET_PLAYBACK_SPEED:
+        this.updateState("playbackSpeed", action.payload);
+        break;
+      case CORE_ACTIONS.SET_IS_PLAYING:
+        this.updateState("isPlaying", action.payload);
+        break;
+      case CORE_ACTIONS.SET_LOOP_MODE:
+        this.updateState("loopMode", action.payload);
+        break;
+      case CORE_ACTIONS.SET_VOLUME:
+        this.updateState("volume", action.payload);
+        break;
+      case CORE_ACTIONS.SET_IS_MUTED:
+        this.updateState("isMuted", action.payload);
         break;
       case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
         this.updateState("trackBpms", {
@@ -113,6 +113,9 @@ export class FakeAppCore implements IAppCore {
         break;
       case CORE_ACTIONS.CLEAR_TRACK_BPMS:
         this.updateState("trackBpms", {});
+        break;
+      case CORE_ACTIONS.SET_FEATURE_FLAGS:
+        this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
         break;
     }
   }

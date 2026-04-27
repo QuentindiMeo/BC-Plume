@@ -12,11 +12,11 @@ interface BandcampTrackEntry {
   title_link?: string;
 }
 
-interface BandcampTralbum {
+interface BandcampTrAlbum {
   trackinfo?: BandcampTrackEntry[];
 }
 
-const parseTralbum = (): BandcampTralbum | null => {
+const parseTrAlbum = (): BandcampTrAlbum | null => {
   const el = document.querySelector<HTMLElement>("[data-tralbum]");
   const raw = el?.dataset["tralbum"];
   if (!raw) {
@@ -25,7 +25,7 @@ const parseTralbum = (): BandcampTralbum | null => {
   }
 
   try {
-    return JSON.parse(raw) as BandcampTralbum;
+    return JSON.parse(raw) as BandcampTrAlbum;
   } catch {
     logger(CPL.WARN, getString("WARN__TRALBUM__PARSE_ERROR"));
     return null;
@@ -37,11 +37,11 @@ const extractAudioUrl = (file: Record<string, string>): string | null =>
 
 export class TrackAudioAdapter implements TrackAudioPort {
   getTrackAudioInfos(): TrackAudioInfo[] {
-    const tralbum = parseTralbum();
-    if (!tralbum?.trackinfo) return [];
+    const trAlbum = parseTrAlbum();
+    if (!trAlbum?.trackinfo) return [];
 
     const results: TrackAudioInfo[] = [];
-    for (const entry of tralbum.trackinfo) {
+    for (const entry of trAlbum.trackinfo) {
       if (!entry.title_link || !entry.file) continue;
       const audioStreamUrl = extractAudioUrl(entry.file);
       if (!audioStreamUrl) continue;

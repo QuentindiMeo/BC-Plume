@@ -58,9 +58,9 @@ vi.mock("@/infra/elements/plume", () => ({
     speedSlider: "input.plume-speed-slider",
     speedCustomInput: "input.plume-speed-custom-input",
     speedPopover: "div.plume-speed-popover",
-    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
     bpmContainer: "div#plume-bpm-container",
     bpmBadge: "span.plume-bpm-badge",
+    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
@@ -865,8 +865,12 @@ describe("runtime feature flag subscription", () => {
     container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
     document.body.appendChild(container);
 
-    const flags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
-    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
+    // Enable first (default is off), then disable
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+
+    const disabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
 
     expect(container.classList.contains("plume-feature-hidden")).toBe(true);
     document.body.removeChild(container);
@@ -877,11 +881,14 @@ describe("runtime feature flag subscription", () => {
     container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
     document.body.appendChild(container);
 
+    // Enable first, then disable, then re-enable
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+
     const disabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
     expect(container.classList.contains("plume-feature-hidden")).toBe(true);
 
-    const enabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: true };
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
     expect(container.classList.contains("plume-feature-hidden")).toBe(false);
     document.body.removeChild(container);

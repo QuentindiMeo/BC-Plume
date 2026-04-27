@@ -14,8 +14,8 @@ vi.mock("@/infra/elements/plume", () => ({
     tracklistDropdown: "div#plume-tracklist-dropdown",
     playbackManager: "div#plume-playback-manager",
     progressContainer: "div#plume-progress-container",
-    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
     bpmContainer: "div#plume-bpm-container",
+    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
@@ -47,8 +47,8 @@ const fakeBcPlayer = {
 };
 vi.mock("@/app/stores/adapters", () => ({ getBcPlayerInstance: () => fakeBcPlayer }));
 
-import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { PLUME_DEFAULTS } from "@/domain/plume";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 let fakeAppCore = new FakeAppCore({ pageType: "album" });
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));

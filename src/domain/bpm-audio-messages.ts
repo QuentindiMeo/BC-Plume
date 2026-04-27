@@ -4,7 +4,7 @@
  * audio data used in BPM detection.
  */
 
-export const BPM_FETCH_ACTION = "BPM_FETCH_AUDIO";
+export const BPM_FETCH_ACTION = "BPM_FETCH_AUDIO" as const;
 
 export interface BpmFetchRequest {
   action: typeof BPM_FETCH_ACTION;

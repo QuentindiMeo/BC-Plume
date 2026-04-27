@@ -5,9 +5,9 @@ import { IAction, IScenarioView, IStore } from "@/domain/store";
 
 export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;
+  playbackSpeed: number;
   loopMode: LoopModeType;
   volume: number;
-  playbackSpeed: number;
 
   hotkeyBindings: Record<HotkeyAction, KeyBinding>;
   seekJumpDuration: number;
@@ -21,7 +21,6 @@ export interface TrackBpmEntry {
   loading: boolean;
   error: boolean;
 }
-
 export interface AppTransientState {
   pageType: BcPageType | null;
   trackTitle: string | null;
@@ -31,8 +30,8 @@ export interface AppTransientState {
   isPlaying: boolean;
   isMuted: boolean;
   volumeBeforeMute: number;
-  isFullscreen: boolean;
   trackBpms: Record<string, TrackBpmEntry>;
+  isFullscreen: boolean;
 }
 
 export interface AppCore extends AppPersistedState, AppTransientState {}
@@ -51,6 +50,10 @@ export enum CORE_ACTIONS {
   SET_IS_MUTED = "SET_IS_MUTED",
   TOGGLE_MUTE = "TOGGLE_MUTE",
   SET_VOLUME = "SET_VOLUME",
+  SET_TRACK_BPM_LOADING = "SET_TRACK_BPM_LOADING",
+  SET_TRACK_BPM_SUCCESS = "SET_TRACK_BPM_SUCCESS",
+  SET_TRACK_BPM_ERROR = "SET_TRACK_BPM_ERROR",
+  CLEAR_TRACK_BPMS = "CLEAR_TRACK_BPMS",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
 
   SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
@@ -58,11 +61,6 @@ export enum CORE_ACTIONS {
   SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
-
-  SET_TRACK_BPM_LOADING = "SET_TRACK_BPM_LOADING",
-  SET_TRACK_BPM_SUCCESS = "SET_TRACK_BPM_SUCCESS",
-  SET_TRACK_BPM_ERROR = "SET_TRACK_BPM_ERROR",
-  CLEAR_TRACK_BPMS = "CLEAR_TRACK_BPMS",
 }
 
 export type CoreAction =
@@ -79,16 +77,16 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_IS_MUTED, boolean>
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_LOADING, string>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_SUCCESS, { trackUrl: string; bpm: number }>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_ERROR, string>
+  | IAction<CORE_ACTIONS.CLEAR_TRACK_BPMS>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
   | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
   | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
   | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
-  | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>
-  | IAction<CORE_ACTIONS.SET_TRACK_BPM_LOADING, string>
-  | IAction<CORE_ACTIONS.SET_TRACK_BPM_SUCCESS, { trackUrl: string; bpm: number }>
-  | IAction<CORE_ACTIONS.SET_TRACK_BPM_ERROR, string>
-  | IAction<CORE_ACTIONS.CLEAR_TRACK_BPMS>;
+  | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
 
 interface ICoreActions {
   // State
@@ -105,6 +103,10 @@ interface ICoreActions {
   setIsMuted: (isMuted: boolean) => CoreAction;
   toggleMute: () => CoreAction;
   setVolume: (volume: number) => CoreAction;
+  setTrackBpmLoading: (trackUrl: string) => CoreAction;
+  setTrackBpmSuccess: (trackUrl: string, bpm: number) => CoreAction;
+  setTrackBpmError: (trackUrl: string) => CoreAction;
+  clearTrackBpms: () => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
   // Settings
@@ -113,12 +115,6 @@ interface ICoreActions {
   setTrackRestartThreshold: (threshold: number) => CoreAction;
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setFeatureFlags: (flags: FeatureFlags) => CoreAction;
-
-  // BPM
-  setTrackBpmLoading: (trackUrl: string) => CoreAction;
-  setTrackBpmSuccess: (trackUrl: string, bpm: number) => CoreAction;
-  setTrackBpmError: (trackUrl: string) => CoreAction;
-  clearTrackBpms: () => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -144,6 +140,19 @@ export const coreActions: ICoreActions = {
   setIsMuted: (isMuted: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_MUTED, payload: isMuted }),
   toggleMute: (): CoreAction => ({ type: CORE_ACTIONS.TOGGLE_MUTE }),
   setVolume: (volume: number): CoreAction => ({ type: CORE_ACTIONS.SET_VOLUME, payload: volume }),
+  setTrackBpmLoading: (trackUrl: string): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_LOADING,
+    payload: trackUrl,
+  }),
+  setTrackBpmSuccess: (trackUrl: string, bpm: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_SUCCESS,
+    payload: { trackUrl, bpm },
+  }),
+  setTrackBpmError: (trackUrl: string): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_ERROR,
+    payload: trackUrl,
+  }),
+  clearTrackBpms: (): CoreAction => ({ type: CORE_ACTIONS.CLEAR_TRACK_BPMS }),
   setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
     type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
@@ -169,20 +178,6 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_FEATURE_FLAGS,
     payload: flags,
   }),
-
-  setTrackBpmLoading: (trackUrl: string): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_BPM_LOADING,
-    payload: trackUrl,
-  }),
-  setTrackBpmSuccess: (trackUrl: string, bpm: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_BPM_SUCCESS,
-    payload: { trackUrl, bpm },
-  }),
-  setTrackBpmError: (trackUrl: string): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_BPM_ERROR,
-    payload: trackUrl,
-  }),
-  clearTrackBpms: (): CoreAction => ({ type: CORE_ACTIONS.CLEAR_TRACK_BPMS }),
 } as const;
 
 export type AppCoreListener<AppCoreProp extends keyof AppCore = keyof AppCore> = (

@@ -18,8 +18,8 @@ vi.mock("@/app/stores/adapters", () => ({
 vi.mock("@/app/use-cases/detect-bpm", () => ({ detectBpmForAllTracks: vi.fn() }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string, args?: string[]) => (args ? `${k}:${args.join(",")}` : k) }));
 
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { createBpmDisplaySection, syncBpmDisplay } from "@/app/features/ui/bpm-display";
+import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 
 describe("createBpmDisplaySection", () => {
   it("creates a container with label and value elements", () => {

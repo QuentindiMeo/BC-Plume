@@ -9,6 +9,7 @@ const handleBpmFetch = async (url: string): Promise<BpmFetchResponse> => {
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+
     const buffer = await response.arrayBuffer();
     return { ok: true, data: Array.from(new Uint8Array(buffer)) };
   } catch (error) {
