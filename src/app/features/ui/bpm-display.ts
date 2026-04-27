@@ -131,7 +131,12 @@ export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement =>
     detectAllBtn.textContent = getString("LABEL__BPM__DETECT_ALL");
     detectAllBtn.ariaLabel = getString("ARIA__BPM__DETECT_ALL_BTN");
     detectAllBtn.addEventListener("click", () => {
-      detectBpmForAllTracks();
+      if (detectAllBtn.disabled) return;
+      detectAllBtn.disabled = true;
+
+      detectBpmForAllTracks().finally(() => {
+        detectAllBtn.disabled = false;
+      });
     });
     container.appendChild(detectAllBtn);
   }

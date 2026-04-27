@@ -11,8 +11,12 @@ export interface IBrowserApi {
   };
   runtime: {
     onMessage: {
-      addListener: (handler: (message: unknown) => void) => void;
-      removeListener: (handler: (message: unknown) => void) => void;
+      addListener: (
+        handler: (message: unknown, sender: unknown, sendResponse: (response: unknown) => void) => boolean | void
+      ) => void;
+      removeListener: (
+        handler: (message: unknown, sender: unknown, sendResponse: (response: unknown) => void) => boolean | void
+      ) => void;
     };
     sendMessage: (message: unknown) => Promise<unknown>;
   };
