@@ -6,6 +6,9 @@ export interface IBrowserPort {
     addListener: (callback: (message: any) => void) => void;
     removeListener: (callback: (message: any) => void) => void;
   };
+  onDisconnect?: {
+    addListener: (callback: () => void) => void;
+  };
   disconnect: () => void;
 }
 

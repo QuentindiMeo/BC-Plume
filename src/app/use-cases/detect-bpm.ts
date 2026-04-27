@@ -21,8 +21,32 @@ const mergeChunks = (chunks: Uint8Array[]): Uint8Array => {
 const fetchAudioViaBackground = (audioStreamUrl: string): Promise<ArrayBuffer> =>
   new Promise((resolve, reject) => {
     const browserApi = inferBrowserApi();
-    const port = browserApi.runtime.connect({ name: BPM_PORT_PREFIX + audioStreamUrl });
+    let port: ReturnType<typeof browserApi.runtime.connect>;
+    try {
+      port = browserApi.runtime.connect({ name: BPM_PORT_PREFIX + audioStreamUrl });
+    } catch (error) {
+      reject(new Error("Failed to connect to background worker"));
+      return;
+    }
     const chunks: Uint8Array[] = [];
+    let settled = false;
+
+    const cleanup = () => {
+      port.onMessage.removeListener(onMessage);
+      try {
+        port.disconnect();
+      } catch {
+        // Port may already be disconnected
+      }
+    };
+
+    const onDisconnect = () => {
+      if (!settled) {
+        settled = true;
+        cleanup();
+        reject(new Error("Background port disconnected unexpectedly"));
+      }
+    };
 
     const onMessage = (message: BpmAudioMessage) => {
       switch (message.type) {
@@ -32,18 +56,19 @@ const fetchAudioViaBackground = (audioStreamUrl: string): Promise<ArrayBuffer> =
           chunks.push(new Uint8Array(message.data));
           break;
         case "BPM_AUDIO_END":
-          port.onMessage.removeListener(onMessage);
-          port.disconnect();
+          settled = true;
+          cleanup();
           resolve(mergeChunks(chunks).buffer as ArrayBuffer);
           break;
         case "BPM_AUDIO_ERROR":
-          port.onMessage.removeListener(onMessage);
-          port.disconnect();
+          settled = true;
+          cleanup();
           reject(new Error(message.reason));
           break;
       }
     };
     port.onMessage.addListener(onMessage);
+    port.onDisconnect?.addListener(onDisconnect);
   });
 
 const analyzeAudioBuffer = async (buffer: ArrayBuffer): Promise<number> => {
@@ -92,9 +117,9 @@ export const detectBpmForAllTracks = async (): Promise<void> => {
     appCore.dispatch(coreActions.setTrackBpmSuccess(url, bpm));
   }
 
-  // Detect BPM for tracks that don't have a cached value
+  // Detect BPM for tracks that don't have a cached value (sequential to avoid overwhelming the worker)
   const uncached = infos.filter((info) => !cached.has(info.trackUrl));
   for (const info of uncached) {
-    detectBpmForTrack(info.trackUrl, info.audioStreamUrl);
+    await detectBpmForTrack(info.trackUrl, info.audioStreamUrl);
   }
 };
