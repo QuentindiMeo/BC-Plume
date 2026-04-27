@@ -495,6 +495,86 @@ describe("AppCoreImpl reducer", () => {
       expect(appCore.computed.progressPercentage()).toBe(25);
     });
   });
+
+  describe("SET_TRACK_BPM_LOADING", () => {
+    it("sets a track to loading state", () => {
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: null,
+        loading: true,
+        error: false,
+      });
+    });
+
+    it("preserves existing bpm when transitioning to loading", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 128));
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: 128,
+        loading: true,
+        error: false,
+      });
+    });
+
+    it("does not affect other tracks", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/a", 120));
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/b"));
+      expect(appCore.getState().trackBpms["/track/a"]).toEqual({
+        bpm: 120,
+        loading: false,
+        error: false,
+      });
+    });
+  });
+
+  describe("SET_TRACK_BPM_SUCCESS", () => {
+    it("sets a track bpm", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 140));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: 140,
+        loading: false,
+        error: false,
+      });
+    });
+
+    it("overwrites a loading state", () => {
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/test"));
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 95.5));
+      const entry = appCore.getState().trackBpms["/track/test"];
+      expect(entry.bpm).toBe(95.5);
+      expect(entry.loading).toBe(false);
+    });
+  });
+
+  describe("SET_TRACK_BPM_ERROR", () => {
+    it("sets a track to error state", () => {
+      appCore.dispatch(coreActions.setTrackBpmError("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: null,
+        loading: false,
+        error: true,
+      });
+    });
+
+    it("preserves existing bpm on error", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 128));
+      appCore.dispatch(coreActions.setTrackBpmError("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: 128,
+        loading: false,
+        error: true,
+      });
+    });
+  });
+
+  describe("CLEAR_TRACK_BPMS", () => {
+    it("clears all track bpms", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/a", 120));
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/b", 140));
+      appCore.dispatch(coreActions.clearTrackBpms());
+      expect(appCore.getState().trackBpms).toEqual({});
+    });
+  });
 });
 
 describe("AppCoreImpl — playbackSpeed persist/load integration", () => {

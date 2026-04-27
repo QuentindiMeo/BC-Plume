@@ -859,4 +859,31 @@ describe("runtime feature flag subscription", () => {
     expect(span.classList.contains("plume-feature-hidden")).toBe(false);
     document.body.removeChild(span);
   });
+
+  it("hides the BPM container when bpmDetect flag is disabled", () => {
+    const container = document.createElement("div");
+    container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
+    document.body.appendChild(container);
+
+    const flags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: flags as never });
+
+    expect(container.classList.contains("plume-feature-hidden")).toBe(true);
+    document.body.removeChild(container);
+  });
+
+  it("shows the BPM container when bpmDetect flag is re-enabled", () => {
+    const container = document.createElement("div");
+    container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
+    document.body.appendChild(container);
+
+    const disabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
+    expect(container.classList.contains("plume-feature-hidden")).toBe(true);
+
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+    expect(container.classList.contains("plume-feature-hidden")).toBe(false);
+    document.body.removeChild(container);
+  });
 });
