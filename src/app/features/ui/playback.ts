@@ -10,7 +10,7 @@ import {
   seekForward,
   togglePlayback,
 } from "@/app/use-cases";
-import { PLAYBACK_SPEED_STEPS, parseCustomPlaybackSpeed, speedToSliderPosition } from "@/domain/plume";
+import { PLAYBACK_SPEED_STEPS, PLUME_CONSTANTS, parseCustomPlaybackSpeed, speedToSliderPosition } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
@@ -143,7 +143,7 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
       popover.ariaHidden = "true";
       if (speedBtn) speedBtn.setAttribute("aria-expanded", "false");
       hideTimer = null;
-    }, 700);
+    }, PLUME_CONSTANTS.WCAG_INTERACTION_TIMEOUT_MS);
   };
 
   const onFocusOut = (e: FocusEvent): void => {
