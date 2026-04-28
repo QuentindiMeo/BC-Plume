@@ -57,6 +57,7 @@ const syncTracklistBpmBadges = (
 
 const updateBpmElement = (el: HTMLElement, entry: TrackBpmEntry | undefined, speed: number): void => {
   el.classList.remove("detecting", "error");
+  el.ariaLabel = getString("ARIA__BPM__DISPLAY");
 
   if (!entry) {
     el.textContent = "—";

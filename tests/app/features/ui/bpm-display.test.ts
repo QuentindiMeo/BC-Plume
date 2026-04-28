@@ -103,6 +103,14 @@ describe("syncBpmDisplay", () => {
     expect(getValueEl().classList.contains("detecting")).toBe(false);
     expect(getValueEl().classList.contains("error")).toBe(false);
   });
+
+  it("resets ariaLabel to the generic display label when leaving success state", () => {
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: false } });
+    expect(getValueEl().ariaLabel).toBe("ARIA__BPM__BADGE:128");
+
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: true, error: false } });
+    expect(getValueEl().ariaLabel).toBe("ARIA__BPM__DISPLAY");
+  });
 });
 
 describe("syncBpmDisplay — tracklist badge aria attributes", () => {
@@ -134,13 +142,13 @@ describe("syncBpmDisplay — tracklist badge aria attributes", () => {
     syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: false } });
     syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: true, error: false } });
     expect(getBadge().ariaHidden).toBe("true");
-    expect(getBadge().ariaLabel).toBe("");
+    expect(getBadge().ariaLabel).toBeNull();
   });
 
   it("resets ariaHidden and ariaLabel when transitioning from success to error", () => {
     syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: false } });
     syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: true } });
     expect(getBadge().ariaHidden).toBe("true");
-    expect(getBadge().ariaLabel).toBe("");
+    expect(getBadge().ariaLabel).toBeNull();
   });
 });
