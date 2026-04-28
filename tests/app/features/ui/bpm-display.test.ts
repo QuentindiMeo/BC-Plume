@@ -104,3 +104,43 @@ describe("syncBpmDisplay", () => {
     expect(getValueEl().classList.contains("error")).toBe(false);
   });
 });
+
+describe("syncBpmDisplay — tracklist badge aria attributes", () => {
+  const BADGE_SEL = `.${PLUME_ELEM_SELECTORS.bpmBadge.split(".")[1]}`;
+
+  const addTracklistItem = (index: number): void => {
+    const item = document.createElement("div");
+    item.className = PLUME_ELEM_SELECTORS.tracklistItem.split(".")[1];
+    item.dataset["index"] = String(index);
+    document.body.appendChild(item);
+  };
+
+  beforeEach(() => {
+    document.body.innerHTML = "";
+    fakeAppCore = new FakeAppCore({ pageType: "album" });
+    document.body.appendChild(createBpmDisplaySection(true));
+    addTracklistItem(0); // index 0 → trackNumber 1 → /track/song-one
+  });
+
+  const getBadge = () => document.querySelector<HTMLElement>(BADGE_SEL)!;
+
+  it("exposes BPM badge to assistive tech when displaying a value", () => {
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: false } });
+    expect(getBadge().ariaHidden).toBe("false");
+    expect(getBadge().ariaLabel).toBe("ARIA__BPM__BADGE:128");
+  });
+
+  it("resets ariaHidden and ariaLabel when transitioning from success to loading", () => {
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: false } });
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: true, error: false } });
+    expect(getBadge().ariaHidden).toBe("true");
+    expect(getBadge().ariaLabel).toBe("");
+  });
+
+  it("resets ariaHidden and ariaLabel when transitioning from success to error", () => {
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: false } });
+    syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: false, error: true } });
+    expect(getBadge().ariaHidden).toBe("true");
+    expect(getBadge().ariaLabel).toBe("");
+  });
+});

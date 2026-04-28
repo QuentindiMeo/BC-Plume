@@ -38,6 +38,8 @@ const syncTracklistBpmBadges = (
     }
 
     badge.classList.remove("detecting", "error");
+    badge.ariaHidden = "true";
+    badge.ariaLabel = null;
     if (entry.loading) {
       badge.textContent = getString("LABEL__BPM__DETECTING");
       badge.classList.add("detecting");
