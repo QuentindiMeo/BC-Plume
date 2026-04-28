@@ -443,6 +443,7 @@
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Búsqueda rápida (0–9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Duración total" },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Control de velocidad de reproducción" },
+  "LABEL__FEATURES__BPM_DETECT": { "message": "Detección de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
@@ -567,5 +568,33 @@
 
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Valor de velocidad inválido" },
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Por favor, ingrese un número entre 0.25 y 5." },
-  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" }
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" },
+
+  "LABEL__BPM__DISPLAY": { "message": "BPM" },
+  "LABEL__BPM__DETECTING": { "message": "..." },
+  "LABEL__BPM__ERROR": { "message": "—" },
+  "LABEL__BPM__DETECT_ALL": { "message": "Detectar BPM" },
+  "ARIA__BPM__DISPLAY": { "message": "Pulsaciones por minuto de la pista actual" },
+  "ARIA__BPM__DETECT_ALL_BTN": { "message": "Detectar BPM de todas las pistas" },
+  "ARIA__BPM__BADGE": {
+    "message": "$BPM$ pulsaciones por minuto",
+    "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Datos del álbum (data-tralbum) no encontrados en la página" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Error al analizar los datos del álbum (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "Detección de BPM fallida para '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Iniciando detección de BPM para '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM detectado: $BPM$ para '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/alguna-pista" }
+    }
+  }
 }

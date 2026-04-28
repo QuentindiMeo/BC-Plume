@@ -1,6 +1,7 @@
 import {
   assertBoundedInteger,
   assertWholeNumber,
+  PLUME_CONSTANTS,
   PLUME_DEFAULTS,
   PLUME_SUPPORTED_LANGUAGES,
   SEEK_JUMP_DURATION_MAX,
@@ -142,7 +143,7 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
     debounceTimer = setTimeout(() => {
       persist(result.value);
       debounceTimer = null;
-    }, 700);
+    }, PLUME_CONSTANTS.WCAG_INTERACTION_TIMEOUT_MS);
   });
 
   input.addEventListener("blur", () => {

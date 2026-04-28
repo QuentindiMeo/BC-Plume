@@ -44,6 +44,7 @@ vi.mock("@/app/features/fullscreen", () => ({ cleanupFullscreenMode: vi.fn() }))
 vi.mock("@/app/features/lifecycle", () => ({ markPlumeInitiatedPlay: vi.fn() }));
 vi.mock("@/app/features/observers", () => ({ updateTrackForwardBtnState: vi.fn() }));
 vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
+vi.mock("@/app/features/ui/bpm-display", () => ({ syncBpmDisplay: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
@@ -57,6 +58,8 @@ vi.mock("@/infra/elements/plume", () => ({
     speedSlider: "input.plume-speed-slider",
     speedCustomInput: "input.plume-speed-custom-input",
     speedPopover: "div.plume-speed-popover",
+    bpmContainer: "div#plume-bpm-container",
+    bpmBadge: "span.plume-bpm-badge",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
@@ -855,5 +858,39 @@ describe("runtime feature flag subscription", () => {
     fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
     expect(span.classList.contains("plume-feature-hidden")).toBe(false);
     document.body.removeChild(span);
+  });
+
+  it("hides the BPM container when bpmDetect flag is disabled", () => {
+    const container = document.createElement("div");
+    container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
+    document.body.appendChild(container);
+
+    // Enable first (default is off), then disable
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+
+    const disabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
+
+    expect(container.classList.contains("plume-feature-hidden")).toBe(true);
+    document.body.removeChild(container);
+  });
+
+  it("shows the BPM container when bpmDetect flag is re-enabled", () => {
+    const container = document.createElement("div");
+    container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
+    document.body.appendChild(container);
+
+    // Enable first, then disable, then re-enable
+    const enabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: true };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+
+    const disabledFlags = { ...fakeAppCore.getState().featureFlags, bpmDetect: false };
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: disabledFlags as never });
+    expect(container.classList.contains("plume-feature-hidden")).toBe(true);
+
+    fakeAppCore.dispatch({ type: "SET_FEATURE_FLAGS" as never, payload: enabledFlags as never });
+    expect(container.classList.contains("plume-feature-hidden")).toBe(false);
+    document.body.removeChild(container);
   });
 });

@@ -1,6 +1,7 @@
 import type { BcPlayerPort } from "@/domain/ports/bc-player";
-import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import type { IMessageReceiver } from "@/domain/ports/messaging";
+import type { MusicPlayerPort } from "@/domain/ports/music-player";
+import type { TrackAudioPort } from "@/domain/ports/track-audio";
 
 // Populated once at the composition root (main.ts), before launchPlume() runs
 let bcPlayerInstance: BcPlayerPort | null = null;
@@ -34,4 +35,15 @@ export const getMessageReceiverInstance = (): IMessageReceiver => {
   if (!messageReceiverInstance)
     throw new Error("IMessageReceiver not registered — call registerMessageReceiver() first.");
   return messageReceiverInstance;
+};
+
+let trackAudioInstance: TrackAudioPort | null = null;
+
+export const registerTrackAudio = (instance: TrackAudioPort): void => {
+  trackAudioInstance = instance;
+};
+
+export const getTrackAudioInstance = (): TrackAudioPort => {
+  if (!trackAudioInstance) throw new Error("TrackAudioPort not registered — call registerTrackAudio() first.");
+  return trackAudioInstance;
 };

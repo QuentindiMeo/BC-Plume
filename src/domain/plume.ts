@@ -7,6 +7,7 @@ export const PLUME_CONSTANTS = {
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
+  WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
 } as const;
 
 export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr"] as const;
@@ -93,11 +94,12 @@ export const PLUME_DEFAULTS = {
   featureFlags: {
     goToTrack: true,
     tracklist: true,
+    speedControl: true,
     loopModes: true,
+    bpmDetect: false,
     fullscreen: true,
     quickSeek: true,
     runtime: true,
-    speedControl: true,
   } as const,
 } as const;
 
@@ -110,10 +112,11 @@ export interface TimeState {
 export type FeatureFlags = {
   goToTrack: boolean;
   tracklist: boolean;
+  speedControl: boolean;
   loopModes: boolean;
+  bpmDetect: boolean;
   fullscreen: boolean;
   quickSeek: boolean;
   runtime: boolean;
-  speedControl: boolean;
 };
 export type FeatureFlagKey = keyof FeatureFlags;

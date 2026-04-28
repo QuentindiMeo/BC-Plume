@@ -422,6 +422,15 @@
 #plume-speed-wrapper {
   @apply relative inline-flex items-center justify-center;
 
+  #plume-speed-btn {
+    @apply relative;
+
+    &__text {
+      @apply absolute bottom-1/10 left-1/2 text-4xs leading-none tabular-nums opacity-75 pointer-events-none;
+      translate: -50% 0;
+    }
+  }
+
   .plume-speed-popover {
     @apply
       z-50 absolute left-1/2 -translate-x-1/2
@@ -566,6 +575,59 @@
     @media (prefers-contrast: more) {
       @apply text-white;
     }
+  }
+}
+
+#plume-bpm-container {
+  @apply px-3 py-1.5 flex items-center gap-2;
+
+  #plume-bpm-label {
+    @apply font-sans font-semibold text-xs text-plume-dimmed uppercase tracking-wider;
+  }
+
+  #plume-bpm-value {
+    @apply min-w-6 font-sans font-bold text-sm text-white tabular-nums text-center;
+
+    &.detecting {
+      @apply text-plume-dimmed animate-pulse;
+    }
+    &.error {
+      @apply text-red-400/70;
+    }
+  }
+
+  #plume-bpm-detect-all-btn {
+    @apply
+      h-6 px-2 py-0 ml-auto bg-white/5 border border-white/15 rounded
+      font-sans font-medium text-xs text-plume-dimmed
+      transition-[color,background,border-color]
+    ;
+
+    &:hover {
+      @apply bg-white/15 border-white/30 text-white;
+    }
+    &:active {
+      @apply bg-white/10;
+    }
+    &:focus-visible {
+      @apply rounded-focusable;
+    }
+  }
+}
+
+.plume-bpm-badge {
+  @apply
+    ml-1 px-1.5 py-0 rounded bg-white/5 border border-white/10
+    inline-flex items-center justify-center
+    font-sans font-semibold text-2xs text-plume-dimmed tabular-nums
+    leading-tight whitespace-nowrap
+  ;
+
+  &.detecting {
+    @apply animate-pulse;
+  }
+  &.error {
+    @apply text-red-400/50;
   }
 }
 

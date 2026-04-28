@@ -51,6 +51,12 @@ const popupBuildOptions = {
   outfile: path.join(distDir, "popup.js"),
 };
 
+const backgroundBuildOptions = {
+  ...sharedOptions,
+  entryPoints: [path.join(__dirname, "..", "src", "background.ts")],
+  outfile: path.join(distDir, "background.js"),
+};
+
 const styleEntries = [
   {
     input: path.join(__dirname, "..", "src", "tailwind.css"),
@@ -134,7 +140,8 @@ async function build() {
     if (isWatch) {
       const contentCtx = await esbuild.context(contentBuildOptions);
       const popupCtx = await esbuild.context(popupBuildOptions);
-      await Promise.all([contentCtx.watch(), popupCtx.watch(), buildStyles()]);
+      const backgroundCtx = await esbuild.context(backgroundBuildOptions);
+      await Promise.all([contentCtx.watch(), popupCtx.watch(), backgroundCtx.watch(), buildStyles()]);
       watchStyles();
       copyPopupAssets();
       watchPopupAssets();
@@ -143,6 +150,7 @@ async function build() {
       await Promise.all([
         esbuild.build(contentBuildOptions),
         esbuild.build(popupBuildOptions),
+        esbuild.build(backgroundBuildOptions),
         buildStyles(),
       ]);
       copyPopupAssets();

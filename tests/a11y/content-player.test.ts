@@ -33,6 +33,7 @@ vi.mock("@/infra/elements/plume", () => ({
     playbackControls: "div#plume-playback-controls",
     speedWrapper: "div#plume-speed-wrapper",
     speedBtn: "button#plume-speed-btn",
+    speedBtnText: "span#plume-speed-btn__text",
     speedPopover: "div.plume-speed-popover",
     speedLabel: "span.plume-speed-label",
     speedCustomInput: "input.plume-speed-custom-input",

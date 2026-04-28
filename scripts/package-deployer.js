@@ -28,7 +28,7 @@ const deployPackage = (browser) => {
 
   // Copy compiled JavaScript files
   const distDir = path.join(__dirname, "..", "dist");
-  const srcFiles = ["content.js", "popup.js", "popup.html", "popup.css", "tailwind.css", "styles.css"];
+  const srcFiles = ["content.js", "popup.js", "background.js", "popup.html", "popup.css", "tailwind.css", "styles.css"];
 
   srcFiles.forEach((file) => {
     const srcPath = path.join(distDir, file);
@@ -74,6 +74,7 @@ const deployPackage = (browser) => {
         run_at: rootManifest.content_scripts[0].run_at,
       },
     ],
+    background: { service_worker: "background.js" },
     icons: {
       16: "icons/icon16.png",
       48: "icons/icon48.png",

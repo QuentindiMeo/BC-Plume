@@ -14,6 +14,7 @@ vi.mock("@/infra/elements/plume", () => ({
     tracklistDropdown: "div#plume-tracklist-dropdown",
     playbackManager: "div#plume-playback-manager",
     progressContainer: "div#plume-progress-container",
+    bpmContainer: "div#plume-bpm-container",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
@@ -46,8 +47,8 @@ const fakeBcPlayer = {
 };
 vi.mock("@/app/stores/adapters", () => ({ getBcPlayerInstance: () => fakeBcPlayer }));
 
-import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { PLUME_DEFAULTS } from "@/domain/plume";
+import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 let fakeAppCore = new FakeAppCore({ pageType: "album" });
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
@@ -70,6 +71,11 @@ vi.mock("@/app/features/original-player", () => ({
   hideOriginalPlayerElements: vi.fn(),
 }));
 vi.mock("@/app/features/ui", () => ({
+  createBpmDisplaySection: () => {
+    const el = document.createElement("div");
+    el.id = "plume-bpm-container";
+    return el;
+  },
   createPlaybackControlPanel: () => document.createElement("div"),
   createProgressBar: () => document.createElement("div"),
   createVolumeControlSection: async () => document.createElement("div"),

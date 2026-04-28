@@ -428,6 +428,7 @@
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
   "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
+  "LABEL__FEATURES__BPM_DETECT": { "message": "BPM Detection" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
@@ -540,6 +541,33 @@
 
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Invalid speed value" },
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Please enter a number between 0.25 and 5." },
-  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "invalid custom input" }
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "invalid custom input" },
 
+  "LABEL__BPM__DISPLAY": { "message": "BPM" },
+  "LABEL__BPM__DETECTING": { "message": "..." },
+  "LABEL__BPM__ERROR": { "message": "—" },
+  "LABEL__BPM__DETECT_ALL": { "message": "Detect BPM" },
+  "ARIA__BPM__DISPLAY": { "message": "Beats per minute for the current track" },
+  "ARIA__BPM__DETECT_ALL_BTN": { "message": "Detect BPM for all tracks" },
+  "ARIA__BPM__BADGE": {
+    "message": "$BPM$ beats per minute",
+    "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Track album data (data-tralbum) not found on page" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Failed to parse track album data (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "BPM detection failed for '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Starting BPM detection for '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM detected: $BPM$ for '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/some-track" }
+    }
+  }
 }

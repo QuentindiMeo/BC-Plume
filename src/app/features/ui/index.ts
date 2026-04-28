@@ -1,3 +1,4 @@
+export { createBpmDisplaySection, syncBpmDisplay } from "@/app/features/ui/bpm-display";
 export { createFullscreenButtonSection } from "@/app/features/ui/fullscreen-button";
 export {
   createPlaybackControlPanel,

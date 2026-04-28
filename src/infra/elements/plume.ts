@@ -24,6 +24,7 @@ export enum PLUME_ELEM_SELECTORS {
 
   speedWrapper = "div#plume-speed-wrapper",
   speedBtn = "button#plume-speed-btn",
+  speedBtnText = "span#plume-speed-btn__text",
   speedPopover = "div.plume-speed-popover",
   speedLabel = "span.plume-speed-label",
   speedCustomInput = "input.plume-speed-custom-input",
@@ -39,6 +40,12 @@ export enum PLUME_ELEM_SELECTORS {
   muteBtn = "button#plume-mute-btn",
   volumeSlider = "input#plume-volume-slider",
   volumeValue = "div#plume-volume-value",
+
+  bpmContainer = "div#plume-bpm-container",
+  bpmValue = "span#plume-bpm-value",
+  bpmLabel = "span#plume-bpm-label",
+  bpmDetectAllBtn = "button#plume-bpm-detect-all-btn",
+  bpmBadge = "span.plume-bpm-badge",
 
   fullscreenBtn = "button#plume-fullscreen-btn",
   fullscreenBtnLabel = "span#plume-fullscreen-btn-label",

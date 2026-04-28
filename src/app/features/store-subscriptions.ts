@@ -2,6 +2,7 @@ import { cleanupFullscreenMode } from "@/app/features/fullscreen";
 import { markPlumeInitiatedPlay } from "@/app/features/lifecycle";
 import { updateTrackForwardBtnState } from "@/app/features/observers";
 import type { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncBpmDisplay } from "@/app/features/ui/bpm-display";
 import { syncLoopBtn } from "@/app/features/ui/loop";
 import { applyPlaybackControlsSize } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
@@ -152,14 +153,17 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (speedBtn) {
           speedBtn.ariaLabel = speedBtnLabel;
           speedBtn.title = speedBtnLabel;
+          const textBadge = speedBtn.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.speedBtnText);
+          if (textBadge) textBadge.textContent = speedText;
         }
       });
 
-      if (
-        !safariSpeedWarningShown &&
-        isSafariBrowser() &&
-        (speed < PLAYBACK_SPEED_SAFARI_MIN || speed > PLAYBACK_SPEED_SAFARI_MAX)
-      ) {
+      // Re-sync BPM display with new speed multiplier
+      const appState = appCore.getState();
+      syncBpmDisplay(appState.trackBpms);
+
+      const speedIsOutOfBounds = speed < PLAYBACK_SPEED_SAFARI_MIN || speed > PLAYBACK_SPEED_SAFARI_MAX;
+      if (!safariSpeedWarningShown && isSafariBrowser() && speedIsOutOfBounds) {
         safariSpeedWarningShown = true;
         createToast({
           label: getString("META__TOAST__SPEED__SAFARI_UNSUPPORTED"),
@@ -221,11 +225,22 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         });
       }
 
-      // Quick seek: flag is read on trigger (key)
+      // BPM detect: toggle container visibility
+      if (flags.bpmDetect !== prevFlags.bpmDetect) {
+        const bpmContainer = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmContainer);
+        if (bpmContainer) bpmContainer.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+      }
 
       // Resize playback controls to fit the number of visible children
       const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (controls) applyPlaybackControlsSize(controls);
+    }),
+    appCore.subscribe("trackBpms", (trackBpms) => {
+      syncBpmDisplay(trackBpms);
+    }),
+    appCore.subscribe("trackNumber", () => {
+      const appState = appCore.getState();
+      syncBpmDisplay(appState.trackBpms);
     })
   );
 

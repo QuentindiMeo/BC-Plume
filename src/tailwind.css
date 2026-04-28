@@ -45,4 +45,6 @@
   --font-popup: system-ui, -apple-system, sans-serif;
   --radius-popup: 0.375rem;
   --text-2xs: 10px;
+  --text-3xs: 8px;
+  --text-4xs: 6px;
 }
