@@ -335,6 +335,12 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   speedBtn.ariaExpanded = "false";
   speedBtn.addEventListener("click", handleSpeedCycle);
 
+  const speedBtnText = document.createElement("span");
+  speedBtnText.id = PLUME_ELEM_SELECTORS.speedBtnText.split("#")[1];
+  speedBtnText.textContent = `${appState.playbackSpeed}×`;
+  speedBtnText.ariaHidden = "true";
+  speedBtn.appendChild(speedBtnText);
+
   const speedPopover = document.createElement("div");
   speedPopover.className = PLUME_ELEM_SELECTORS.speedPopover.split(".")[1];
   speedPopover.ariaHidden = "true";

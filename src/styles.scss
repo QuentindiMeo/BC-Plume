@@ -422,6 +422,15 @@
 #plume-speed-wrapper {
   @apply relative inline-flex items-center justify-center;
 
+  #plume-speed-btn {
+    @apply relative;
+
+    &__text {
+      @apply absolute bottom-1/10 left-1/2 text-4xs leading-none tabular-nums opacity-75 pointer-events-none;
+      translate: -50% 0;
+    }
+  }
+
   .plume-speed-popover {
     @apply
       z-50 absolute left-1/2 -translate-x-1/2

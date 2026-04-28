@@ -153,6 +153,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (speedBtn) {
           speedBtn.ariaLabel = speedBtnLabel;
           speedBtn.title = speedBtnLabel;
+          const textBadge = speedBtn.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.speedBtnText);
+          if (textBadge) textBadge.textContent = speedText;
         }
       });
 
@@ -160,11 +162,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const appState = appCore.getState();
       syncBpmDisplay(appState.trackBpms);
 
-      if (
-        !safariSpeedWarningShown &&
-        isSafariBrowser() &&
-        (speed < PLAYBACK_SPEED_SAFARI_MIN || speed > PLAYBACK_SPEED_SAFARI_MAX)
-      ) {
+      const speedIsOutOfBounds = speed < PLAYBACK_SPEED_SAFARI_MIN || speed > PLAYBACK_SPEED_SAFARI_MAX;
+      if (!safariSpeedWarningShown && isSafariBrowser() && speedIsOutOfBounds) {
         safariSpeedWarningShown = true;
         createToast({
           label: getString("META__TOAST__SPEED__SAFARI_UNSUPPORTED"),

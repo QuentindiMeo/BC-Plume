@@ -24,6 +24,7 @@ export enum PLUME_ELEM_SELECTORS {
 
   speedWrapper = "div#plume-speed-wrapper",
   speedBtn = "button#plume-speed-btn",
+  speedBtnText = "span#plume-speed-btn__text",
   speedPopover = "div.plume-speed-popover",
   speedLabel = "span.plume-speed-label",
   speedCustomInput = "input.plume-speed-custom-input",
