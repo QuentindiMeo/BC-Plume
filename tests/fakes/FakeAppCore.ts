@@ -96,7 +96,7 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
         this.updateState("trackBpms", {
           ...this.state.trackBpms,
-          [action.payload]: { bpm: null, loading: true, error: false },
+          [action.payload]: { bpm: this.state.trackBpms[action.payload]?.bpm ?? null, loading: true, error: false },
         });
         break;
       case CORE_ACTIONS.SET_TRACK_BPM_SUCCESS:
@@ -108,7 +108,7 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.SET_TRACK_BPM_ERROR:
         this.updateState("trackBpms", {
           ...this.state.trackBpms,
-          [action.payload]: { bpm: null, loading: false, error: true },
+          [action.payload]: { bpm: this.state.trackBpms[action.payload]?.bpm ?? null, loading: false, error: true },
         });
         break;
       case CORE_ACTIONS.CLEAR_TRACK_BPMS:
