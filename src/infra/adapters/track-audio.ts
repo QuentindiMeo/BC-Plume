@@ -16,28 +16,37 @@ interface BandcampTrAlbum {
   trackinfo?: BandcampTrackEntry[];
 }
 
-const parseTrAlbum = (): BandcampTrAlbum | null => {
-  const el = document.querySelector<HTMLElement>("[data-tralbum]");
-  const raw = el?.dataset["tralbum"];
-  if (!raw) {
-    logger(CPL.WARN, getString("WARN__TRALBUM__NOT_FOUND"));
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw) as BandcampTrAlbum;
-  } catch {
-    logger(CPL.WARN, getString("WARN__TRALBUM__PARSE_ERROR"));
-    return null;
-  }
-};
-
 const extractAudioUrl = (file: Record<string, string>): string | null =>
   Object.values(file).find((url) => BCBITS_URL_PATTERN.test(url)) ?? null;
 
 export class TrackAudioAdapter implements TrackAudioPort {
+  /** Cached parse result — null means "not yet parsed"; {value:null} means "parsed but absent/invalid". */
+  private trAlbumCache: { value: BandcampTrAlbum | null } | null = null;
+
+  private parseTrAlbum(): BandcampTrAlbum | null {
+    if (this.trAlbumCache !== null) return this.trAlbumCache.value;
+
+    const el = document.querySelector<HTMLElement>("[data-tralbum]");
+    const raw = el?.dataset["tralbum"];
+    if (!raw) {
+      logger(CPL.WARN, getString("WARN__TRALBUM__NOT_FOUND"));
+      this.trAlbumCache = { value: null };
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as BandcampTrAlbum;
+      this.trAlbumCache = { value: parsed };
+      return parsed;
+    } catch {
+      logger(CPL.WARN, getString("WARN__TRALBUM__PARSE_ERROR"));
+      this.trAlbumCache = { value: null };
+      return null;
+    }
+  }
+
   getTrackAudioInfos(): TrackAudioInfo[] {
-    const trAlbum = parseTrAlbum();
+    const trAlbum = this.parseTrAlbum();
     if (!trAlbum?.trackinfo) return [];
 
     const results: TrackAudioInfo[] = [];

@@ -24,12 +24,14 @@ vi.mock("@/shared/browser", () => ({
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: { WARN: "warn" }, logger: vi.fn() }));
 
+import { logger } from "@/shared/logger";
 import { TrackAudioAdapter } from "@/infra/adapters/track-audio";
 
 describe("TrackAudioAdapter", () => {
   let adapter: TrackAudioAdapter;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     adapter = new TrackAudioAdapter();
     document.body.innerHTML = "";
     for (const key of Object.keys(mockStorage)) delete mockStorage[key];
@@ -114,6 +116,20 @@ describe("TrackAudioAdapter", () => {
       document.body.appendChild(el);
 
       expect(adapter.getTrackAudioInfos()).toEqual([]);
+    });
+
+    it("logs the missing-element warning only once across repeated calls", () => {
+      adapter.getTrackAudioInfos();
+      adapter.getTrackAudioInfos();
+      adapter.getTrackAudioInfos();
+      expect(vi.mocked(logger)).toHaveBeenCalledOnce();
+    });
+
+    it("returns consistent results from the cached parse on repeated calls", () => {
+      setTralbum({
+        trackinfo: [{ track_num: 1, title_link: "/track/a", file: { "mp3-128": "https://t4.bcbits.com/stream/x" } }],
+      });
+      expect(adapter.getTrackAudioInfos()).toEqual(adapter.getTrackAudioInfos());
     });
   });
 
