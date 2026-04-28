@@ -2,13 +2,16 @@ import { getTrackAudioInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { detectBpmForAllTracks } from "@/app/use-cases/detect-bpm";
 import type { TrackBpmEntry } from "@/domain/ports/app-core";
+import type { TrackAudioInfo } from "@/domain/ports/track-audio";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 
 const BADGE_CLASS = PLUME_ELEM_SELECTORS.bpmBadge.split(".")[1];
-const syncTracklistBpmBadges = (trackBpms: Record<string, TrackBpmEntry>, speed: number): void => {
-  const trackAudio = getTrackAudioInstance();
-  const infos = trackAudio.getTrackAudioInfos();
+const syncTracklistBpmBadges = (
+  trackBpms: Record<string, TrackBpmEntry>,
+  speed: number,
+  infos: TrackAudioInfo[]
+): void => {
   if (infos.length === 0) return;
 
   // Build trackNumber→trackUrl map (trackNumber is 1-based, tracklist idx is 0-based)
@@ -71,10 +74,7 @@ const updateBpmElement = (el: HTMLElement, entry: TrackBpmEntry | undefined, spe
   }
 };
 
-const resolveCurrentTrackUrl = (): string | null => {
-  const trackAudio = getTrackAudioInstance();
-  const infos = trackAudio.getTrackAudioInfos();
-
+const resolveCurrentTrackUrl = (infos: TrackAudioInfo[]): string | null => {
   // Single-track page: only one entry
   if (infos.length === 1) return infos[0].trackUrl;
 
@@ -95,9 +95,10 @@ const resolveCurrentTrackUrl = (): string | null => {
 export const syncBpmDisplay = (trackBpms: Record<string, TrackBpmEntry>): void => {
   const appCore = getAppCoreInstance();
   const speed = appCore.getState().playbackSpeed;
+  const infos = getTrackAudioInstance().getTrackAudioInfos();
 
   // Update main BPM display for current track
-  const currentUrl = resolveCurrentTrackUrl();
+  const currentUrl = resolveCurrentTrackUrl(infos);
   const valueEl = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmValue);
   if (valueEl) {
     const entry = currentUrl ? trackBpms[currentUrl] : undefined;
@@ -105,7 +106,7 @@ export const syncBpmDisplay = (trackBpms: Record<string, TrackBpmEntry>): void =
   }
 
   // Update tracklist badges
-  syncTracklistBpmBadges(trackBpms, speed);
+  syncTracklistBpmBadges(trackBpms, speed, infos);
 };
 
 export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement => {
