@@ -63,6 +63,7 @@ const deployPackage = (browser) => {
 
   const rootManifestPath = path.join(__dirname, "..", "manifest.json");
   const rootManifest = JSON.parse(fs.readFileSync(rootManifestPath, "utf8"));
+  const background = browser === "chrome" ? { service_worker: "background.js" } : { scripts: ["background.js"] };
   const manifest = {
     ...rootManifest,
     version: packageVersion,
@@ -74,7 +75,7 @@ const deployPackage = (browser) => {
         run_at: rootManifest.content_scripts[0].run_at,
       },
     ],
-    background: { service_worker: "background.js" },
+    background,
     icons: {
       16: "icons/icon16.png",
       48: "icons/icon48.png",
