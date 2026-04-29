@@ -274,6 +274,18 @@
   "ARIA__LOOP__COLLECTION_TRACK": { "message": "Répétition : piste" },
   "ARIA__LOOP__ONE_TRACK": { "message": "Répétition : activée" },
 
+  "LABEL__SPEED": { "message": "Vitesse de lecture" },
+  "ARIA__SPEED_SLIDER": { "message": "Curseur de vitesse de lecture" },
+  "ARIA__SPEED_BTN": {
+    "message": "Vitesse : $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1,5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Bouton de vitesse cliqué" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Vitesse de lecture personnalisée" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Cliquer pour saisir une vitesse personnalisée" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Vitesse de lecture chargée :" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Vitesse invalide — réinitialisation à 1×" },
+
   "INFO__HOTKEYS__REGISTERED": { "message": "Raccourcis clavier enregistrés" },
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Basculer en mode plein écran" },
@@ -343,18 +355,23 @@
 
   "POPUP_TITLE": { "message": "Panneau de configuration" },
   "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },
+  "INFO__SETTING__REFRESH_REQUIRED": {
+    "message": "Rafraîchissez la page pour que le changement prenne effet."
+  },
+  "LABEL__SETTING__RESET": { "message": "Réinitialiser" },
+  "LABEL__TAB__RESET": { "message": "Tout réinitialiser " },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "Général" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Échec de la sauvegarde de la préférence de langue" },
-  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": {
-    "message": "Rechargez la page pour que le changement de langue prenne effet"
-  },
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Langue" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Langue d'affichage imposée" },
   "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
   "LABEL__LANGUAGE__EN": { "message": "Anglais" },
   "LABEL__LANGUAGE__ES": { "message": "Espagnol" },
   "LABEL__LANGUAGE__FR": { "message": "Français" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
@@ -385,12 +402,12 @@
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Plein écran" },
   "LABEL__HOTKEY__MUTE": { "message": "Couper / Rétablir le son" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Changer le mode de répétition" },
-  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0%–90% (touches numériques)" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Changer la vitesse de lecture" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Aller à 0% – 90% (touches numériques)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Appuyez sur une touche..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Désactivé" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmer" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Annuler" },
-  "POPUP__HOTKEYS__RESET_ALL": { "message": "Tout réinitialiser" },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Réassigner le raccourci $ACTION$ — actuellement $BINDING$",
     "placeholders": {
@@ -414,10 +431,16 @@
     }
   },
 
-  "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
-  "LABEL__GENERAL__RESET": { "message": "Réinitialiser" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Fonctionnalités" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Aller à la piste" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
+  "LABEL__FEATURES__BPM_DETECT": { "message": "Détection de BPM" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Doit valoir entre 1 et 300" },
@@ -533,5 +556,43 @@
     "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
   },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "piste non lisible" },
-  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" }
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "pistes non lisibles" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Vitesse de lecture limitée" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari cantonne la vitesse à 0,5×–2×. Votre sélection sera ajustée."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "vitesse non prise en charge par Safari" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Valeur de vitesse invalide" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Veuillez entrer un nombre entre 0,25 et 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrée personnalisée invalide" },
+
+  "LABEL__BPM__DISPLAY": { "message": "BPM" },
+  "LABEL__BPM__DETECTING": { "message": "..." },
+  "LABEL__BPM__ERROR": { "message": "—" },
+  "LABEL__BPM__DETECT_ALL": { "message": "Détecter le BPM" },
+  "ARIA__BPM__DISPLAY": { "message": "Battements par minute du morceau actuel" },
+  "ARIA__BPM__DETECT_ALL_BTN": { "message": "Détecter le BPM de tous les morceaux" },
+  "ARIA__BPM__BADGE": {
+    "message": "$BPM$ battements par minute",
+    "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Données de l'album (data-tralbum) non trouvées sur la page" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Échec de l'analyse des données de l'album (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "Détection du BPM échouée pour '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Début de la détection du BPM pour '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM détecté : $BPM$ pour '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/un-morceau" }
+    }
+  }
 }

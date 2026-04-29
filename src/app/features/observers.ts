@@ -7,6 +7,7 @@ import { CleanupCallback } from "@/app/features/types";
 import {
   handleMuteToggle,
   handlePlayPause,
+  handleSpeedCycle,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
@@ -146,6 +147,7 @@ export const setupListeners = (handles: CleanupHandles) => {
       handleMuteToggle,
       toggleFullscreenMode,
       handleLoopCycle,
+      handleSpeedCycle,
     },
     hotkeyBindings
   );

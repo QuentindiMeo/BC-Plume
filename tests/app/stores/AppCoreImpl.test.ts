@@ -1,6 +1,10 @@
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
+import { PLUME_CACHE_KEYS } from "@/domain/browser";
 import {
   LOOP_MODE,
   LOOP_MODE_CYCLE,
+  PLAYBACK_SPEED_DEFAULT,
+  PLAYBACK_SPEED_STEPS,
   PLUME_DEFAULTS,
   SEEK_JUMP_DURATION_MAX,
   SEEK_JUMP_DURATION_MIN,
@@ -10,6 +14,7 @@ import {
   VOLUME_HOTKEY_STEP_MIN,
 } from "@/domain/plume";
 import { coreActions, type IAppCore } from "@/domain/ports/app-core";
+import { BROWSER_ACTIONS } from "@/domain/ports/browser";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/app/stores/BrowserImpl", () => ({
@@ -125,6 +130,86 @@ describe("AppCoreImpl reducer", () => {
     it("updates isMuted", () => {
       appCore.dispatch(coreActions.setIsMuted(true));
       expect(appCore.getState().isMuted).toBe(true);
+    });
+  });
+
+  describe("SET_TRACK_BPM_LOADING", () => {
+    it("sets a track to loading state", () => {
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: null,
+        loading: true,
+        error: false,
+      });
+    });
+
+    it("preserves existing bpm when transitioning to loading", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 128));
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: 128,
+        loading: true,
+        error: false,
+      });
+    });
+
+    it("does not affect other tracks", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/a", 120));
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/b"));
+      expect(appCore.getState().trackBpms["/track/a"]).toEqual({
+        bpm: 120,
+        loading: false,
+        error: false,
+      });
+    });
+  });
+
+  describe("SET_TRACK_BPM_SUCCESS", () => {
+    it("sets a track bpm", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 140));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: 140,
+        loading: false,
+        error: false,
+      });
+    });
+
+    it("overwrites a loading state", () => {
+      appCore.dispatch(coreActions.setTrackBpmLoading("/track/test"));
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 95.5));
+      const entry = appCore.getState().trackBpms["/track/test"];
+      expect(entry.bpm).toBe(95.5);
+      expect(entry.loading).toBe(false);
+    });
+  });
+
+  describe("SET_TRACK_BPM_ERROR", () => {
+    it("sets a track to error state", () => {
+      appCore.dispatch(coreActions.setTrackBpmError("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: null,
+        loading: false,
+        error: true,
+      });
+    });
+
+    it("preserves existing bpm on error", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/test", 128));
+      appCore.dispatch(coreActions.setTrackBpmError("/track/test"));
+      expect(appCore.getState().trackBpms["/track/test"]).toEqual({
+        bpm: 128,
+        loading: false,
+        error: true,
+      });
+    });
+  });
+
+  describe("CLEAR_TRACK_BPMS", () => {
+    it("clears all track bpms", () => {
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/a", 120));
+      appCore.dispatch(coreActions.setTrackBpmSuccess("/track/b", 140));
+      appCore.dispatch(coreActions.clearTrackBpms());
+      expect(appCore.getState().trackBpms).toEqual({});
     });
   });
 
@@ -342,6 +427,74 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
+  describe("SET_PLAYBACK_SPEED", () => {
+    it("starts at the default speed", () => {
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it.each(PLAYBACK_SPEED_STEPS)("accepts predefined step %s×", (speed: number) => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(speed));
+      expect(appCore.getState().playbackSpeed).toBe(speed);
+    });
+
+    it("accepts a custom in-range float not in PLAYBACK_SPEED_STEPS", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(1.3));
+      expect(appCore.getState().playbackSpeed).toBe(1.3);
+    });
+
+    it("rounds the stored value to 2 decimal places", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(1.555));
+      expect(appCore.getState().playbackSpeed).toBe(1.56);
+    });
+
+    it("accepts the minimum bound (0.25)", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(0.25));
+      expect(appCore.getState().playbackSpeed).toBe(0.25);
+    });
+
+    it("accepts the maximum bound (3)", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(3));
+      expect(appCore.getState().playbackSpeed).toBe(3);
+    });
+
+    it("resets to default for a negative value", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(-1));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it("resets to default for zero", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(0));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+
+    it("resets to default for a value above the maximum", () => {
+      appCore.dispatch(coreActions.setPlaybackSpeed(6));
+      expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+    });
+  });
+
+  describe("SET_FEATURE_FLAGS", () => {
+    it("updates featureFlags", () => {
+      const flags = { ...PLUME_DEFAULTS.featureFlags, fullscreen: false };
+      appCore.dispatch(coreActions.setFeatureFlags(flags));
+      expect(appCore.getState().featureFlags).toEqual(flags);
+    });
+
+    it("merges with defaults so new flags get their default value", () => {
+      // Dispatch a partial object (simulating a stored value missing a key)
+      appCore.dispatch(coreActions.setFeatureFlags({ loopModes: false } as any));
+      const result = appCore.getState().featureFlags;
+      expect(result.loopModes).toBe(false);
+      expect(result.goToTrack).toBe(true);
+      expect(result.fullscreen).toBe(true);
+      expect(result.runtime).toBe(true);
+    });
+
+    it("starts with all flags enabled by default", () => {
+      expect(appCore.getState().featureFlags).toEqual(PLUME_DEFAULTS.featureFlags);
+    });
+  });
+
   describe("subscribe", () => {
     it("calls listener when subscribed key changes", () => {
       const listener = vi.fn();
@@ -421,5 +574,94 @@ describe("AppCoreImpl reducer", () => {
       appCore.dispatch(coreActions.setCurrentTime(50));
       expect(appCore.computed.progressPercentage()).toBe(25);
     });
+  });
+});
+
+describe("AppCoreImpl — playbackSpeed persist/load integration", () => {
+  const seedStorage = (data: Record<string, unknown>) => {
+    vi.mocked(getBrowserInstance).mockReturnValue({
+      dispatch: vi.fn(),
+      getState: vi.fn(() => ({
+        cache: {
+          get: vi.fn().mockResolvedValue(data),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
+      })),
+    } as unknown as ReturnType<typeof getBrowserInstance>);
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    // Restore the default empty-storage mock for other tests
+    vi.mocked(getBrowserInstance).mockReturnValue({
+      dispatch: vi.fn(),
+      getState: vi.fn(() => ({
+        cache: {
+          get: vi.fn().mockResolvedValue({}),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
+      })),
+    } as unknown as ReturnType<typeof getBrowserInstance>);
+  });
+
+  it("loads a predefined step persisted speed on startup", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 1.5 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(1.5);
+  });
+
+  it("loads a custom in-range float persisted speed on startup", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 1.3 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(1.3);
+  });
+
+  it("falls back to default when the persisted value is out of the valid range", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: 99 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+  });
+
+  it("starts at default when no speed was persisted", async () => {
+    seedStorage({});
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
+  });
+
+  it("persists the speed after dispatch", async () => {
+    const dispatchMock = vi.fn();
+    vi.mocked(getBrowserInstance).mockReturnValue({
+      dispatch: dispatchMock,
+      getState: vi.fn(() => ({
+        cache: {
+          get: vi.fn().mockResolvedValue({}),
+          set: vi.fn().mockResolvedValue(undefined),
+        },
+      })),
+    } as unknown as ReturnType<typeof getBrowserInstance>);
+
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+
+    appCore.dispatch(coreActions.setPlaybackSpeed(2));
+    await vi.runAllTimersAsync(); // flush 200ms PERSISTENCE_DELAY_MS debounce
+
+    expect(dispatchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: BROWSER_ACTIONS.SET_CACHE_VALUES,
+        payload: expect.objectContaining({
+          keys: expect.arrayContaining([PLUME_CACHE_KEYS.PLAYBACK_SPEED]),
+          values: expect.arrayContaining([2]),
+        }),
+      })
+    );
   });
 });

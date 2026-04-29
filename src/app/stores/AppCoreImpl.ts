@@ -5,9 +5,12 @@ import { LocalStorage, PLUME_CACHE_KEYS, PlumeCacheKey } from "@/domain/browser"
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding, KeyBindingMap } from "@/domain/hotkeys";
 import {
   assertBoundedInteger,
+  isValidPlaybackSpeed,
+  isValidVolume,
   LOOP_MODE,
   LOOP_MODE_CYCLE,
   type LoopModeType,
+  PLAYBACK_SPEED_DEFAULT,
   PLUME_DEFAULTS,
   SEEK_JUMP_DURATION_MAX,
   SEEK_JUMP_DURATION_MIN,
@@ -34,27 +37,32 @@ const INITIAL_STATE: AppCore = {
   currentTime: 0,
   isPlaying: false,
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
+  playbackSpeed: PLUME_DEFAULTS.playbackSpeed,
   loopMode: PLUME_DEFAULTS.loopMode,
   volume: PLUME_DEFAULTS.savedVolume,
   isMuted: false,
   volumeBeforeMute: PLUME_DEFAULTS.savedVolume,
+  trackBpms: {},
   isFullscreen: false,
 
-  hotkeyBindings: { ...DEFAULT_HOTKEYS },
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
   trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
+  hotkeyBindings: { ...DEFAULT_HOTKEYS },
+  featureFlags: { ...PLUME_DEFAULTS.featureFlags },
 };
 
 const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
   "durationDisplayMethod",
+  "playbackSpeed",
   "loopMode",
   "volume",
 
-  "hotkeyBindings",
   "seekJumpDuration",
   "volumeHotkeyStep",
   "trackRestartThreshold",
+  "hotkeyBindings",
+  "featureFlags",
 ]);
 const PERSISTENCE_DELAY_MS = 200;
 
@@ -93,16 +101,18 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.VOLUME] = state.volume;
         } else if (key === "durationDisplayMethod") {
           toSave[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] = state.durationDisplayMethod;
+        } else if (key === "playbackSpeed") {
+          toSave[PLUME_CACHE_KEYS.PLAYBACK_SPEED] = state.playbackSpeed;
         } else if (key === "loopMode") {
           toSave[PLUME_CACHE_KEYS.LOOP_MODE] = state.loopMode;
-        } else if (key === "hotkeyBindings") {
-          toSave[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = state.hotkeyBindings;
         } else if (key === "seekJumpDuration") {
           toSave[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION] = state.seekJumpDuration;
         } else if (key === "volumeHotkeyStep") {
           toSave[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP] = state.volumeHotkeyStep;
         } else if (key === "trackRestartThreshold") {
           toSave[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] = state.trackRestartThreshold;
+        } else if (key === "hotkeyBindings") {
+          toSave[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = state.hotkeyBindings;
         }
       }
 
@@ -194,7 +204,8 @@ const createAppCoreInstance = (): IAppCore => {
         updateState("trackNumber", action.payload);
         break;
       case CORE_ACTIONS.SET_VOLUME:
-        if (action.payload < 0 || action.payload > 1) {
+        const volume = action.payload;
+        if (!isValidVolume(volume)) {
           logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
           return;
         }
@@ -212,6 +223,16 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_IS_PLAYING:
         updateState("isPlaying", action.payload);
         break;
+      case CORE_ACTIONS.SET_PLAYBACK_SPEED: {
+        const speed = action.payload;
+        if (!isValidPlaybackSpeed(speed)) {
+          logger(CPL.WARN, getString("WARN__PLAYBACK_SPEED__INVALID_VALUE"));
+          updateState("playbackSpeed", PLAYBACK_SPEED_DEFAULT);
+          return;
+        }
+        updateState("playbackSpeed", Math.round(speed * 100) / 100);
+        break;
+      }
       case CORE_ACTIONS.SET_IS_MUTED:
         updateState("isMuted", action.payload);
         break;
@@ -229,11 +250,29 @@ const createAppCoreInstance = (): IAppCore => {
         }
         break;
       }
+      case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
+        updateState("trackBpms", {
+          ...state.trackBpms,
+          [action.payload]: { bpm: state.trackBpms[action.payload]?.bpm ?? null, loading: true, error: false },
+        });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_SUCCESS:
+        updateState("trackBpms", {
+          ...state.trackBpms,
+          [action.payload.trackUrl]: { bpm: action.payload.bpm, loading: false, error: false },
+        });
+        break;
+      case CORE_ACTIONS.SET_TRACK_BPM_ERROR:
+        updateState("trackBpms", {
+          ...state.trackBpms,
+          [action.payload]: { bpm: state.trackBpms[action.payload]?.bpm ?? null, loading: false, error: true },
+        });
+        break;
+      case CORE_ACTIONS.CLEAR_TRACK_BPMS:
+        updateState("trackBpms", {});
+        break;
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
-        break;
-      case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
-        updateState("hotkeyBindings", action.payload);
         break;
       case CORE_ACTIONS.SET_SEEK_JUMP_DURATION:
         try {
@@ -283,6 +322,12 @@ const createAppCoreInstance = (): IAppCore => {
         }
         break;
       }
+      case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
+        updateState("hotkeyBindings", action.payload);
+        break;
+      case CORE_ACTIONS.SET_FEATURE_FLAGS:
+        updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
+        break;
       default:
         action satisfies never; // Ensure declared all action types are handled
         handleUnknownAction(action);
@@ -293,37 +338,37 @@ const createAppCoreInstance = (): IAppCore => {
     try {
       const browserCache = getBrowserInstance().getState().cache;
       const keys = [
-        PLUME_CACHE_KEYS.LOOP_MODE,
         PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD,
+        PLUME_CACHE_KEYS.PLAYBACK_SPEED,
+        PLUME_CACHE_KEYS.LOOP_MODE,
         PLUME_CACHE_KEYS.VOLUME,
-        PLUME_CACHE_KEYS.HOTKEY_BINDINGS,
         PLUME_CACHE_KEYS.SEEK_JUMP_DURATION,
         PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP,
         PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD,
+        PLUME_CACHE_KEYS.HOTKEY_BINDINGS,
+        PLUME_CACHE_KEYS.FEATURE_FLAGS,
       ];
       const result = await browserCache.get(keys);
 
-      if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
-        const isValidValue = typeof result[PLUME_CACHE_KEYS.VOLUME] === "number";
-        const cachedVolume = isValidValue ? result[PLUME_CACHE_KEYS.VOLUME] : PLUME_DEFAULTS.savedVolume;
-
-        const clampedVolume = Math.max(0, Math.min(1, cachedVolume));
-        dispatch(coreActions.setVolume(clampedVolume));
-
-        if (clampedVolume === 0) {
-          dispatch(coreActions.setIsMuted(true));
-        }
-        logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), [`${Math.round(clampedVolume * 100)}%`]);
-      }
-
       if (result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD] !== undefined) {
         const isValidValue = isPlumeDurationDisplayMethod(result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]);
-        const cachedMethod = isValidValue
+        const value = isValidValue
           ? result[PLUME_CACHE_KEYS.DURATION_DISPLAY_METHOD]
           : PLUME_DEFAULTS.durationDisplayMethod;
 
-        dispatch(coreActions.setDurationDisplayMethod(cachedMethod));
-        logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [cachedMethod]));
+        dispatch(coreActions.setDurationDisplayMethod(value));
+        logger(CPL.INFO, getString("INFO__DURATION_DISPLAY_METHOD__APPLIED", [value]));
+      }
+
+      if (result[PLUME_CACHE_KEYS.PLAYBACK_SPEED] !== undefined) {
+        const value = result[PLUME_CACHE_KEYS.PLAYBACK_SPEED];
+        if (isValidPlaybackSpeed(value)) {
+          dispatch(coreActions.setPlaybackSpeed(value));
+          logger(CPL.INFO, getString("INFO__PLAYBACK_SPEED__LOADED"), `${value}×`);
+        } else {
+          logger(CPL.WARN, getString("WARN__PLAYBACK_SPEED__INVALID_VALUE"));
+          dispatch(coreActions.setPlaybackSpeed(PLAYBACK_SPEED_DEFAULT));
+        }
       }
 
       if (result[PLUME_CACHE_KEYS.LOOP_MODE] !== undefined) {
@@ -342,26 +387,19 @@ const createAppCoreInstance = (): IAppCore => {
         musicPlayer.setLoop(inferredLoopMode === LOOP_MODE.TRACK);
       }
 
-      const rawBindings = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS];
-      if (areCachedHotkeyBindingsInvalid(rawBindings)) {
-        logger(CPL.WARN, getString("WARN__HOTKEY_BINDINGS__INVALID_CACHE"));
-        // Overwrite invalid cached bindings with defaults so future loads see a valid value
-        const defaultBindings = { ...DEFAULT_HOTKEYS };
-        await browserCache.set({ [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: defaultBindings });
-        dispatch(coreActions.setHotkeyBindings(defaultBindings));
-      } else {
-        const storedBindings = rawBindings as KeyBindingMap | undefined;
-        if (storedBindings) {
-          // Stored bindings override defaults; actions absent from storage keep their default binding
-          const resolved = Object.fromEntries(
-            (Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]).map((action) => [
-              action,
-              storedBindings[action] ?? DEFAULT_HOTKEYS[action],
-            ])
-          ) as Record<HotkeyAction, KeyBinding>;
-          dispatch(coreActions.setHotkeyBindings(resolved));
+      if (result[PLUME_CACHE_KEYS.VOLUME] !== undefined) {
+        const isValidValue = typeof result[PLUME_CACHE_KEYS.VOLUME] === "number";
+        const cachedVolume = isValidValue ? result[PLUME_CACHE_KEYS.VOLUME] : PLUME_DEFAULTS.savedVolume;
+
+        const clampedVolume = Math.max(0, Math.min(1, cachedVolume));
+        dispatch(coreActions.setVolume(clampedVolume));
+
+        if (clampedVolume === 0) {
+          dispatch(coreActions.setIsMuted(true));
         }
+        logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), [`${Math.round(clampedVolume * 100)}%`]);
       }
+
       if (result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION] !== undefined) {
         const value = result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION];
         try {
@@ -399,6 +437,32 @@ const createAppCoreInstance = (): IAppCore => {
           const defaultThreshold = PLUME_DEFAULTS.trackRestartThreshold;
           dispatch(coreActions.setTrackRestartThreshold(defaultThreshold));
         }
+      }
+
+      const rawBindings = result[PLUME_CACHE_KEYS.HOTKEY_BINDINGS];
+      if (areCachedHotkeyBindingsInvalid(rawBindings)) {
+        logger(CPL.WARN, getString("WARN__HOTKEY_BINDINGS__INVALID_CACHE"));
+        // Overwrite invalid cached bindings with defaults so future loads see a valid value
+        const defaultBindings = { ...DEFAULT_HOTKEYS };
+        await browserCache.set({ [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: defaultBindings });
+        dispatch(coreActions.setHotkeyBindings(defaultBindings));
+      } else {
+        const storedBindings = rawBindings as KeyBindingMap | undefined;
+        if (storedBindings) {
+          // Stored bindings override defaults; actions absent from storage keep their default binding
+          const resolved = Object.fromEntries(
+            (Object.keys(DEFAULT_HOTKEYS) as HotkeyAction[]).map((action) => [
+              action,
+              storedBindings[action] ?? DEFAULT_HOTKEYS[action],
+            ])
+          ) as Record<HotkeyAction, KeyBinding>;
+          dispatch(coreActions.setHotkeyBindings(resolved));
+        }
+      }
+
+      const storedFlags = result[PLUME_CACHE_KEYS.FEATURE_FLAGS];
+      if (storedFlags !== undefined && typeof storedFlags === "object" && storedFlags !== null) {
+        dispatch(coreActions.setFeatureFlags(storedFlags));
       }
     } catch (error) {
       logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);

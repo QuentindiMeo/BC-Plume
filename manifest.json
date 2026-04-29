@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_APP_NAME__",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "__MSG_APP_DESCRIPTION__",
   "default_locale": "en",
   "action": {
@@ -13,8 +13,12 @@
     "tabs"
   ],
   "host_permissions": [
-    "*://*.bandcamp.com/*"
+    "*://*.bandcamp.com/*",
+    "*://*.bcbits.com/*"
   ],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -25,7 +29,8 @@
         "dist/content.js"
       ],
       "css": [
-        "styles.css"
+        "dist/styles.css",
+        "dist/tailwind.css"
       ],
       "run_at": "document_end"
     }

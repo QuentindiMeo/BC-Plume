@@ -1,7 +1,8 @@
 import { BANDCAMP_TAB_PATTERN, PLUME_CACHE_KEYS } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction } from "@/domain/hotkeys";
 import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
-import type { PlumeLanguage, WholeNumber } from "@/domain/plume";
+import { type FeatureFlags, PLUME_DEFAULTS, type PlumeLanguage, type WholeNumber } from "@/domain/plume";
+import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
 import { resetHotkeys } from "@/popup/use-cases/resetHotkeys";
 import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
@@ -137,6 +138,23 @@ describe("resetHotkeys", () => {
     expect(fakeSender.broadcasts[0]).toEqual({
       urlPattern: BANDCAMP_TAB_PATTERN,
       message: { type: PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED, bindings: DEFAULT_HOTKEYS },
+    });
+  });
+});
+
+describe("saveFeatureFlags", () => {
+  it("persists flags under the correct storage key", async () => {
+    const flags: FeatureFlags = { ...PLUME_DEFAULTS.featureFlags, fullscreen: false };
+    await saveFeatureFlags(flags, fakeSender);
+    expect(fakeStorage.store[PLUME_CACHE_KEYS.FEATURE_FLAGS]).toEqual(flags);
+  });
+
+  it("broadcasts FEATURE_FLAGS_UPDATED with the full flags object", async () => {
+    const flags: FeatureFlags = { ...PLUME_DEFAULTS.featureFlags, quickSeek: false };
+    await saveFeatureFlags(flags, fakeSender);
+    expect(fakeSender.broadcasts[0]).toEqual({
+      urlPattern: BANDCAMP_TAB_PATTERN,
+      message: { type: PLUME_MESSAGE_TYPE.FEATURE_FLAGS_UPDATED, featureFlags: flags },
     });
   });
 });

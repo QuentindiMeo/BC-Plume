@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { FakeAppCore } from "../fakes/FakeAppCore";
 import { FakeMusicPlayer } from "../fakes/FakeMusicPlayer";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
@@ -25,29 +25,37 @@ vi.mock("@/svg/icons", () => ({
     volumeOn: "",
     volumeMuted: "",
     fullscreen: "",
+    speedGauge: "",
   },
 }));
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
-    playbackControls: "div#bpe-playback-controls",
-    trackBwdBtn: "button#bpe-track-bwd-btn",
-    timeBwdBtn: "button#bpe-time-bwd-btn",
-    playPauseBtn: "button#bpe-play-pause-btn",
-    timeFwdBtn: "button#bpe-time-fwd-btn",
-    trackFwdBtn: "button#bpe-track-fwd-btn",
-    loopBtn: "button#bpe-loop-btn",
-    volumeContainer: "div#bpe-volume-container",
-    muteBtn: "button#bpe-mute-btn",
-    volumeSlider: "input#bpe-volume-slider",
-    volumeValue: "div#bpe-volume-value",
-    progressContainer: "div#bpe-progress-container",
-    progressSlider: "input#bpe-progress-slider",
-    timeDisplay: "div#bpe-time-display",
-    elapsedDisplay: "span#bpe-elapsed-display",
-    durationDisplay: "button#bpe-duration-display",
-    fullscreenBtn: "button#bpe-fullscreen-btn",
-    fullscreenBtnLabel: "span#bpe-fullscreen-btn-label",
-    fullscreenBtnContainer: "div#bpe-fullscreen-btn-container",
+    playbackControls: "div#plume-playback-controls",
+    speedWrapper: "div#plume-speed-wrapper",
+    speedBtn: "button#plume-speed-btn",
+    speedBtnText: "span#plume-speed-btn__text",
+    speedPopover: "div.plume-speed-popover",
+    speedLabel: "span.plume-speed-label",
+    speedCustomInput: "input.plume-speed-custom-input",
+    speedSlider: "input.plume-speed-slider",
+    trackBwdBtn: "button#plume-track-bwd-btn",
+    timeBwdBtn: "button#plume-time-bwd-btn",
+    playPauseBtn: "button#plume-play-pause-btn",
+    timeFwdBtn: "button#plume-time-fwd-btn",
+    trackFwdBtn: "button#plume-track-fwd-btn",
+    loopBtn: "button#plume-loop-btn",
+    volumeContainer: "div#plume-volume-container",
+    muteBtn: "button#plume-mute-btn",
+    volumeSlider: "input#plume-volume-slider",
+    volumeValue: "div#plume-volume-value",
+    progressContainer: "div#plume-progress-container",
+    progressSlider: "input#plume-progress-slider",
+    timeDisplay: "div#plume-time-display",
+    elapsedDisplay: "span#plume-elapsed-display",
+    durationDisplay: "button#plume-duration-display",
+    fullscreenBtn: "button#plume-fullscreen-btn",
+    fullscreenBtnLabel: "span#plume-fullscreen-btn-label",
+    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
 
@@ -113,7 +121,7 @@ describe("content-player accessibility", () => {
       document.body.appendChild(panel);
 
       const buttons = panel.querySelectorAll("button");
-      expect(buttons.length).toBe(6);
+      expect(buttons.length).toBe(7);
       for (const btn of buttons) {
         expect(btn.getAttribute("aria-label")).toBeTruthy();
       }

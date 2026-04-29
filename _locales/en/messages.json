@@ -266,6 +266,19 @@
   "ARIA__LOOP__COLLECTION_TRACK": { "message": "Repeat: track" },
   "ARIA__LOOP__ONE_TRACK": { "message": "Repeat: on" },
 
+  "LABEL__SPEED": { "message": "Playback speed" },
+  "ARIA__SPEED_SLIDER": { "message": "Playback speed slider" },
+  "ARIA__SPEED_BTN": {
+    "message": "Playback speed: $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Speed button clicked" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Custom speed input rejected (out of range or non-numeric)" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Custom playback speed" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Click to enter a custom speed" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Playback speed loaded:" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Invalid playback speed — resetting to 1×" },
+
   "INFO__HOTKEYS__REGISTERED": { "message": "Hotkeys registered" },
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Toggle Fullscreen Mode" },
@@ -333,16 +346,21 @@
 
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
+  "INFO__SETTING__REFRESH_REQUIRED": { "message": "Refresh the page for the change to take effect." },
+  "LABEL__SETTING__RESET": { "message": "Reset" },
+  "LABEL__TAB__RESET": { "message": "Reset all" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Failed to save language preference" },
-  "INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED": { "message": "Refresh the page for the language change to take effect" },
   "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Language" },
   "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Display language override" },
   "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
   "LABEL__LANGUAGE__EN": { "message": "English" },
   "LABEL__LANGUAGE__ES": { "message": "Spanish" },
   "LABEL__LANGUAGE__FR": { "message": "French" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Hotkeys" },
@@ -373,12 +391,12 @@
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Fullscreen" },
   "LABEL__HOTKEY__MUTE": { "message": "Mute / Unmute" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cycle loop mode" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Cycle playback speed" },
   "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Seek to 0%–90% (digit keys)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Press a key..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Disabled" },
   "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirm" },
   "POPUP__HOTKEYS__CANCEL": { "message": "Cancel" },
-  "POPUP__HOTKEYS__RESET_ALL": { "message": "Reset all" },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Remap $ACTION$ hotkey — currently $BINDING$",
     "placeholders": {
@@ -402,10 +420,16 @@
     }
   },
 
-  "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
-  "LABEL__GENERAL__RESET": { "message": "Reset" },
-  "META__SECONDS_UNIT": { "message": "s" },
-  "META__PERCENT_UNIT": { "message": "%" },
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Features" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Go to track" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Tracklist" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Loop modes" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
+  "LABEL__FEATURES__BPM_DETECT": { "message": "BPM Detection" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },
@@ -507,5 +531,43 @@
     "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
   },
   "META__TOAST__UNPLAYABLE_TRACK": { "message": "unplayable track" },
-  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" }
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "unplayable tracks" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Limited speed control" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari limits playback speed to 0.5×–2×. Your selection will be clamped."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "safari unsupported speed" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Invalid speed value" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Please enter a number between 0.25 and 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "invalid custom input" },
+
+  "LABEL__BPM__DISPLAY": { "message": "BPM" },
+  "LABEL__BPM__DETECTING": { "message": "..." },
+  "LABEL__BPM__ERROR": { "message": "—" },
+  "LABEL__BPM__DETECT_ALL": { "message": "Detect BPM" },
+  "ARIA__BPM__DISPLAY": { "message": "Beats per minute for the current track" },
+  "ARIA__BPM__DETECT_ALL_BTN": { "message": "Detect BPM for all tracks" },
+  "ARIA__BPM__BADGE": {
+    "message": "$BPM$ beats per minute",
+    "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Track album data (data-tralbum) not found on page" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Failed to parse track album data (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "BPM detection failed for '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Starting BPM detection for '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM detected: $BPM$ for '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/some-track" }
+    }
+  }
 }

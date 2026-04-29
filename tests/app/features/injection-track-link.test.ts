@@ -3,18 +3,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/infra/elements/plume", () => ({
   PLUME_ELEM_SELECTORS: {
-    plumeContainer: "div#bpe-plume",
-    headerContainer: "div#bpe-header-container",
-    headerLogo: "a#bpe-header-logo",
-    headerCurrent: "div#bpe-header-current",
-    headerTitlePretext: "span#bpe-header-title-pretext",
-    headerTitle: "span#bpe-header-title",
-    headerTrackLink: "a#bpe-header-track-link",
-    tracklistToggleBtn: "button#bpe-tracklist-toggle-btn",
-    tracklistDropdown: "div#bpe-tracklist-dropdown",
-    playbackManager: "div#bpe-playback-manager",
-    progressContainer: "div#bpe-progress-container",
-    fullscreenBtnContainer: "div#bpe-fullscreen-btn-container",
+    plumeContainer: "div#plume-root",
+    headerContainer: "div#plume-header-container",
+    headerLogo: "a#plume-header-logo",
+    headerCurrent: "div#plume-header-current",
+    headerTitlePretext: "span#plume-header-title-pretext",
+    headerTitle: "span#plume-header-title",
+    headerTrackLink: "a#plume-header-track-link",
+    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
+    tracklistDropdown: "div#plume-tracklist-dropdown",
+    playbackManager: "div#plume-playback-manager",
+    progressContainer: "div#plume-progress-container",
+    bpmContainer: "div#plume-bpm-container",
+    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
   },
 }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
@@ -46,6 +47,7 @@ const fakeBcPlayer = {
 };
 vi.mock("@/app/stores/adapters", () => ({ getBcPlayerInstance: () => fakeBcPlayer }));
 
+import { PLUME_DEFAULTS } from "@/domain/plume";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 let fakeAppCore = new FakeAppCore({ pageType: "album" });
@@ -69,15 +71,26 @@ vi.mock("@/app/features/original-player", () => ({
   hideOriginalPlayerElements: vi.fn(),
 }));
 vi.mock("@/app/features/ui", () => ({
+  createBpmDisplaySection: () => {
+    const el = document.createElement("div");
+    el.id = "plume-bpm-container";
+    return el;
+  },
   createPlaybackControlPanel: () => document.createElement("div"),
   createProgressBar: () => document.createElement("div"),
   createVolumeControlSection: async () => document.createElement("div"),
-  createFullscreenButtonSection: () => document.createElement("div"),
-  createTracklistToggle: () => ({
-    toggleBtn: document.createElement("button"),
-    dropdownEl: document.createElement("div"),
-    cleanup: () => {},
-  }),
+  createFullscreenButtonSection: () => {
+    const el = document.createElement("div");
+    el.id = "plume-fullscreen-btn-container";
+    return el;
+  },
+  createTracklistToggle: () => {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.id = "plume-tracklist-toggle-btn";
+    const dropdownEl = document.createElement("div");
+    dropdownEl.id = "plume-tracklist-dropdown";
+    return { toggleBtn, dropdownEl, cleanup: () => {} };
+  },
 }));
 vi.mock("@/app/features/fullscreen", () => ({ toggleFullscreenMode: vi.fn() }));
 
@@ -96,9 +109,9 @@ describe("track link in injection", () => {
     const { ok } = await injectEnhancements();
     expect(ok).toBe(true);
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink).not.toBeNull();
-    expect(trackLink.id).toBe("bpe-header-track-link");
+    expect(trackLink.id).toBe("plume-header-track-link");
   });
 
   it("does not create a track link element on track pages", async () => {
@@ -106,14 +119,14 @@ describe("track link in injection", () => {
     const { ok } = await injectEnhancements();
     expect(ok).toBe(true);
 
-    const trackLink = document.querySelector("a#bpe-header-track-link");
+    const trackLink = document.querySelector("a#plume-header-track-link");
     expect(trackLink).toBeNull();
   });
 
   it("sets the href from getCurrentTrackUrl when available", async () => {
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink.href).toContain("/track/test-track");
     expect(trackLink.ariaDisabled).toBe("false");
     expect(trackLink.tabIndex).toBe(0);
@@ -123,7 +136,7 @@ describe("track link in injection", () => {
     mockTrackUrl = null;
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink).not.toBeNull();
     expect(trackLink.hasAttribute("href")).toBe(false);
     expect(trackLink.ariaDisabled).toBe("true");
@@ -134,7 +147,7 @@ describe("track link in injection", () => {
   it("sets correct ARIA attributes on the track link", async () => {
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     expect(trackLink.ariaLabel).toBe("ARIA__TRACK_LINK");
     expect(trackLink.title).toBe("ARIA__TRACK_LINK");
   });
@@ -142,7 +155,7 @@ describe("track link in injection", () => {
   it("contains an SVG icon inside the track link", async () => {
     await injectEnhancements();
 
-    const trackLink = document.querySelector("a#bpe-header-track-link") as HTMLAnchorElement;
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
     const svg = trackLink.querySelector("svg");
     expect(svg).not.toBeNull();
   });
@@ -150,10 +163,82 @@ describe("track link in injection", () => {
   it("places the track link before the title span in the title row", async () => {
     await injectEnhancements();
 
-    const titleRow = document.querySelector(".bpe-header-title-row") as HTMLDivElement;
+    const titleRow = document.querySelector(".plume-header-title-row") as HTMLDivElement;
     const children = Array.from(titleRow.children);
-    const linkIdx = children.findIndex((el) => el.id === "bpe-header-track-link");
-    const titleIdx = children.findIndex((el) => el.id === "bpe-header-title");
+    const linkIdx = children.findIndex((el) => el.id === "plume-header-track-link");
+    const titleIdx = children.findIndex((el) => el.id === "plume-header-title");
     expect(linkIdx).toBeLessThan(titleIdx);
+  });
+
+  it("creates the track link as hidden when goToTrack flag is disabled", async () => {
+    fakeAppCore = new FakeAppCore({
+      pageType: "album",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, goToTrack: false },
+    });
+    await injectEnhancements();
+
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
+    expect(trackLink).not.toBeNull();
+    expect(trackLink.classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
+  it("creates the track link as visible when goToTrack flag is enabled", async () => {
+    await injectEnhancements();
+
+    const trackLink = document.querySelector("a#plume-header-track-link") as HTMLAnchorElement;
+    expect(trackLink).not.toBeNull();
+    expect(trackLink.classList.contains("plume-feature-hidden")).toBe(false);
+  });
+});
+
+describe("tracklist toggle in injection", () => {
+  it("creates the tracklist toggle as hidden when tracklist flag is disabled", async () => {
+    fakeAppCore = new FakeAppCore({
+      pageType: "album",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklist: false },
+    });
+    await injectEnhancements();
+
+    const toggleBtn = document.querySelector("button#plume-tracklist-toggle-btn");
+    expect(toggleBtn).not.toBeNull();
+    expect((toggleBtn as HTMLElement).classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
+  it("creates the tracklist toggle as visible when tracklist flag is enabled", async () => {
+    await injectEnhancements();
+
+    const toggleBtn = document.querySelector("button#plume-tracklist-toggle-btn");
+    expect(toggleBtn).not.toBeNull();
+    expect((toggleBtn as HTMLElement).classList.contains("plume-feature-hidden")).toBe(false);
+  });
+
+  it("does not create tracklist toggle on track pages", async () => {
+    fakeAppCore = new FakeAppCore({ pageType: "track" });
+    await injectEnhancements();
+
+    const toggleBtn = document.querySelector("button#plume-tracklist-toggle-btn");
+    expect(toggleBtn).toBeNull();
+  });
+});
+
+describe("fullscreen button section in injection", () => {
+  it("creates the fullscreen section as hidden when fullscreen flag is disabled", async () => {
+    fakeAppCore = new FakeAppCore({
+      pageType: "album",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, fullscreen: false },
+    });
+    await injectEnhancements();
+
+    const section = document.querySelector("div#plume-fullscreen-btn-container");
+    expect(section).not.toBeNull();
+    expect((section as HTMLElement).classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
+  it("creates the fullscreen section as visible when fullscreen flag is enabled", async () => {
+    await injectEnhancements();
+
+    const section = document.querySelector("div#plume-fullscreen-btn-container");
+    expect(section).not.toBeNull();
+    expect((section as HTMLElement).classList.contains("plume-feature-hidden")).toBe(false);
   });
 });

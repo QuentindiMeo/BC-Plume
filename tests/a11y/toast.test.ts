@@ -37,7 +37,7 @@ describe("toast accessibility", () => {
         duration: 9999,
       });
 
-      const toastContainer = document.getElementById("bpe-toast-container");
+      const toastContainer = document.getElementById("plume-toast-container");
       expect(toastContainer).not.toBeNull();
       await checkA11y(toastContainer!);
       handle.cleanup();
@@ -53,7 +53,7 @@ describe("toast accessibility", () => {
       duration: 9999,
     });
 
-    const toast = document.querySelector(".bpe-toast");
+    const toast = document.querySelector(".plume-toast");
     expect(toast?.getAttribute("role")).toBe("status");
     expect(toast?.getAttribute("aria-live")).toBe("polite");
     handle.cleanup();
@@ -67,7 +67,7 @@ describe("toast accessibility", () => {
       duration: 9999,
     });
 
-    const dismissBtn = document.querySelector(".bpe-toast__dismiss");
+    const dismissBtn = document.querySelector(".plume-toast__dismiss");
     expect(dismissBtn?.getAttribute("aria-label")).toBeTruthy();
     handle.cleanup();
   });
@@ -80,7 +80,7 @@ describe("toast accessibility", () => {
       duration: 9999,
     });
 
-    const timer = document.querySelector(".bpe-toast__timer");
+    const timer = document.querySelector(".plume-toast__timer");
     expect(timer?.getAttribute("aria-hidden")).toBe("true");
     handle.cleanup();
   });
@@ -97,7 +97,7 @@ describe("toast accessibility", () => {
         duration: 9999,
       });
 
-      const toastContainer = document.getElementById("bpe-toast-container");
+      const toastContainer = document.getElementById("plume-toast-container");
       expect(toastContainer).not.toBeNull();
       await checkA11y(toastContainer!);
       handle.cleanup();

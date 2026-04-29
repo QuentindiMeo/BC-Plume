@@ -22,15 +22,39 @@ import { guiActions } from "@/domain/ports/plume-ui";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-const initPlayback = () => {
-  // BC's native play button is clicked to trigger its own internal playback bootstrap
+/**
+ * Flag set by Plume's store subscription right before calling audio.play().
+ * Consumed by the bootstrap listener to distinguish Plume-initiated plays from BC-initiated ones.
+ */
+let plumeInitiatedPlay = false;
+
+/** Call immediately before Plume triggers audio.play() to arm the BC bootstrap. */
+export const markPlumeInitiatedPlay = (): void => {
+  plumeInitiatedPlay = true;
+};
+
+/**
+ * Defers Bandcamp's internal player bootstrap to the first Plume-initiated play.
+ * This avoids triggering Bandcamp's cross-tab audio exclusivity on page load,
+ * which would pause players in other tabs on Plume init.
+ */
+const initPlayback = (audio: HTMLAudioElement) => {
   const bcPlayer = getBcPlayerInstance();
   const playButton = bcPlayer.getPlayPauseButton();
-  if (playButton) {
-    playButton.click();
-  } else {
+  if (!playButton) {
     logger(CPL.WARN, getString("WARN__PLAY_PAUSE__NOT_FOUND"));
+    return;
   }
+
+  const bootstrapOnce = () => {
+    // If Bandcamp initiated the play (track row click), it already bootstrapped itself.
+    if (!plumeInitiatedPlay) return;
+    plumeInitiatedPlay = false;
+
+    audio.removeEventListener("play", bootstrapOnce);
+    playButton.click();
+  };
+  audio.addEventListener("play", bootstrapOnce, { once: true });
 };
 
 const findAudioElement = async (): Promise<HTMLAudioElement | null> => {
@@ -155,7 +179,7 @@ export const launchPlume = (): void => {
     if (await shouldShowReleaseToast(browserCache)) showReleaseToast();
 
     setupListeners(handles);
-    initPlayback();
+    initPlayback(audioElement);
 
     // Debug: show detected controls
     debugBandcampControls();

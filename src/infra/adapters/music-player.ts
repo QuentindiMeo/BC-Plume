@@ -12,36 +12,22 @@ export class MusicPlayerAdapter implements MusicPlayerPort {
     return this.audioProvider.getAudioElement();
   }
 
-  isPaused(): boolean {
-    return this.audio.paused;
+  getDuration(): number {
+    return this.audio.duration;
+  }
+  getCurrentTime(): number {
+    return this.audio.currentTime;
+  }
+  getPlaybackRate(): number {
+    return this.audio.playbackRate;
   }
 
   getVolume(): number {
     return this.audio.volume;
   }
 
-  getCurrentTime(): number {
-    return this.audio.currentTime;
-  }
-
-  getDuration(): number {
-    return this.audio.duration;
-  }
-
-  play(): void {
-    void this.audio.play();
-  }
-
-  pause(): void {
-    this.audio.pause();
-  }
-
-  setVolume(volume: number): void {
-    this.audio.volume = volume;
-  }
-
-  setLoop(loop: boolean): void {
-    this.audio.loop = loop;
+  isPaused(): boolean {
+    return this.audio.paused;
   }
 
   seekTo(time: number): void {
@@ -75,6 +61,26 @@ export class MusicPlayerAdapter implements MusicPlayerPort {
         signal: controller.signal,
       });
     }
+  }
+
+  setPlaybackRate(rate: number): void {
+    this.audio.playbackRate = rate;
+  }
+
+  play(): void {
+    void this.audio.play();
+  }
+
+  pause(): void {
+    this.audio.pause();
+  }
+
+  setLoop(loop: boolean): void {
+    this.audio.loop = loop;
+  }
+
+  setVolume(volume: number): void {
+    this.audio.volume = volume;
   }
 
   on(event: string, handler: EventListener): void {

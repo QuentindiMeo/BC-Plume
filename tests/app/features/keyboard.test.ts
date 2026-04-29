@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 let fakeAppCore = new FakeAppCore();
@@ -12,11 +13,13 @@ vi.mock("@/app/use-cases/seek-to-progress", () => ({ seekToProgress: vi.fn() }))
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: {}, logger: vi.fn() }));
 vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: { tracklistDropdown: "div#bpe-tracklist-dropdown" },
+  PLUME_ELEM_SELECTORS: { tracklistDropdown: "div#plume-tracklist-dropdown" },
 }));
 
 import { bindingKey, setupHotkeys } from "@/app/features/keyboard";
-import { type KeyBinding, DEFAULT_HOTKEYS } from "@/domain/hotkeys";
+import { seekToProgress } from "@/app/use-cases/seek-to-progress";
+import { DEFAULT_HOTKEYS, type KeyBinding } from "@/domain/hotkeys";
+import { PLUME_DEFAULTS, type FeatureFlags } from "@/domain/plume";
 
 const binding = (
   code: string,
@@ -80,14 +83,15 @@ describe("bindingKey", () => {
 
 describe("setupHotkeys — arrow keys inside tracklist", () => {
   const noopHandlers = {
-    handlePlayPause: vi.fn(),
-    handleTimeBackward: vi.fn(),
-    handleTimeForward: vi.fn(),
+    handleSpeedCycle: vi.fn(),
     handleTrackBackward: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handlePlayPause: vi.fn(),
+    handleTimeForward: vi.fn(),
     handleTrackForward: vi.fn(),
+    handleLoopCycle: vi.fn(),
     handleMuteToggle: vi.fn(),
     toggleFullscreenMode: vi.fn(),
-    handleLoopCycle: vi.fn(),
   };
 
   let cleanup: () => void;
@@ -97,7 +101,7 @@ describe("setupHotkeys — arrow keys inside tracklist", () => {
   beforeEach(() => {
     fakeAppCore = new FakeAppCore();
     dropdown = document.createElement("div");
-    dropdown.id = "bpe-tracklist-dropdown";
+    dropdown.id = "plume-tracklist-dropdown";
     item = document.createElement("div");
     dropdown.appendChild(item);
     document.body.appendChild(dropdown);
@@ -145,5 +149,70 @@ describe("setupHotkeys — arrow keys inside tracklist", () => {
     item.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(true);
     expect(noopHandlers.handleMuteToggle).toHaveBeenCalled();
+  });
+});
+
+describe("setupHotkeys — feature flag guards", () => {
+  const noopHandlers = {
+    handleSpeedCycle: vi.fn(),
+    handleTrackBackward: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handlePlayPause: vi.fn(),
+    handleTimeForward: vi.fn(),
+    handleTrackForward: vi.fn(),
+    handleLoopCycle: vi.fn(),
+    handleMuteToggle: vi.fn(),
+    toggleFullscreenMode: vi.fn(),
+  };
+
+  let cleanup: () => void;
+
+  const setupWithFlags = (overrides: Partial<FeatureFlags>) => {
+    const flags = { ...PLUME_DEFAULTS.featureFlags, ...overrides };
+    fakeAppCore = new FakeAppCore({ featureFlags: flags });
+    cleanup = setupHotkeys(noopHandlers, DEFAULT_HOTKEYS);
+  };
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it("blocks quick-seek digit keys when quickSeek flag is off", () => {
+    setupWithFlags({ quickSeek: false });
+    const event = new KeyboardEvent("keydown", { code: "Digit5", key: "5", bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(vi.mocked(seekToProgress)).not.toHaveBeenCalled();
+  });
+
+  it("allows quick-seek digit keys when quickSeek flag is on", () => {
+    setupWithFlags({ quickSeek: true });
+    const event = new KeyboardEvent("keydown", { code: "Digit5", key: "5", bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(vi.mocked(seekToProgress)).toHaveBeenCalled();
+  });
+
+  it("blocks fullscreen hotkey when fullscreen flag is off", () => {
+    setupWithFlags({ fullscreen: false });
+    const { code, label: key } = DEFAULT_HOTKEYS.FULLSCREEN;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(noopHandlers.toggleFullscreenMode).not.toHaveBeenCalled();
+  });
+
+  it("blocks loop cycle hotkey when loopModes flag is off", () => {
+    setupWithFlags({ loopModes: false });
+    const { code, label: key } = DEFAULT_HOTKEYS.LOOP_CYCLE;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(noopHandlers.handleLoopCycle).not.toHaveBeenCalled();
+  });
+
+  it("allows loop cycle hotkey when loopModes flag is on", () => {
+    setupWithFlags({ loopModes: true });
+    const { code, label: key } = DEFAULT_HOTKEYS.LOOP_CYCLE;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true });
+    document.dispatchEvent(event);
+    expect(noopHandlers.handleLoopCycle).toHaveBeenCalled();
   });
 });

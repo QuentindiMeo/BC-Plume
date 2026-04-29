@@ -1,6 +1,7 @@
+import { describe, expect, it } from "vitest";
+
 import { DEFAULT_HOTKEYS, HotkeyAction } from "@/domain/hotkeys";
 import { CORE_ACTIONS, coreActions } from "@/domain/ports/app-core";
-import { describe, expect, it } from "vitest";
 
 describe("HotkeyAction", () => {
   it("defines all expected action values", () => {
@@ -15,6 +16,7 @@ describe("HotkeyAction", () => {
       "FULLSCREEN",
       "MUTE",
       "LOOP_CYCLE",
+      "SPEED_CYCLE",
     ];
     expect(Object.values(HotkeyAction)).toEqual(expected);
   });

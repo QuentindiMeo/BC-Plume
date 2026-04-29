@@ -1,0 +1,308 @@
+@reference "../tailwind.css";
+
+*,
+*::before,
+*::after {
+  @apply box-border m-0 p-0;
+}
+
+body {
+  @apply w-90 font-popup leading-normal text-sm text-popup-text bg-popup-bg;
+
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-popup-accent;
+  }
+}
+
+/* Visually hidden but accessible to screen readers */
+.sr-live {
+  @apply sr-only;
+}
+
+#app {
+  @apply pb-2;
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  .popup__header {
+    @apply pt-3.5 px-4 pb-3 border-b border-popup-border flex items-center justify-between;
+
+    h1 {
+      @apply text-base font-semibold text-popup-text;
+    }
+
+    .popup__header-logo {
+      @apply size-8 flex items-center shrink-0 text-popup-accent;
+      margin-top: -0.25rem; /* optical alignment with text */
+    }
+  }
+
+  .popup__tablist {
+    @apply flex border-b border-popup-border;
+
+    .popup__tab {
+      @apply
+        py-2 px-4 bg-transparent border-none border-b-2 border-b-transparent
+        flex-1
+        font-popup font-medium text-sm text-center text-popup-text-muted whitespace-nowrap
+        transition-[color,background,border-color] duration-150
+      ;
+      margin-bottom: -1px; /* overlap container border so active underline replaces it */
+      letter-spacing: 0.01em;
+
+      &:hover:not(.active) {
+        @apply bg-popup-surface-alt text-popup-text;
+      }
+
+      &:focus-visible {
+        @apply -outline-offset-2;
+      }
+
+      &.active {
+        @apply text-popup-text border-b-popup-accent cursor-default;
+        border-bottom-style: solid;
+      }
+    }
+  }
+
+  .popup__tab-panel[hidden] {
+    @apply hidden;
+  }
+}
+
+/* Settings sections (shared by both tabs) */
+.settings__section {
+  @apply pt-2 px-4 pb-0;
+
+  .settings__section-title {
+    @apply mb-1.5 text-xs font-semibold uppercase text-popup-text-muted;
+    letter-spacing: 0.08em;
+  }
+}
+
+.setting-row {
+  @apply py-1.5 px-0 flex items-center justify-between gap-3 border-b border-popup-border;
+
+  &:last-of-type {
+    @apply border-b-0;
+  }
+
+  .setting-row__label {
+    @apply min-w-0 flex-1 text-sm text-popup-text;
+
+    &--info {
+      @apply p-0 italic text-popup-text-muted;
+    }
+  }
+
+  .setting-row__value {
+    @apply flex flex-col items-end gap-1 shrink-0;
+  }
+
+  .setting-row__btn {
+    @apply
+      min-w-24 px-3 py-1 bg-popup-surface rounded-popup border border-popup-border
+      font-popup font-medium text-xs text-popup-text text-center whitespace-nowrap
+      transition-[border-color,background] duration-150
+    ;
+
+    &:hover:not(:disabled) {
+      @apply bg-popup-surface-alt border-popup-accent-dim;
+    }
+
+    &--capturing {
+      @apply bg-popup-surface-alt border-popup-accent text-popup-accent;
+
+      @keyframes pulse-border {
+        from { border-color: var(--color-popup-accent-dim); }
+        to { border-color: var(--color-popup-accent); }
+      }
+      animation: pulse-border 1s ease-in-out infinite alternate;
+    }
+
+    &--info {
+      @apply opacity-60 cursor-default;
+      min-width: unset;
+    }
+
+    &:disabled {
+      @apply opacity-45 cursor-not-allowed;
+    }
+  }
+
+  .setting-row__badge {
+    @apply
+      px-3.5 py-1.5 bg-popup-surface border border-popup-border rounded-popup
+      text-xs text-popup-text-muted whitespace-nowrap
+    ;
+  }
+
+  .setting-row__conflict {
+    @apply max-w-[180px] flex flex-col gap-1 text-xs text-right text-popup-danger;
+
+    .setting-row__conflict-msg {
+      line-height: 1.3;
+    }
+
+    .setting-row__conflict-actions {
+      @apply flex gap-1 justify-end;
+
+      .setting-row__conflict-btn {
+        @apply px-0.5 py-2 border rounded-popup font-popup text-2xs transition-[background] duration-120;
+
+        &--confirm {
+          @apply bg-popup-danger-dim border-popup-danger text-popup-text;
+
+          &:hover {
+            @apply bg-popup-danger;
+          }
+        }
+
+        &--cancel {
+          @apply bg-popup-surface border-popup-border text-popup-text-muted;
+
+          &:hover {
+            @apply bg-popup-surface-alt;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Footer (hotkeys tab reset section) */
+.popup__footer {
+  @apply pt-5 px-4 pb-2 flex justify-end items-center gap-2;
+
+  .popup__reset-confirm-text {
+    @apply text-xs text-popup-text-muted;
+  }
+
+  .popup__reset-btn {
+    @apply
+      px-2.5 py-1.5 bg-transparent border border-popup-border rounded-popup
+      font-popup text-xs text-popup-text-muted
+      transition-[border-color,color] duration-150
+    ;
+
+    &:hover {
+      @apply border-popup-danger text-popup-danger;
+    }
+
+    &--confirm {
+      @apply bg-popup-danger-dim border-popup-danger text-popup-text transition-[background] duration-120;
+
+      &:hover {
+        @apply bg-popup-danger text-popup-text;
+      }
+    }
+
+    &--cancel {
+      @apply bg-transparent border border-popup-border text-popup-text-muted;
+
+      &:hover {
+        @apply bg-popup-surface-alt;
+      }
+    }
+  }
+}
+
+/* General tab — numeric input rows */
+.general-row__input-row {
+  @apply flex items-center gap-1;
+}
+
+.general-row__input {
+  @apply
+    w-15 px-[3px] py-1
+    bg-popup-surface border border-popup-border rounded-popup
+    font-popup font-medium text-xs text-popup-text text-center
+    transition-[border-color] duration-150
+  ;
+
+  /* Hide spinner arrows */
+  appearance: textfield;
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  &:focus-visible {
+    @apply border-popup-accent-dim;
+  }
+
+  &.is-invalid {
+    @apply border-popup-danger;
+  }
+}
+
+.general-row__select {
+  @apply
+    px-2 py-1.5 bg-popup-surface border border-popup-border rounded-popup
+    font-popup font-medium text-xs text-popup-text
+    cursor-pointer transition-[border-color] duration-150
+  ;
+
+  &:focus-visible {
+    @apply border-popup-accent-dim;
+  }
+}
+
+.general-row__unit {
+  @apply min-w-3 text-xs text-popup-text-muted text-center;
+}
+
+.general-row__error {
+  @apply text-2xs text-popup-danger text-right;
+  line-height: 1.3;
+}
+
+.general-row__reset-link {
+  @apply p-0 bg-transparent border-none font-popup text-2xs text-popup-text-muted text-right underline;
+
+  &:hover {
+    @apply text-popup-text;
+  }
+}
+
+.general-row__refresh-notice {
+  @apply pt-1 px-0 pb-0.5 text-2xs text-popup-accent;
+  line-height: 1.3;
+}
+
+/* Features tab — toggle switch */
+.feature-toggle {
+  @apply
+    relative inline-flex items-center shrink-0
+    w-9 h-5 p-0 rounded-full border border-popup-border
+    bg-popup-surface
+    transition-[background-color,border-color] duration-150
+    cursor-pointer
+  ;
+
+  &[aria-checked="true"] {
+    @apply bg-popup-accent border-popup-accent;
+
+    .feature-toggle__thumb {
+      @apply translate-x-4 bg-popup-text;
+    }
+  }
+
+  &[aria-checked="false"] {
+    .feature-toggle__thumb {
+      @apply translate-x-0.5 bg-popup-text-muted;
+    }
+  }
+
+  &:hover {
+    @apply border-popup-accent-dim;
+  }
+}
+
+.feature-toggle__thumb {
+  @apply block size-3.5 rounded-full transition-transform duration-150;
+}

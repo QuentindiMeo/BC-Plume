@@ -1,6 +1,7 @@
 import {
   assertBoundedInteger,
   assertWholeNumber,
+  PLUME_CONSTANTS,
   PLUME_DEFAULTS,
   PLUME_SUPPORTED_LANGUAGES,
   SEEK_JUMP_DURATION_MAX,
@@ -90,7 +91,7 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
 
   const resetBtn = document.createElement("button");
   resetBtn.className = "general-row__reset-link";
-  resetBtn.textContent = getString("LABEL__GENERAL__RESET");
+  resetBtn.textContent = getString("LABEL__SETTING__RESET");
   resetBtn.hidden = currentValue === defaultValue;
 
   const validate = (raw: string): { valid: true; value: WholeNumber } | { valid: false; error: string } => {
@@ -142,7 +143,7 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
     debounceTimer = setTimeout(() => {
       persist(result.value);
       debounceTimer = null;
-    }, 700);
+    }, PLUME_CONSTANTS.WCAG_INTERACTION_TIMEOUT_MS);
   });
 
   input.addEventListener("blur", () => {
@@ -219,7 +220,7 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
 
   const resetBtn = document.createElement("button");
   resetBtn.className = "general-row__reset-link";
-  resetBtn.textContent = getString("LABEL__GENERAL__RESET");
+  resetBtn.textContent = getString("LABEL__SETTING__RESET");
   resetBtn.hidden = initialValue === defaultValue;
 
   select.addEventListener("change", () => {
@@ -265,7 +266,7 @@ export const createGeneralTab = (
 
     const refreshNotice = document.createElement("p");
     refreshNotice.className = "general-row__refresh-notice";
-    refreshNotice.textContent = getString("INFO__GENERAL__LANGUAGE_REFRESH_REQUIRED");
+    refreshNotice.textContent = getString("INFO__SETTING__REFRESH_REQUIRED");
     refreshNotice.hidden = true;
 
     const languageRow = buildSelectRow({
@@ -325,8 +326,8 @@ export const createGeneralTab = (
       onSave: (value) => saveTrackRestartThreshold(value, sender),
     });
 
-    section.appendChild(languageRow);
     section.appendChild(refreshNotice);
+    section.appendChild(languageRow);
     section.appendChild(seekJumpRow);
     section.appendChild(volumeStepRow);
     section.appendChild(trackRestartRow);

@@ -5,6 +5,13 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+- _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)  
+The new Features popup tab allows toggling Plume features on or off.  
+Playback speed control is introduced: a speed button with an integrated slider lets users pick between presets (0.5×, 1×, 1.5×, 2×, 3×) or enter a custom value; a live badge shows the active multiplier at a glance.  
+BPM detection is introduced: a background service worker fetches audio cross-origin, and the web-audio-beat-detector engine analyzes the tempo; the live BPM is displayed on the player and as per-track badges in the tracklist.  
+Plume's audio initialization no longer pauses tracks playing in other tabs.  
+Tailwind and Sass are introduced for more efficient and maintainable styling.
+
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)  
 An interactive tracklist dropdown is added to the header: browse a collection's tracks and jump directly to any of them.  
 A "go to track" link button docked to the track title allows navigation to a specific track's single page, on collections.  

@@ -5,6 +5,7 @@ import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
 import { getAppropriateAccentColor, getCurrentTrackTitle } from "@/app/features/track-title";
 import { CleanupCallback } from "@/app/features/types";
 import {
+  createBpmDisplaySection,
   createFullscreenButtonSection,
   createPlaybackControlPanel,
   createProgressBar,
@@ -78,6 +79,9 @@ const addRuntime = () => {
 };
 
 const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
+  const appCore = getAppCoreInstance();
+  const flags = appCore.getState().featureFlags;
+
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
   plumeContainer.lang = getActiveLocale();
@@ -122,11 +126,12 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitlePretext.ariaHidden = "true"; // hide from screen readers to avoid redundancy
   currentTitleSection.appendChild(currentTitlePretext);
   const titleRow = document.createElement("div");
-  titleRow.className = "bpe-header-title-row";
+  titleRow.className = "plume-header-title-row";
 
   if (isAlbumPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
+    trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
 
     if (trackLink) {
       const trackUrl = bcPlayer.getCurrentTrackUrl();
@@ -164,6 +169,8 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   let pendingDropdown: HTMLDivElement | undefined;
   if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
+    toggleBtn.classList.toggle("plume-feature-hidden", !flags.tracklist);
+    dropdownEl.classList.toggle("plume-feature-hidden", !flags.tracklist);
     titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
@@ -187,7 +194,12 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const volumeContainer = await createVolumeControlSection();
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
 
+  const bpmSection = createBpmDisplaySection(isAlbumPage);
+  bpmSection.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+  plumeContainer.appendChild(bpmSection);
+
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
+  fullscreenBtnSection.classList.toggle("plume-feature-hidden", !flags.fullscreen);
   plumeContainer.appendChild(fullscreenBtnSection);
 
   return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
@@ -234,6 +246,8 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
 
   if (isAlbumPage) {
     addRuntime();
+    const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
+    if (runtimeSpan) runtimeSpan.classList.toggle("plume-feature-hidden", !appCore.getState().featureFlags.runtime);
     notifyUnplayableTracks();
   }
 

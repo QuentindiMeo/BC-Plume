@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PLUME_DEFAULTS } from "@/domain/plume";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeMessageSender } from "../fakes/FakeMessageSender";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
 
@@ -179,6 +180,13 @@ describe("popup accessibility", () => {
   });
 
   describe("createSettingsPanel", () => {
+    // Pre-warm all transitive imports before any test timer starts.
+    // SettingsPanel pulls in every popup component; under V8 coverage the
+    // instrumentation overhead alone can exceed AXE_TEST_TIMEOUT.
+    beforeAll(async () => {
+      await import("@/popup/components/SettingsPanel");
+    }, 60_000);
+
     it(
       "full popup has no a11y violations",
       async () => {
@@ -191,6 +199,7 @@ describe("popup accessibility", () => {
             volumeHotkeyStep: undefined,
             trackRestartThreshold: undefined,
             hotkeyBindings: undefined,
+            featureFlags: { ...PLUME_DEFAULTS.featureFlags },
           },
           sender
         );
@@ -211,6 +220,7 @@ describe("popup accessibility", () => {
           volumeHotkeyStep: undefined,
           trackRestartThreshold: undefined,
           hotkeyBindings: undefined,
+          featureFlags: { ...PLUME_DEFAULTS.featureFlags },
         },
         sender
       );

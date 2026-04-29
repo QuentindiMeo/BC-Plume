@@ -2,11 +2,17 @@ import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
+  applyPlaybackControlsSize,
   handlePlayPause,
+  handleSpeedCycle,
+  handleSpeedSlider,
+  handleSpeedSliderKeydown,
   handleTimeBackward,
   handleTimeForward,
   handleTrackBackward,
   handleTrackForward,
+  setupSpeedLabelClickBehavior,
+  setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
@@ -33,15 +39,18 @@ interface FullscreenElements {
   progressSlider: HTMLInputElement;
   elapsedDisplay: HTMLSpanElement;
   durationDisplay: HTMLButtonElement;
-  playPauseBtn: HTMLButtonElement;
-  volumeSlider: HTMLInputElement;
-  volumeDisplay: HTMLDivElement;
-  muteBtn: HTMLButtonElement;
+  speedWrapper: HTMLDivElement;
+  speedBtn: HTMLButtonElement;
+  speedSlider: HTMLInputElement;
   trackBackwardBtn: HTMLButtonElement;
   timeBackwardBtn: HTMLButtonElement;
+  playPauseBtn: HTMLButtonElement;
   timeForwardBtn: HTMLButtonElement;
   trackForwardBtn: HTMLButtonElement;
   loopBtn: HTMLButtonElement;
+  muteBtn: HTMLButtonElement;
+  volumeSlider: HTMLInputElement;
+  volumeDisplay: HTMLDivElement;
 }
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
@@ -78,6 +87,7 @@ const exitFullscreenMode = (): void => {
 
   // Clear the fullscreen-specific buttons from the store arrays before removing the DOM
   const plume = plumeUi.getState();
+  plumeUi.dispatch(guiActions.setSpeedBtns(plume.speedBtns.filter((w) => existingOverlay.contains(w) === false)));
   plumeUi.dispatch(
     guiActions.setPlayPauseBtns(plume.playPauseBtns.filter((btn) => existingOverlay.contains(btn) === false))
   );
@@ -153,9 +163,9 @@ const renderProgressSlider = (elements: FullscreenElements, progressPercentage: 
     return;
   }
 
-  const bgImg = `linear-gradient(90deg, var(--progbar-fill-bg-left) ${progressPercentage.toFixed(1)}%, var(--progbar-bg) 0%)`;
-  elements.progressSlider.value = `${progressPercentage * (PROGRESS_SLIDER_GRANULARITY / 100)}`;
-  elements.progressSlider.style.backgroundImage = bgImg;
+  const progressFraction = progressPercentage / 100;
+  elements.progressSlider.value = `${progressFraction * PROGRESS_SLIDER_GRANULARITY}`;
+  elements.progressSlider.style.setProperty("--progress-fraction", progressFraction.toString());
 
   const { currentTime, duration } = getAppCoreInstance().getState();
   elements.progressSlider.setAttribute(
@@ -222,15 +232,18 @@ const getFullscreenElements = (clone: HTMLElement): FullscreenElements => {
     progressSlider: clone.querySelector(PLUME_ELEM_SELECTORS.progressSlider) as HTMLInputElement,
     elapsedDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.elapsedDisplay) as HTMLSpanElement,
     durationDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.durationDisplay) as HTMLButtonElement,
-    playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
-    volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
-    volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
-    muteBtn: clone.querySelector(PLUME_ELEM_SELECTORS.muteBtn) as HTMLButtonElement,
+    speedWrapper: clone.querySelector(PLUME_ELEM_SELECTORS.speedWrapper) as HTMLDivElement,
+    speedBtn: clone.querySelector(PLUME_ELEM_SELECTORS.speedBtn) as HTMLButtonElement,
+    speedSlider: clone.querySelector(PLUME_ELEM_SELECTORS.speedSlider) as HTMLInputElement,
     trackBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackBwdBtn) as HTMLButtonElement,
     timeBackwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeBwdBtn) as HTMLButtonElement,
+    playPauseBtn: clone.querySelector(PLUME_ELEM_SELECTORS.playPauseBtn) as HTMLButtonElement,
     timeForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.timeFwdBtn) as HTMLButtonElement,
     trackForwardBtn: clone.querySelector(PLUME_ELEM_SELECTORS.trackFwdBtn) as HTMLButtonElement,
     loopBtn: clone.querySelector(PLUME_ELEM_SELECTORS.loopBtn) as HTMLButtonElement,
+    muteBtn: clone.querySelector(PLUME_ELEM_SELECTORS.muteBtn) as HTMLButtonElement,
+    volumeSlider: clone.querySelector(PLUME_ELEM_SELECTORS.volumeSlider) as HTMLInputElement,
+    volumeDisplay: clone.querySelector(PLUME_ELEM_SELECTORS.volumeValue) as HTMLDivElement,
   };
 };
 
@@ -251,8 +264,35 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const subscriptions: Array<SubscriptionCallback> = [];
   const elements: FullscreenElements = getFullscreenElements(clone);
 
+  // Mutable ref for the tracklist cleanup — replaced each time the tracklist is re-initialized live.
+  let tracklistCleanupRef: CleanupCallback = () => {};
+
+  const initTracklist = (): void => {
+    const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup } = createTracklistToggle();
+    tracklistCleanupRef = cleanup;
+    const inertToggle = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
+    inertToggle?.replaceWith(fsToggleBtn);
+    const inertDropdown = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistDropdown);
+    if (inertDropdown) inertDropdown.replaceWith(fsDropdownEl);
+    else clone.appendChild(fsDropdownEl);
+  };
+
   // Subscribe to state changes and use pure rendering functions for updates
   subscriptions.push(
+    appCore.subscribe("pageType", () => {
+      // because available loop modes depend on the page type
+      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      if (withLoopModes) renderLoopButton(elements, appCore.getState().loopMode);
+    }),
+    appCore.subscribe("trackTitle", (trackTitle) => {
+      renderTrackTitle(elements, trackTitle);
+    }),
+    appCore.subscribe("trackNumber", (trackNumber) => {
+      renderTrackNumber(elements, trackNumber);
+    }),
+    appCore.subscribe("isPlaying", (isPlaying) => {
+      renderPlayPauseButton(elements, isPlaying);
+    }),
     appCore.subscribe("currentTime", () => {
       renderProgressSlider(elements, appCore.computed.progressPercentage());
       renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
@@ -264,8 +304,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     appCore.subscribe("durationDisplayMethod", () => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
-    appCore.subscribe("isPlaying", (isPlaying) => {
-      renderPlayPauseButton(elements, isPlaying);
+    appCore.subscribe("loopMode", (loopMode) => {
+      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      if (withLoopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("volume", (volume) => {
       renderVolume(elements, volume);
@@ -273,17 +314,33 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     appCore.subscribe("isMuted", (isMuted) => {
       renderMuteButton(elements, isMuted);
     }),
-    appCore.subscribe("trackTitle", (trackTitle) => {
-      renderTrackTitle(elements, trackTitle);
-    }),
-    appCore.subscribe("trackNumber", (trackNumber) => {
-      renderTrackNumber(elements, trackNumber);
-    }),
-    appCore.subscribe("loopMode", (loopMode) => {
-      renderLoopButton(elements, loopMode);
-    }),
-    appCore.subscribe("pageType", () => {
-      renderLoopButton(elements, appCore.getState().loopMode);
+    appCore.subscribe("featureFlags", (flags, prevFlags) => {
+      if (flags.goToTrack !== prevFlags.goToTrack) {
+        const trackLink = elements.headerContainer?.querySelector<HTMLAnchorElement>(
+          PLUME_ELEM_SELECTORS.headerTrackLink
+        );
+        if (trackLink) {
+          trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
+          if (flags.goToTrack && isAlbumPage) trackLink.style.color = getAppropriateAccentColor();
+        }
+      }
+      if (isAlbumPage && flags.tracklist !== prevFlags.tracklist) {
+        if (flags.tracklist) {
+          initTracklist();
+        } else {
+          tracklistCleanupRef();
+          tracklistCleanupRef = () => {};
+          const btn = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
+          const dd = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
+          if (btn) btn.classList.add("plume-feature-hidden");
+          if (dd) dd.classList.add("plume-feature-hidden");
+        }
+      }
+      if (flags.loopModes && !prevFlags.loopModes) {
+        renderLoopButton(elements, appCore.getState().loopMode);
+      }
+      const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
+      if (fsControls) applyPlaybackControlsSize(fsControls);
     })
   );
 
@@ -311,7 +368,19 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.trackForwardBtn.addEventListener("click", handleTrackForward);
   elements.volumeSlider.addEventListener("input", handleVolumeInput);
   elements.muteBtn.addEventListener("click", handleMuteToggle);
-  elements.loopBtn.addEventListener("click", handleLoopCycle);
+
+  // Speed and loop: always wire up regardless of initial flag state.
+  // plume-feature-hidden controls visibility; listeners are harmless on hidden elements.
+  elements.speedBtn?.addEventListener("click", handleSpeedCycle);
+  elements.speedSlider?.addEventListener("input", handleSpeedSlider);
+  elements.speedSlider?.addEventListener("keydown", handleSpeedSliderKeydown);
+  if (elements.speedWrapper) {
+    subscriptions.push(setupSpeedPopoverBehavior(elements.speedWrapper));
+    subscriptions.push(setupSpeedLabelClickBehavior(elements.speedWrapper));
+  }
+  elements.loopBtn?.addEventListener("click", handleLoopCycle);
+
+  const flags = appCore.getState().featureFlags;
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
@@ -323,7 +392,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   });
 
   // Apply the Bandcamp theme color to the track link in the fullscreen clone
-  if (isAlbumPage) {
+  if (flags.goToTrack && isAlbumPage) {
     const fsTrackLink = elements.headerContainer.querySelector(
       PLUME_ELEM_SELECTORS.headerTrackLink
     ) as HTMLAnchorElement;
@@ -333,22 +402,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   // Re-initialize the tracklist for the fullscreen clone.
   // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another
   // inert clone of the toggle button. Replace both inert elements with a fresh instance.
-  if (isAlbumPage) {
-    const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup: tracklistCleanup } = createTracklistToggle();
-    subscriptions.push(tracklistCleanup);
-
-    // Toggle button lives inside the re-populated header
-    const inertToggle = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
-    inertToggle?.replaceWith(fsToggleBtn);
-
-    // Dropdown is a direct child of the plumeClone (sibling of the header)
-    const inertDropdown = clone.querySelector(PLUME_ELEM_SELECTORS.tracklistDropdown);
-    if (inertDropdown) {
-      inertDropdown.replaceWith(fsDropdownEl);
-    } else {
-      clone.appendChild(fsDropdownEl);
-    }
-  }
+  if (flags.tracklist && isAlbumPage) initTracklist();
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
   renderProgressSlider(elements, appCore.computed.progressPercentage());
@@ -359,11 +413,12 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderMuteButton(elements, state.isMuted);
   renderTrackTitle(elements, state.trackTitle);
   renderTrackNumber(elements, state.trackNumber);
-  renderLoopButton(elements, state.loopMode);
+  if (flags.loopModes) renderLoopButton(elements, state.loopMode);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
     subscriptions.forEach((unsubscribe) => unsubscribe());
+    tracklistCleanupRef();
   };
 };
 
@@ -543,11 +598,18 @@ export const toggleFullscreenMode = (): void => {
   const plumeClone = overlay.querySelector(`#${PLUME_ELEM_SELECTORS.fullscreenClone.split("#")[1]}`) as HTMLDivElement;
   fullscreenCleanupCallback = setupFullscreenUi(plumeClone);
 
-  // Register the fullscreen buttons in the store alongside the main-panel buttons
+  // Register the fullscreen buttons in the store alongside the main-panel buttons.
+  // Always register speed/loop elements (even when their flags are off) so the featureFlags
+  // subscription in store-subscriptions.ts can toggle their visibility via the store arrays.
   const fsElements = getFullscreenElements(plumeClone);
+  if (fsElements.speedWrapper) {
+    plumeUi.dispatch(guiActions.setSpeedBtns([...plume.speedBtns, fsElements.speedWrapper]));
+  }
   plumeUi.dispatch(guiActions.setPlayPauseBtns([...plume.playPauseBtns, fsElements.playPauseBtn]));
   plumeUi.dispatch(guiActions.setTrackFwdBtns([...plume.trackFwdBtns, fsElements.trackForwardBtn]));
-  plumeUi.dispatch(guiActions.setLoopBtns([...plume.loopBtns, fsElements.loopBtn]));
+  if (fsElements.loopBtn) {
+    plumeUi.dispatch(guiActions.setLoopBtns([...plume.loopBtns, fsElements.loopBtn]));
+  }
 
   // Mount overlay to DOM and record it in the store
   document.body.appendChild(overlay);

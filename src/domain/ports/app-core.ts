@@ -1,10 +1,11 @@
 import { HotkeyAction, KeyBinding } from "@/domain/hotkeys";
-import { LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
-import { IAction, IScenarioView, IStore } from "@/domain/store";
+import { FeatureFlags, LoopModeType, TimeDisplayMethodType } from "@/domain/plume";
 import { BcPageType } from "@/domain/ports/bc-player";
+import { IAction, IScenarioView, IStore } from "@/domain/store";
 
 export interface AppPersistedState {
   durationDisplayMethod: TimeDisplayMethodType;
+  playbackSpeed: number;
   loopMode: LoopModeType;
   volume: number;
 
@@ -12,8 +13,14 @@ export interface AppPersistedState {
   seekJumpDuration: number;
   volumeHotkeyStep: number;
   trackRestartThreshold: number;
+  featureFlags: FeatureFlags;
 }
 
+export interface TrackBpmEntry {
+  bpm: number | null;
+  loading: boolean;
+  error: boolean;
+}
 export interface AppTransientState {
   pageType: BcPageType | null;
   trackTitle: string | null;
@@ -23,6 +30,7 @@ export interface AppTransientState {
   isPlaying: boolean;
   isMuted: boolean;
   volumeBeforeMute: number;
+  trackBpms: Record<string, TrackBpmEntry>;
   isFullscreen: boolean;
 }
 
@@ -36,17 +44,23 @@ export enum CORE_ACTIONS {
   SET_CURRENT_TIME = "SET_CURRENT_TIME",
   SET_IS_PLAYING = "SET_IS_PLAYING",
   SET_DURATION_DISPLAY_METHOD = "SET_DURATION_DISPLAY_METHOD",
+  SET_PLAYBACK_SPEED = "SET_PLAYBACK_SPEED",
   SET_LOOP_MODE = "SET_LOOP_MODE",
   CYCLE_LOOP_MODE = "CYCLE_LOOP_MODE",
   SET_IS_MUTED = "SET_IS_MUTED",
   TOGGLE_MUTE = "TOGGLE_MUTE",
   SET_VOLUME = "SET_VOLUME",
+  SET_TRACK_BPM_LOADING = "SET_TRACK_BPM_LOADING",
+  SET_TRACK_BPM_SUCCESS = "SET_TRACK_BPM_SUCCESS",
+  SET_TRACK_BPM_ERROR = "SET_TRACK_BPM_ERROR",
+  CLEAR_TRACK_BPMS = "CLEAR_TRACK_BPMS",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
 
-  SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
   SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
   SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
+  SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
+  SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
 }
 
 export type CoreAction =
@@ -57,18 +71,25 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_CURRENT_TIME, number>
   | IAction<CORE_ACTIONS.SET_IS_PLAYING, boolean>
   | IAction<CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD, TimeDisplayMethodType>
+  | IAction<CORE_ACTIONS.SET_PLAYBACK_SPEED, number>
   | IAction<CORE_ACTIONS.SET_LOOP_MODE, LoopModeType>
   | IAction<CORE_ACTIONS.CYCLE_LOOP_MODE>
   | IAction<CORE_ACTIONS.SET_IS_MUTED, boolean>
   | IAction<CORE_ACTIONS.TOGGLE_MUTE>
   | IAction<CORE_ACTIONS.SET_VOLUME, number>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_LOADING, string>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_SUCCESS, { trackUrl: string; bpm: number }>
+  | IAction<CORE_ACTIONS.SET_TRACK_BPM_ERROR, string>
+  | IAction<CORE_ACTIONS.CLEAR_TRACK_BPMS>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
-  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
   | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
-  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>;
+  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
+  | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
+  | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
 
 interface ICoreActions {
+  // State
   setPageType: (pageType: BcPageType | null) => CoreAction;
   setTrackTitle: (title: string | null) => CoreAction;
   setTrackNumber: (number: string | null) => CoreAction;
@@ -76,17 +97,24 @@ interface ICoreActions {
   setCurrentTime: (time: number) => CoreAction;
   setIsPlaying: (isPlaying: boolean) => CoreAction;
   setDurationDisplayMethod: (method: TimeDisplayMethodType) => CoreAction;
+  setPlaybackSpeed: (speed: number) => CoreAction;
   setLoopMode: (mode: LoopModeType) => CoreAction;
   cycleLoopMode: () => CoreAction;
   setIsMuted: (isMuted: boolean) => CoreAction;
   toggleMute: () => CoreAction;
   setVolume: (volume: number) => CoreAction;
+  setTrackBpmLoading: (trackUrl: string) => CoreAction;
+  setTrackBpmSuccess: (trackUrl: string, bpm: number) => CoreAction;
+  setTrackBpmError: (trackUrl: string) => CoreAction;
+  clearTrackBpms: () => CoreAction;
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
-  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
+  // Settings
   setSeekJumpDuration: (duration: number) => CoreAction;
   setVolumeHotkeyStep: (step: number) => CoreAction;
   setTrackRestartThreshold: (threshold: number) => CoreAction;
+  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
+  setFeatureFlags: (flags: FeatureFlags) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
@@ -100,6 +128,10 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD,
     payload: method,
   }),
+  setPlaybackSpeed: (speed: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_PLAYBACK_SPEED,
+    payload: speed,
+  }),
   setLoopMode: (mode: LoopModeType): CoreAction => ({
     type: CORE_ACTIONS.SET_LOOP_MODE,
     payload: mode,
@@ -108,6 +140,19 @@ export const coreActions: ICoreActions = {
   setIsMuted: (isMuted: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_MUTED, payload: isMuted }),
   toggleMute: (): CoreAction => ({ type: CORE_ACTIONS.TOGGLE_MUTE }),
   setVolume: (volume: number): CoreAction => ({ type: CORE_ACTIONS.SET_VOLUME, payload: volume }),
+  setTrackBpmLoading: (trackUrl: string): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_LOADING,
+    payload: trackUrl,
+  }),
+  setTrackBpmSuccess: (trackUrl: string, bpm: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_SUCCESS,
+    payload: { trackUrl, bpm },
+  }),
+  setTrackBpmError: (trackUrl: string): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_BPM_ERROR,
+    payload: trackUrl,
+  }),
+  clearTrackBpms: (): CoreAction => ({ type: CORE_ACTIONS.CLEAR_TRACK_BPMS }),
   setIsFullscreen: (isFullscreen: boolean): CoreAction => ({
     type: CORE_ACTIONS.SET_IS_FULLSCREEN,
     payload: isFullscreen,
@@ -128,6 +173,10 @@ export const coreActions: ICoreActions = {
   setTrackRestartThreshold: (threshold: number): CoreAction => ({
     type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
     payload: threshold,
+  }),
+  setFeatureFlags: (flags: FeatureFlags): CoreAction => ({
+    type: CORE_ACTIONS.SET_FEATURE_FLAGS,
+    payload: flags,
   }),
 } as const;
 

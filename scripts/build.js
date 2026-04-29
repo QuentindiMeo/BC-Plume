@@ -2,6 +2,10 @@
 const esbuild = require("esbuild");
 const fs = require("node:fs");
 const path = require("node:path");
+const sass = require("sass");
+const postcss = require("postcss");
+const tailwindcss = require("@tailwindcss/postcss");
+const autoprefixer = require("autoprefixer");
 
 const isDev = process.argv.includes("--dev");
 const isTest = process.argv.includes("--test");
@@ -47,12 +51,74 @@ const popupBuildOptions = {
   outfile: path.join(distDir, "popup.js"),
 };
 
+const backgroundBuildOptions = {
+  ...sharedOptions,
+  entryPoints: [path.join(__dirname, "..", "src", "background.ts")],
+  outfile: path.join(distDir, "background.js"),
+};
+
+const styleEntries = [
+  {
+    input: path.join(__dirname, "..", "src", "tailwind.css"),
+    output: path.join(distDir, "tailwind.css"),
+    useSass: false,
+  },
+  {
+    input: path.join(__dirname, "..", "src", "styles.scss"),
+    output: path.join(distDir, "styles.css"),
+    useSass: true,
+  },
+  {
+    input: path.join(__dirname, "..", "src", "popup", "popup.scss"),
+    output: path.join(distDir, "popup.css"),
+    useSass: true,
+  },
+];
+
+const postcssProcessor = postcss([
+  tailwindcss(),
+  autoprefixer(),
+]);
+
+const buildStyleEntry = async ({ input, output, useSass }) => {
+  let css;
+  if (useSass) {
+    const sassResult = sass.compile(input, {
+      style: !isDev && !isTest ? "compressed" : "expanded",
+      loadPaths: [path.join(__dirname, "..", "src")],
+    });
+    css = sassResult.css;
+  } else {
+    css = fs.readFileSync(input, "utf8");
+  }
+  const postcssResult = await postcssProcessor.process(css, {
+    from: input,
+    to: output,
+  });
+  fs.writeFileSync(output, postcssResult.css);
+  postcssResult.warnings().forEach((w) => console.warn(`⚠️  ${w.toString()}`));
+};
+
+const buildStyles = () => Promise.all(styleEntries.map(buildStyleEntry));
+
+const watchStyles = () => {
+  const srcDir = path.join(__dirname, "..", "src");
+  try {
+    fs.watch(srcDir, { recursive: true }, (_, filename) => {
+      if (!filename || (!filename.endsWith(".scss") && filename !== "tailwind.css")) return;
+      buildStyles().catch((err) => console.error("❌ Style rebuild failed:", err));
+    });
+  } catch (err) {
+    console.error("❌ Failed to start watcher for styles:", err);
+  }
+};
+
 const popupSrcDir = path.join(__dirname, "..", "src", "popup");
 const watchPopupAssets = () => {
   try {
     fs.watch(popupSrcDir, (_, filename) => {
       if (!filename) return;
-      if (filename === "popup.html" || filename === "popup.css") {
+      if (filename === "popup.html") {
         try {
           copyPopupAssets();
           console.log(`📄 Updated popup asset copied: ${filename}`);
@@ -67,7 +133,6 @@ const watchPopupAssets = () => {
 };
 const copyPopupAssets = () => {
   fs.copyFileSync(path.join(popupSrcDir, "popup.html"), path.join(distDir, "popup.html"));
-  fs.copyFileSync(path.join(popupSrcDir, "popup.css"), path.join(distDir, "popup.css"));
 };
 
 async function build() {
@@ -75,12 +140,19 @@ async function build() {
     if (isWatch) {
       const contentCtx = await esbuild.context(contentBuildOptions);
       const popupCtx = await esbuild.context(popupBuildOptions);
-      await Promise.all([contentCtx.watch(), popupCtx.watch()]);
+      const backgroundCtx = await esbuild.context(backgroundBuildOptions);
+      await Promise.all([contentCtx.watch(), popupCtx.watch(), backgroundCtx.watch(), buildStyles()]);
+      watchStyles();
       copyPopupAssets();
       watchPopupAssets();
       console.log("👀 Watching for changes...");
     } else {
-      await Promise.all([esbuild.build(contentBuildOptions), esbuild.build(popupBuildOptions)]);
+      await Promise.all([
+        esbuild.build(contentBuildOptions),
+        esbuild.build(popupBuildOptions),
+        esbuild.build(backgroundBuildOptions),
+        buildStyles(),
+      ]);
       copyPopupAssets();
       console.log("✅ Build complete!");
     }
