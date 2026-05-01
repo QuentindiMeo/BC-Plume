@@ -375,6 +375,10 @@
   "LABEL__LANGUAGE__EN": { "message": "Inglés" },
   "LABEL__LANGUAGE__ES": { "message": "Español" },
   "LABEL__LANGUAGE__FR": { "message": "Francés" },
+  "LABEL__LANGUAGE__IT": { "message": "Italiano" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Portugués (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Rumano" },
+  "LABEL__LANGUAGE__RU": { "message": "Ruso" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },

@@ -1,0 +1,579 @@
+{
+  "APP_NAME": { "message": "Plume - Улучшенный плеер Bandcamp" },
+  "APP_DESCRIPTION": {
+    "message": "Расширение для Bandcamp: регулятор громкости, интерактивная полоса прогресса, режимы повтора, полноэкранный режим и горячие клавиши."
+  },
+
+  "ERROR__NO_BROWSER_API": { "message": "API браузера не обнаружен" },
+  "WARN__BROWSER_API__NOT_DETECTED": {
+    "message": "API браузера не обнаружен, используется localStorage как резервный вариант"
+  },
+  "INFO__BROWSER__DETECTED": { "message": "Обнаружен браузер:" },
+
+  "ERROR__STATE__LOAD_FAILED": { "message": "Ошибка загрузки сохранённого состояния:" },
+  "ERROR__STATE__PERSIST_FAILED": { "message": "Ошибка сохранения состояния:" },
+  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Ошибка глобального обработчика состояния:" },
+  "ERROR__STATE__LISTENER_FAILED": { "message": "Ошибка обработчика состояния:" },
+  "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Подписки хранилища инициализированы" },
+  "DEBUG__STATE__PERSISTED": { "message": "Состояние сохранено в хранилище:" },
+
+  "LOG__INITIALIZATION__START": { "message": "Инициализация Plume..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume инициализирован успешно" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume смонтирован успешно" },
+  "LOG__NAVIGATION_DETECTED": { "message": "Обнаружена навигация, перезапуск..." },
+
+  "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Элементы оригинального плеера скрыты" },
+  "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Элементы оригинального плеера восстановлены" },
+
+  "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
+    "message": "Элемент Bandcamp не найден (обязательный): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "div.inline_player"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
+    "message": "Элемент Bandcamp не найден (необязательный): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "span.fromAlbum"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Все элементы Bandcamp найдены" },
+
+  "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Не удалось найти подходящий контейнер" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Родительский элемент плеера не найден" },
+  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Контейнер плеера не найден, поиск альтернативы..." },
+
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Аудиоэлемент не найден, повторная попытка..." },
+  "INFO__AUDIO__FOUND": { "message": "Аудиоэлемент найден" },
+  "INFO__NEW_AUDIO__FOUND": { "message": "Обнаружен новый аудиоэлемент" },
+  "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Обработчики аудиособытий установлены" },
+
+  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Обнаружены элементы управления ===" },
+  "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Найдены потенциальные элементы управления:" },
+  "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== КОНЕЦ DEBUG ===" },
+
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Контейнер заголовка или номер трека не найден" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Контейнер заголовка или название трека не найдено" },
+  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Элемент предтекста заголовка не найден" },
+  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Элемент заголовка не найден" },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Номер текущего трека: $TRACK_NUMBER$, Всего треков: $TOTAL_TRACKS$",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
+  "LABEL__TRACK": { "message": "воспроизводится" },
+  "LABEL__TRACK_CURRENT": {
+    "message": "воспроизводится ($NUMBERING$)",
+    "placeholders": {
+      "numbering": {
+        "content": "$1",
+        "example": "1/4"
+      }
+    }
+  },
+  "LABEL__TRACK_UNKNOWN": { "message": "неизвестный трек" },
+  "ARIA__APP_NAME": { "message": "Plume - Улучшенный плеер Bandcamp" },
+  "ARIA__LOGO_LINK": { "message": "Узнать больше о Plume" },
+  "ARIA__TRACK": {
+    "message": "Сейчас воспроизводится трек $TRACK_TITLE$",
+    "placeholders": {
+      "track_title": {
+        "content": "$1",
+        "example": "Song Title"
+      }
+    }
+  },
+  "ARIA__TRACK_CURRENT": {
+    "message": "Сейчас воспроизводится трек $TRACK_TITLE$ (трек $TRACK_NUMBER$ из $TOTAL_TRACKS$)",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "1"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "4"
+      },
+      "track_title": {
+        "content": "$3",
+        "example": "Song Title"
+      }
+    }
+  },
+
+  "ARIA__TRACK_LINK": { "message": "Перейти на страницу трека" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Элемент ссылки на трек не найден, ссылка отключена" },
+
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "Не удалось рассчитать общую длительность" },
+  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Список треков не найден, расчёт длительности пропущен" },
+  "INFO__RUNTIME__CALCULATED": { "message": "Общая длительность рассчитана:" },
+  "LABEL__RUNTIME": {
+    "message": "$MINUTES$ мин $SECONDS$ с$PLAYABLE$",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "seconds": {
+        "content": "$2",
+        "example": "30"
+      },
+      "playable": {
+        "content": "$3",
+        "example": " доступно"
+      }
+    }
+  },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " доступно" },
+  "ARIA__RUNTIME__LABEL": {
+    "message": "Общая длительность: $MINUTES$ минут и $SECONDS$ секунд",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "seconds": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+
+  "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Кнопка воспроизведения/паузы не найдена" },
+  "WARN__PREV_TRACK__NOT_FOUND": { "message": "Кнопка предыдущего трека не найдена" },
+  "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Кнопка воспроизведения/паузы не найдена" },
+  "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Кнопка следующего трека не найдена" },
+  "DEBUG__PREV_TRACK__CLICKED": { "message": "Нажата кнопка предыдущего трека" },
+  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Событие предыдущего трека отправлено" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Текущий трек перезапущен" },
+  "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Нажата кнопка воспроизведения/паузы" },
+  "DEBUG__NEXT_TRACK__CLICKED": { "message": "Нажата кнопка следующего трека" },
+  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Событие следующего трека отправлено" },
+  "LABEL__TRACK_BACKWARD": { "message": "Перезапустить трек / Предыдущий трек" },
+  "LABEL__PLAY_PAUSE": { "message": "Воспроизведение/Пауза" },
+  "LABEL__TRACK_FORWARD": { "message": "Следующий трек" },
+
+  "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Элемент полосы прогресса не найден" },
+  "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Элемент отображения прошедшего времени не найден" },
+  "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Элемент отображения длительности не найден" },
+  "INFO__DURATION_DISPLAY_METHOD__APPLIED": {
+    "message": "Применён метод отображения длительности: $METHOD$",
+    "placeholders": {
+      "method": {
+        "content": "$1",
+        "example": "remaining"
+      }
+    }
+  },
+  "DEBUG__REWIND_TIME__CLICKED": { "message": "Нажата кнопка перемотки назад" },
+  "DEBUG__REWIND_TIME__DISPATCHED": {
+    "message": "Перемотано назад до: $TIME$ с",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
+  "DEBUG__FORWARD_TIME__CLICKED": { "message": "Нажата кнопка перемотки вперёд" },
+  "DEBUG__FORWARD_TIME__DISPATCHED": {
+    "message": "Перемотано вперёд до: $TIME$ с",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Полоса прогресса сдвинута: $VALUE$ с",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
+  "LABEL__TIME_BACKWARD": { "message": "Назад" },
+  "LABEL__TIME_FORWARD": { "message": "Вперёд" },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Переключить отображение оставшегося/полного времени" },
+  "ARIA__PROGRESS_SLIDER": { "message": "Ползунок прогресса воспроизведения" },
+  "ARIA__DURATION_DISPLAY": { "message": "Переключить между оставшимся и полным временем" },
+  "ARIA__PROGRESS_VALUETEXT": {
+    "message": "$ELAPSED$ из $DURATION$",
+    "placeholders": {
+      "ELAPSED": { "content": "$1" },
+      "DURATION": { "content": "$2" }
+    }
+  },
+
+  "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Кнопка отключения звука не найдена" },
+  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Регулятор громкости или элемент отображения не найден" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Недопустимое значение громкости:" },
+  "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
+    "message": "Регулировка громкости с нулевой дельтой может свидетельствовать о логической ошибке"
+  },
+  "INFO__VOLUME__LOADED": { "message": "Громкость загружена из хранилища:" },
+  "INFO__VOLUME__FOUND": {
+    "message": "Громкость восстановлена: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
+  "INFO__VOLUME__APPLIED": {
+    "message": "Громкость применена к новому аудио: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
+  "META__PERCENTAGE": { "message": "%" },
+  "ARIA__VOLUME_SLIDER": { "message": "Регулятор громкости" },
+  "ARIA__MUTE": { "message": "Отключить звук" },
+  "ARIA__UNMUTE": { "message": "Включить звук" },
+
+  "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Кнопка повтора не найдена" },
+  "INFO__LOOP_MODE__COERCED": { "message": "Режим повтора загружен как альбом, но применён как трек (страница одного трека)" },
+  "DEBUG__LOOP__CYCLED": { "message": "Режим повтора переключён" },
+  "LABEL__LOOP": { "message": "Повтор" },
+  "ARIA__LOOP__OFF": { "message": "Повтор: выкл." },
+  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Повтор: альбом" },
+  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Повтор: трек" },
+  "ARIA__LOOP__ONE_TRACK": { "message": "Повтор: вкл." },
+
+  "LABEL__SPEED": { "message": "Скорость воспроизведения" },
+  "ARIA__SPEED_SLIDER": { "message": "Ползунок скорости воспроизведения" },
+  "ARIA__SPEED_BTN": {
+    "message": "Скорость воспроизведения: $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Нажата кнопка скорости" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Произвольная скорость отклонена (вне диапазона или не числовая)" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Произвольная скорость" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Нажмите для ввода произвольной скорости" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Скорость воспроизведения загружена:" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Недопустимая скорость воспроизведения — сброс до 1×" },
+
+  "INFO__HOTKEYS__REGISTERED": { "message": "Горячие клавиши зарегистрированы" },
+
+  "LABEL__FULLSCREEN_TOGGLE": { "message": "Включить/выключить полноэкранный режим" },
+
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Список треков: текущий трек неизвестен, навигация невозможна" },
+  "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
+    "message": "Список треков: индекс трека $INDEX$ вне диапазона",
+    "placeholders": {
+      "index": { "content": "$1", "example": "10" }
+    }
+  },
+  "WARN__TRACKLIST__TRACK_UNPLAYABLE": {
+    "message": "Список треков: трек $NUMBER$ недоступен для воспроизведения",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "DEBUG__TRACKLIST__NAVIGATED": {
+    "message": "Список треков: переход к треку $NUMBER$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "ARIA__TRACKLIST__TOGGLE_OPEN": { "message": "Открыть список треков" },
+  "ARIA__TRACKLIST__TOGGLE_CLOSE": { "message": "Закрыть список треков" },
+  "ARIA__TRACKLIST__PANEL": { "message": "Список треков" },
+  "ARIA__TRACKLIST__ITEM": {
+    "message": "Трек $NUMBER$: $TITLE$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_CURRENT": {
+    "message": "Трек $NUMBER$: $TITLE$, воспроизводится",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_UNPLAYABLE": {
+    "message": "Трек $NUMBER$: $TITLE$, недоступен",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+
+  "WARN__COVER_ART__NOT_FOUND": { "message": "Обложка не найдена" },
+  "WARN__INFO_SECTION__NOT_FOUND": { "message": "Информационная секция не найдена для полноэкранного режима" },
+  "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Контейнер Plume не найден для полноэкранного режима" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Полноэкранный режим активирован" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Полноэкранный режим деактивирован" },
+  "ARIA__FULLSCREEN__ENTERED": { "message": "Полноэкранный режим активирован" },
+  "ARIA__FULLSCREEN__EXITED": { "message": "Полноэкранный режим деактивирован" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Выйти из полноэкранного режима" },
+  "ARIA__COVER_ART": { "message": "Обложка альбома" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Обложка $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Полноэкранный музыкальный плеер" },
+
+  "POPUP_TITLE": { "message": "Настройки" },
+  "ARIA__POPUP__TABLIST": { "message": "Разделы настроек" },
+  "INFO__SETTING__REFRESH_REQUIRED": { "message": "Обновите страницу, чтобы изменения вступили в силу." },
+  "LABEL__SETTING__RESET": { "message": "Сбросить" },
+  "LABEL__TAB__RESET": { "message": "Сбросить всё" },
+  "META__SECONDS_UNIT": { "message": "с" },
+  "META__PERCENT_UNIT": { "message": "%" },
+
+  "POPUP__GENERAL__TAB_LABEL": { "message": "Основные" },
+  "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Ошибка сохранения языковых настроек" },
+  "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Язык" },
+  "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Переопределить язык интерфейса" },
+  "LABEL__LANGUAGE__AUTO": { "message": "Авто" },
+  "LABEL__LANGUAGE__EN": { "message": "Английский" },
+  "LABEL__LANGUAGE__ES": { "message": "Испанский" },
+  "LABEL__LANGUAGE__FR": { "message": "Французский" },
+  "LABEL__LANGUAGE__IT": { "message": "Итальянский" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Португальский (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Румынский" },
+  "LABEL__LANGUAGE__RU": { "message": "Русский" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Должно быть целым числом" },
+
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Горячие клавиши" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Горячие клавиши" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": {
+    "message": "Необработанное действие горячей клавиши: $ACTION$",
+    "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } }
+  },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Ошибка сохранения горячих клавиш" },
+  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": {
+    "message": "Запись кэша горячих клавиш недействительна, используются значения по умолчанию"
+  },
+  "WARN__HOTKEYS__CONFLICT": {
+    "message": "Уже назначено на: $ACTION$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Воспроизвести / Пауза"
+      }
+    }
+  },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Воспроизвести / Пауза" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Перемотать назад" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Перемотать вперёд" },
+  "LABEL__HOTKEY__VOLUME_UP": { "message": "Увеличить громкость" },
+  "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Уменьшить громкость" },
+  "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Предыдущий трек / Перемотать назад" },
+  "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Следующий трек" },
+  "LABEL__HOTKEY__FULLSCREEN": { "message": "Полный экран" },
+  "LABEL__HOTKEY__MUTE": { "message": "Откл. / Вкл. звук" },
+  "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Переключить режим повтора" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Переключить скорость воспроизведения" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Перейти к 0%–90% (цифровые клавиши)" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Нажмите клавишу..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Отключено" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Подтвердить" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Отмена" },
+  "ARIA__HOTKEY_ROW__BUTTON": {
+    "message": "Переназначить клавишу $ACTION$ — текущая: $BINDING$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Воспроизвести / Пауза"
+      },
+      "binding": {
+        "content": "$2",
+        "example": "Space"
+      }
+    }
+  },
+  "ARIA__HOTKEY_ROW__CAPTURING": {
+    "message": "Захват клавиши для $ACTION$ — нажмите любую клавишу или Esc для отмены",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Воспроизвести / Пауза"
+      }
+    }
+  },
+
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Функции" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Перейти к треку" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Список треков" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Режимы повтора" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Полноэкранный режим" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Быстрый переход (0–9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Длительность" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Управление скоростью" },
+  "LABEL__FEATURES__BPM_DETECT": { "message": "Определение BPM" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Ошибка сохранения настроек функций" },
+
+  "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Должно быть целым числом" },
+  "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Должно быть от 1 до 300" },
+  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Ошибка сохранения длительности перемотки" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Недопустимое значение длительности перемотки, используется значение по умолчанию" },
+  "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Длительность перемотки загружена:" },
+  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Шаг перемотки" },
+  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Длительность шага перемотки в секундах" },
+
+  "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Должно быть от 1 до 20" },
+  "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Ошибка сохранения шага громкости" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Недопустимое значение шага громкости, используется значение по умолчанию" },
+  "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Шаг громкости загружен:" },
+  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Шаг громкости" },
+  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Процент громкости за одно нажатие клавиши" },
+
+  "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Должно быть от 0 до 10" },
+  "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Ошибка сохранения порога перезапуска трека" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Недопустимое значение порога перезапуска, используется значение по умолчанию" },
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Порог перезапуска трека загружен:" },
+  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Порог перезапуска трека" },
+  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
+    "message": "Секунды, в течение которых кнопка предыдущего трека перезапускает текущий"
+  },
+
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Ошибка разбора SVG иконки уведомления" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "Недопустимый SVG иконки уведомления для метки '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__TOAST__SHOWN": {
+    "message": "Уведомление показано ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Уведомление закрыто ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Уведомление $LABEL$ расширения",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Закрыть уведомление $LABEL$",
+    "placeholders": { "label": { "content": "$1", "example": "release update" } }
+  },
+
+  "INFO__RELEASE__PERSISTED": { "message": "Последнее наблюдение обновления сохранено в хранилище" },
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "Вышло обновление!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ теперь доступен.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "Что нового" },
+  "META__TOAST__RELEASE": { "message": "обновление" },
+
+  "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume не удалось загрузить" },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "Подходящий контейнер плеера не найден на этой странице." },
+  "META__TOAST__INJECTION_FAILED": { "message": "ошибка загрузки" },
+
+  "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Ожидание аудио" },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "Аудиоэлемент не обнаружен. Элементы управления воспроизведением неактивны." },
+  "META__TOAST__AUDIO_NOT_FOUND": { "message": "аудио не найдено" },
+
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Полный экран недоступен" },
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION": {
+    "message": "Необходимые элементы страницы отсутствуют. Проверьте консоль для деталей."
+  },
+  "META__TOAST__FULLSCREEN_UNAVAILABLE": { "message": "полный экран недоступен" },
+
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Проверка: отсутствует $MISSING_REQUIRED$ обязательных элементов",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": {
+    "message": "Plume не сможет работать корректно. Проверьте консоль для деталей."
+  },
+  "META__TOAST__HEALTH_CHECK": { "message": "проверка работоспособности" },
+
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "Трек $TRACK_NUMBER$ недоступен",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "«$TRACK_TITLE$» нельзя воспроизвести. Трек будет пропущен.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ треков недоступны",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "Следующие треки недоступны: $TITLES_LIST$. Они будут пропущены.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "недоступный трек" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "недоступные треки" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Ограниченное управление скоростью" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari ограничивает скорость воспроизведения до 0,5×–2×. Значение будет скорректировано."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "неподдерживаемая скорость в Safari" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Недопустимое значение скорости" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Введите число от 0,25 до 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "недопустимый ввод" },
+
+  "LABEL__BPM__DISPLAY": { "message": "BPM" },
+  "LABEL__BPM__DETECTING": { "message": "..." },
+  "LABEL__BPM__ERROR": { "message": "—" },
+  "LABEL__BPM__DETECT_ALL": { "message": "Определить BPM" },
+  "ARIA__BPM__DISPLAY": { "message": "Ударов в минуту для текущего трека" },
+  "ARIA__BPM__DETECT_ALL_BTN": { "message": "Определить BPM для всех треков" },
+  "ARIA__BPM__BADGE": {
+    "message": "$BPM$ ударов в минуту",
+    "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Данные альбома (data-tralbum) не найдены на странице" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Ошибка разбора данных альбома (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "Определение BPM не удалось для '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Начало определения BPM для '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM определён: $BPM$ для '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/some-track" }
+    }
+  }
+}
