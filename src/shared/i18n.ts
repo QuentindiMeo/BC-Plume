@@ -2,6 +2,10 @@ import type { PlumeLanguage } from "@/domain/plume";
 import enMessages from "../../_locales/en/messages.json";
 import esMessages from "../../_locales/es/messages.json";
 import frMessages from "../../_locales/fr/messages.json";
+import itMessages from "../../_locales/it/messages.json";
+import ptBrMessages from "../../_locales/pt_BR/messages.json";
+import roMessages from "../../_locales/ro/messages.json";
+import ruMessages from "../../_locales/ru/messages.json";
 
 interface BrowserApiI18n {
   getMessage: (key: string, substitutions?: string | string[]) => string;
@@ -23,6 +27,10 @@ const LOCALE_MAPS: Record<string, LocaleMap> = {
   en: enMessages as LocaleMap,
   es: esMessages as LocaleMap,
   fr: frMessages as LocaleMap,
+  it: itMessages as LocaleMap,
+  pt_BR: ptBrMessages as LocaleMap,
+  ro: roMessages as LocaleMap,
+  ru: ruMessages as LocaleMap,
 };
 
 let forcedLocale: LocaleMap | null = null;
@@ -60,8 +68,11 @@ export const getActiveLocale = (): string => {
     }
   }
   const api = (globalThis as any).browser ?? (globalThis as any).chrome;
-  const uiLang = (api?.i18n?.getUILanguage?.() as string | undefined)?.split("-")[0];
-  return uiLang && uiLang in LOCALE_MAPS ? uiLang : "en";
+  const rawLang = api?.i18n?.getUILanguage?.() as string | undefined;
+  const normalizedTag = rawLang?.replace("-", "_");
+  if (normalizedTag && normalizedTag in LOCALE_MAPS) return normalizedTag;
+  const baseLang = rawLang?.split("-")[0];
+  return baseLang && baseLang in LOCALE_MAPS ? baseLang : "en";
 };
 
 export const getString = (key: string, substitutions?: string[]): string => {

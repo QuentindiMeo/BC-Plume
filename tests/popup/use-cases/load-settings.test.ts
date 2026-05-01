@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction, KeyBinding } from "@/domain/hotkeys";
 import { FeatureFlags, PLUME_DEFAULTS, PLUME_SUPPORTED_LANGUAGES, PlumeLanguage } from "@/domain/plume";
@@ -8,7 +10,6 @@ import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
 import { inferBrowserApi } from "@/shared/browser";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeBrowserLocalStorage } from "../../fakes/FakeBrowserLocalStorage";
 
 vi.mock("@/shared/browser", () => ({ inferBrowserApi: vi.fn() }));

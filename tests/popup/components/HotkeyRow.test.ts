@@ -1,5 +1,6 @@
-import { buildLabel, labelForKeyEvent } from "@/popup/components/HotkeyRow";
 import { describe, expect, it } from "vitest";
+
+import { buildLabel, labelForKeyEvent } from "@/popup/components/HotkeyRow";
 
 const key = (code: string, key: string) => ({ code, key });
 
