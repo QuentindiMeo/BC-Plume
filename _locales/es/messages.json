@@ -357,6 +357,9 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reproductor de música en pantalla completa" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de audio" },
+  "WARN__VISUALIZER__CORS_BLOCKED": { "message": "Visualizador de audio bloqueado por la política CORS" },
+
   "POPUP_TITLE": { "message": "Panel de configuración" },
   "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },
   "INFO__SETTING__REFRESH_REQUIRED": {

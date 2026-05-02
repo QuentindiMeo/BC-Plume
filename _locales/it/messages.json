@@ -344,6 +344,9 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lettore musicale a schermo intero" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Visualizzatore audio" },
+  "WARN__VISUALIZER__CORS_BLOCKED": { "message": "Visualizzatore audio bloccato dalla politica CORS" },
+
   "POPUP_TITLE": { "message": "Impostazioni" },
   "ARIA__POPUP__TABLIST": { "message": "Sezioni impostazioni" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Ricarica la pagina per applicare la modifica." },

@@ -344,6 +344,9 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Audio Visualizer" },
+  "WARN__VISUALIZER__CORS_BLOCKED": { "message": "Audio visualizer blocked by CORS policy" },
+
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Refresh the page for the change to take effect." },

@@ -97,6 +97,7 @@ export const PLUME_DEFAULTS = {
     speedControl: true,
     loopModes: true,
     bpmDetect: false,
+    visualizer: false,
     fullscreen: true,
     quickSeek: true,
     runtime: true,
@@ -115,6 +116,7 @@ export type FeatureFlags = {
   speedControl: boolean;
   loopModes: boolean;
   bpmDetect: boolean;
+  visualizer: boolean;
   fullscreen: boolean;
   quickSeek: boolean;
   runtime: boolean;
