@@ -76,7 +76,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **BPM detection**: Detects and displays the track's tempo live, with indicators in the tracklist
 - **Feature flags**: Toggle individual features on or off from the popup's Features tab
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
-- **Several languages**: Enjoy Plume in 7 languages: EN-US 🇺🇸, ES 🇪🇸, FR 🇫🇷, IT 🇮🇹, PT-BR 🇵🇹, RO 🇷🇴, RU 🇷🇺 (more on demand!)
+- **Several languages**: Enjoy Plume in 7 languages: en 🇺🇸, es 🇪🇸, fr 🇫🇷, it 🇮🇹, pt_BR 🇧🇷, ro 🇷🇴, ru 🇷🇺 (more on demand!)
 
 ## 🚀 Installation
 
