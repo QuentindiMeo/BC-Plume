@@ -20,16 +20,16 @@ import { handleMuteToggle } from "@/app/features/ui/volume";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import { runVisualizer, seekToProgress, setVolume, stopVisualizer, toggleDurationDisplay } from "@/app/use-cases";
 import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
-import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
+import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -80,6 +80,8 @@ const exitFullscreenMode = (): void => {
 
   const appCore = getAppCoreInstance();
   appCore.dispatch(coreActions.setIsFullscreen(false));
+
+  stopVisualizer();
 
   // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
   if (fullscreenCleanupCallback) {
@@ -342,6 +344,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       if (flags.loopModes && !prevFlags.loopModes) {
         renderLoopButton(elements, appCore.getState().loopMode);
       }
+      if (flags.visualizer !== prevFlags.visualizer && vizCanvas) {
+        vizCanvas.classList.toggle("plume-feature-hidden", !flags.visualizer);
+        if (flags.visualizer) runVisualizer(vizCanvas);
+        else stopVisualizer();
+      }
       const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (fsControls) applyPlaybackControlsSize(fsControls);
     })
@@ -384,6 +391,12 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   elements.loopBtn?.addEventListener("click", handleLoopCycle);
 
   const flags = appCore.getState().featureFlags;
+
+  const vizCanvas =
+    clone
+      .closest<HTMLDivElement>(PLUME_ELEM_SELECTORS.fullscreenOverlay)
+      ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.visualizerCanvas) ?? null;
+  if (vizCanvas && flags.visualizer) runVisualizer(vizCanvas);
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
@@ -446,6 +459,13 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   background.id = PLUME_ELEM_SELECTORS.fullscreenBackground.split("#")[1];
   background.style.backgroundImage = `url("${encodeURI(artworkUrl)}")`;
   overlay.appendChild(background);
+
+  const vizCanvas = document.createElement("canvas");
+  vizCanvas.id = PLUME_ELEM_SELECTORS.visualizerCanvas.split("#")[1];
+  vizCanvas.ariaHidden = "true";
+  const { featureFlags } = getAppCoreInstance().getState();
+  if (!featureFlags.visualizer) vizCanvas.classList.add("plume-feature-hidden");
+  overlay.appendChild(vizCanvas);
 
   const contentContainer = document.createElement("div");
   contentContainer.id = PLUME_ELEM_SELECTORS.fullscreenContent.split("#")[1];
