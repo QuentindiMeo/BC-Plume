@@ -11,7 +11,7 @@ export class AudioVisualizerAdapter implements AudioVisualizerPort {
   private analyser: AnalyserNode | null = null;
   private source: MediaElementAudioSourceNode | null = null;
   private rafHandle: number | null = null;
-  private dataArray: Uint8Array | null = null;
+  private dataArray: Uint8Array<ArrayBuffer> | null = null;
 
   start(audioEl: HTMLAudioElement, canvas: HTMLCanvasElement): void {
     if (this.isRunning()) this.stop();
