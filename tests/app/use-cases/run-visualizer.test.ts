@@ -15,7 +15,7 @@ vi.mock("@/app/stores/adapters", () => ({
   getTrackAudioInstance: () => ({ getTrackAudioInfos: mockGetTrackAudioInfos }),
 }));
 
-import { runVisualizer, stopVisualizer } from "@/app/use-cases/run-visualizer";
+import { runVisualizer, stopVisualizer, syncVisualizerWithPlayback } from "@/app/use-cases/run-visualizer";
 
 const TRACK_URL = "https://bandcamp.com/track/1";
 const fakeCanvas = {} as HTMLCanvasElement;
@@ -74,5 +74,28 @@ describe("stopVisualizer", () => {
     stopVisualizer();
 
     expect(mockStop).toHaveBeenCalledOnce();
+  });
+});
+
+describe("syncVisualizerWithPlayback", () => {
+  it("starts the visualizer when isPlaying is true", () => {
+    syncVisualizerWithPlayback(true, fakeCanvas);
+
+    expect(mockStart).toHaveBeenCalledOnce();
+    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 120);
+  });
+
+  it("stops the visualizer when isPlaying is false", () => {
+    syncVisualizerWithPlayback(false, fakeCanvas);
+
+    expect(mockStop).toHaveBeenCalledOnce();
+  });
+
+  it("does not start the visualizer when the flag is off", () => {
+    fakeAppCore = new FakeAppCore({ featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: false } });
+
+    syncVisualizerWithPlayback(true, fakeCanvas);
+
+    expect(mockStart).not.toHaveBeenCalled();
   });
 });

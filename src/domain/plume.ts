@@ -92,15 +92,15 @@ export const PLUME_DEFAULTS = {
   volumeHotkeyStep: 5 as WholeNumber, // in percent
   playbackSpeed: PLAYBACK_SPEED_DEFAULT,
   featureFlags: {
+    runtime: true,
     goToTrack: true,
     tracklist: true,
+    quickSeek: true,
     speedControl: true,
     loopModes: true,
-    bpmDetect: false,
-    visualizer: false,
     fullscreen: true,
-    quickSeek: true,
-    runtime: true,
+    visualizer: false,
+    bpmDetect: false,
   } as const,
 } as const;
 

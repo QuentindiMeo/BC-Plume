@@ -25,3 +25,8 @@ export const runVisualizer = (canvas: HTMLCanvasElement): void => {
 export const stopVisualizer = (): void => {
   getVisualizerInstance().stop();
 };
+
+export const syncVisualizerWithPlayback = (isPlaying: boolean, canvas: HTMLCanvasElement): void => {
+  if (isPlaying) runVisualizer(canvas);
+  else stopVisualizer();
+};

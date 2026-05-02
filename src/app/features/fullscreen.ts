@@ -20,7 +20,14 @@ import { handleMuteToggle } from "@/app/features/ui/volume";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { runVisualizer, seekToProgress, setVolume, stopVisualizer, toggleDurationDisplay } from "@/app/use-cases";
+import {
+  runVisualizer,
+  seekToProgress,
+  setVolume,
+  stopVisualizer,
+  syncVisualizerWithPlayback,
+  toggleDurationDisplay,
+} from "@/app/use-cases";
 import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
@@ -297,6 +304,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
+      if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
     appCore.subscribe("currentTime", () => {
       renderProgressSlider(elements, appCore.computed.progressPercentage());
@@ -396,7 +404,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     clone
       .closest<HTMLDivElement>(PLUME_ELEM_SELECTORS.fullscreenOverlay)
       ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.visualizerCanvas) ?? null;
-  if (vizCanvas && flags.visualizer) runVisualizer(vizCanvas);
+  if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const state = appCore.getState();
