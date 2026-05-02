@@ -1,11 +1,11 @@
 import type { PlumeLanguage } from "@/domain/plume";
-import enMessages from "../../_locales/en/messages.json";
-import esMessages from "../../_locales/es/messages.json";
-import frMessages from "../../_locales/fr/messages.json";
-import itMessages from "../../_locales/it/messages.json";
-import ptBrMessages from "../../_locales/pt_BR/messages.json";
-import roMessages from "../../_locales/ro/messages.json";
-import ruMessages from "../../_locales/ru/messages.json";
+import enMessages from "@lang/en/messages.json";
+import esMessages from "@lang/es/messages.json";
+import frMessages from "@lang/fr/messages.json";
+import itMessages from "@lang/it/messages.json";
+import ptBrMessages from "@lang/pt_BR/messages.json";
+import roMessages from "@lang/ro/messages.json";
+import ruMessages from "@lang/ru/messages.json";
 
 interface BrowserApiI18n {
   getMessage: (key: string, substitutions?: string | string[]) => string;
@@ -23,20 +23,20 @@ const browserI18n = ((): BrowserApiI18n | null => {
   return (api?.i18n as BrowserApiI18n | undefined) ?? null;
 })();
 
-const LOCALE_MAPS: Record<string, LocaleMap> = {
-  en: enMessages as LocaleMap,
-  es: esMessages as LocaleMap,
-  fr: frMessages as LocaleMap,
-  it: itMessages as LocaleMap,
-  pt_BR: ptBrMessages as LocaleMap,
-  ro: roMessages as LocaleMap,
-  ru: ruMessages as LocaleMap,
+const LOCALE_MAPS: Partial<Record<Exclude<PlumeLanguage, "auto">, LocaleMap>> = {
+  en: enMessages satisfies LocaleMap,
+  es: esMessages satisfies LocaleMap,
+  fr: frMessages satisfies LocaleMap,
+  it: itMessages satisfies LocaleMap,
+  pt_BR: ptBrMessages satisfies LocaleMap,
+  ro: roMessages satisfies LocaleMap,
+  ru: ruMessages satisfies LocaleMap,
 };
 
 let forcedLocale: LocaleMap | null = null;
 
 export const setForcedLanguage = (lang: PlumeLanguage | null): void => {
-  const chosenLocale = lang !== null ? LOCALE_MAPS[lang] : null;
+  const chosenLocale = lang !== null && lang !== "auto" ? LOCALE_MAPS[lang] : null;
   forcedLocale = chosenLocale ?? null;
 };
 
@@ -69,7 +69,7 @@ export const getActiveLocale = (): string => {
   }
   const api = (globalThis as any).browser ?? (globalThis as any).chrome;
   const rawLang = api?.i18n?.getUILanguage?.() as string | undefined;
-  const normalizedTag = rawLang?.replace("-", "_");
+  const normalizedTag = rawLang?.replaceAll("-", "_");
   if (normalizedTag && normalizedTag in LOCALE_MAPS) return normalizedTag;
   const baseLang = rawLang?.split("-")[0];
   return baseLang && baseLang in LOCALE_MAPS ? baseLang : "en";

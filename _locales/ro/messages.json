@@ -181,7 +181,7 @@
   },
   "DEBUG__REWIND_TIME__CLICKED": { "message": "Buton de retrocedare apăsat" },
   "DEBUG__REWIND_TIME__DISPATCHED": {
-    "message": "Timp retrocedат la: $TIME$ s",
+    "message": "Timp retrocedat la: $TIME$ s",
     "placeholders": {
       "time": {
         "content": "$1",
