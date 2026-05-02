@@ -6,7 +6,7 @@ import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
-import { setForcedLanguage } from "@/shared/i18n";
+import { getActiveLocale, setForcedLanguage } from "@/shared/i18n";
 
 (async () => {
   const [forcedLanguage, seekJumpDuration, volumeHotkeyStep, trackRestartThreshold, hotkeyBindings, featureFlags] =
@@ -20,6 +20,7 @@ import { setForcedLanguage } from "@/shared/i18n";
     ]);
 
   setForcedLanguage(forcedLanguage ?? null);
+  document.documentElement.lang = getActiveLocale();
 
   const messageSender = createTabsMessageSender();
 
