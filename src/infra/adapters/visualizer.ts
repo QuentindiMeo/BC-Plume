@@ -1,64 +1,58 @@
 import type { AudioVisualizerPort } from "@/domain/ports/visualizer";
-import { getString } from "@/shared/i18n";
-import { CPL, logger } from "@/shared/logger";
 
-const FFT_SIZE = 256;
-const SMOOTHING = 0.8;
+const BAR_COUNT = 64;
 const BAR_GAP = 1;
+const BAR_MAX_HEIGHT = 0.5; // Max bar height as a fraction of canvas height
+
+// Quick attack, exponential decay — simulates a kick/hit envelope on each beat
+const beatEnvelope = (phase: number): number => {
+  if (phase < 0.05) return phase / 0.05; // linear rise 0 → 1 over first 5% of beat
+  return Math.exp(-4 * (phase - 0.05)); // exponential decay toward next beat
+};
+
+// Spectral weight: peaks around bar 10 (bass) and bar 26 (low-mid), rolls off high
+const spectralShape = (i: number): number => {
+  const x = i / BAR_COUNT;
+  return Math.exp(-10 * (x - 0.15) ** 2) * 0.7 + Math.exp(-3 * (x - 0.4) ** 2) * 0.3;
+};
+
+// Deterministic per-bar per-beat noise for organic variation (range 0.6 – 1.0)
+const barNoise = (i: number, beat: number): number => {
+  const h = ((i * 1619 + beat * 31337) ^ (i * 2053)) & 0xffff;
+  return 0.6 + 0.4 * (h / 0xffff);
+};
 
 export class AudioVisualizerAdapter implements AudioVisualizerPort {
-  private audioContext: AudioContext | null = null;
-  private analyser: AnalyserNode | null = null;
-  private source: MediaElementAudioSourceNode | null = null;
   private rafHandle: number | null = null;
-  private dataArray: Uint8Array<ArrayBuffer> | null = null;
 
-  start(audioEl: HTMLAudioElement, canvas: HTMLCanvasElement): void {
+  start(canvas: HTMLCanvasElement, bpm: number): void {
     if (this.isRunning()) this.stop();
 
-    try {
-      const ctx = new AudioContext();
-      const source = ctx.createMediaElementSource(audioEl);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = FFT_SIZE;
-      analyser.smoothingTimeConstant = SMOOTHING;
-      source.connect(analyser);
-      analyser.connect(ctx.destination);
+    const beatInterval = 60000 / bpm;
 
-      this.audioContext = ctx;
-      this.analyser = analyser;
-      this.source = source;
-      this.dataArray = new Uint8Array(analyser.frequencyBinCount);
-    } catch {
-      logger(CPL.WARN, getString("WARN__VISUALIZER__CORS_BLOCKED"));
-      return;
-    }
-
-    const draw = (): void => {
+    const draw = (timestamp: number): void => {
       this.rafHandle = requestAnimationFrame(draw);
 
-      const analyser = this.analyser;
-      const data = this.dataArray;
-      if (!analyser || !data) return;
+      const phase = (timestamp % beatInterval) / beatInterval;
+      const beat = Math.floor(timestamp / beatInterval);
+      const energy = beatEnvelope(phase);
 
-      analyser.getByteFrequencyData(data);
-
-      const canvasCtx = canvas.getContext("2d");
-      if (!canvasCtx) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
       const { width, height } = canvas;
-      canvasCtx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
 
-      const barWidth = width / data.length - BAR_GAP;
-      for (let i = 0; i < data.length; i++) {
-        const amplitude = (data[i] ?? 0) / 255;
-        const barHeight = amplitude * height;
-        canvasCtx.fillStyle = `rgba(255, 255, 255, ${amplitude.toFixed(2)})`;
-        canvasCtx.fillRect(i * (barWidth + BAR_GAP), height - barHeight, barWidth, barHeight);
+      const barWidth = width / BAR_COUNT - BAR_GAP;
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const amplitude = energy * spectralShape(i) * barNoise(i, beat);
+        const barHeight = amplitude * height * BAR_MAX_HEIGHT;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(amplitude, 1).toFixed(2)})`;
+        ctx.fillRect(i * (barWidth + BAR_GAP), height - barHeight, barWidth, barHeight);
       }
     };
 
-    draw();
+    this.rafHandle = requestAnimationFrame(draw);
   }
 
   stop(): void {
@@ -66,13 +60,6 @@ export class AudioVisualizerAdapter implements AudioVisualizerPort {
       cancelAnimationFrame(this.rafHandle);
       this.rafHandle = null;
     }
-    this.source?.disconnect();
-    this.analyser?.disconnect();
-    void this.audioContext?.close();
-    this.audioContext = null;
-    this.analyser = null;
-    this.source = null;
-    this.dataArray = null;
   }
 
   isRunning(): boolean {

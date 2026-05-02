@@ -1,19 +1,27 @@
-import { getVisualizerInstance } from "@/app/stores/adapters";
+import { getTrackAudioInstance, getVisualizerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
+import type { AppCore } from "@/domain/ports/app-core";
+
+const DEFAULT_BPM = 120;
+
+const resolveCurrentBpm = (state: AppCore): number => {
+  const match = state.trackNumber?.match(/(\d+)/);
+  if (match) {
+    const currentNum = Number(match[1]);
+    const infos = getTrackAudioInstance().getTrackAudioInfos();
+    const info = infos.find((i) => i.trackNumber === currentNum);
+    const bpm = info?.trackUrl ? state.trackBpms[info.trackUrl]?.bpm : null;
+    if (bpm) return bpm;
+  }
+  return DEFAULT_BPM;
+};
 
 export const runVisualizer = (canvas: HTMLCanvasElement): void => {
-  const appState = getAppCoreInstance().getState();
-  if (!appState.featureFlags.visualizer) return;
-
-  const plume = getGuiInstance().getState();
-  if (!plume.audioElement) return;
-
-  const visualizer = getVisualizerInstance();
-  visualizer.start(plume.audioElement, canvas);
+  const state = getAppCoreInstance().getState();
+  if (!state.featureFlags.visualizer) return;
+  getVisualizerInstance().start(canvas, resolveCurrentBpm(state));
 };
 
 export const stopVisualizer = (): void => {
-  const visualizer = getVisualizerInstance();
-  visualizer.stop();
+  getVisualizerInstance().stop();
 };

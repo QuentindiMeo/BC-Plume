@@ -347,7 +347,6 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Redare muzică pe ecran complet" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Vizualizator audio" },
-  "WARN__VISUALIZER__CORS_BLOCKED": { "message": "Vizualizatorul audio a fost blocat de politica CORS" },
 
   "POPUP_TITLE": { "message": "Panou de setări" },
   "ARIA__POPUP__TABLIST": { "message": "Secțiuni setări" },

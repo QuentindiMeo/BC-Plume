@@ -347,7 +347,6 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Полноэкранный музыкальный плеер" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Аудио-визуализатор" },
-  "WARN__VISUALIZER__CORS_BLOCKED": { "message": "Аудио-визуализатор заблокирован политикой CORS" },
 
   "POPUP_TITLE": { "message": "Настройки" },
   "ARIA__POPUP__TABLIST": { "message": "Разделы настроек" },

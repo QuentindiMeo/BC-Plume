@@ -1,5 +1,5 @@
 export interface AudioVisualizerPort {
-  start(audioEl: HTMLAudioElement, canvas: HTMLCanvasElement): void;
+  start(canvas: HTMLCanvasElement, bpm: number): void;
   stop(): void;
   isRunning(): boolean;
 }
