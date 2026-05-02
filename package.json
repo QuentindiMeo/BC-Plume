@@ -20,12 +20,12 @@
     "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
     "format": "pnpm prettier:fix && pnpm eslint:fix",
     "prepare": "tsc --noEmit && husky",
+    "ship": "pnpm run deploy && node scripts/zip-sources.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "pnpm test tests/a11y/",
     "test:cov": "pnpm test --coverage --coverage.skipFull",
-    "test:cov:report": "pnpm test:cov --reporter=verbose",
-    "zip": "node scripts/zip-sources.js"
+    "test:report": "pnpm test:cov --reporter=verbose"
   },
   "keywords": [
     "bandcamp",

@@ -10,7 +10,7 @@ export const PLUME_CONSTANTS = {
   WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
 } as const;
 
-export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr"] as const;
+export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr", "it", "pt_BR", "ro", "ru"] as const;
 export type PlumeLanguage = (typeof PLUME_SUPPORTED_LANGUAGES)[number];
 
 export enum LOOP_MODE {

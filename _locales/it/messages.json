@@ -1,0 +1,577 @@
+{
+  "APP_NAME": { "message": "Plume - Il lettore Bandcamp reinventato" },
+  "APP_DESCRIPTION": {
+    "message": "Estensione Bandcamp: volume, barra di avanzamento, modalità ripetizione, schermo intero e tasti di scelta rapida per il player."
+  },
+
+  "ERROR__NO_BROWSER_API": { "message": "Nessuna API del browser rilevata" },
+  "WARN__BROWSER_API__NOT_DETECTED": { "message": "Nessuna API del browser rilevata, utilizzo di localStorage come alternativa" },
+  "INFO__BROWSER__DETECTED": { "message": "Browser rilevato:" },
+
+  "ERROR__STATE__LOAD_FAILED": { "message": "Impossibile caricare lo stato persistito:" },
+  "ERROR__STATE__PERSIST_FAILED": { "message": "Impossibile persistere lo stato:" },
+  "ERROR__STATE__GLOBAL_LISTENER_FAILED": { "message": "Errore nel listener di stato globale:" },
+  "ERROR__STATE__LISTENER_FAILED": { "message": "Errore nel listener di stato:" },
+  "INFO__STATE__SUBSCRIPTIONS_SETUP": { "message": "Sottoscrizioni dello store inizializzate" },
+  "DEBUG__STATE__PERSISTED": { "message": "Stato persistito nell'archivio:" },
+
+  "LOG__INITIALIZATION__START": { "message": "Inizializzazione di Plume..." },
+  "LOG__INITIALIZATION__COMPLETE": { "message": "Plume inizializzato con successo" },
+  "LOG__MOUNT__COMPLETE": { "message": "Plume montato con successo" },
+  "LOG__NAVIGATION_DETECTED": { "message": "Navigazione rilevata, ripristino..." },
+
+  "LOG__ORIGINAL_PLAYER__HIDDEN": { "message": "Elementi del player originale nascosti" },
+  "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementi del player originale ripristinati" },
+
+  "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
+    "message": "Elemento Bandcamp non trovato (obbligatorio): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "div.inline_player"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__MISSING_OPTIONAL": {
+    "message": "Elemento Bandcamp non trovato (facoltativo): $SELECTOR$",
+    "placeholders": {
+      "selector": {
+        "content": "$1",
+        "example": "span.fromAlbum"
+      }
+    }
+  },
+  "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tutti gli elementi Bandcamp trovati" },
+
+  "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossibile trovare un contenitore adeguato" },
+  "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento genitore del player non trovato" },
+  "WARN__PLAYER_CONTAINER_NOT_FOUND": { "message": "Contenitore del player non trovato, ricerca di un'alternativa..." },
+
+  "WARN__AUDIO_ELEMENT__NOT_FOUND": { "message": "Elemento audio non trovato, nuovo tentativo..." },
+  "INFO__AUDIO__FOUND": { "message": "Elemento audio trovato" },
+  "INFO__NEW_AUDIO__FOUND": { "message": "Nuovo elemento audio rilevato" },
+  "INFO__AUDIO_EVENT_LISTENERS__SET_UP": { "message": "Listener degli eventi audio configurati" },
+
+  "DEBUG__CONTROL_ELEMENTS__DETECTED": { "message": "=== DEBUG: Elementi di controllo rilevati ===" },
+  "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controlli potenziali trovati:" },
+  "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FINE DEBUG ===" },
+
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Contenitore dell'intestazione o numero di traccia non trovato" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Contenitore dell'intestazione o titolo della traccia non trovato" },
+  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Elemento pretesto dell'intestazione non trovato" },
+  "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Elemento titolo dell'intestazione non trovato" },
+  "DEBUG__TRACK__QUANTIFIERS": {
+    "message": "Numero traccia corrente: $TRACK_NUMBER$, Totale tracce: $TOTAL_TRACKS$",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "3"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "10"
+      }
+    }
+  },
+  "LABEL__TRACK": { "message": "in riproduzione" },
+  "LABEL__TRACK_CURRENT": {
+    "message": "in riproduzione ($NUMBERING$)",
+    "placeholders": {
+      "numbering": {
+        "content": "$1",
+        "example": "1/4"
+      }
+    }
+  },
+  "LABEL__TRACK_UNKNOWN": { "message": "traccia sconosciuta" },
+  "ARIA__APP_NAME": { "message": "Plume - Il lettore Bandcamp reinventato" },
+  "ARIA__LOGO_LINK": { "message": "Scopri di più su Plume" },
+  "ARIA__TRACK": {
+    "message": "La traccia $TRACK_TITLE$ è in riproduzione",
+    "placeholders": {
+      "track_title": {
+        "content": "$1",
+        "example": "Song Title"
+      }
+    }
+  },
+  "ARIA__TRACK_CURRENT": {
+    "message": "La traccia $TRACK_TITLE$ è in riproduzione (traccia $TRACK_NUMBER$ di $TOTAL_TRACKS$)",
+    "placeholders": {
+      "track_number": {
+        "content": "$1",
+        "example": "1"
+      },
+      "total_tracks": {
+        "content": "$2",
+        "example": "4"
+      },
+      "track_title": {
+        "content": "$3",
+        "example": "Song Title"
+      }
+    }
+  },
+
+  "ARIA__TRACK_LINK": { "message": "Vai alla pagina della traccia" },
+  "WARN__TRACK_LINK__NOT_FOUND": { "message": "Elemento link della traccia non trovato, link disabilitato" },
+
+  "WARN__RUNTIME__NOT_CALCULATED": { "message": "Impossibile calcolare la durata totale" },
+  "WARN__TRACK_LIST__NOT_FOUND": { "message": "Lista tracce non trovata, calcolo durata ignorato" },
+  "INFO__RUNTIME__CALCULATED": { "message": "Durata totale calcolata:" },
+  "LABEL__RUNTIME": {
+    "message": "$MINUTI$ min $SECONDI$ s$RIPRODUCIBILI$",
+    "placeholders": {
+      "minuti": {
+        "content": "$1",
+        "example": "5"
+      },
+      "secondi": {
+        "content": "$2",
+        "example": "30"
+      },
+      "riproducibili": {
+        "content": "$3",
+        "example": " riproducibili"
+      }
+    }
+  },
+  "LABEL__RUNTIME__PLAYABLE": { "message": " riproducibili" },
+  "ARIA__RUNTIME__LABEL": {
+    "message": "Durata totale: $MINUTES$ minuti e $SECONDS$ secondi",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "5"
+      },
+      "seconds": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+
+  "ERROR__PLAY_PAUSE_BUTTON__NOT_FOUND": { "message": "Pulsante Riproduci/Pausa non trovato" },
+  "WARN__PREV_TRACK__NOT_FOUND": { "message": "Pulsante traccia precedente non trovato" },
+  "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Pulsante Riproduci/Pausa non trovato" },
+  "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Pulsante traccia successiva non trovato" },
+  "DEBUG__PREV_TRACK__CLICKED": { "message": "Pulsante traccia precedente premuto" },
+  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Evento traccia precedente inviato" },
+  "DEBUG__TRACK__RESTARTED": { "message": "Traccia corrente riavviata" },
+  "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Pulsante Riproduci/Pausa premuto" },
+  "DEBUG__NEXT_TRACK__CLICKED": { "message": "Pulsante traccia successiva premuto" },
+  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Evento traccia successiva inviato" },
+  "LABEL__TRACK_BACKWARD": { "message": "Ricomincia traccia / Traccia precedente" },
+  "LABEL__PLAY_PAUSE": { "message": "Riproduci/Pausa" },
+  "LABEL__TRACK_FORWARD": { "message": "Traccia successiva" },
+
+  "ERROR__PROGRESS_SLIDER__NOT_FOUND": { "message": "Elemento cursore di avanzamento non trovato" },
+  "ERROR__ELAPSED_DISPLAY__NOT_FOUND": { "message": "Elemento visualizzazione tempo trascorso non trovato" },
+  "ERROR__DURATION_DISPLAY__NOT_FOUND": { "message": "Elemento visualizzazione durata non trovato" },
+  "INFO__DURATION_DISPLAY_METHOD__APPLIED": {
+    "message": "Metodo di visualizzazione durata applicato: $METHOD$",
+    "placeholders": {
+      "method": {
+        "content": "$1",
+        "example": "remaining"
+      }
+    }
+  },
+  "DEBUG__REWIND_TIME__CLICKED": { "message": "Pulsante di riavvolgimento premuto" },
+  "DEBUG__REWIND_TIME__DISPATCHED": {
+    "message": "Tempo riavvolto a: $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
+  "DEBUG__FORWARD_TIME__CLICKED": { "message": "Pulsante di avanzamento premuto" },
+  "DEBUG__FORWARD_TIME__DISPATCHED": {
+    "message": "Tempo avanzato a: $TIME$ s",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "120"
+      }
+    }
+  },
+  "DEBUG__PROGRESS_SLIDER__INPUT": {
+    "message": "Cursore di avanzamento spostato: $VALUE$ s",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
+  "LABEL__TIME_BACKWARD": { "message": "Indietro" },
+  "LABEL__TIME_FORWARD": { "message": "Avanti veloce" },
+  "LABEL__TIME_DISPLAY__INVERT": { "message": "Passa alla visualizzazione tempo rimanente/durata" },
+  "ARIA__PROGRESS_SLIDER": { "message": "Barra di avanzamento audio" },
+  "ARIA__DURATION_DISPLAY": { "message": "Alterna tra tempo rimanente e durata totale" },
+  "ARIA__PROGRESS_VALUETEXT": {
+    "message": "$ELAPSED$ di $DURATION$",
+    "placeholders": {
+      "ELAPSED": { "content": "$1" },
+      "DURATION": { "content": "$2" }
+    }
+  },
+
+  "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Pulsante di silenziamento non trovato" },
+  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Cursore volume o elemento di visualizzazione non trovato" },
+  "WARN__VOLUME__INVALID_VALUE": { "message": "Valore del volume non valido:" },
+  "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
+    "message": "La regolazione del volume con delta nullo potrebbe indicare un errore logico nel codice"
+  },
+  "INFO__VOLUME__LOADED": { "message": "Volume caricato dall'archivio:" },
+  "INFO__VOLUME__FOUND": {
+    "message": "Volume ripristinato: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
+  "INFO__VOLUME__APPLIED": {
+    "message": "Volume applicato al nuovo audio: $VOLUME$$PERCENTAGE$",
+    "placeholders": {
+      "volume": {
+        "content": "$1",
+        "example": "75"
+      },
+      "percentage": {
+        "content": "$2",
+        "example": "%"
+      }
+    }
+  },
+  "META__PERCENTAGE": { "message": "%" },
+  "ARIA__VOLUME_SLIDER": { "message": "Controllo volume" },
+  "ARIA__MUTE": { "message": "Silenzia" },
+  "ARIA__UNMUTE": { "message": "Riattiva audio" },
+
+  "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Pulsante di ripetizione non trovato" },
+  "INFO__LOOP_MODE__COERCED": { "message": "Modalità ripetizione caricata come ripetizione album ma applicata come ripetizione traccia (pagina singola traccia)" },
+  "DEBUG__LOOP__CYCLED": { "message": "Modalità ripetizione cambiata" },
+  "LABEL__LOOP": { "message": "Ripeti" },
+  "ARIA__LOOP__OFF": { "message": "Ripeti: disattivato" },
+  "ARIA__LOOP__COLLECTION_ALBUM": { "message": "Ripeti: album" },
+  "ARIA__LOOP__COLLECTION_TRACK": { "message": "Ripeti: traccia" },
+  "ARIA__LOOP__ONE_TRACK": { "message": "Ripeti: attivato" },
+
+  "LABEL__SPEED": { "message": "Velocità di riproduzione" },
+  "ARIA__SPEED_SLIDER": { "message": "Controllo velocità di riproduzione" },
+  "ARIA__SPEED_BTN": {
+    "message": "Velocità di riproduzione: $SPEED$",
+    "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
+  },
+  "DEBUG__SPEED__CLICKED": { "message": "Pulsante velocità premuto" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Velocità personalizzata rifiutata (fuori intervallo o non numerica)" },
+  "ARIA__SPEED_CUSTOM_INPUT": { "message": "Velocità personalizzata" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clicca per inserire una velocità personalizzata" },
+  "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocità di riproduzione caricata:" },
+  "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Velocità di riproduzione non valida — ripristino a 1×" },
+
+  "INFO__HOTKEYS__REGISTERED": { "message": "Tasti di scelta rapida registrati" },
+
+  "LABEL__FULLSCREEN_TOGGLE": { "message": "Attiva/disattiva schermo intero" },
+
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Tracklist: la traccia corrente è sconosciuta, impossibile navigare" },
+  "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
+    "message": "Tracklist: indice traccia $INDEX$ fuori dai limiti",
+    "placeholders": {
+      "index": { "content": "$1", "example": "10" }
+    }
+  },
+  "WARN__TRACKLIST__TRACK_UNPLAYABLE": {
+    "message": "Tracklist: la traccia $NUMBER$ non è riproducibile",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "DEBUG__TRACKLIST__NAVIGATED": {
+    "message": "Tracklist: navigato alla traccia $NUMBER$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" }
+    }
+  },
+  "ARIA__TRACKLIST__TOGGLE_OPEN": { "message": "Apri lista tracce" },
+  "ARIA__TRACKLIST__TOGGLE_CLOSE": { "message": "Chiudi lista tracce" },
+  "ARIA__TRACKLIST__PANEL": { "message": "Lista tracce" },
+  "ARIA__TRACKLIST__ITEM": {
+    "message": "Traccia $NUMBER$: $TITLE$",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_CURRENT": {
+    "message": "Traccia $NUMBER$: $TITLE$, in riproduzione",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+  "ARIA__TRACKLIST__ITEM_UNPLAYABLE": {
+    "message": "Traccia $NUMBER$: $TITLE$, non disponibile",
+    "placeholders": {
+      "number": { "content": "$1", "example": "3" },
+      "title": { "content": "$2", "example": "Song Name" }
+    }
+  },
+
+  "WARN__COVER_ART__NOT_FOUND": { "message": "Copertina non trovata" },
+  "WARN__INFO_SECTION__NOT_FOUND": { "message": "Sezione informazioni non trovata per la modalità schermo intero" },
+  "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Contenitore Plume non trovato per la modalità schermo intero" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Modalità schermo intero attivata" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Modalità schermo intero disattivata" },
+  "ARIA__FULLSCREEN__ENTERED": { "message": "Modalità schermo intero attivata" },
+  "ARIA__FULLSCREEN__EXITED": { "message": "Modalità schermo intero disattivata" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Esci da schermo intero" },
+  "ARIA__COVER_ART": { "message": "Copertina album" },
+  "ARIA__COVER_ART_FOR": {
+    "message": "Copertina di $RELEASE$",
+    "placeholders": {
+      "release": { "content": "$1" }
+    }
+  },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Lettore musicale a schermo intero" },
+
+  "POPUP_TITLE": { "message": "Impostazioni" },
+  "ARIA__POPUP__TABLIST": { "message": "Sezioni impostazioni" },
+  "INFO__SETTING__REFRESH_REQUIRED": { "message": "Ricarica la pagina per applicare la modifica." },
+  "LABEL__SETTING__RESET": { "message": "Ripristina" },
+  "LABEL__TAB__RESET": { "message": "Ripristina tutto" },
+  "META__SECONDS_UNIT": { "message": "s" },
+  "META__PERCENT_UNIT": { "message": "%" },
+
+  "POPUP__GENERAL__TAB_LABEL": { "message": "Generale" },
+  "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Impossibile salvare la preferenza di lingua" },
+  "LABEL__GENERAL__FORCED_LANGUAGE": { "message": "Lingua" },
+  "ARIA__GENERAL__FORCED_LANGUAGE_SELECT": { "message": "Imposta lingua manualmente" },
+  "LABEL__LANGUAGE__AUTO": { "message": "Auto" },
+  "LABEL__LANGUAGE__EN": { "message": "Inglese" },
+  "LABEL__LANGUAGE__ES": { "message": "Spagnolo" },
+  "LABEL__LANGUAGE__FR": { "message": "Francese" },
+  "LABEL__LANGUAGE__IT": { "message": "Italiano" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Portoghese (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Rumeno" },
+  "LABEL__LANGUAGE__RU": { "message": "Russo" },
+  "ERROR__GENERAL__NOT_INTEGER": { "message": "Deve essere un numero intero" },
+
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Tasti di scelta rapida" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Tasti di scelta rapida" },
+  "ERROR__HOTKEYS__UNHANDLED_ACTION": {
+    "message": "Azione tasto di scelta rapida non gestita: $ACTION$",
+    "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } }
+  },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Impossibile persistere le associazioni dei tasti di scelta rapida" },
+  "WARN__HOTKEY_BINDINGS__INVALID_CACHE": {
+    "message": "Voce cache delle associazioni tasti non valida, utilizzo dei valori predefiniti"
+  },
+  "WARN__HOTKEYS__CONFLICT": {
+    "message": "Già assegnato a: $ACTION$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      }
+    }
+  },
+  "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Riproduci / Pausa" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Cerca indietro" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Cerca avanti" },
+  "LABEL__HOTKEY__VOLUME_UP": { "message": "Aumenta volume" },
+  "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Diminuisci volume" },
+  "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Traccia precedente / Riavvolgi" },
+  "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Traccia successiva" },
+  "LABEL__HOTKEY__FULLSCREEN": { "message": "Schermo intero" },
+  "LABEL__HOTKEY__MUTE": { "message": "Silenzia / Riattiva" },
+  "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Cambia modalità ripetizione" },
+  "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Cambia velocità di riproduzione" },
+  "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Cerca allo 0%–90% (tasti numerici)" },
+  "POPUP__HOTKEYS__PRESS_KEY": { "message": "Premi un tasto..." },
+  "POPUP__HOTKEYS__DISABLED": { "message": "Disabilitato" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Conferma" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Annulla" },
+  "ARIA__HOTKEY_ROW__BUTTON": {
+    "message": "Riassegna il tasto $ACTION$ — attualmente $BINDING$",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      },
+      "binding": {
+        "content": "$2",
+        "example": "Space"
+      }
+    }
+  },
+  "ARIA__HOTKEY_ROW__CAPTURING": {
+    "message": "Acquisizione tasto per $ACTION$ — premi un tasto o Esc per annullare",
+    "placeholders": {
+      "action": {
+        "content": "$1",
+        "example": "Play / Pause"
+      }
+    }
+  },
+
+  "POPUP__FEATURES__TAB_LABEL": { "message": "Funzionalità" },
+  "LABEL__FEATURES__GO_TO_TRACK": { "message": "Vai alla traccia" },
+  "LABEL__FEATURES__TRACKLIST": { "message": "Lista tracce" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modalità ripetizione" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Schermo intero" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Ricerca rapida (0–9)" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Durata" },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Controllo velocità" },
+  "LABEL__FEATURES__BPM_DETECT": { "message": "Rilevamento BPM" },
+  "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Impossibile salvare le preferenze delle funzionalità" },
+
+  "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Deve essere un numero intero" },
+  "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Deve essere compreso tra 1 e 300" },
+  "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Impossibile salvare la durata del passo di avanzamento" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Valore durata del passo di avanzamento non valido, utilizzo del valore predefinito" },
+  "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Durata del passo di avanzamento caricata:" },
+  "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Passo avanzamento" },
+  "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Durata del passo di avanzamento in secondi" },
+
+  "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Deve essere compreso tra 1 e 20" },
+  "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Impossibile salvare il passo del volume" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Valore del passo del volume non valido, utilizzo del valore predefinito" },
+  "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Passo del volume caricato:" },
+  "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Passo volume" },
+  "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Percentuale di volume per pressione del tasto" },
+
+  "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Deve essere compreso tra 0 e 10" },
+  "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Impossibile salvare la soglia di riavvio della traccia" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valore soglia di riavvio traccia non valido, utilizzo del valore predefinito" },
+  "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Soglia di riavvio traccia caricata:" },
+  "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Soglia riavvio traccia" },
+  "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
+    "message": "Secondi entro i quali il tasto traccia precedente riavvia la traccia corrente"
+  },
+
+  "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Impossibile analizzare l'SVG dell'icona di notifica" },
+  "WARN__TOAST__ICON_SVG_INVALID": {
+    "message": "SVG dell'icona di notifica non valido per l'etichetta '$LABEL$'",
+    "placeholders": { "label": { "content": "$1", "example": "aggiornamento versione" } }
+  },
+  "INFO__TOAST__SHOWN": {
+    "message": "Notifica mostrata ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "aggiornamento versione" } }
+  },
+  "INFO__TOAST__DISMISSED": {
+    "message": "Notifica chiusa ($LABEL$)",
+    "placeholders": { "label": { "content": "$1", "example": "aggiornamento versione" } }
+  },
+  "ARIA__TOAST__CONTAINER": {
+    "message": "Notifica $LABEL$ dell'estensione",
+    "placeholders": { "label": { "content": "$1", "example": "aggiornamento versione" } }
+  },
+  "ARIA__TOAST__DISMISS": {
+    "message": "Chiudi la notifica $LABEL$",
+    "placeholders": { "label": { "content": "$1", "example": "aggiornamento versione" } }
+  },
+
+  "INFO__RELEASE__PERSISTED": { "message": "L'ultima osservazione di rilascio è stata salvata nell'archivio" },
+  "LABEL__TOAST__RELEASE__TITLE": { "message": "Aggiornamento disponibile!" },
+  "LABEL__TOAST__RELEASE__DESCRIPTION": {
+    "message": "Plume $RELEASE$ è ora disponibile.",
+    "placeholders": {
+      "release": {
+        "content": "$1",
+        "example": "1.3.3"
+      }
+    }
+  },
+  "LABEL__TOAST__RELEASE__CTA": { "message": "Scopri le novità" },
+  "META__TOAST__RELEASE": { "message": "aggiornamento versione" },
+
+  "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume non è riuscito a caricarsi" },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "Nessun contenitore player adatto trovato su questa pagina." },
+  "META__TOAST__INJECTION_FAILED": { "message": "errore di iniezione" },
+
+  "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "In attesa dell'audio" },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "Nessun elemento audio rilevato. I controlli di riproduzione sono inattivi." },
+  "META__TOAST__AUDIO_NOT_FOUND": { "message": "audio non trovato" },
+
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Schermo intero non disponibile" },
+  "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__DESCRIPTION": {
+    "message": "Elementi di pagina richiesti mancanti. Controlla la console per i dettagli."
+  },
+  "META__TOAST__FULLSCREEN_UNAVAILABLE": { "message": "schermo intero non disponibile" },
+
+  "LABEL__TOAST__HEALTH_CHECK__TITLE": {
+    "message": "Controllo: $MISSING_REQUIRED$ elemento/i richiesto/i mancante/i",
+    "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": {
+    "message": "Plume non potrà funzionare correttamente. Controlla la console per i dettagli."
+  },
+  "META__TOAST__HEALTH_CHECK": { "message": "controllo integrità" },
+
+  "LABEL__TOAST__UNPLAYABLE_TRACK__TITLE": {
+    "message": "La traccia $TRACK_NUMBER$ non è riproducibile",
+    "placeholders": { "track_number": { "content": "$1", "example": "3" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACK__DESCRIPTION": {
+    "message": "\"$TRACK_TITLE$\" non può essere riprodotta in streaming. Verrà saltata durante la riproduzione.",
+    "placeholders": { "track_title": { "content": "$1", "example": "Hidden Track" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__TITLE": {
+    "message": "$COUNT$ tracce non sono riproducibili",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "LABEL__TOAST__UNPLAYABLE_TRACKS__DESCRIPTION": {
+    "message": "Le seguenti tracce non sono riproducibili: $TITLES_LIST$. Verranno saltate durante la riproduzione.",
+    "placeholders": { "titles_list": { "content": "$1", "example": "Track 1, Track 2" } }
+  },
+  "META__TOAST__UNPLAYABLE_TRACK": { "message": "traccia non riproducibile" },
+  "META__TOAST__UNPLAYABLE_TRACKS": { "message": "tracce non riproducibili" },
+
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Velocità limitata" },
+  "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
+    "message": "Safari limita la velocità di riproduzione a 0,5×–2×. La selezione verrà adattata."
+  },
+  "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "velocità non supportata da Safari" },
+
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Velocità non valida" },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Inserisci un numero compreso tra 0,25 e 5." },
+  "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "input personalizzato non valido" },
+
+  "LABEL__BPM__DISPLAY": { "message": "BPM" },
+  "LABEL__BPM__DETECTING": { "message": "..." },
+  "LABEL__BPM__ERROR": { "message": "—" },
+  "LABEL__BPM__DETECT_ALL": { "message": "Rileva BPM" },
+  "ARIA__BPM__DISPLAY": { "message": "Battiti al minuto per la traccia corrente" },
+  "ARIA__BPM__DETECT_ALL_BTN": { "message": "Rileva BPM per tutte le tracce" },
+  "ARIA__BPM__BADGE": {
+    "message": "$BPM$ battiti al minuto",
+    "placeholders": { "bpm": { "content": "$1", "example": "128" } }
+  },
+  "WARN__TRALBUM__NOT_FOUND": { "message": "Dati album (data-tralbum) non trovati nella pagina" },
+  "WARN__TRALBUM__PARSE_ERROR": { "message": "Impossibile analizzare i dati album (data-tralbum)" },
+  "WARN__BPM__DETECT_FAILED": {
+    "message": "Rilevamento BPM non riuscito per '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_START": {
+    "message": "Avvio rilevamento BPM per '$TRACK_URL$'",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__BPM__DETECT_SUCCESS": {
+    "message": "BPM rilevato: $BPM$ per '$TRACK_URL$'",
+    "placeholders": {
+      "bpm": { "content": "$1", "example": "128" },
+      "track_url": { "content": "$2", "example": "/track/some-track" }
+    }
+  }
+}

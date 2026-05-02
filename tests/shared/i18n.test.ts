@@ -1,5 +1,6 @@
-import { getActiveLocale, getString, setForcedLanguage } from "@/shared/i18n";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { getActiveLocale, getString, setForcedLanguage } from "@/shared/i18n";
 
 describe("getString", () => {
   it("resolves placeholders using the substitutions array", () => {
@@ -124,6 +125,13 @@ describe("getActiveLocale (browser i18n live path)", () => {
     vi.resetModules();
     const { getActiveLocale: fresh } = await import("@/shared/i18n");
     expect(fresh()).toBe("es");
+  });
+
+  it("returns 'pt_BR' when browser UI language is pt-BR (hyphen normalized to underscore)", async () => {
+    vi.stubGlobal("chrome", { i18n: { getMessage: () => "", getUILanguage: () => "pt-BR" } });
+    vi.resetModules();
+    const { getActiveLocale: fresh } = await import("@/shared/i18n");
+    expect(fresh()).toBe("pt_BR");
   });
 
   it("falls back to 'en' for unsupported browser locale", async () => {

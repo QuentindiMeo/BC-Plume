@@ -360,6 +360,10 @@
   "LABEL__LANGUAGE__EN": { "message": "English" },
   "LABEL__LANGUAGE__ES": { "message": "Spanish" },
   "LABEL__LANGUAGE__FR": { "message": "French" },
+  "LABEL__LANGUAGE__IT": { "message": "Italian" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Portuguese (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Romanian" },
+  "LABEL__LANGUAGE__RU": { "message": "Russian" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },

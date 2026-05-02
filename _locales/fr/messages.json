@@ -371,6 +371,10 @@
   "LABEL__LANGUAGE__EN": { "message": "Anglais" },
   "LABEL__LANGUAGE__ES": { "message": "Espagnol" },
   "LABEL__LANGUAGE__FR": { "message": "Français" },
+  "LABEL__LANGUAGE__IT": { "message": "Italien" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Portugais (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Roumain" },
+  "LABEL__LANGUAGE__RU": { "message": "Russe" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
