@@ -15,12 +15,11 @@
 
 <div id="badges1" align="center">
   <a href="#%EF%B8%8F-roadmap"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.12.0-blue?logo=semver" /></a>
-  <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
-  <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
-  <a href="https://github.com/QuentindiMeo/BC-Plume/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/QuentindiMeo/BC-Plume?color=red&logo=stackedit" /></a>
+  <a href="https://github.com/QuentindiMeo/BC-Plume/releases"><img alt="GitHub last release date" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?label=date%20of%20last%20release&color=blueviolet&logo=clarifai" /></a>
 </div>
 <div id="badges2" align="center">
-  <a href="https://github.com/QuentindiMeo/BC-Plume/releases"><img alt="GitHub last release date" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?label=date%20of%20last%20release&color=blueviolet&logo=clarifai" /></a>
+  <a href="https://chromewebstore.google.com/detail/bc-plume-bandcamp-player/ldojecagppaiodalfjnhandfjkiljplm"><img alt="Chrome store rating" src="https://img.shields.io/chrome-web-store/rating/ldojecagppaiodalfjnhandfjkiljplm?logo=googlechrome" /></a>
+  <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
   <a href="#%EF%B8%8F-roadmap"><img alt="project code coverage" src="https://img.shields.io/badge/coverage-100%25-forestgreen?logo=chianetwork" /></a>
@@ -77,7 +76,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **BPM detection**: Detects and displays the track's tempo live, with indicators in the tracklist
 - **Feature flags**: Toggle individual features on or off from the popup's Features tab
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
-- **Several languages**: Enjoy Plume in English 🇺🇸, French 🇫🇷, Spanish 🇪🇸... (more on demand!)
+- **Several languages**: Enjoy Plume in 7 languages: EN-US 🇺🇸, ES 🇪🇸, FR 🇫🇷, IT 🇮🇹, PT-BR 🇵🇹, RO 🇷🇴, RU 🇷🇺 (more on demand!)
 
 ## 🚀 Installation
 
@@ -127,6 +126,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find details about each release in [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md).
 
+- _**[1.13.0]** ??? ?? 2026_: **...** [#???]()
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)

@@ -26,7 +26,7 @@ import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
@@ -59,9 +59,10 @@ let fullscreenLiveRegion: HTMLDivElement | null = null;
 const announceFullscreenState = (messageKey: string): void => {
   if (!fullscreenLiveRegion) {
     fullscreenLiveRegion = document.createElement("div");
-    fullscreenLiveRegion.ariaLive = "polite";
     fullscreenLiveRegion.role = "status";
+    fullscreenLiveRegion.ariaLive = "polite";
     fullscreenLiveRegion.className = "sr-live";
+    fullscreenLiveRegion.lang = getActiveLocale();
     document.body.appendChild(fullscreenLiveRegion);
   }
   // Clear then set to ensure re-announcement even if the same message is sent twice
@@ -436,6 +437,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   overlay.role = "dialog";
   overlay.ariaModal = "true";
   overlay.ariaLabel = getString("ARIA__FULLSCREEN_OVERLAY");
+  overlay.lang = getActiveLocale();
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
