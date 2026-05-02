@@ -27,6 +27,7 @@ import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
+import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
@@ -209,6 +210,7 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
 
   headerTitle.textContent = trackTitle;
   headerTitle.title = trackTitle;
+  applyTitleLang(headerTitle, trackTitle);
 };
 
 const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | null): void => {
@@ -451,7 +453,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const presentationContainer = document.createElement("div");
   presentationContainer.id = PLUME_ELEM_SELECTORS.fullscreenPresentationContainer.split("#")[1];
 
-  const newNameSection = bcPlayer.getInfoSection() as HTMLDivElement | null;
+  const newNameSection = bcPlayer.getInfoSection();
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return null;
@@ -461,10 +463,12 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
 
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
+  adjustedNameSection.lang = document.documentElement.lang;
   const headTitle = adjustedNameSection.querySelector("h2")!;
   const releaseName = headTitle.textContent?.trim() || "";
   headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
   if (!isAlbumPage) headTitle.textContent = `"${releaseName}"`;
+  applyTitleLang(headTitle, releaseName);
 
   const coverArtImg = document.createElement("img");
   coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];

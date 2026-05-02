@@ -22,6 +22,7 @@ import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
+import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
@@ -116,6 +117,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   currentTitleSection.ariaLabel = isAlbumPage
     ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
+  applyTitleLang(currentTitleSection, initialTrackTitle);
   const currentTitlePretext = document.createElement("span");
   currentTitlePretext.id = PLUME_ELEM_SELECTORS.headerTitlePretext.split("#")[1];
   const initialTrackNumberText = isAlbumPage

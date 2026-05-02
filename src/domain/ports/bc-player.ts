@@ -21,7 +21,7 @@ export interface BcPlayerPort {
   getAudioElement(): HTMLAudioElement | null;
   getPageBackground(): HTMLElement | null;
   getPlayerParent(): HTMLElement | null;
-  getInfoSection(): HTMLElement | null;
+  getInfoSection(): HTMLDivElement | null;
   getTrackTitleElement(): HTMLElement | null;
   getTrackView(): HTMLDivElement | null;
   getInlinePlayerTable(): HTMLTableElement | null;

@@ -25,6 +25,7 @@ import { guiActions } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
+import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
 
 // Runs before GUI store is populated, queries the DOM directly.
@@ -65,6 +66,7 @@ const updateTrackDisplay = () => {
       headerCurrent.ariaLabel = isAlbumPage
         ? getString("ARIA__TRACK_CURRENT", [String(current), String(total), newTrackTitle])
         : getString("ARIA__TRACK", [newTrackTitle]);
+      applyTitleLang(headerCurrent, newTrackTitle);
     }
   }
 
