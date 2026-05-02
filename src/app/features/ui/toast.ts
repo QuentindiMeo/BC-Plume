@@ -46,7 +46,7 @@ const getToastContainer = (): HTMLElement => {
 
   const container = document.createElement("div");
   container.id = "plume-toast-container";
-  container.lang = getActiveLocale();
+  container.lang = getActiveLocale() || document.documentElement.lang || "en";
   document.body.appendChild(container);
   return container;
 };

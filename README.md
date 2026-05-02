@@ -76,7 +76,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **BPM detection**: Detects and displays the track's tempo live, with indicators in the tracklist
 - **Feature flags**: Toggle individual features on or off from the popup's Features tab
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
-- **Several languages**: Enjoy Plume in 7 languages: EN-US 🇺🇸, ES 🇪🇸, FR 🇫🇷, IT 🇮🇹, PT-BR 🇵🇹, RO 🇷🇴, RU 🇷🇺 (more on demand!)
+- **Several languages**: Enjoy Plume in 7 languages: en 🇺🇸, es 🇪🇸, fr 🇫🇷, it 🇮🇹, pt_BR 🇧🇷, ro 🇷🇴, ru 🇷🇺 (more on demand!)
 
 ## 🚀 Installation
 
@@ -126,7 +126,6 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find details about each release in [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md).
 
-- _**[1.13.0]** ??? ?? 2026_: **...** [#???]()
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
