@@ -60,4 +60,6 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenTitlingRelease = "h2#plume-fullscreen-titling__release",
   fullscreenTitlingArtist = "h3#plume-fullscreen-titling__artist",
   fullscreenClone = "div#plume-fullscreen-clone",
+
+  visualizerCanvas = "canvas#plume-visualizer-canvas",
 }
