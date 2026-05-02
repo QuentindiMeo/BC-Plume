@@ -5,6 +5,8 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+  - _**[1.12.1]** May 02 2026_: Hotfixing invasive hotkeys in input fields [#158](https://github.com/QuentindiMeo/BC-Plume/pull/158)
+
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)  
 The new Features popup tab allows toggling Plume features on or off.  
 Playback speed control is introduced: a speed button with an integrated slider lets users pick between presets (0.5×, 1×, 1.5×, 2×, 3×) or enter a custom value; a live badge shows the active multiplier at a glance.  
