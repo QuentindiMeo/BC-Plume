@@ -76,8 +76,10 @@ export const setupHotkeys = (
   };
 
   const handleKeydown = (e: KeyboardEvent) => {
+    const target = (e.composedPath()[0] ?? e.target) as HTMLElement;
     const userIsTypingInInput =
-      (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) && !e.target.readOnly;
+      ((target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) && !target.readOnly) ||
+      target?.isContentEditable;
     if (userIsTypingInInput) return;
 
     const flags = appCore.getState().featureFlags;

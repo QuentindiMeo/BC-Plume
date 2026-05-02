@@ -216,3 +216,86 @@ describe("setupHotkeys — feature flag guards", () => {
     expect(noopHandlers.handleLoopCycle).toHaveBeenCalled();
   });
 });
+
+describe("setupHotkeys — input/textarea guard", () => {
+  const noopHandlers = {
+    handleSpeedCycle: vi.fn(),
+    handleTrackBackward: vi.fn(),
+    handleTimeBackward: vi.fn(),
+    handlePlayPause: vi.fn(),
+    handleTimeForward: vi.fn(),
+    handleTrackForward: vi.fn(),
+    handleLoopCycle: vi.fn(),
+    handleMuteToggle: vi.fn(),
+    toggleFullscreenMode: vi.fn(),
+  };
+
+  let cleanup: () => void;
+
+  beforeEach(() => {
+    fakeAppCore = new FakeAppCore();
+    cleanup = setupHotkeys(noopHandlers, DEFAULT_HOTKEYS);
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  const fireHotkeyFrom = (target: EventTarget, opts: EventInit = {}): KeyboardEvent => {
+    const { code, label: key } = DEFAULT_HOTKEYS.MUTE;
+    const event = new KeyboardEvent("keydown", { code, key, bubbles: true, cancelable: true, ...opts });
+    target.dispatchEvent(event);
+    return event;
+  };
+
+  it("does not trigger hotkey when typing in an <input>", () => {
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    const event = fireHotkeyFrom(input);
+    expect(event.defaultPrevented).toBe(false);
+    expect(noopHandlers.handleMuteToggle).not.toHaveBeenCalled();
+    document.body.removeChild(input);
+  });
+
+  it("does not trigger hotkey when typing in a <textarea>", () => {
+    const textarea = document.createElement("textarea");
+    document.body.appendChild(textarea);
+    const event = fireHotkeyFrom(textarea);
+    expect(event.defaultPrevented).toBe(false);
+    expect(noopHandlers.handleMuteToggle).not.toHaveBeenCalled();
+    document.body.removeChild(textarea);
+  });
+
+  it("does not trigger hotkey when typing in a contenteditable element", () => {
+    const div = document.createElement("div");
+    div.contentEditable = "true";
+    document.body.appendChild(div);
+    const event = fireHotkeyFrom(div);
+    expect(event.defaultPrevented).toBe(false);
+    expect(noopHandlers.handleMuteToggle).not.toHaveBeenCalled();
+    document.body.removeChild(div);
+  });
+
+  it("still triggers hotkey when the <input> is readonly", () => {
+    const input = document.createElement("input");
+    input.readOnly = true;
+    document.body.appendChild(input);
+    const event = fireHotkeyFrom(input);
+    expect(event.defaultPrevented).toBe(true);
+    expect(noopHandlers.handleMuteToggle).toHaveBeenCalled();
+    document.body.removeChild(input);
+  });
+
+  it("detects real target via composedPath for an <input> inside a shadow DOM", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const shadow = host.attachShadow({ mode: "open" });
+    const input = document.createElement("input");
+    shadow.appendChild(input);
+    const event = fireHotkeyFrom(input, { composed: true });
+    expect(event.defaultPrevented).toBe(false);
+    expect(noopHandlers.handleMuteToggle).not.toHaveBeenCalled();
+    document.body.removeChild(host);
+  });
+});
