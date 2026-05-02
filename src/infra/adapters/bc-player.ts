@@ -103,8 +103,8 @@ export class BcPlayerAdapter implements BcPlayerPort {
     return this.query<HTMLElement>(BC_ELEM_SELECTORS.playerParent);
   }
 
-  getInfoSection(): HTMLElement | null {
-    return this.query<HTMLElement>(BC_ELEM_SELECTORS.infoSection);
+  getInfoSection(): HTMLDivElement | null {
+    return this.query<HTMLDivElement>(BC_ELEM_SELECTORS.infoSection);
   }
 
   getTrackTitleElement(): HTMLElement | null {
