@@ -23,7 +23,8 @@
     "allowUnusedLabels": false,
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@lang/*": ["./_locales/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],

@@ -20,7 +20,7 @@
     "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
     "format": "pnpm prettier:fix && pnpm eslint:fix",
     "prepare": "tsc --noEmit && husky",
-    "publish": "pnpm run deploy && node scripts/zip-sources.js",
+    "ship": "pnpm run deploy && node scripts/zip-sources.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "pnpm test tests/a11y/",
