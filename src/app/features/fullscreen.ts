@@ -1,5 +1,6 @@
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   applyPlaybackControlsSize,
@@ -14,7 +15,6 @@ import {
   setupSpeedLabelClickBehavior,
   setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
-import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { handleMuteToggle } from "@/app/features/ui/volume";
@@ -279,6 +279,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
   // Mutable ref for the tracklist cleanup — replaced each time the tracklist is re-initialized live.
   let tracklistCleanupRef: CleanupCallback = () => {};
+  // Last known currentTime — used to detect seeks (discontinuous jumps) and re-anchor the visualizer.
+  let lastCurrentTime = 0;
 
   const initTracklist = (): void => {
     const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup } = createTracklistToggle();
@@ -314,10 +316,15 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       renderPlayPauseButton(elements, isPlaying);
       if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
-    appCore.subscribe("currentTime", () => {
+    appCore.subscribe("currentTime", (currentTime) => {
       renderProgressSlider(elements, appCore.computed.progressPercentage());
       renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
+      // Re-anchor the visualizer's beat phase when a seek is detected (time jump > 2s)
+      if (vizCanvas && Math.abs(currentTime - lastCurrentTime) > 2) {
+        syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
+      }
+      lastCurrentTime = currentTime;
     }),
     appCore.subscribe("duration", () => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
@@ -457,6 +464,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderTrackTitle(elements, appState.trackTitle);
   renderTrackNumber(elements, appState.trackNumber);
   if (flags.loopModes) renderLoopButton(elements, appState.loopMode);
+  lastCurrentTime = appState.currentTime ?? 0;
 
   // Return cleanup function to unsubscribe all listeners
   return () => {

@@ -36,12 +36,21 @@ beforeEach(() => {
 });
 
 describe("runVisualizer", () => {
-  it("calls start with the detected BPM for the current track", () => {
+  it("calls start with the detected BPM and current audio time", () => {
     withBpm(140);
 
     runVisualizer(fakeCanvas);
 
-    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 140);
+    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 140, 0); // currentTime defaults to 0
+  });
+
+  it("passes the current audio position as audioTime to start", () => {
+    withBpm(140);
+    fakeAppCore.dispatch({ type: "SET_CURRENT_TIME" as never, payload: 42.5 as never });
+
+    runVisualizer(fakeCanvas);
+
+    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 140, 42.5);
   });
 
   it("is a no-op when BPM has not been detected yet (no trackNumber in state)", () => {
@@ -81,7 +90,7 @@ describe("syncVisualizerWithPlayback", () => {
 
     syncVisualizerWithPlayback(true, fakeCanvas);
 
-    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 128);
+    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 128, 0);
   });
 
   it("is a no-op when isPlaying is true but BPM is not yet available", () => {

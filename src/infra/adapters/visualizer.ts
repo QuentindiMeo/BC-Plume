@@ -1,5 +1,6 @@
 import type { AudioVisualizerPort } from "@/domain/ports/visualizer";
 
+const MILLISECONDS_PER_MINUTE = 60000;
 const BAR_COUNT = 64;
 const BAR_GAP = 1;
 const BAR_MAX_HEIGHT = 0.25; // Max bar height as a fraction of canvas height
@@ -25,16 +26,21 @@ const barNoise = (i: number, beat: number): number => {
 export class AudioVisualizerAdapter implements AudioVisualizerPort {
   private rafHandle: number | null = null;
 
-  start(canvas: HTMLCanvasElement, bpm: number): void {
+  start(canvas: HTMLCanvasElement, bpm: number, audioTime: number): void {
     if (this.isRunning()) this.stop();
 
-    const beatInterval = 60000 / bpm;
+    const beatInterval = MILLISECONDS_PER_MINUTE / bpm;
+    // Lazy reference timestamp: set on first frame so that audioMs starts exactly at audioTime.
+    // refTimestamp = firstTimestamp - audioTime * 1000  →  audioMs = timestamp - refTimestamp = audioTime * 1000 + elapsed
+    let refTimestamp: number | null = null;
 
     const draw = (timestamp: number): void => {
       this.rafHandle = requestAnimationFrame(draw);
 
-      const phase = (timestamp % beatInterval) / beatInterval;
-      const beat = Math.floor(timestamp / beatInterval);
+      if (refTimestamp === null) refTimestamp = timestamp - audioTime * 1000;
+      const audioMs = timestamp - refTimestamp;
+      const phase = (audioMs % beatInterval) / beatInterval;
+      const beat = Math.floor(audioMs / beatInterval);
       const energy = beatEnvelope(phase);
 
       const ctx = canvas.getContext("2d");

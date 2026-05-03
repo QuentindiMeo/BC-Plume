@@ -2,27 +2,27 @@ import { getTrackAudioInstance, getVisualizerInstance } from "@/app/stores/adapt
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import type { AppCore } from "@/domain/ports/app-core";
 
-const resolveCurrentBpm = (state: AppCore): number | null => {
-  const match = state.trackNumber?.match(/(\d+)/);
+const resolveCurrentBpm = (appState: AppCore): number | null => {
+  const match = appState.trackNumber?.match(/(\d+)/);
   if (match) {
     const currentNum = Number(match[1]);
     const infos = getTrackAudioInstance().getTrackAudioInfos();
     const info = infos.find((i) => i.trackNumber === currentNum);
-    const bpm = info?.trackUrl ? state.trackBpms[info.trackUrl]?.bpm : null;
+    const bpm = info?.trackUrl ? appState.trackBpms[info.trackUrl]?.bpm : null;
     if (bpm) return bpm;
   }
   return null;
 };
 
 export const runVisualizer = (canvas: HTMLCanvasElement): void => {
-  const state = getAppCoreInstance().getState();
-  if (!state.featureFlags.visualizer) return;
+  const appState = getAppCoreInstance().getState();
+  if (!appState.featureFlags.visualizer) return;
 
-  const bpm = resolveCurrentBpm(state);
+  const bpm = resolveCurrentBpm(appState);
   if (!bpm) return;
 
   const visualizer = getVisualizerInstance();
-  visualizer.start(canvas, bpm);
+  visualizer.start(canvas, bpm, appState.currentTime ?? 0);
 };
 
 export const stopVisualizer = (): void => {
