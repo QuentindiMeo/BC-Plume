@@ -29,22 +29,20 @@ export class AudioVisualizerAdapter implements AudioVisualizerPort {
   start(canvas: HTMLCanvasElement, bpm: number, audioTime: number): void {
     if (this.isRunning()) this.stop();
 
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
     const beatInterval = MILLISECONDS_PER_MINUTE / bpm;
     // Lazy reference timestamp: set on first frame so that audioMs starts exactly at audioTime.
     // refTimestamp = firstTimestamp - audioTime * 1000  →  audioMs = timestamp - refTimestamp = audioTime * 1000 + elapsed
     let refTimestamp: number | null = null;
 
     const draw = (timestamp: number): void => {
-      this.rafHandle = requestAnimationFrame(draw);
-
       if (refTimestamp === null) refTimestamp = timestamp - audioTime * 1000;
       const audioMs = timestamp - refTimestamp;
       const phase = (audioMs % beatInterval) / beatInterval;
       const beat = Math.floor(audioMs / beatInterval);
       const energy = beatEnvelope(phase);
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
 
       const { width, height } = canvas;
       ctx.clearRect(0, 0, width, height);
@@ -56,6 +54,8 @@ export class AudioVisualizerAdapter implements AudioVisualizerPort {
         ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(amplitude, 1).toFixed(2)})`;
         ctx.fillRect(i * (barWidth + BAR_GAP), height - barHeight, barWidth, barHeight);
       }
+
+      this.rafHandle = requestAnimationFrame(draw);
     };
 
     this.rafHandle = requestAnimationFrame(draw);

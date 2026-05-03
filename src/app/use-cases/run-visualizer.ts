@@ -9,7 +9,7 @@ const resolveCurrentBpm = (appState: AppCore): number | null => {
     const infos = getTrackAudioInstance().getTrackAudioInfos();
     const info = infos.find((i) => i.trackNumber === currentNum);
     const bpm = info?.trackUrl ? appState.trackBpms[info.trackUrl]?.bpm : null;
-    if (bpm) return bpm;
+    if (!!bpm && Number.isFinite(bpm)) return bpm;
   }
   return null;
 };

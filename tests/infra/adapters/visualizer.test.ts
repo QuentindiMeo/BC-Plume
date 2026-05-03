@@ -80,15 +80,14 @@ describe("start", () => {
     expect(mockRaf).toHaveBeenCalledTimes(2);
   });
 
-  it("skips drawing when canvas context is unavailable", () => {
+  it("does not start the loop when canvas context is unavailable", () => {
     mockGetContext.mockReturnValue(null);
 
     const viz = new AudioVisualizerAdapter();
     viz.start(fakeCanvas, 120, 0);
-    capturedDrawCallback!(10);
 
-    expect(mockClearRect).not.toHaveBeenCalled();
-    expect(mockFillRect).not.toHaveBeenCalled();
+    expect(mockRaf).not.toHaveBeenCalled();
+    expect(viz.isRunning()).toBe(false);
   });
 
   it("anchors beat phase to the given audioTime — drawing at audioTime offset produces same energy as at t=0", () => {
