@@ -17,9 +17,9 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
   { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
-  { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
-  { flagKey: "visualizer", labelKey: "LABEL__FEATURES__VISUALIZER" },
   { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
+  { flagKey: "visualizer", labelKey: "LABEL__FEATURES__VISUALIZER" },
+  { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
 ] as const;
 
 const areAllDefaults = (flags: FeatureFlags): boolean =>
@@ -67,6 +67,18 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.addEventListener("click", () => {
       currentFlags[flagKey] = !currentFlags[flagKey];
       toggle.ariaChecked = String(currentFlags[flagKey]);
+
+      // visualizer requires bpmDetect: enforce the dependency in both directions
+      if (flagKey === "visualizer" && currentFlags.visualizer) {
+        currentFlags.bpmDetect = true;
+        const bpmBtn = toggleBtns.get("bpmDetect");
+        if (bpmBtn) bpmBtn.ariaChecked = "true";
+      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect) {
+        currentFlags.visualizer = false;
+        const vizBtn = toggleBtns.get("visualizer");
+        if (vizBtn) vizBtn.ariaChecked = "false";
+      }
+
       persist(currentFlags);
       syncResetVisibility();
     });

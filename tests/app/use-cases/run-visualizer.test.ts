@@ -20,6 +20,15 @@ import { runVisualizer, stopVisualizer, syncVisualizerWithPlayback } from "@/app
 const TRACK_URL = "https://bandcamp.com/track/1";
 const fakeCanvas = {} as HTMLCanvasElement;
 
+const withBpm = (bpm: number | null, visualizer = true) => {
+  fakeAppCore = new FakeAppCore({
+    featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer },
+    trackNumber: "1/12",
+    trackBpms: { [TRACK_URL]: { bpm, loading: bpm === null, error: false } },
+  });
+  mockGetTrackAudioInfos.mockReturnValue([{ trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: "" }]);
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
   fakeAppCore = new FakeAppCore({ featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: true } });
@@ -27,41 +36,30 @@ beforeEach(() => {
 });
 
 describe("runVisualizer", () => {
-  it("calls start with the canvas and default BPM (120) when no BPM is detected", () => {
-    runVisualizer(fakeCanvas);
-
-    expect(mockStart).toHaveBeenCalledOnce();
-    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 120);
-  });
-
   it("calls start with the detected BPM for the current track", () => {
-    fakeAppCore = new FakeAppCore({
-      featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: true },
-      trackNumber: "1/12",
-      trackBpms: { [TRACK_URL]: { bpm: 140, loading: false, error: false } },
-    });
-    mockGetTrackAudioInfos.mockReturnValue([{ trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: "" }]);
+    withBpm(140);
 
     runVisualizer(fakeCanvas);
 
     expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 140);
   });
 
-  it("falls back to default BPM when track is known but BPM entry is null", () => {
-    fakeAppCore = new FakeAppCore({
-      featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: true },
-      trackNumber: "1/12",
-      trackBpms: { [TRACK_URL]: { bpm: null, loading: true, error: false } },
-    });
-    mockGetTrackAudioInfos.mockReturnValue([{ trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: "" }]);
+  it("is a no-op when BPM has not been detected yet (no trackNumber in state)", () => {
+    runVisualizer(fakeCanvas); // default state: no trackNumber
+
+    expect(mockStart).not.toHaveBeenCalled();
+  });
+
+  it("is a no-op when BPM entry is null (detection in progress)", () => {
+    withBpm(null);
 
     runVisualizer(fakeCanvas);
 
-    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 120);
+    expect(mockStart).not.toHaveBeenCalled();
   });
 
   it("is a no-op when featureFlags.visualizer is false", () => {
-    fakeAppCore = new FakeAppCore({ featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: false } });
+    withBpm(140, false);
 
     runVisualizer(fakeCanvas);
 
@@ -78,11 +76,18 @@ describe("stopVisualizer", () => {
 });
 
 describe("syncVisualizerWithPlayback", () => {
-  it("starts the visualizer when isPlaying is true", () => {
+  it("starts the visualizer with the detected BPM when isPlaying is true", () => {
+    withBpm(128);
+
     syncVisualizerWithPlayback(true, fakeCanvas);
 
-    expect(mockStart).toHaveBeenCalledOnce();
-    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 120);
+    expect(mockStart).toHaveBeenCalledWith(fakeCanvas, 128);
+  });
+
+  it("is a no-op when isPlaying is true but BPM is not yet available", () => {
+    syncVisualizerWithPlayback(true, fakeCanvas);
+
+    expect(mockStart).not.toHaveBeenCalled();
   });
 
   it("stops the visualizer when isPlaying is false", () => {
@@ -92,7 +97,7 @@ describe("syncVisualizerWithPlayback", () => {
   });
 
   it("does not start the visualizer when the flag is off", () => {
-    fakeAppCore = new FakeAppCore({ featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: false } });
+    withBpm(140, false);
 
     syncVisualizerWithPlayback(true, fakeCanvas);
 

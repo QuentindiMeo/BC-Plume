@@ -293,14 +293,20 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   subscriptions.push(
     appCore.subscribe("pageType", () => {
       // because available loop modes depend on the page type
-      const withLoopModes = appCore.getState().featureFlags.loopModes;
-      if (withLoopModes) renderLoopButton(elements, appCore.getState().loopMode);
+      const { featureFlags, loopMode } = appCore.getState();
+      if (featureFlags.loopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("trackTitle", (trackTitle) => {
       renderTrackTitle(elements, trackTitle);
     }),
     appCore.subscribe("trackNumber", (trackNumber) => {
       renderTrackNumber(elements, trackNumber);
+      // Track changed: stop the old BPM loop, then restart if BPM is already known for the new track
+      if (vizCanvas) {
+        stopVisualizer();
+        const { isPlaying } = appCore.getState();
+        syncVisualizerWithPlayback(isPlaying, vizCanvas);
+      }
     }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
@@ -318,7 +324,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
     appCore.subscribe("loopMode", (loopMode) => {
-      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      const { featureFlags } = appCore.getState();
+      const withLoopModes = featureFlags.loopModes;
       if (withLoopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("volume", (volume) => {
@@ -326,6 +333,11 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     }),
     appCore.subscribe("isMuted", (isMuted) => {
       renderMuteButton(elements, isMuted);
+    }),
+    appCore.subscribe("trackBpms", () => {
+      // BPM resolved for some track: (re-)start visualizer if the current track's BPM just became available
+      const { isPlaying } = appCore.getState();
+      if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
     appCore.subscribe("featureFlags", (flags, prevFlags) => {
       if (flags.goToTrack !== prevFlags.goToTrack) {
@@ -350,7 +362,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         }
       }
       if (flags.loopModes && !prevFlags.loopModes) {
-        renderLoopButton(elements, appCore.getState().loopMode);
+        const { loopMode } = appCore.getState();
+        renderLoopButton(elements, loopMode);
       }
       if (flags.visualizer !== prevFlags.visualizer && vizCanvas) {
         vizCanvas.classList.toggle("plume-feature-hidden", !flags.visualizer);
@@ -407,7 +420,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
 
   // Initialize fullscreen UI with current state using the same rendering functions
-  const state = appCore.getState();
+  const appState = appCore.getState();
 
   // Clone child nodes from controlled element instead of innerHTML
   elements.headerContainer.textContent = "";
@@ -432,12 +445,12 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderProgressSlider(elements, appCore.computed.progressPercentage());
   renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
   renderDurationDisplay(elements, appCore.computed.formattedDuration());
-  renderPlayPauseButton(elements, state.isPlaying);
-  renderVolume(elements, state.volume);
-  renderMuteButton(elements, state.isMuted);
-  renderTrackTitle(elements, state.trackTitle);
-  renderTrackNumber(elements, state.trackNumber);
-  if (flags.loopModes) renderLoopButton(elements, state.loopMode);
+  renderPlayPauseButton(elements, appState.isPlaying);
+  renderVolume(elements, appState.volume);
+  renderMuteButton(elements, appState.isMuted);
+  renderTrackTitle(elements, appState.trackTitle);
+  renderTrackNumber(elements, appState.trackNumber);
+  if (flags.loopModes) renderLoopButton(elements, appState.loopMode);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
