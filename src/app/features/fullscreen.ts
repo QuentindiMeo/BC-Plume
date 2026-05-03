@@ -14,6 +14,7 @@ import {
   setupSpeedLabelClickBehavior,
   setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
+import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { handleMuteToggle } from "@/app/features/ui/volume";
@@ -301,12 +302,13 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     }),
     appCore.subscribe("trackNumber", (trackNumber) => {
       renderTrackNumber(elements, trackNumber);
+      const { isPlaying, trackBpms } = appCore.getState();
       // Track changed: stop the old BPM loop, then restart if BPM is already known for the new track
       if (vizCanvas) {
         stopVisualizer();
-        const { isPlaying } = appCore.getState();
         syncVisualizerWithPlayback(isPlaying, vizCanvas);
       }
+      syncBpmDisplay(trackBpms);
     }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
@@ -334,8 +336,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     appCore.subscribe("isMuted", (isMuted) => {
       renderMuteButton(elements, isMuted);
     }),
-    appCore.subscribe("trackBpms", () => {
-      // BPM resolved for some track: (re-)start visualizer if the current track's BPM just became available
+    appCore.subscribe("trackBpms", (trackBpms) => {
+      // BPM resolved for some track: update BPM display and (re-)start visualizer if the current track's BPM just became available
+      syncBpmDisplay(trackBpms);
       const { isPlaying } = appCore.getState();
       if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
@@ -410,6 +413,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     subscriptions.push(setupSpeedLabelClickBehavior(elements.speedWrapper));
   }
   elements.loopBtn?.addEventListener("click", handleLoopCycle);
+
+  const fsBpmDetectAllBtn = clone.querySelector<HTMLButtonElement>(PLUME_ELEM_SELECTORS.bpmDetectAllBtn);
+  if (fsBpmDetectAllBtn) wireDetectAllBpmButton(fsBpmDetectAllBtn);
 
   const flags = appCore.getState().featureFlags;
 
@@ -662,6 +668,9 @@ export const toggleFullscreenMode = (): void => {
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
   setupFullscreenFocusTrap(overlay);
+
+  // Initialize BPM display in the freshly mounted overlay (querySelectorAll now reaches the clone)
+  syncBpmDisplay(appCore.getState().trackBpms);
 
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));

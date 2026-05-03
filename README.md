@@ -14,7 +14,7 @@
 &#xa0;
 
 <div id="badges1" align="center">
-  <a href="#%EF%B8%8F-roadmap"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.12.1-blue?logo=semver" /></a>
+  <a href="#%EF%B8%8F-roadmap"><img alt="Last version released" src="https://img.shields.io/badge/release-v1.13.0-blue?logo=semver" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/releases"><img alt="GitHub last release date" src="https://img.shields.io/github/last-commit/QuentindiMeo/BC-Plume?label=date%20of%20last%20release&color=blueviolet&logo=clarifai" /></a>
 </div>
 <div id="badges2" align="center">

@@ -18,7 +18,8 @@ vi.mock("@/app/stores/adapters", () => ({
 vi.mock("@/app/use-cases/detect-bpm", () => ({ detectBpmForAllTracks: vi.fn() }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string, args?: string[]) => (args ? `${k}:${args.join(",")}` : k) }));
 
-import { createBpmDisplaySection, syncBpmDisplay } from "@/app/features/ui/bpm-display";
+import { createBpmDisplaySection, syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
+import { detectBpmForAllTracks } from "@/app/use-cases/detect-bpm";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 
 describe("createBpmDisplaySection", () => {
@@ -110,6 +111,58 @@ describe("syncBpmDisplay", () => {
 
     syncBpmDisplay({ "/track/song-one": { bpm: 128, loading: true, error: false } });
     expect(getValueEl().ariaLabel).toBe("ARIA__BPM__DISPLAY");
+  });
+
+  it("updates all BPM value elements in the document (main player + fullscreen clone)", () => {
+    // Simulate fullscreen clone: a second section appended after the first
+    const clone = createBpmDisplaySection(false);
+    document.body.appendChild(clone);
+
+    syncBpmDisplay({ "/track/song-one": { bpm: 140, loading: false, error: false } });
+
+    const allValueEls = document.querySelectorAll<HTMLElement>(PLUME_ELEM_SELECTORS.bpmValue);
+    expect(allValueEls).toHaveLength(2);
+    allValueEls.forEach((el) => expect(el.textContent).toBe("140"));
+  });
+});
+
+describe("wireDetectAllBpmButton", () => {
+  let btn: HTMLButtonElement;
+  let resolveFn: () => void;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    btn = document.createElement("button");
+    resolveFn = () => {};
+    (detectBpmForAllTracks as ReturnType<typeof vi.fn>).mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveFn = resolve;
+      })
+    );
+    wireDetectAllBpmButton(btn);
+  });
+
+  it("triggers detectBpmForAllTracks on click", () => {
+    btn.click();
+    expect(detectBpmForAllTracks).toHaveBeenCalledOnce();
+  });
+
+  it("disables the button during detection", () => {
+    btn.click();
+    expect(btn.disabled).toBe(true);
+  });
+
+  it("re-enables the button after detection completes", async () => {
+    btn.click();
+    resolveFn();
+    await Promise.resolve();
+    expect(btn.disabled).toBe(false);
+  });
+
+  it("ignores clicks while already disabled", () => {
+    btn.click();
+    btn.click();
+    expect(detectBpmForAllTracks).toHaveBeenCalledOnce();
   });
 });
 

@@ -2,7 +2,7 @@ import type { AudioVisualizerPort } from "@/domain/ports/visualizer";
 
 const BAR_COUNT = 64;
 const BAR_GAP = 1;
-const BAR_MAX_HEIGHT = 0.5; // Max bar height as a fraction of canvas height
+const BAR_MAX_HEIGHT = 0.25; // Max bar height as a fraction of canvas height
 
 // Quick attack, exponential decay — simulates a kick/hit envelope on each beat
 const beatEnvelope = (phase: number): number => {
