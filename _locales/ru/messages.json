@@ -346,6 +346,8 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Полноэкранный музыкальный плеер" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Аудио-визуализатор" },
+
   "POPUP_TITLE": { "message": "Настройки" },
   "ARIA__POPUP__TABLIST": { "message": "Разделы настроек" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Обновите страницу, чтобы изменения вступили в силу." },

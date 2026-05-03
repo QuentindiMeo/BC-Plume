@@ -1,5 +1,6 @@
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   applyPlaybackControlsSize,
@@ -20,16 +21,23 @@ import { handleMuteToggle } from "@/app/features/ui/volume";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import {
+  runVisualizer,
+  seekToProgress,
+  setVolume,
+  stopVisualizer,
+  syncVisualizerWithPlayback,
+  toggleDurationDisplay,
+} from "@/app/use-cases";
 import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
-import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
+import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -80,6 +88,8 @@ const exitFullscreenMode = (): void => {
 
   const appCore = getAppCoreInstance();
   appCore.dispatch(coreActions.setIsFullscreen(false));
+
+  stopVisualizer();
 
   // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
   if (fullscreenCleanupCallback) {
@@ -269,6 +279,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 
   // Mutable ref for the tracklist cleanup — replaced each time the tracklist is re-initialized live.
   let tracklistCleanupRef: CleanupCallback = () => {};
+  // Last known currentTime — used to detect seeks (discontinuous jumps) and re-anchor the visualizer.
+  let lastCurrentTime = 0;
 
   const initTracklist = (): void => {
     const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup } = createTracklistToggle();
@@ -284,22 +296,35 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   subscriptions.push(
     appCore.subscribe("pageType", () => {
       // because available loop modes depend on the page type
-      const withLoopModes = appCore.getState().featureFlags.loopModes;
-      if (withLoopModes) renderLoopButton(elements, appCore.getState().loopMode);
+      const { featureFlags, loopMode } = appCore.getState();
+      if (featureFlags.loopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("trackTitle", (trackTitle) => {
       renderTrackTitle(elements, trackTitle);
     }),
     appCore.subscribe("trackNumber", (trackNumber) => {
       renderTrackNumber(elements, trackNumber);
+      const { isPlaying, trackBpms } = appCore.getState();
+      // Track changed: stop the old BPM loop, then restart if BPM is already known for the new track
+      if (vizCanvas) {
+        stopVisualizer();
+        syncVisualizerWithPlayback(isPlaying, vizCanvas);
+      }
+      syncBpmDisplay(trackBpms);
     }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
+      if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
-    appCore.subscribe("currentTime", () => {
+    appCore.subscribe("currentTime", (currentTime) => {
       renderProgressSlider(elements, appCore.computed.progressPercentage());
       renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
+      // Re-anchor the visualizer's beat phase when a seek is detected (time jump > 2s)
+      if (vizCanvas && Math.abs(currentTime - lastCurrentTime) > 2) {
+        syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
+      }
+      lastCurrentTime = currentTime;
     }),
     appCore.subscribe("duration", () => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
@@ -308,7 +333,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
     appCore.subscribe("loopMode", (loopMode) => {
-      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      const { featureFlags } = appCore.getState();
+      const withLoopModes = featureFlags.loopModes;
       if (withLoopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("volume", (volume) => {
@@ -316,6 +342,12 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     }),
     appCore.subscribe("isMuted", (isMuted) => {
       renderMuteButton(elements, isMuted);
+    }),
+    appCore.subscribe("trackBpms", (trackBpms) => {
+      // BPM resolved for some track: update BPM display and (re-)start visualizer if the current track's BPM just became available
+      syncBpmDisplay(trackBpms);
+      const { isPlaying } = appCore.getState();
+      if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
     appCore.subscribe("featureFlags", (flags, prevFlags) => {
       if (flags.goToTrack !== prevFlags.goToTrack) {
@@ -340,7 +372,13 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         }
       }
       if (flags.loopModes && !prevFlags.loopModes) {
-        renderLoopButton(elements, appCore.getState().loopMode);
+        const { loopMode } = appCore.getState();
+        renderLoopButton(elements, loopMode);
+      }
+      if (flags.visualizer !== prevFlags.visualizer && vizCanvas) {
+        vizCanvas.classList.toggle("plume-feature-hidden", !flags.visualizer);
+        if (flags.visualizer) runVisualizer(vizCanvas);
+        else stopVisualizer();
       }
       const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (fsControls) applyPlaybackControlsSize(fsControls);
@@ -383,10 +421,19 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   }
   elements.loopBtn?.addEventListener("click", handleLoopCycle);
 
+  const fsBpmDetectAllBtn = clone.querySelector<HTMLButtonElement>(PLUME_ELEM_SELECTORS.bpmDetectAllBtn);
+  if (fsBpmDetectAllBtn) wireDetectAllBpmButton(fsBpmDetectAllBtn);
+
   const flags = appCore.getState().featureFlags;
 
+  const vizCanvas =
+    clone
+      .closest<HTMLDivElement>(PLUME_ELEM_SELECTORS.fullscreenOverlay)
+      ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.visualizerCanvas) ?? null;
+  if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
+
   // Initialize fullscreen UI with current state using the same rendering functions
-  const state = appCore.getState();
+  const appState = appCore.getState();
 
   // Clone child nodes from controlled element instead of innerHTML
   elements.headerContainer.textContent = "";
@@ -411,12 +458,13 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderProgressSlider(elements, appCore.computed.progressPercentage());
   renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
   renderDurationDisplay(elements, appCore.computed.formattedDuration());
-  renderPlayPauseButton(elements, state.isPlaying);
-  renderVolume(elements, state.volume);
-  renderMuteButton(elements, state.isMuted);
-  renderTrackTitle(elements, state.trackTitle);
-  renderTrackNumber(elements, state.trackNumber);
-  if (flags.loopModes) renderLoopButton(elements, state.loopMode);
+  renderPlayPauseButton(elements, appState.isPlaying);
+  renderVolume(elements, appState.volume);
+  renderMuteButton(elements, appState.isMuted);
+  renderTrackTitle(elements, appState.trackTitle);
+  renderTrackNumber(elements, appState.trackNumber);
+  if (flags.loopModes) renderLoopButton(elements, appState.loopMode);
+  lastCurrentTime = appState.currentTime ?? 0;
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
@@ -446,6 +494,13 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   background.id = PLUME_ELEM_SELECTORS.fullscreenBackground.split("#")[1];
   background.style.backgroundImage = `url("${encodeURI(artworkUrl)}")`;
   overlay.appendChild(background);
+
+  const vizCanvas = document.createElement("canvas");
+  vizCanvas.id = PLUME_ELEM_SELECTORS.visualizerCanvas.split("#")[1];
+  vizCanvas.ariaHidden = "true";
+  const { featureFlags } = getAppCoreInstance().getState();
+  if (!featureFlags.visualizer) vizCanvas.classList.add("plume-feature-hidden");
+  overlay.appendChild(vizCanvas);
 
   const contentContainer = document.createElement("div");
   contentContainer.id = PLUME_ELEM_SELECTORS.fullscreenContent.split("#")[1];
@@ -621,6 +676,9 @@ export const toggleFullscreenMode = (): void => {
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
   setupFullscreenFocusTrap(overlay);
+
+  // Initialize BPM display in the freshly mounted overlay (querySelectorAll now reaches the clone)
+  syncBpmDisplay(appCore.getState().trackBpms);
 
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));

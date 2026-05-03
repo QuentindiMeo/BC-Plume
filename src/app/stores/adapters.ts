@@ -2,10 +2,14 @@ import type { BcPlayerPort } from "@/domain/ports/bc-player";
 import type { IMessageReceiver } from "@/domain/ports/messaging";
 import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import type { TrackAudioPort } from "@/domain/ports/track-audio";
+import type { AudioVisualizerPort } from "@/domain/ports/visualizer";
 
 // Populated once at the composition root (main.ts), before launchPlume() runs
 let bcPlayerInstance: BcPlayerPort | null = null;
 let musicPlayerInstance: MusicPlayerPort | null = null;
+let messageReceiverInstance: IMessageReceiver | null = null;
+let trackAudioInstance: TrackAudioPort | null = null;
+let visualizerInstance: AudioVisualizerPort | null = null;
 
 export const registerBcPlayer = (instance: BcPlayerPort): void => {
   bcPlayerInstance = instance;
@@ -13,6 +17,18 @@ export const registerBcPlayer = (instance: BcPlayerPort): void => {
 
 export const registerMusicPlayer = (instance: MusicPlayerPort): void => {
   musicPlayerInstance = instance;
+};
+
+export const registerMessageReceiver = (receiver: IMessageReceiver): void => {
+  messageReceiverInstance = receiver;
+};
+
+export const registerTrackAudio = (instance: TrackAudioPort): void => {
+  trackAudioInstance = instance;
+};
+
+export const registerVisualizer = (instance: AudioVisualizerPort): void => {
+  visualizerInstance = instance;
 };
 
 export const getBcPlayerInstance = (): BcPlayerPort => {
@@ -25,25 +41,18 @@ export const getMusicPlayerInstance = (): MusicPlayerPort => {
   return musicPlayerInstance;
 };
 
-let messageReceiverInstance: IMessageReceiver | null = null;
-
-export const registerMessageReceiver = (receiver: IMessageReceiver): void => {
-  messageReceiverInstance = receiver;
-};
-
 export const getMessageReceiverInstance = (): IMessageReceiver => {
   if (!messageReceiverInstance)
     throw new Error("IMessageReceiver not registered — call registerMessageReceiver() first.");
   return messageReceiverInstance;
 };
 
-let trackAudioInstance: TrackAudioPort | null = null;
-
-export const registerTrackAudio = (instance: TrackAudioPort): void => {
-  trackAudioInstance = instance;
-};
-
 export const getTrackAudioInstance = (): TrackAudioPort => {
   if (!trackAudioInstance) throw new Error("TrackAudioPort not registered — call registerTrackAudio() first.");
   return trackAudioInstance;
+};
+
+export const getVisualizerInstance = (): AudioVisualizerPort => {
+  if (!visualizerInstance) throw new Error("AudioVisualizerPort not registered — call registerVisualizer() first.");
+  return visualizerInstance;
 };

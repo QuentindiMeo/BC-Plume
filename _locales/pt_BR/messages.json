@@ -346,6 +346,8 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reprodutor de música em tela cheia" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de áudio" },
+
   "POPUP_TITLE": { "message": "Painel de configurações" },
   "ARIA__POPUP__TABLIST": { "message": "Seções de configurações" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Atualize a página para aplicar a alteração." },

@@ -673,6 +673,15 @@
       pointer-events-none select-none;
   }
 
+  canvas#plume-visualizer-canvas {
+    @apply absolute top-0 left-0 w-screen h-screen opacity-20 pointer-events-none select-none;
+    z-index: 1; /* above background, below content (z-10000) */
+
+    @media (prefers-reduced-motion: reduce) {
+      @apply hidden;
+    }
+  }
+
   #plume-fullscreen-content {
     @apply relative flex items-center justify-center gap-12 pointer-events-auto z-10000;
 

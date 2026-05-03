@@ -346,6 +346,8 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Redare muzică pe ecran complet" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Vizualizator audio" },
+
   "POPUP_TITLE": { "message": "Panou de setări" },
   "ARIA__POPUP__TABLIST": { "message": "Secțiuni setări" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Reîncarcă pagina pentru a aplica modificarea." },
