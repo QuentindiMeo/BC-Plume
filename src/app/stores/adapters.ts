@@ -3,6 +3,7 @@ import type { IMessageReceiver } from "@/domain/ports/messaging";
 import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import type { TrackAudioPort } from "@/domain/ports/track-audio";
 import type { AudioVisualizerPort } from "@/domain/ports/visualizer";
+import { AdapterNotRegisteredError } from "@/shared/errors";
 
 // Populated once at the composition root (main.ts), before launchPlume() runs
 let bcPlayerInstance: BcPlayerPort | null = null;
@@ -32,27 +33,26 @@ export const registerVisualizer = (instance: AudioVisualizerPort): void => {
 };
 
 export const getBcPlayerInstance = (): BcPlayerPort => {
-  if (!bcPlayerInstance) throw new Error("BcPlayerPort not registered — call registerBcPlayer() first.");
+  if (!bcPlayerInstance) throw new AdapterNotRegisteredError("BcPlayerPort", registerBcPlayer.name);
   return bcPlayerInstance;
 };
 
 export const getMusicPlayerInstance = (): MusicPlayerPort => {
-  if (!musicPlayerInstance) throw new Error("MusicPlayerPort not registered — call registerMusicPlayer() first.");
+  if (!musicPlayerInstance) throw new AdapterNotRegisteredError("MusicPlayerPort", registerMusicPlayer.name);
   return musicPlayerInstance;
 };
 
 export const getMessageReceiverInstance = (): IMessageReceiver => {
-  if (!messageReceiverInstance)
-    throw new Error("IMessageReceiver not registered — call registerMessageReceiver() first.");
+  if (!messageReceiverInstance) throw new AdapterNotRegisteredError("IMessageReceiver", registerMessageReceiver.name);
   return messageReceiverInstance;
 };
 
 export const getTrackAudioInstance = (): TrackAudioPort => {
-  if (!trackAudioInstance) throw new Error("TrackAudioPort not registered — call registerTrackAudio() first.");
+  if (!trackAudioInstance) throw new AdapterNotRegisteredError("TrackAudioPort", registerTrackAudio.name);
   return trackAudioInstance;
 };
 
 export const getVisualizerInstance = (): AudioVisualizerPort => {
-  if (!visualizerInstance) throw new Error("AudioVisualizerPort not registered — call registerVisualizer() first.");
+  if (!visualizerInstance) throw new AdapterNotRegisteredError("AudioVisualizerPort", registerVisualizer.name);
   return visualizerInstance;
 };

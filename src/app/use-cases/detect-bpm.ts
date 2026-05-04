@@ -3,6 +3,7 @@ import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { BPM_FETCH_ACTION, type BpmFetchResponse } from "@/domain/bpm-audio-messages";
 import { coreActions } from "@/domain/ports/app-core";
 import { inferBrowserApi } from "@/shared/browser";
+import { AudioFetchError } from "@/shared/errors";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
@@ -14,7 +15,7 @@ const fetchAudioViaBackground = async (audioStreamUrl: string): Promise<ArrayBuf
   })) as BpmFetchResponse;
 
   if (!response?.ok || !response.data) {
-    throw new Error(response?.error ?? "Background audio fetch failed");
+    throw new AudioFetchError(response?.error ?? "Background audio fetch failed");
   }
 
   return new Uint8Array(response.data).buffer as ArrayBuffer;

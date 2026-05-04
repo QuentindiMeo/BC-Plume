@@ -1,4 +1,5 @@
 import { IBrowserApi } from "@/domain/ports/browser";
+import { BrowserApiError } from "@/shared/errors";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
@@ -14,10 +15,7 @@ export const logDetectedBrowser = (): void => {
 };
 
 export const inferBrowserApi = (): IBrowserApi => {
-  if (!(globalThis as any).browser && !(globalThis as any).chrome)
-    throw new Error(
-      "No compatible browser API found. This extension requires a Chromium-based or Firefox-based browser."
-    );
+  if (!(globalThis as any).browser && !(globalThis as any).chrome) throw new BrowserApiError();
 
   return (globalThis as any).browser ?? (globalThis as any).chrome;
 };
