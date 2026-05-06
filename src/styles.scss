@@ -49,6 +49,10 @@
     }
   }
 
+  ul.tralbumCommands h3.hd {
+    position: static !important;
+  }
+
   .progbar,
   .progbar_empty {
     @apply h-2! rounded! cursor-pointer!;
