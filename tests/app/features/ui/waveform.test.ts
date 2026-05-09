@@ -44,6 +44,7 @@ const makeCanvas = (width = 400, height = 40): HTMLCanvasElement => {
 
 import {
   attachWaveformSeekHandler,
+  clearPeaksCache,
   clearWaveform,
   createWaveformCanvas,
   renderWaveform,
@@ -60,8 +61,9 @@ beforeEach(() => {
   });
   mockDecodeWaveformForCurrentTrack.mockResolvedValue(null);
 
-  // Always reset module-level cache by clearing on a dummy canvas
-  clearWaveform(makeCanvas());
+  // Reset all module-level state between tests
+  clearPeaksCache();
+  clearWaveform(makeCanvas()); // resets decodeAbortFlag
 });
 
 // ─── createWaveformCanvas ────────────────────────────────────────────────────
@@ -285,7 +287,10 @@ describe("triggerWaveformDecode", () => {
     await triggerWaveformDecode(canvas1);
     mockDecodeWaveformForCurrentTrack.mockClear();
 
-    // Second call should use cache without decoding
+    // Simulate track navigation: clearWaveform hides display but preserves cache
+    clearWaveform(canvas1);
+
+    // Second call for the same track uses cache — no decode
     const canvas2 = makeCanvas();
     const ctx2 = makeMockCtx();
     vi.spyOn(canvas2, "getContext").mockReturnValue(ctx2 as unknown as CanvasRenderingContext2D);
@@ -293,6 +298,48 @@ describe("triggerWaveformDecode", () => {
 
     expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
     expect(ctx2.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
+  });
+});
+
+// ─── loading state ───────────────────────────────────────────────────────────
+
+describe("loading state", () => {
+  it("shows canvas with loading class while decode is in progress, removes it after", async () => {
+    let resolveDecode!: (peaks: Float32Array | null) => void;
+    mockDecodeWaveformForCurrentTrack.mockReturnValue(new Promise((r) => (resolveDecode = r)));
+
+    const canvas = makeCanvas();
+    canvas.classList.add("plume-feature-hidden");
+    vi.spyOn(canvas, "getContext").mockReturnValue(makeMockCtx() as unknown as CanvasRenderingContext2D);
+
+    const promise = triggerWaveformDecode(canvas);
+
+    // Synchronous portion has run: canvas visible, loading class present
+    expect(canvas.classList.contains("plume-feature-hidden")).toBe(false);
+    expect(canvas.classList.contains("plume-waveform-loading")).toBe(true);
+
+    resolveDecode(fakePeaks);
+    await promise;
+
+    // After decode: loading class removed, canvas stays visible
+    expect(canvas.classList.contains("plume-waveform-loading")).toBe(false);
+    expect(canvas.classList.contains("plume-feature-hidden")).toBe(false);
+  });
+
+  it("removes loading class and hides canvas when decode is aborted", async () => {
+    let resolveDecode!: (peaks: Float32Array | null) => void;
+    mockDecodeWaveformForCurrentTrack.mockReturnValue(new Promise((r) => (resolveDecode = r)));
+
+    const canvas = makeCanvas();
+    vi.spyOn(canvas, "getContext").mockReturnValue(makeMockCtx() as unknown as CanvasRenderingContext2D);
+
+    const promise = triggerWaveformDecode(canvas);
+    clearWaveform(canvas);
+    resolveDecode(fakePeaks);
+    await promise;
+
+    expect(canvas.classList.contains("plume-waveform-loading")).toBe(false);
+    expect(canvas.classList.contains("plume-feature-hidden")).toBe(true);
   });
 });
 

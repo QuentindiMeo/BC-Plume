@@ -6,8 +6,19 @@ import { PLUME_CONSTANTS } from "@/domain/plume";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 
-let cachedPeaks: Float32Array | null = null;
+// Peaks are cached per track and survive clearWaveform (track navigation back reuses the cache).
+const peaksCache = new Map<string, Float32Array>();
 let decodeAbortFlag = false;
+
+// Track number as cache key — unique within a page session.
+const getCacheKey = (): string => {
+  const { trackNumber } = getAppCoreInstance().getState();
+  return trackNumber != null ? `t${trackNumber}` : "t0";
+};
+
+export const clearPeaksCache = (): void => {
+  peaksCache.clear();
+};
 
 export const createWaveformCanvas = (): HTMLCanvasElement => {
   const canvas = document.createElement("canvas");
@@ -51,37 +62,54 @@ export const renderWaveform = (
 };
 
 export const triggerWaveformDecode = async (canvas: HTMLCanvasElement): Promise<void> => {
+  const cacheKey = getCacheKey();
+
   // Fast path: peaks already cached for this track — skip decode and render immediately.
-  if (cachedPeaks) {
+  if (peaksCache.has(cacheKey)) {
     canvas.classList.remove("plume-feature-hidden");
     const appState = getAppCoreInstance().getState();
     const progressFraction =
       appState.currentTime != null && appState.duration ? appState.currentTime / appState.duration : 0;
-    renderWaveform(canvas, cachedPeaks, progressFraction, getAccentColor());
+    renderWaveform(canvas, peaksCache.get(cacheKey)!, progressFraction, getAccentColor());
     return;
   }
 
+  // Show loading state while decode runs (CSS pulse + aria label; no canvas drawing)
   decodeAbortFlag = false;
+  canvas.classList.remove("plume-feature-hidden");
+  canvas.classList.add("plume-waveform-loading");
+  canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS__LOADING");
+
   const peaks = await decodeWaveformForCurrentTrack();
 
-  if (decodeAbortFlag) return;
-  if (!peaks) return;
+  canvas.classList.remove("plume-waveform-loading");
+  canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS");
 
-  cachedPeaks = peaks;
-  canvas.classList.remove("plume-feature-hidden");
+  if (decodeAbortFlag) {
+    canvas.classList.add("plume-feature-hidden");
+    return;
+  }
+  if (!peaks) {
+    canvas.classList.add("plume-feature-hidden");
+    return;
+  }
+
+  peaksCache.set(cacheKey, peaks);
 
   const appState = getAppCoreInstance().getState();
   const progressFraction =
     appState.currentTime != null && appState.duration ? appState.currentTime / appState.duration : 0;
 
-  renderWaveform(canvas, cachedPeaks, progressFraction, getAccentColor());
+  renderWaveform(canvas, peaks, progressFraction, getAccentColor());
 };
 
 export const clearWaveform = (canvas: HTMLCanvasElement): void => {
   decodeAbortFlag = true;
-  cachedPeaks = null;
+  // Peaks cache is preserved — navigation back to this track skips the decode.
 
+  canvas.classList.remove("plume-waveform-loading");
   canvas.classList.add("plume-feature-hidden");
+  canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS");
 
   const ctx = canvas.getContext("2d");
   if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -100,8 +128,9 @@ export const attachWaveformSeekHandler = (canvas: HTMLCanvasElement): void => {
 };
 
 export const syncWaveformPlayhead = (canvas: HTMLCanvasElement, progressFraction: number): void => {
-  if (!cachedPeaks) return;
-  renderWaveform(canvas, cachedPeaks, progressFraction, getAccentColor());
+  const peaks = peaksCache.get(getCacheKey());
+  if (!peaks) return;
+  renderWaveform(canvas, peaks, progressFraction, getAccentColor());
 };
 
 // Reads the Bandcamp accent color from the CSS custom property set on :root.

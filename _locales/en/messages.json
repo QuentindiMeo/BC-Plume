@@ -347,6 +347,7 @@
   "LABEL__FEATURES__VISUALIZER": { "message": "Audio Visualizer" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Waveform scrubber" },
   "ARIA__WAVEFORM_CANVAS": { "message": "Audio waveform" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Audio waveform — loading..." },
   "INFO__WAVEFORM__DECODE_START": {
     "message": "Decoding waveform for: $TRACK_URL$",
     "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }

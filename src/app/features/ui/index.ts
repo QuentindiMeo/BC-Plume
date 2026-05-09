@@ -19,6 +19,7 @@ export { createTracklistToggle } from "@/app/features/ui/tracklist";
 export { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "@/app/features/ui/volume";
 export {
   attachWaveformSeekHandler,
+  clearPeaksCache,
   clearWaveform,
   createWaveformCanvas,
   renderWaveform,

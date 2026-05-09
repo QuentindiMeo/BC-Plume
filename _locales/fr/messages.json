@@ -356,6 +356,7 @@
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualiseur audio" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Forme d'onde" },
   "ARIA__WAVEFORM_CANVAS": { "message": "Forme d'onde audio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forme d'onde audio — chargement..." },
   "INFO__WAVEFORM__DECODE_START": {
     "message": "Décodage de la forme d'onde pour : $TRACK_URL$",
     "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }

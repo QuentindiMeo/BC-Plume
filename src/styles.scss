@@ -288,6 +288,11 @@
   canvas#plume-waveform-canvas {
     @apply z-0 absolute inset-x-0 -top-3 w-full h-6 pointer-events-none;
     border-radius: inherit;
+
+    &.plume-waveform-loading {
+      @apply animate-pulse;
+      background-color: rgba(128, 128, 128, 0.15);
+    }
   }
 
   // When waveform is visible, it becomes the progress bar: hide the slider, enable canvas interaction

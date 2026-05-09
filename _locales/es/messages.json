@@ -360,6 +360,7 @@
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de audio" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Forma de onda" },
   "ARIA__WAVEFORM_CANVAS": { "message": "Forma de onda del audio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forma de onda del audio — cargando..." },
   "INFO__WAVEFORM__DECODE_START": {
     "message": "Decodificando forma de onda para: $TRACK_URL$",
     "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
