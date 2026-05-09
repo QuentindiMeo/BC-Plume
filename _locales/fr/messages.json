@@ -354,6 +354,20 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lecteur musical en plein écran" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualiseur audio" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Forme d'onde" },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forme d'onde audio" },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Décodage de la forme d'onde pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forme d'onde décodée pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Échec du décodage de la forme d'onde pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
 
   "POPUP_TITLE": { "message": "Panneau de configuration" },
   "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },

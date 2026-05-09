@@ -8,6 +8,7 @@ export const PLUME_CONSTANTS = {
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
   WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
+  WAVEFORM_PEAK_COLUMNS: 600, // number of amplitude bars rendered across the waveform canvas
 } as const;
 
 export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr", "it", "pt_BR", "ro", "ru"] as const;
@@ -101,6 +102,7 @@ export const PLUME_DEFAULTS = {
     fullscreen: true,
     visualizer: false,
     bpmDetect: false,
+    waveform: false,
   } as const,
 } as const;
 
@@ -117,6 +119,7 @@ export type FeatureFlags = {
   loopModes: boolean;
   bpmDetect: boolean;
   visualizer: boolean;
+  waveform: boolean;
   fullscreen: boolean;
   quickSeek: boolean;
   runtime: boolean;

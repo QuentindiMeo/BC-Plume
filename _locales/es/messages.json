@@ -358,6 +358,20 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reproductor de música en pantalla completa" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de audio" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Forma de onda" },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forma de onda del audio" },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Decodificando forma de onda para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forma de onda decodificada para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Error al decodificar la forma de onda para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/alguna-pista" } }
+  },
 
   "POPUP_TITLE": { "message": "Panel de configuración" },
   "ARIA__POPUP__TABLIST": { "message": "Secciones de ajustes" },

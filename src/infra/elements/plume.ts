@@ -62,4 +62,5 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenClone = "div#plume-fullscreen-clone",
 
   visualizerCanvas = "canvas#plume-visualizer-canvas",
+  waveformCanvas = "canvas#plume-waveform-canvas",
 }
