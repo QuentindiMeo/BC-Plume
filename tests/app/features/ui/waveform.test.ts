@@ -1,17 +1,22 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PLUME_DEFAULTS } from "@/domain/plume";
+import { PLUME_CONSTANTS, PLUME_DEFAULTS } from "@/domain/plume";
 import { FakeAppCore } from "../../../fakes/FakeAppCore";
 
 // ─── Module mocks ─────────────────────────────────────────────────────────────
 
 const mockDecodeWaveformForCurrentTrack = vi.hoisted(() => vi.fn());
+const mockSeekToProgress = vi.hoisted(() => vi.fn());
 
 vi.mock("@/app/use-cases/decode-waveform", () => ({
   decodeWaveformForCurrentTrack: mockDecodeWaveformForCurrentTrack,
 }));
+vi.mock("@/app/use-cases", () => ({ seekToProgress: mockSeekToProgress }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+
+const fakeMusicPlayer = {};
+vi.mock("@/app/stores/adapters", () => ({ getMusicPlayerInstance: () => fakeMusicPlayer }));
 
 let fakeAppCore = new FakeAppCore();
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
@@ -38,6 +43,7 @@ const makeCanvas = (width = 400, height = 40): HTMLCanvasElement => {
 // ─── Import SUT after mocks are declared ─────────────────────────────────────
 
 import {
+  attachWaveformSeekHandler,
   clearWaveform,
   createWaveformCanvas,
   renderWaveform,
@@ -161,6 +167,17 @@ describe("clearWaveform", () => {
     expect(ctx.clearRect).toHaveBeenCalledOnce();
   });
 
+  it("adds plume-feature-hidden to the canvas", () => {
+    const canvas = makeCanvas();
+    const ctx = makeMockCtx();
+    vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+    canvas.classList.remove("plume-feature-hidden");
+
+    clearWaveform(canvas);
+
+    expect(canvas.classList.contains("plume-feature-hidden")).toBe(true);
+  });
+
   it("makes syncWaveformPlayhead a no-op (peaks cleared)", () => {
     // First seed peaks via triggerWaveformDecode, then clear
     const canvas = makeCanvas();
@@ -259,7 +276,7 @@ describe("triggerWaveformDecode", () => {
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
 
-  it("skips decode and renders immediately when peaks are already cached (fast path)", async () => {
+  it("skips decode and renders immediately when peaks are already cached (fast-path)", async () => {
     mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
 
     // First call seeds the cache
@@ -276,5 +293,50 @@ describe("triggerWaveformDecode", () => {
 
     expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
     expect(ctx2.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
+  });
+});
+
+// ─── attachWaveformSeekHandler ────────────────────────────────────────────────
+
+describe("attachWaveformSeekHandler", () => {
+  const mockRect = (left: number, width: number): DOMRect =>
+    ({ left, width, top: 0, bottom: 40, right: left + width, height: 40, x: left, y: 0, toJSON: () => {} }) as DOMRect;
+
+  it("calls seekToProgress with fraction × PROGRESS_SLIDER_GRANULARITY on click", () => {
+    const canvas = makeCanvas(400, 40);
+    vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue(mockRect(0, 400));
+
+    attachWaveformSeekHandler(canvas);
+    canvas.dispatchEvent(new MouseEvent("click", { clientX: 200, bubbles: true }));
+
+    expect(mockSeekToProgress).toHaveBeenCalledWith(
+      0.5 * PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY,
+      expect.anything(),
+      fakeMusicPlayer
+    );
+  });
+
+  it("clamps fraction to 0 when clicking before the left edge", () => {
+    const canvas = makeCanvas(400, 40);
+    vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue(mockRect(100, 400));
+
+    attachWaveformSeekHandler(canvas);
+    canvas.dispatchEvent(new MouseEvent("click", { clientX: 50, bubbles: true })); // 50 < left(100)
+
+    expect(mockSeekToProgress).toHaveBeenCalledWith(0, expect.anything(), fakeMusicPlayer);
+  });
+
+  it("clamps fraction to PROGRESS_SLIDER_GRANULARITY when clicking past the right edge", () => {
+    const canvas = makeCanvas(400, 40);
+    vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue(mockRect(0, 400));
+
+    attachWaveformSeekHandler(canvas);
+    canvas.dispatchEvent(new MouseEvent("click", { clientX: 500, bubbles: true })); // 500 > right(400)
+
+    expect(mockSeekToProgress).toHaveBeenCalledWith(
+      PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY,
+      expect.anything(),
+      fakeMusicPlayer
+    );
   });
 });

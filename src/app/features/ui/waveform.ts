@@ -1,5 +1,8 @@
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { seekToProgress } from "@/app/use-cases";
 import { decodeWaveformForCurrentTrack } from "@/app/use-cases/decode-waveform";
+import { PLUME_CONSTANTS } from "@/domain/plume";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 
@@ -37,14 +40,13 @@ export const renderWaveform = (
 
   const peakCount = peaks.length;
   const columnWidth = width / peakCount;
-  const midY = height / 2;
 
   for (let i = 0; i < peakCount; i++) {
-    const barHalfHeight = (peaks[i] as number) * midY * 0.9;
+    const barHeight = height * 0.1 + (peaks[i] as number) * height * 0.9;
     const x = i * columnWidth;
 
     ctx.fillStyle = i / peakCount < progressFraction ? accentColor : "rgba(128,128,128,0.35)";
-    ctx.fillRect(x, midY - barHalfHeight, Math.max(columnWidth - 1, 1), barHalfHeight * 2);
+    ctx.fillRect(x, height - barHeight, Math.max(columnWidth - 1, 1), barHeight);
   }
 };
 
@@ -79,8 +81,22 @@ export const clearWaveform = (canvas: HTMLCanvasElement): void => {
   decodeAbortFlag = true;
   cachedPeaks = null;
 
+  canvas.classList.add("plume-feature-hidden");
+
   const ctx = canvas.getContext("2d");
   if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
+
+export const attachWaveformSeekHandler = (canvas: HTMLCanvasElement): void => {
+  canvas.addEventListener("click", (e: MouseEvent) => {
+    const rect = canvas.getBoundingClientRect();
+    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    seekToProgress(
+      fraction * PLUME_CONSTANTS.PROGRESS_SLIDER_GRANULARITY,
+      getAppCoreInstance(),
+      getMusicPlayerInstance()
+    );
+  });
 };
 
 export const syncWaveformPlayhead = (canvas: HTMLCanvasElement, progressFraction: number): void => {

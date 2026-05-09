@@ -1,7 +1,7 @@
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
-import { triggerWaveformDecode } from "@/app/features/ui/waveform";
+import { attachWaveformSeekHandler, clearWaveform, triggerWaveformDecode } from "@/app/features/ui/waveform";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   applyPlaybackControlsSize,
@@ -382,8 +382,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         else stopVisualizer();
       }
       if (flags.waveform !== prevFlags.waveform && fsWaveformCanvas) {
-        fsWaveformCanvas.classList.toggle("plume-feature-hidden", !flags.waveform);
         if (flags.waveform) void triggerWaveformDecode(fsWaveformCanvas);
+        else clearWaveform(fsWaveformCanvas);
       }
       const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (fsControls) applyPlaybackControlsSize(fsControls);
@@ -438,6 +438,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
 
   const fsWaveformCanvas = clone.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas) ?? null;
+  if (fsWaveformCanvas) attachWaveformSeekHandler(fsWaveformCanvas);
 
   // Initialize fullscreen UI with current state using the same rendering functions
   const appState = appCore.getState();

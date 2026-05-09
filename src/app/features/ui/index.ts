@@ -18,6 +18,7 @@ export type { ToastBorderType, ToastConfig, ToastCta, ToastHandle } from "@/app/
 export { createTracklistToggle } from "@/app/features/ui/tracklist";
 export { createVolumeControlSection, handleMuteToggle, syncMuteBtn } from "@/app/features/ui/volume";
 export {
+  attachWaveformSeekHandler,
   clearWaveform,
   createWaveformCanvas,
   renderWaveform,

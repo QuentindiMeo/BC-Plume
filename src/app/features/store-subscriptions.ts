@@ -237,11 +237,11 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (bpmContainer) bpmContainer.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
       }
 
-      // Waveform scrubber: show/hide canvas and trigger decode when enabling
+      // Waveform scrubber: on enable → decode (canvas shown only on success); on disable → clear and hide
       if (flags.waveform !== prevFlags.waveform) {
         document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
-          canvas.classList.toggle("plume-feature-hidden", !flags.waveform);
           if (flags.waveform) void triggerWaveformDecode(canvas);
+          else clearWaveform(canvas);
         });
       }
 
