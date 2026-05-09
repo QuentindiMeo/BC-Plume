@@ -1,22 +1,35 @@
-import { FeatureFlagKey, FeatureFlags, PLUME_DEFAULTS } from "@/domain/plume";
+import { FeatureFlagKey, FeatureFlags, PLUME_CONSTANTS, PLUME_DEFAULTS } from "@/domain/plume";
 import type { IMessageSender } from "@/domain/ports/messaging";
 import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-interface ToggleRowConfig {
-  flagKey: FeatureFlagKey;
-  labelKey: string;
-  noticeKey?: string;
-}
+type ToggleRowConfig =
+  | {
+      flagKey: FeatureFlagKey;
+      labelKey: string;
+      noticeKey?: undefined;
+      noticeSubstitutions?: undefined;
+    }
+  | {
+      flagKey: FeatureFlagKey;
+      labelKey: string;
+      noticeKey: string;
+      noticeSubstitutions: string[];
+    };
 
 const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "runtime", labelKey: "LABEL__FEATURES__RUNTIME" },
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
-  { flagKey: "waveform", labelKey: "LABEL__FEATURES__WAVEFORM", noticeKey: "LABEL__FEATURES__WAVEFORM__NOTICE" },
+  {
+    flagKey: "waveform",
+    labelKey: "LABEL__FEATURES__WAVEFORM",
+    noticeKey: "LABEL__FEATURES__WAVEFORM__NOTICE",
+    noticeSubstitutions: [String(PLUME_CONSTANTS.WAVEFORM_MAX_DURATION_SECONDS / 60)],
+  },
   { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
   { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
@@ -45,7 +58,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
   };
 
   const buildToggleRow = (config: ToggleRowConfig): HTMLElement => {
-    const { flagKey, labelKey, noticeKey } = config;
+    const { flagKey, labelKey, noticeKey, noticeSubstitutions } = config;
 
     const row = document.createElement("div");
     row.className = "setting-row";
@@ -58,7 +71,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     if (noticeKey) {
       const notice = document.createElement("p");
       notice.className = "setting-row__notice";
-      notice.textContent = getString(noticeKey);
+      notice.textContent = getString(noticeKey, noticeSubstitutions);
       notice.hidden = !currentFlags[flagKey];
       label.appendChild(notice);
       noticeRefs.set(flagKey, notice);

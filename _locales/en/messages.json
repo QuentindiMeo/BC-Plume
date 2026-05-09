@@ -446,7 +446,10 @@
   "LABEL__FEATURES__TRACKLIST": { "message": "Tracklist" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Waveform progress bar" },
-  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Not available for tracks over 20 min." },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Not available for tracks over $LIMIT_MINUTES$ min.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Loop modes" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },

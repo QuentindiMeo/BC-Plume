@@ -6,6 +6,7 @@ export const PLUME_CONSTANTS = {
   SEEK_PAUSE_GUARD_MS: 100, // delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
   WAVEFORM_PEAK_COLUMNS: 400, // number of amplitude bars rendered across the waveform canvas
+  WAVEFORM_MAX_DURATION_SECONDS: 20 * 60, // 20 minutes — tracks longer than this are skipped, they're too heavy to fetch/decode
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
   WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with

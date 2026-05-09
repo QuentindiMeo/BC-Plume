@@ -446,7 +446,10 @@
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista tracce" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Ricerca rapida (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barra di avanzamento a forma d'onda" },
-  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Non disponibile per tracce superiori a 20 min." },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Non disponibile per tracce superiori a $LIMIT_MINUTES$ min.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Controllo velocità" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Modalità ripetizione" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Schermo intero" },

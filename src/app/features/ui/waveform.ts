@@ -63,15 +63,26 @@ export const renderWaveform = (
 };
 
 export const triggerWaveformDecode = async (canvas: HTMLCanvasElement): Promise<void> => {
+  const appState = getAppCoreInstance().getState();
+
+  if (!appState.featureFlags.waveform) {
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
+    return;
+  }
+
   const cacheKey = getCacheKey();
 
   // Fast path: peaks already cached for this track — skip decode and render immediately.
   if (peaksCache.has(cacheKey)) {
     canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
-    const appState = getAppCoreInstance().getState();
     const progressFraction =
       appState.currentTime != null && appState.duration ? appState.currentTime / appState.duration : 0;
     renderWaveform(canvas, peaksCache.get(cacheKey)!, progressFraction, getAccentColor());
+    return;
+  }
+
+  if (appState.duration > PLUME_CONSTANTS.WAVEFORM_MAX_DURATION_SECONDS) {
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
     return;
   }
 
@@ -97,9 +108,8 @@ export const triggerWaveformDecode = async (canvas: HTMLCanvasElement): Promise<
 
   peaksCache.set(cacheKey, peaks);
 
-  const appState = getAppCoreInstance().getState();
-  const progressFraction =
-    appState.currentTime != null && appState.duration ? appState.currentTime / appState.duration : 0;
+  const newAppState = getAppCoreInstance().getState();
+  const progressFraction = !!newAppState.duration ? newAppState.currentTime / newAppState.duration : 0;
 
   renderWaveform(canvas, peaks, progressFraction, getAccentColor());
 };

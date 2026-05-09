@@ -448,7 +448,10 @@
   "LABEL__FEATURES__TRACKLIST": { "message": "Список треков" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Быстрый переход (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Прогресс-бар с формой волны" },
-  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Недоступно для треков длиннее 20 мин." },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Недоступно для треков длиннее $LIMIT_MINUTES$ мин.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Управление скоростью" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Режимы повтора" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Полноэкранный режим" },

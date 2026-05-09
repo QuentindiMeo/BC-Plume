@@ -243,6 +243,11 @@ describe("syncWaveformPlayhead", () => {
   });
 
   it("renders when peaks are cached after triggerWaveformDecode", async () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      currentTime: 0,
+      duration: 100,
+    });
     mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
 
     const canvas = makeCanvas();
@@ -259,6 +264,14 @@ describe("syncWaveformPlayhead", () => {
 });
 
 describe("triggerWaveformDecode", () => {
+  beforeEach(() => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      currentTime: 0,
+      duration: 100,
+    });
+  });
+
   it("removes plume-feature-hidden on successful decode", async () => {
     mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
     const canvas = makeCanvas();
@@ -348,9 +361,87 @@ describe("triggerWaveformDecode", () => {
     expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
     expect(ctx.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
   });
+
+  it("keeps canvas hidden and does not decode when featureFlags.waveform is false", async () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: false },
+      currentTime: 0,
+      duration: 100,
+    });
+    const canvas = makeCanvas();
+    canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
+
+    await triggerWaveformDecode(canvas);
+
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
+    expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
+  });
+
+  it("hides canvas without decoding when featureFlags.waveform is false even with cached peaks", async () => {
+    // Seed the cache while flag is on (inherited from nested beforeEach)
+    mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
+    const seedCanvas = makeCanvas();
+    vi.spyOn(seedCanvas, "getContext").mockReturnValue(makeMockCtx() as unknown as CanvasRenderingContext2D);
+    await triggerWaveformDecode(seedCanvas);
+    mockDecodeWaveformForCurrentTrack.mockClear();
+
+    // Now disable the flag — guard must run before the fast path
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: false },
+      currentTime: 0,
+      duration: 100,
+    });
+    const canvas = makeCanvas();
+    canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
+
+    await triggerWaveformDecode(canvas);
+
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
+    expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
+  });
+
+  it("keeps canvas hidden and skips fetch when duration exceeds WAVEFORM_MAX_DURATION_SECS", async () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      currentTime: 0,
+      duration: PLUME_CONSTANTS.WAVEFORM_MAX_DURATION_SECONDS + 1,
+    });
+    const canvas = makeCanvas();
+    canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
+
+    await triggerWaveformDecode(canvas);
+
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
+    expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
+  });
+
+  it("proceeds with decode when duration equals WAVEFORM_MAX_DURATION_SECS exactly", async () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      currentTime: 0,
+      duration: PLUME_CONSTANTS.WAVEFORM_MAX_DURATION_SECONDS,
+    });
+    mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
+    const canvas = makeCanvas();
+    const ctx = makeMockCtx();
+    vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+
+    await triggerWaveformDecode(canvas);
+
+    expect(mockDecodeWaveformForCurrentTrack).toHaveBeenCalled();
+    expect(ctx.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
+  });
 });
 
 describe("loading state", () => {
+  beforeEach(() => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      currentTime: 0,
+      duration: 100,
+    });
+  });
+
   it("shows canvas with loading class while decode is in progress, removes it after", async () => {
     let resolveDecode!: (peaks: Float32Array | null) => void;
     mockDecodeWaveformForCurrentTrack.mockReturnValue(new Promise((r) => (resolveDecode = r)));
