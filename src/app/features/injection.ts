@@ -20,7 +20,7 @@ import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
 import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
@@ -133,7 +133,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   if (isAlbumPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
-    trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
+    trackLink.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
 
     if (trackLink) {
       const trackUrl = bcPlayer.getCurrentTrackUrl();
@@ -171,8 +171,8 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   let pendingDropdown: HTMLDivElement | undefined;
   if (isAlbumPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
-    toggleBtn.classList.toggle("plume-feature-hidden", !flags.tracklist);
-    dropdownEl.classList.toggle("plume-feature-hidden", !flags.tracklist);
+    toggleBtn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
+    dropdownEl.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
     titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
@@ -197,11 +197,11 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
 
   const bpmSection = createBpmDisplaySection(isAlbumPage);
-  bpmSection.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+  bpmSection.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.bpmDetect);
   plumeContainer.appendChild(bpmSection);
 
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
-  fullscreenBtnSection.classList.toggle("plume-feature-hidden", !flags.fullscreen);
+  fullscreenBtnSection.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.fullscreen);
   plumeContainer.appendChild(fullscreenBtnSection);
 
   return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
@@ -249,7 +249,8 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   if (isAlbumPage) {
     addRuntime();
     const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
-    if (runtimeSpan) runtimeSpan.classList.toggle("plume-feature-hidden", !appCore.getState().featureFlags.runtime);
+    if (runtimeSpan)
+      runtimeSpan.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !appCore.getState().featureFlags.runtime);
     notifyUnplayableTracks();
   }
 

@@ -13,7 +13,7 @@ import {
 import { PLAYBACK_SPEED_STEPS, PLUME_CONSTANTS, parseCustomPlaybackSpeed, speedToSliderPosition } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { setSvgContent } from "@/shared/svg";
@@ -170,7 +170,7 @@ export const setupSpeedPopoverBehavior = (wrapper: HTMLDivElement): (() => void)
 export const applyPlaybackControlsSize = (container: HTMLElement): void => {
   const visibleCount = Array.from(container.children).filter((child) => {
     const playbackButton = child as HTMLElement;
-    return !playbackButton.hidden && !playbackButton.classList.contains("plume-feature-hidden");
+    return !playbackButton.hidden && !playbackButton.classList.contains(PLUME_CSS_CLASSES.featureHidden);
   }).length;
   container.classList.remove("compact", "spacious");
   if (visibleCount <= 5) container.classList.add("spacious");
@@ -324,7 +324,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   const withSpeedControl = appState.featureFlags.speedControl;
   const speedWrapper = document.createElement("div");
   speedWrapper.id = PLUME_ELEM_SELECTORS.speedWrapper.split("#")[1];
-  speedWrapper.classList.toggle("plume-feature-hidden", !withSpeedControl);
+  speedWrapper.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !withSpeedControl);
 
   const speedBtn = document.createElement("button");
   speedBtn.id = PLUME_ELEM_SELECTORS.speedBtn.split("#")[1];
@@ -403,7 +403,7 @@ export const createPlaybackControlPanel = (): HTMLDivElement => {
   const loopBtn = document.createElement("button");
   loopBtn.id = PLUME_ELEM_SELECTORS.loopBtn.split("#")[1];
   loopBtn.type = "button";
-  loopBtn.classList.toggle("plume-feature-hidden", !withLoopModes);
+  loopBtn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !withLoopModes);
   setSvgContent(loopBtn, PLUME_SVG.loopNone);
   loopBtn.title = getString("ARIA__LOOP__OFF");
   loopBtn.ariaLabel = getString("ARIA__LOOP__OFF");

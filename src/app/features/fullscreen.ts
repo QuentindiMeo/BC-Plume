@@ -1,7 +1,6 @@
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
-import { attachWaveformSeekHandler, clearWaveform, triggerWaveformDecode } from "@/app/features/ui/waveform";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   applyPlaybackControlsSize,
@@ -19,6 +18,7 @@ import {
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { handleMuteToggle } from "@/app/features/ui/volume";
+import { attachWaveformSeekHandler, clearWaveform, triggerWaveformDecode } from "@/app/features/ui/waveform";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
@@ -34,7 +34,7 @@ import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
@@ -356,7 +356,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
           PLUME_ELEM_SELECTORS.headerTrackLink
         );
         if (trackLink) {
-          trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
+          trackLink.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
           if (flags.goToTrack && isAlbumPage) trackLink.style.color = getAppropriateAccentColor();
         }
       }
@@ -368,8 +368,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
           tracklistCleanupRef = () => {};
           const btn = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
           const dd = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
-          if (btn) btn.classList.add("plume-feature-hidden");
-          if (dd) dd.classList.add("plume-feature-hidden");
+          if (btn) btn.classList.add(PLUME_CSS_CLASSES.featureHidden);
+          if (dd) dd.classList.add(PLUME_CSS_CLASSES.featureHidden);
         }
       }
       if (flags.loopModes && !prevFlags.loopModes) {
@@ -377,7 +377,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         renderLoopButton(elements, loopMode);
       }
       if (flags.visualizer !== prevFlags.visualizer && vizCanvas) {
-        vizCanvas.classList.toggle("plume-feature-hidden", !flags.visualizer);
+        vizCanvas.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.visualizer);
         if (flags.visualizer) runVisualizer(vizCanvas);
         else stopVisualizer();
       }
@@ -434,7 +434,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const vizCanvas =
     clone
       .closest<HTMLDivElement>(PLUME_ELEM_SELECTORS.fullscreenOverlay)
-      ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.visualizerCanvas) ?? null;
+      ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.fullscreenVisualizerCanvas) ?? null;
   if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
 
   const fsWaveformCanvas = clone.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas) ?? null;
@@ -507,10 +507,10 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   overlay.appendChild(background);
 
   const vizCanvas = document.createElement("canvas");
-  vizCanvas.id = PLUME_ELEM_SELECTORS.visualizerCanvas.split("#")[1];
+  vizCanvas.id = PLUME_ELEM_SELECTORS.fullscreenVisualizerCanvas.split("#")[1];
   vizCanvas.ariaHidden = "true";
   const { featureFlags } = getAppCoreInstance().getState();
-  if (!featureFlags.visualizer) vizCanvas.classList.add("plume-feature-hidden");
+  if (!featureFlags.visualizer) vizCanvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
   overlay.appendChild(vizCanvas);
 
   const contentContainer = document.createElement("div");

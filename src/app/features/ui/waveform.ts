@@ -3,7 +3,7 @@ import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { seekToProgress } from "@/app/use-cases";
 import { decodeWaveformForCurrentTrack } from "@/app/use-cases/decode-waveform";
 import { PLUME_CONSTANTS } from "@/domain/plume";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 
 // Peaks are cached per track and survive clearWaveform (track navigation back reuses the cache).
@@ -25,8 +25,9 @@ export const createWaveformCanvas = (): HTMLCanvasElement => {
   canvas.id = PLUME_ELEM_SELECTORS.waveformCanvas.split("#")[1];
   canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS");
 
-  const isEnabled = getAppCoreInstance().getState().featureFlags.waveform;
-  if (!isEnabled) canvas.classList.add("plume-feature-hidden");
+  const { featureFlags } = getAppCoreInstance().getState();
+  const isEnabled = featureFlags.waveform;
+  if (!isEnabled) canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
 
   return canvas;
 };
@@ -66,7 +67,7 @@ export const triggerWaveformDecode = async (canvas: HTMLCanvasElement): Promise<
 
   // Fast path: peaks already cached for this track — skip decode and render immediately.
   if (peaksCache.has(cacheKey)) {
-    canvas.classList.remove("plume-feature-hidden");
+    canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
     const appState = getAppCoreInstance().getState();
     const progressFraction =
       appState.currentTime != null && appState.duration ? appState.currentTime / appState.duration : 0;
@@ -76,21 +77,21 @@ export const triggerWaveformDecode = async (canvas: HTMLCanvasElement): Promise<
 
   // Show loading state while decode runs (CSS pulse + aria label; no canvas drawing)
   decodeAbortFlag = false;
-  canvas.classList.remove("plume-feature-hidden");
-  canvas.classList.add("plume-waveform-loading");
+  canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
+  canvas.classList.add(PLUME_CSS_CLASSES.waveformLoading);
   canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS__LOADING");
 
   const peaks = await decodeWaveformForCurrentTrack();
 
-  canvas.classList.remove("plume-waveform-loading");
+  canvas.classList.remove(PLUME_CSS_CLASSES.waveformLoading);
   canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS");
 
   if (decodeAbortFlag) {
-    canvas.classList.add("plume-feature-hidden");
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
     return;
   }
   if (!peaks) {
-    canvas.classList.add("plume-feature-hidden");
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
     return;
   }
 
@@ -107,12 +108,12 @@ export const clearWaveform = (canvas: HTMLCanvasElement): void => {
   decodeAbortFlag = true;
   // Peaks cache is preserved — navigation back to this track skips the decode.
 
-  canvas.classList.remove("plume-waveform-loading");
-  canvas.classList.add("plume-feature-hidden");
+  canvas.classList.remove(PLUME_CSS_CLASSES.waveformLoading);
+  canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
   canvas.ariaLabel = getString("ARIA__WAVEFORM_CANVAS");
 
   const ctx = canvas.getContext("2d");
-  if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx?.clearRect(0, 0, canvas.width, canvas.height);
 };
 
 export const attachWaveformSeekHandler = (canvas: HTMLCanvasElement): void => {
@@ -130,11 +131,13 @@ export const attachWaveformSeekHandler = (canvas: HTMLCanvasElement): void => {
 export const syncWaveformPlayhead = (canvas: HTMLCanvasElement, progressFraction: number): void => {
   const peaks = peaksCache.get(getCacheKey());
   if (!peaks) return;
+
   renderWaveform(canvas, peaks, progressFraction, getAccentColor());
 };
 
 // Reads the Bandcamp accent color from the CSS custom property set on :root.
 const getAccentColor = (): string => {
-  const color = getComputedStyle(document.documentElement).getPropertyValue("--band-color").trim();
-  return color || "#1da0c3";
+  const plumeVersion = document.querySelector(PLUME_ELEM_SELECTORS.headerLogoVersion) as HTMLParagraphElement | null;
+  const versionColor = plumeVersion ? getComputedStyle(plumeVersion).color : null;
+  return versionColor || "#ffffff";
 };

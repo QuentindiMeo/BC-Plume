@@ -8,6 +8,7 @@ import { CPL, logger } from "@/shared/logger";
 interface ToggleRowConfig {
   flagKey: FeatureFlagKey;
   labelKey: string;
+  noticeKey?: string;
 }
 
 const FLAG_ORDER: ToggleRowConfig[] = [
@@ -15,11 +16,11 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
+  { flagKey: "waveform", labelKey: "LABEL__FEATURES__WAVEFORM", noticeKey: "LABEL__FEATURES__WAVEFORM__NOTICE" },
   { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
   { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
   { flagKey: "visualizer", labelKey: "LABEL__FEATURES__VISUALIZER" },
-  { flagKey: "waveform", labelKey: "LABEL__FEATURES__WAVEFORM" },
   { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
 ] as const;
 
@@ -29,9 +30,9 @@ const areAllDefaults = (flags: FeatureFlags): boolean =>
 export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSender): TabDefinition["buildPanel"] => {
   const currentFlags: FeatureFlags = { ...storedFlags };
   const toggleBtns = new Map<FeatureFlagKey, HTMLButtonElement>();
+  const noticeRefs = new Map<FeatureFlagKey, HTMLParagraphElement>();
 
   let resetBtn: HTMLButtonElement | null = null;
-  let waveformNotice: HTMLParagraphElement | null = null;
 
   const syncResetVisibility = (): void => {
     if (resetBtn) resetBtn.hidden = areAllDefaults(currentFlags);
@@ -44,7 +45,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
   };
 
   const buildToggleRow = (config: ToggleRowConfig): HTMLElement => {
-    const { flagKey, labelKey } = config;
+    const { flagKey, labelKey, noticeKey } = config;
 
     const row = document.createElement("div");
     row.className = "setting-row";
@@ -53,6 +54,15 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     label.className = "setting-row__label";
     label.textContent = getString(labelKey);
     label.id = `feature-label-${flagKey}`;
+
+    if (noticeKey) {
+      const notice = document.createElement("p");
+      notice.className = "setting-row__notice";
+      notice.textContent = getString(noticeKey);
+      notice.hidden = !currentFlags[flagKey];
+      label.appendChild(notice);
+      noticeRefs.set(flagKey, notice);
+    }
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -69,6 +79,9 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.addEventListener("click", () => {
       currentFlags[flagKey] = !currentFlags[flagKey];
       toggle.ariaChecked = String(currentFlags[flagKey]);
+
+      const notice = noticeRefs.get(flagKey);
+      if (notice) notice.hidden = !currentFlags[flagKey];
 
       // visualizer requires bpmDetect: enforce the dependency in both directions
       if (flagKey === "visualizer" && currentFlags.visualizer) {
@@ -98,21 +111,9 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     section.className = "settings__section";
     section.ariaLabel = getString("POPUP__FEATURES__TAB_LABEL");
 
-    for (const config of FLAG_ORDER) {
-      const toggleRow = buildToggleRow(config);
-      section.appendChild(toggleRow);
-
-      if (config.flagKey === "waveform") {
-        waveformNotice = document.createElement("p");
-        waveformNotice.className = "setting-row__notice";
-        waveformNotice.textContent = getString("LABEL__FEATURES__WAVEFORM__NOTICE");
-        waveformNotice.hidden = !currentFlags.waveform;
-        toggleRow.firstChild?.appendChild(waveformNotice);
-
-        toggleBtns.get("waveform")!.addEventListener("click", () => {
-          if (waveformNotice) waveformNotice.hidden = !currentFlags.waveform;
-        });
-      }
+    for (const flagConfig of FLAG_ORDER) {
+      const flagToggleRow = buildToggleRow(flagConfig);
+      section.appendChild(flagToggleRow);
     }
 
     return section;
@@ -129,7 +130,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     resetBtn.addEventListener("click", () => {
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);
       for (const [flagKey, btn] of toggleBtns) btn.ariaChecked = String(currentFlags[flagKey]);
-      if (waveformNotice) waveformNotice.hidden = !currentFlags.waveform;
+      for (const [flagKey, notice] of noticeRefs) notice.hidden = !currentFlags[flagKey];
       persist(currentFlags);
       syncResetVisibility();
     });

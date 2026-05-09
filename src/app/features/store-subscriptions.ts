@@ -21,7 +21,7 @@ import {
 } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { isSafariBrowser } from "@/shared/browser";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -67,7 +67,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.durationDisplay.textContent = appCore.computed.formattedDuration();
 
       // Sync waveform playhead on all visible waveform canvases
-      document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
+      const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
+      waveformCanvases.forEach((canvas) => {
         syncWaveformPlayhead(canvas, progressFraction);
       });
     }),
@@ -184,14 +185,16 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (flags.tracklist !== prevFlags.tracklist) {
         const btn = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
         const dd = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
-        if (btn) btn.classList.toggle("plume-feature-hidden", !flags.tracklist);
-        if (dd) dd.classList.toggle("plume-feature-hidden", !flags.tracklist);
+        if (btn) btn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
+        if (dd) dd.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
       }
 
       // Loop modes: toggle button visibility, reset to NONE when disabled
       if (flags.loopModes !== prevFlags.loopModes) {
         const plumeUi = getGuiInstance();
-        plumeUi.getState().loopBtns.forEach((btn) => btn.classList.toggle("plume-feature-hidden", !flags.loopModes));
+        plumeUi
+          .getState()
+          .loopBtns.forEach((btn) => btn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.loopModes));
         if (!flags.loopModes) {
           appCore.dispatch(coreActions.setLoopMode(LOOP_MODE.NONE));
           getMusicPlayerInstance().setLoop(false);
@@ -201,7 +204,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       // Fullscreen: toggle button container visibility, exit fullscreen if active
       if (flags.fullscreen !== prevFlags.fullscreen) {
         const section = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.fullscreenBtnContainer);
-        if (section) section.classList.toggle("plume-feature-hidden", !flags.fullscreen);
+        if (section) section.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.fullscreen);
         if (!flags.fullscreen && appCore.getState().isFullscreen) {
           cleanupFullscreenMode();
         }
@@ -210,14 +213,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       // Go-to-track: toggle link visibility
       if (flags.goToTrack !== prevFlags.goToTrack) {
         const el = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.headerTrackLink);
-        if (el) el.classList.toggle("plume-feature-hidden", !flags.goToTrack);
+        if (el) el.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
       }
 
       // Speed control: toggle button visibility, reset to 1× when disabled
       if (flags.speedControl !== prevFlags.speedControl) {
         getGuiInstance()
           .getState()
-          .speedBtns.forEach((btn) => btn.classList.toggle("plume-feature-hidden", !flags.speedControl));
+          .speedBtns.forEach((btn) => btn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.speedControl));
         if (!flags.speedControl) {
           appCore.dispatch(coreActions.setPlaybackSpeed(PLAYBACK_SPEED_DEFAULT));
         }
@@ -227,19 +230,20 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       if (flags.runtime !== prevFlags.runtime) {
         const runtimeSpans = document.querySelectorAll<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
         runtimeSpans.forEach((runtimeSpan) => {
-          runtimeSpan.classList.toggle("plume-feature-hidden", !flags.runtime);
+          runtimeSpan.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.runtime);
         });
       }
 
       // BPM detect: toggle container visibility
       if (flags.bpmDetect !== prevFlags.bpmDetect) {
         const bpmContainer = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmContainer);
-        if (bpmContainer) bpmContainer.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+        if (bpmContainer) bpmContainer.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.bpmDetect);
       }
 
       // Waveform scrubber: on enable → decode (canvas shown only on success); on disable → clear and hide
       if (flags.waveform !== prevFlags.waveform) {
-        document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
+        const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
+        waveformCanvases.forEach((canvas) => {
           if (flags.waveform) void triggerWaveformDecode(canvas);
           else clearWaveform(canvas);
         });
@@ -257,9 +261,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       syncBpmDisplay(appState.trackBpms);
 
       // New track: clear stale waveform and re-decode for each visible canvas
-      const waveformCanvases = Array.from(
-        document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas)
-      );
+      const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
       waveformCanvases.forEach(clearWaveform);
       waveformCanvases.forEach((canvas) => void triggerWaveformDecode(canvas));
     })
@@ -271,7 +273,8 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
   // (featureFlags and trackNumber both already set), neither subscription fires and the decode never
   // starts. Kick it off explicitly here so the initial page visit renders like subsequent ones.
   if (appCore.getState().featureFlags.waveform) {
-    document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
+    const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
+    waveformCanvases.forEach((canvas) => {
       void triggerWaveformDecode(canvas);
     });
   }

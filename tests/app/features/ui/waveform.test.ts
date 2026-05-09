@@ -2,9 +2,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PLUME_CONSTANTS, PLUME_DEFAULTS } from "@/domain/plume";
+import { PLUME_CSS_CLASSES } from "@/infra/elements/plume";
 import { FakeAppCore } from "../../../fakes/FakeAppCore";
-
-// ─── Module mocks ─────────────────────────────────────────────────────────────
 
 const mockDecodeWaveformForCurrentTrack = vi.hoisted(() => vi.fn());
 const mockSeekToProgress = vi.hoisted(() => vi.fn());
@@ -20,8 +19,6 @@ vi.mock("@/app/stores/adapters", () => ({ getMusicPlayerInstance: () => fakeMusi
 
 let fakeAppCore = new FakeAppCore();
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PEAK_COUNT = 4;
 const fakePeaks = new Float32Array([0.2, 0.8, 0.6, 0.4]);
@@ -39,8 +36,6 @@ const makeCanvas = (width = 400, height = 40): HTMLCanvasElement => {
   Object.defineProperty(canvas, "offsetHeight", { value: height, configurable: true });
   return canvas;
 };
-
-// ─── Import SUT after mocks are declared ─────────────────────────────────────
 
 import {
   attachWaveformSeekHandler,
@@ -66,8 +61,6 @@ beforeEach(() => {
   clearWaveform(makeCanvas()); // resets decodeAbortFlag
 });
 
-// ─── createWaveformCanvas ────────────────────────────────────────────────────
-
 describe("createWaveformCanvas", () => {
   it("returns a canvas element with the correct id", () => {
     const canvas = createWaveformCanvas();
@@ -79,7 +72,7 @@ describe("createWaveformCanvas", () => {
   it("is hidden when the waveform feature flag is off", () => {
     const canvas = createWaveformCanvas();
 
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(true);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
   });
 
   it("is visible when the waveform feature flag is on", () => {
@@ -89,7 +82,7 @@ describe("createWaveformCanvas", () => {
 
     const canvas = createWaveformCanvas();
 
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(false);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(false);
   });
 
   it("has an aria-label set", () => {
@@ -98,8 +91,6 @@ describe("createWaveformCanvas", () => {
     expect(canvas.ariaLabel).toBeTruthy();
   });
 });
-
-// ─── renderWaveform ───────────────────────────────────────────────────────────
 
 describe("renderWaveform", () => {
   it("calls fillRect exactly once per peak", () => {
@@ -203,8 +194,6 @@ describe("renderWaveform", () => {
   });
 });
 
-// ─── clearWaveform ────────────────────────────────────────────────────────────
-
 describe("clearWaveform", () => {
   it("calls clearRect on the canvas context", () => {
     const canvas = makeCanvas();
@@ -220,11 +209,11 @@ describe("clearWaveform", () => {
     const canvas = makeCanvas();
     const ctx = makeMockCtx();
     vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
-    canvas.classList.remove("plume-feature-hidden");
+    canvas.classList.remove(PLUME_CSS_CLASSES.featureHidden);
 
     clearWaveform(canvas);
 
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(true);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
   });
 
   it("makes syncWaveformPlayhead a no-op (peaks cleared)", () => {
@@ -241,8 +230,6 @@ describe("clearWaveform", () => {
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
 });
-
-// ─── syncWaveformPlayhead ─────────────────────────────────────────────────────
 
 describe("syncWaveformPlayhead", () => {
   it("is a no-op when no peaks are cached", () => {
@@ -271,18 +258,16 @@ describe("syncWaveformPlayhead", () => {
   });
 });
 
-// ─── triggerWaveformDecode ────────────────────────────────────────────────────
-
 describe("triggerWaveformDecode", () => {
   it("removes plume-feature-hidden on successful decode", async () => {
     mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
     const canvas = makeCanvas();
-    canvas.classList.add("plume-feature-hidden");
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
     vi.spyOn(canvas, "getContext").mockReturnValue(makeMockCtx() as unknown as CanvasRenderingContext2D);
 
     await triggerWaveformDecode(canvas);
 
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(false);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(false);
   });
 
   it("calls renderWaveform (fillRect N times) after decode succeeds", async () => {
@@ -299,13 +284,13 @@ describe("triggerWaveformDecode", () => {
   it("does not render and does not remove hidden class when decode returns null", async () => {
     mockDecodeWaveformForCurrentTrack.mockResolvedValue(null);
     const canvas = makeCanvas();
-    canvas.classList.add("plume-feature-hidden");
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
     const ctx = makeMockCtx();
     vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
 
     await triggerWaveformDecode(canvas);
 
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(true);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
 
@@ -365,29 +350,27 @@ describe("triggerWaveformDecode", () => {
   });
 });
 
-// ─── loading state ───────────────────────────────────────────────────────────
-
 describe("loading state", () => {
   it("shows canvas with loading class while decode is in progress, removes it after", async () => {
     let resolveDecode!: (peaks: Float32Array | null) => void;
     mockDecodeWaveformForCurrentTrack.mockReturnValue(new Promise((r) => (resolveDecode = r)));
 
     const canvas = makeCanvas();
-    canvas.classList.add("plume-feature-hidden");
+    canvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
     vi.spyOn(canvas, "getContext").mockReturnValue(makeMockCtx() as unknown as CanvasRenderingContext2D);
 
     const promise = triggerWaveformDecode(canvas);
 
     // Synchronous portion has run: canvas visible, loading class present
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(false);
-    expect(canvas.classList.contains("plume-waveform-loading")).toBe(true);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(false);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.waveformLoading)).toBe(true);
 
     resolveDecode(fakePeaks);
     await promise;
 
     // After decode: loading class removed, canvas stays visible
-    expect(canvas.classList.contains("plume-waveform-loading")).toBe(false);
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(false);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.waveformLoading)).toBe(false);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(false);
   });
 
   it("removes loading class and hides canvas when decode is aborted", async () => {
@@ -402,12 +385,10 @@ describe("loading state", () => {
     resolveDecode(fakePeaks);
     await promise;
 
-    expect(canvas.classList.contains("plume-waveform-loading")).toBe(false);
-    expect(canvas.classList.contains("plume-feature-hidden")).toBe(true);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.waveformLoading)).toBe(false);
+    expect(canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)).toBe(true);
   });
 });
-
-// ─── attachWaveformSeekHandler ────────────────────────────────────────────────
 
 describe("attachWaveformSeekHandler", () => {
   const mockRect = (left: number, width: number): DOMRect =>

@@ -5,10 +5,10 @@ export const PLUME_CONSTANTS = {
   AUDIO_RETRY_TOAST_THRESHOLD: 3, // show toast after this many failed audio retries
   SEEK_PAUSE_GUARD_MS: 100, // delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
+  WAVEFORM_PEAK_COLUMNS: 400, // number of amplitude bars rendered across the waveform canvas
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
   WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
-  WAVEFORM_PEAK_COLUMNS: 600, // number of amplitude bars rendered across the waveform canvas
 } as const;
 
 export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr", "it", "pt_BR", "ro", "ru"] as const;
@@ -51,11 +51,11 @@ export const TRACK_RESTART_THRESHOLD_MIN = 0 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MAX = 10 as WholeNumber;
 
 export const PLAYBACK_SPEED_STEPS: readonly number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3];
-export const PLAYBACK_SPEED_DEFAULT = 1 as const;
+export const PLAYBACK_SPEED_DEFAULT = 1;
 export const PLAYBACK_SPEED_MIN = PLAYBACK_SPEED_STEPS[0];
 export const PLAYBACK_SPEED_MAX = PLAYBACK_SPEED_STEPS[PLAYBACK_SPEED_STEPS.length - 1];
-export const PLAYBACK_SPEED_SAFARI_MIN = 0.5 as const;
-export const PLAYBACK_SPEED_SAFARI_MAX = 2.0 as const;
+export const PLAYBACK_SPEED_SAFARI_MIN = 0.5;
+export const PLAYBACK_SPEED_SAFARI_MAX = 2.0;
 export const isValidPlaybackSpeed = (speed: number): boolean =>
   Number.isFinite(speed) && speed >= PLAYBACK_SPEED_MIN && speed <= PLAYBACK_SPEED_MAX;
 
@@ -97,13 +97,13 @@ export const PLUME_DEFAULTS = {
     goToTrack: true,
     tracklist: true,
     quickSeek: true,
+    waveform: false,
     speedControl: true,
     loopModes: true,
     fullscreen: true,
     visualizer: false,
     bpmDetect: false,
-    waveform: false,
-  } as const,
+  },
 } as const;
 
 export interface TimeState {
@@ -113,15 +113,15 @@ export interface TimeState {
 }
 
 export type FeatureFlags = {
+  runtime: boolean;
   goToTrack: boolean;
   tracklist: boolean;
+  quickSeek: boolean;
+  waveform: boolean;
   speedControl: boolean;
   loopModes: boolean;
-  bpmDetect: boolean;
-  visualizer: boolean;
-  waveform: boolean;
   fullscreen: boolean;
-  quickSeek: boolean;
-  runtime: boolean;
+  visualizer: boolean;
+  bpmDetect: boolean;
 };
 export type FeatureFlagKey = keyof FeatureFlags;

@@ -1,14 +1,8 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { FakeAppCore } from "../../../fakes/FakeAppCore";
 
-vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: {
-    tracklistDropdown: "div#plume-tracklist-dropdown",
-    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
-    tracklistItem: "div.plume-tracklist-item",
-  },
-}));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/svg", () => ({ setSvgContent: vi.fn() }));
 vi.mock("@/svg/icons", () => ({ PLUME_SVG: { chevronDown: "" } }));

@@ -8,8 +8,6 @@ import { AudioFetchError } from "@/shared/errors";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-const { WAVEFORM_PEAK_COLUMNS } = PLUME_CONSTANTS;
-
 const fetchAudioViaBackground = async (audioStreamUrl: string): Promise<ArrayBuffer> => {
   const browserApi = inferBrowserApi();
   const response = (await browserApi.runtime.sendMessage({
@@ -58,7 +56,7 @@ const resolveCurrentTrackAudioInfo = (infos: TrackAudioInfo[]): TrackAudioInfo |
 export const decodeWaveformForCurrentTrack = async (): Promise<Float32Array | null> => {
   const trackAudio = getTrackAudioInstance();
   const infos = trackAudio.getTrackAudioInfos();
-  const currentInfo = resolveCurrentTrackAudioInfo(infos);
+  const currentInfo: TrackAudioInfo | null = resolveCurrentTrackAudioInfo(infos);
 
   if (!currentInfo?.audioStreamUrl) return null;
 
@@ -70,7 +68,7 @@ export const decodeWaveformForCurrentTrack = async (): Promise<Float32Array | nu
     const buffer = await fetchAudioViaBackground(audioStreamUrl);
     const audioBuffer = await audioContext.decodeAudioData(buffer);
     const samples = audioBuffer.getChannelData(0);
-    const peaks = downsampleToPeaks(samples, WAVEFORM_PEAK_COLUMNS);
+    const peaks = downsampleToPeaks(samples, PLUME_CONSTANTS.WAVEFORM_PEAK_COLUMNS);
 
     logger(CPL.INFO, getString("INFO__WAVEFORM__DECODE_SUCCESS", [trackUrl]));
     return peaks;

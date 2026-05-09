@@ -218,6 +218,20 @@
       "DURATION": { "content": "$2" }
     }
   },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Audio waveform" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Audio waveform — loading..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Decoding waveform for: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Waveform decoded for: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Waveform decode failed for: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
@@ -345,22 +359,6 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Audio Visualizer" },
-  "LABEL__FEATURES__WAVEFORM": { "message": "Waveform scrubber" },
-  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Not available for tracks over 20 min." },
-  "ARIA__WAVEFORM_CANVAS": { "message": "Audio waveform" },
-  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Audio waveform — loading..." },
-  "INFO__WAVEFORM__DECODE_START": {
-    "message": "Decoding waveform for: $TRACK_URL$",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
-  },
-  "INFO__WAVEFORM__DECODE_SUCCESS": {
-    "message": "Waveform decoded for: $TRACK_URL$",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
-  },
-  "WARN__WAVEFORM__DECODE_FAILED": {
-    "message": "Waveform decode failed for: $TRACK_URL$",
-    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
-  },
 
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
@@ -443,13 +441,15 @@
   },
 
   "POPUP__FEATURES__TAB_LABEL": { "message": "Features" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Go to track" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Tracklist" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Waveform progress bar" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Not available for tracks over 20 min." },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Loop modes" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
-  "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
-  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "BPM Detection" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
 

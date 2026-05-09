@@ -85,41 +85,55 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
   });
 });
 
-describe("waveform notice", () => {
-  const getNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
-    wrapper.querySelector(".setting-row__notice") as HTMLParagraphElement;
+describe("flipper notice (noticeKey)", () => {
+  const getWaveformNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
+    wrapper.querySelector("#feature-label-waveform .setting-row__notice") as HTMLParagraphElement;
 
-  it("is hidden when waveform starts off", () => {
+  it("is not rendered for flippers without a noticeKey", () => {
+    const wrapper = buildPanel();
+    const runtimeLabel = wrapper.querySelector("#feature-label-runtime");
+
+    expect(runtimeLabel?.querySelector(".setting-row__notice")).toBeNull();
+  });
+
+  it("is rendered inside the flipper label for flippers with a noticeKey", () => {
+    const wrapper = buildPanel({ waveform: false });
+    const waveformLabel = wrapper.querySelector("#feature-label-waveform");
+
+    expect(waveformLabel?.querySelector(".setting-row__notice")).not.toBeNull();
+  });
+
+  it("is hidden when the feature starts off", () => {
     const wrapper = buildPanel({ waveform: false });
 
-    expect(getNotice(wrapper).hidden).toBe(true);
+    expect(getWaveformNotice(wrapper).hidden).toBe(true);
   });
 
-  it("is visible when waveform starts on", () => {
+  it("is visible when the feature starts on", () => {
     const wrapper = buildPanel({ waveform: true });
 
-    expect(getNotice(wrapper).hidden).toBe(false);
+    expect(getWaveformNotice(wrapper).hidden).toBe(false);
   });
 
-  it("becomes visible when the waveform toggle is clicked on", () => {
+  it("becomes visible when the toggle is clicked on", () => {
     const wrapper = buildPanel({ waveform: false });
     getToggle(wrapper, "waveform").click();
 
-    expect(getNotice(wrapper).hidden).toBe(false);
+    expect(getWaveformNotice(wrapper).hidden).toBe(false);
   });
 
-  it("becomes hidden when the waveform toggle is clicked off", () => {
+  it("becomes hidden when the toggle is clicked off", () => {
     const wrapper = buildPanel({ waveform: true });
     getToggle(wrapper, "waveform").click();
 
-    expect(getNotice(wrapper).hidden).toBe(true);
+    expect(getWaveformNotice(wrapper).hidden).toBe(true);
   });
 
-  it("becomes hidden after reset when waveform was on", () => {
+  it("becomes hidden after reset when the feature was on", () => {
     const wrapper = buildPanel({ waveform: true });
     const resetBtn = wrapper.querySelector<HTMLButtonElement>(".popup__reset-btn")!;
     resetBtn.click();
 
-    expect(getNotice(wrapper).hidden).toBe(true);
+    expect(getWaveformNotice(wrapper).hidden).toBe(true);
   });
 });
