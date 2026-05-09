@@ -260,10 +260,15 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       const appState = appCore.getState();
       syncBpmDisplay(appState.trackBpms);
 
-      // New track: clear stale waveform and re-decode for each visible canvas
-      const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
-      waveformCanvases.forEach(clearWaveform);
-      waveformCanvases.forEach((canvas) => void triggerWaveformDecode(canvas));
+      if (appState.featureFlags.waveform) {
+        const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
+        // Snapshot visible canvases before clearing — clearWaveform adds featureHidden, so the filter must run first.
+        const visibleCanvases = Array.from(waveformCanvases).filter(
+          (canvas) => !canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)
+        );
+        visibleCanvases.forEach((canvas) => clearWaveform(canvas));
+        visibleCanvases.forEach((canvas) => void triggerWaveformDecode(canvas));
+      }
     })
   );
 
