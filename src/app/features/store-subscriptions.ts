@@ -38,6 +38,12 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
   const storeSubscriptions: Array<SubscriptionCallback> = [];
   const plume = getGuiInstance().getState();
 
+  // Canvas cache — avoids repeated querySelectorAll on the hot currentTime path. Refreshed on fullscreen enter and exit
+  let waveformCanvasCache: HTMLCanvasElement[] = [];
+  const refreshWaveformCanvasCache = (): void => {
+    waveformCanvasCache = Array.from(document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas));
+  };
+
   // Cached once at setup time since plume-volume-value is a static node.
   const volumeValueDisplay = plume.volumeSlider.parentElement?.querySelector(
     PLUME_ELEM_SELECTORS.volumeValue
@@ -66,11 +72,9 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
       plume.durationDisplay.textContent = appCore.computed.formattedDuration();
 
-      // Sync waveform playhead on all visible waveform canvases
-      const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
-      waveformCanvases.forEach((canvas) => {
-        syncWaveformPlayhead(canvas, progressFraction);
-      });
+      if (state.featureFlags.waveform) {
+        waveformCanvasCache.forEach((canvas) => syncWaveformPlayhead(canvas, progressFraction));
+      }
     }),
     appCore.subscribe("volume", (volume) => {
       const plumeUi = getGuiInstance();
@@ -242,8 +246,7 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
       // Waveform scrubber: on enable → decode (canvas shown only on success); on disable → clear and hide
       if (flags.waveform !== prevFlags.waveform) {
-        const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
-        waveformCanvases.forEach((canvas) => {
+        waveformCanvasCache.forEach((canvas) => {
           if (flags.waveform) void triggerWaveformDecode(canvas);
           else clearWaveform(canvas);
         });
@@ -261,27 +264,30 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       syncBpmDisplay(appState.trackBpms);
 
       if (appState.featureFlags.waveform) {
-        const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
         // Snapshot visible canvases before clearing — clearWaveform adds featureHidden, so the filter must run first.
-        const visibleCanvases = Array.from(waveformCanvases).filter(
+        const visibleCanvases = waveformCanvasCache.filter(
           (canvas) => !canvas.classList.contains(PLUME_CSS_CLASSES.featureHidden)
         );
         visibleCanvases.forEach((canvas) => clearWaveform(canvas));
         visibleCanvases.forEach((canvas) => void triggerWaveformDecode(canvas));
       }
+    }),
+    appCore.subscribe("isFullscreen", (isFullscreen) => {
+      if (isFullscreen) refreshWaveformCanvasCache();
+      else queueMicrotask(refreshWaveformCanvasCache);
     })
   );
 
   logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
 
+  // Populate the canvas cache now that the DOM is stable; the isFullscreen subscription keeps it fresh.
+  refreshWaveformCanvasCache();
+
   // Subscriptions only fire on state *changes*. If waveform is already enabled when the page loads
   // (featureFlags and trackNumber both already set), neither subscription fires and the decode never
   // starts. Kick it off explicitly here so the initial page visit renders like subsequent ones.
   if (appCore.getState().featureFlags.waveform) {
-    const waveformCanvases = document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas);
-    waveformCanvases.forEach((canvas) => {
-      void triggerWaveformDecode(canvas);
-    });
+    waveformCanvasCache.forEach((canvas) => void triggerWaveformDecode(canvas));
   }
 
   return () => {

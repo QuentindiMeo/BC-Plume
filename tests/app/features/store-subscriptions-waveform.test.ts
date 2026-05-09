@@ -3,11 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockClearWaveform = vi.hoisted(() => vi.fn());
 const mockTriggerWaveformDecode = vi.hoisted(() => vi.fn());
+const mockSyncWaveformPlayhead = vi.hoisted(() => vi.fn());
 
 vi.mock("@/app/features/ui/waveform", () => ({
   clearWaveform: mockClearWaveform,
   triggerWaveformDecode: mockTriggerWaveformDecode,
-  syncWaveformPlayhead: vi.fn(),
+  syncWaveformPlayhead: mockSyncWaveformPlayhead,
 }));
 vi.mock("@/app/features/ui/bpm-display", () => ({ syncBpmDisplay: vi.fn() }));
 vi.mock("@/app/features/ui/playback", () => ({ applyPlaybackControlsSize: vi.fn() }));
@@ -46,6 +47,8 @@ import { PLUME_DEFAULTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { PLUME_CSS_CLASSES } from "@/infra/elements/plume";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
+
+const DURATION = 100; // non-zero so the currentTime guard passes
 
 let fakeAppCore = new FakeAppCore();
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
@@ -136,5 +139,76 @@ describe("trackNumber subscription — waveform gating", () => {
     fakeAppCore.dispatch(coreActions.setTrackNumber("1"));
 
     expect(vi.mocked(syncBpmDisplay)).toHaveBeenCalled();
+  });
+});
+
+describe("currentTime subscription — waveform flag guard and cache", () => {
+  it("does not call syncWaveformPlayhead when waveform flag is off", () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: false },
+      duration: DURATION,
+    });
+    makeCanvas();
+    cleanup = setupStoreSubscriptions();
+
+    fakeAppCore.dispatch(coreActions.setCurrentTime(5));
+
+    expect(mockSyncWaveformPlayhead).not.toHaveBeenCalled();
+  });
+
+  it("calls syncWaveformPlayhead with the cached canvas when waveform flag is on", () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      duration: DURATION,
+    });
+    const canvas = makeCanvas();
+    cleanup = setupStoreSubscriptions();
+    mockSyncWaveformPlayhead.mockClear();
+
+    fakeAppCore.dispatch(coreActions.setCurrentTime(5));
+
+    expect(mockSyncWaveformPlayhead).toHaveBeenCalledWith(canvas, 5 / DURATION);
+  });
+});
+
+describe("isFullscreen subscription — waveform canvas cache refresh", () => {
+  it("includes a canvas added before isFullscreen=true in subsequent waveform operations", () => {
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+    });
+    makeCanvas(); // main canvas — in DOM at setup time (1 canvas in cache)
+    cleanup = setupStoreSubscriptions();
+    mockTriggerWaveformDecode.mockClear();
+
+    // Simulate fullscreen enter: clone canvas appended to DOM, then state dispatched
+    makeCanvas(); // fullscreen clone canvas
+    fakeAppCore.dispatch(coreActions.setIsFullscreen(true));
+
+    fakeAppCore.dispatch(coreActions.setTrackNumber("1"));
+
+    // Both canvases should now be decoded (cache updated to 2 on enter)
+    expect(mockTriggerWaveformDecode).toHaveBeenCalledTimes(2);
+  });
+
+  it("excludes the removed canvas after isFullscreen=false once the microtask flushes", async () => {
+    // Start in fullscreen so the false-dispatch triggers a real state transition
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, waveform: true },
+      isFullscreen: true,
+    });
+    makeCanvas(); // main canvas
+    const cloneCanvas = makeCanvas(); // fullscreen clone — starts in DOM
+    cleanup = setupStoreSubscriptions(); // cache has both canvases
+    mockTriggerWaveformDecode.mockClear();
+
+    // Simulate exitFullscreenMode: dispatch fires before DOM removal (mirrors production order)
+    fakeAppCore.dispatch(coreActions.setIsFullscreen(false));
+    cloneCanvas.remove();
+    await Promise.resolve(); // flush the queueMicrotask — cache re-queries without the clone
+
+    fakeAppCore.dispatch(coreActions.setTrackNumber("2"));
+
+    // Only the main canvas should be decoded (cache shrank to 1 after exit)
+    expect(mockTriggerWaveformDecode).toHaveBeenCalledTimes(1);
   });
 });
