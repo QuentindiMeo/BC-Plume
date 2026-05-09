@@ -345,6 +345,22 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lettore musicale a schermo intero" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizzatore audio" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Scrubber forma d'onda" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Non disponibile per tracce superiori a 20 min." },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forma d'onda audio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forma d'onda audio — caricamento..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Decodifica forma d'onda per: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forma d'onda decodificata per: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Decodifica forma d'onda fallita per: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
 
   "POPUP_TITLE": { "message": "Impostazioni" },
   "ARIA__POPUP__TABLIST": { "message": "Sezioni impostazioni" },

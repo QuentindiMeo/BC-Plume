@@ -347,6 +347,22 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reprodutor de música em tela cheia" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de áudio" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Barra de forma de onda" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Não disponível para faixas com mais de 20 min." },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forma de onda de áudio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forma de onda de áudio — carregando..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Decodificando forma de onda para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forma de onda decodificada para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Falha ao decodificar forma de onda para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
 
   "POPUP_TITLE": { "message": "Painel de configurações" },
   "ARIA__POPUP__TABLIST": { "message": "Seções de configurações" },
