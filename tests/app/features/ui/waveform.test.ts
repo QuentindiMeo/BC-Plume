@@ -170,7 +170,7 @@ describe("clearWaveform", () => {
     clearWaveform(canvas);
     ctx.fillRect.mockClear();
 
-    syncWaveformPlayhead(canvas, 0.5, "#ff0000");
+    syncWaveformPlayhead(canvas, 0.5);
 
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
@@ -184,7 +184,7 @@ describe("syncWaveformPlayhead", () => {
     const ctx = makeMockCtx();
     vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
 
-    syncWaveformPlayhead(canvas, 0.5, "#ff0000");
+    syncWaveformPlayhead(canvas, 0.5);
 
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
@@ -199,7 +199,7 @@ describe("syncWaveformPlayhead", () => {
     await triggerWaveformDecode(canvas);
     ctx.fillRect.mockClear();
 
-    syncWaveformPlayhead(canvas, 0.5, "#ff0000");
+    syncWaveformPlayhead(canvas, 0.5);
 
     expect(ctx.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
   });
@@ -257,5 +257,24 @@ describe("triggerWaveformDecode", () => {
     await decodePromise;
 
     expect(ctx.fillRect).not.toHaveBeenCalled();
+  });
+
+  it("skips decode and renders immediately when peaks are already cached (fast path)", async () => {
+    mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
+
+    // First call seeds the cache
+    const canvas1 = makeCanvas();
+    vi.spyOn(canvas1, "getContext").mockReturnValue(makeMockCtx() as unknown as CanvasRenderingContext2D);
+    await triggerWaveformDecode(canvas1);
+    mockDecodeWaveformForCurrentTrack.mockClear();
+
+    // Second call should use cache without decoding
+    const canvas2 = makeCanvas();
+    const ctx2 = makeMockCtx();
+    vi.spyOn(canvas2, "getContext").mockReturnValue(ctx2 as unknown as CanvasRenderingContext2D);
+    await triggerWaveformDecode(canvas2);
+
+    expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
+    expect(ctx2.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
   });
 });

@@ -7,6 +7,7 @@ import { syncLoopBtn } from "@/app/features/ui/loop";
 import { applyPlaybackControlsSize } from "@/app/features/ui/playback";
 import { createToast } from "@/app/features/ui/toast";
 import { syncMuteBtn } from "@/app/features/ui/volume";
+import { clearWaveform, syncWaveformPlayhead, triggerWaveformDecode } from "@/app/features/ui/waveform";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
@@ -64,6 +65,11 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
       // Update time displays
       plume.elapsedDisplay.textContent = presentFormattedTime(elapsed);
       plume.durationDisplay.textContent = appCore.computed.formattedDuration();
+
+      // Sync waveform playhead on all visible waveform canvases
+      document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
+        syncWaveformPlayhead(canvas, progressFraction);
+      });
     }),
     appCore.subscribe("volume", (volume) => {
       const plumeUi = getGuiInstance();
@@ -231,6 +237,14 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
         if (bpmContainer) bpmContainer.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
       }
 
+      // Waveform scrubber: show/hide canvas and trigger decode when enabling
+      if (flags.waveform !== prevFlags.waveform) {
+        document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
+          canvas.classList.toggle("plume-feature-hidden", !flags.waveform);
+          if (flags.waveform) void triggerWaveformDecode(canvas);
+        });
+      }
+
       // Resize playback controls to fit the number of visible children
       const controls = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (controls) applyPlaybackControlsSize(controls);
@@ -241,6 +255,13 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
     appCore.subscribe("trackNumber", () => {
       const appState = appCore.getState();
       syncBpmDisplay(appState.trackBpms);
+
+      // New track: clear stale waveform and re-decode for each visible canvas
+      const waveformCanvases = Array.from(
+        document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas)
+      );
+      waveformCanvases.forEach(clearWaveform);
+      waveformCanvases.forEach((canvas) => void triggerWaveformDecode(canvas));
     })
   );
 

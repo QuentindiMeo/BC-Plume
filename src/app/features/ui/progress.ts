@@ -1,6 +1,7 @@
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { createWaveformCanvas } from "@/app/features/ui/waveform";
 import { seekToProgress, toggleDurationDisplay } from "@/app/use-cases";
 import { INITIAL_TIME_DISPLAY, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
@@ -68,6 +69,7 @@ export const createProgressBar = (): HTMLDivElement => {
 
   timeDisplay.appendChild(elapsed);
   timeDisplay.appendChild(duration);
+  container.appendChild(createWaveformCanvas());
   container.appendChild(progressSlider);
   container.appendChild(timeDisplay);
 

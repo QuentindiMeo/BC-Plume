@@ -49,6 +49,16 @@ export const renderWaveform = (
 };
 
 export const triggerWaveformDecode = async (canvas: HTMLCanvasElement): Promise<void> => {
+  // Fast path: peaks already cached for this track — skip decode and render immediately.
+  if (cachedPeaks) {
+    canvas.classList.remove("plume-feature-hidden");
+    const appState = getAppCoreInstance().getState();
+    const progressFraction =
+      appState.currentTime != null && appState.duration ? appState.currentTime / appState.duration : 0;
+    renderWaveform(canvas, cachedPeaks, progressFraction, getAccentColor());
+    return;
+  }
+
   decodeAbortFlag = false;
   const peaks = await decodeWaveformForCurrentTrack();
 
@@ -73,13 +83,9 @@ export const clearWaveform = (canvas: HTMLCanvasElement): void => {
   if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-export const syncWaveformPlayhead = (
-  canvas: HTMLCanvasElement,
-  progressFraction: number,
-  accentColor: string
-): void => {
+export const syncWaveformPlayhead = (canvas: HTMLCanvasElement, progressFraction: number): void => {
   if (!cachedPeaks) return;
-  renderWaveform(canvas, cachedPeaks, progressFraction, accentColor);
+  renderWaveform(canvas, cachedPeaks, progressFraction, getAccentColor());
 };
 
 // Reads the Bandcamp accent color from the CSS custom property set on :root.

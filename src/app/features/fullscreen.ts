@@ -1,6 +1,7 @@
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
+import { triggerWaveformDecode } from "@/app/features/ui/waveform";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   applyPlaybackControlsSize,
@@ -380,6 +381,10 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         if (flags.visualizer) runVisualizer(vizCanvas);
         else stopVisualizer();
       }
+      if (flags.waveform !== prevFlags.waveform && fsWaveformCanvas) {
+        fsWaveformCanvas.classList.toggle("plume-feature-hidden", !flags.waveform);
+        if (flags.waveform) void triggerWaveformDecode(fsWaveformCanvas);
+      }
       const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (fsControls) applyPlaybackControlsSize(fsControls);
     })
@@ -432,6 +437,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.visualizerCanvas) ?? null;
   if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
 
+  const fsWaveformCanvas = clone.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas) ?? null;
+
   // Initialize fullscreen UI with current state using the same rendering functions
   const appState = appCore.getState();
 
@@ -465,6 +472,9 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   renderTrackNumber(elements, appState.trackNumber);
   if (flags.loopModes) renderLoopButton(elements, appState.loopMode);
   lastCurrentTime = appState.currentTime ?? 0;
+
+  // Render waveform on the fullscreen canvas if the feature is enabled (fast path when peaks cached)
+  if (fsWaveformCanvas && flags.waveform) void triggerWaveformDecode(fsWaveformCanvas);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {

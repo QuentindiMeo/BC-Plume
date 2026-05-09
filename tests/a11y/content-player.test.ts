@@ -53,6 +53,7 @@ vi.mock("@/infra/elements/plume", () => ({
     timeDisplay: "div#plume-time-display",
     elapsedDisplay: "span#plume-elapsed-display",
     durationDisplay: "button#plume-duration-display",
+    waveformCanvas: "canvas#plume-waveform-canvas",
     fullscreenBtn: "button#plume-fullscreen-btn",
     fullscreenBtnLabel: "span#plume-fullscreen-btn-label",
     fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
