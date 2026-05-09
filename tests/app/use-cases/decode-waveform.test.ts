@@ -167,4 +167,41 @@ describe("decodeWaveformForCurrentTrack", () => {
 
     expect(mockSendMessage).toHaveBeenCalledWith({ action: BPM_FETCH_ACTION, url: track2.audioStreamUrl });
   });
+
+  it("returns null on an album page when trackNumber is null", async () => {
+    fakeTrackAudio.getTrackAudioInfos.mockReturnValue([
+      { trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: AUDIO_URL },
+      { trackNumber: 2, trackUrl: "/track/b", audioStreamUrl: "https://audio-b.mp3" },
+    ]);
+    // fakeAppCore defaults to trackNumber: null
+
+    const peaks = await decodeWaveformForCurrentTrack();
+
+    expect(peaks).toBeNull();
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("returns null on an album page when trackNumber does not match any track", async () => {
+    fakeTrackAudio.getTrackAudioInfos.mockReturnValue([
+      { trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: AUDIO_URL },
+      { trackNumber: 2, trackUrl: "/track/b", audioStreamUrl: "https://audio-b.mp3" },
+    ]);
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags },
+      trackNumber: "99/5",
+    });
+
+    const peaks = await decodeWaveformForCurrentTrack();
+
+    expect(peaks).toBeNull();
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("returns null when background fetch response data is null", async () => {
+    mockSendMessage.mockResolvedValue({ ok: true, data: null });
+
+    const peaks = await decodeWaveformForCurrentTrack();
+
+    expect(peaks).toBeNull();
+  });
 });

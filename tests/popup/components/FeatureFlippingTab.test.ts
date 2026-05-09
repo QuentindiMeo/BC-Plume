@@ -84,3 +84,42 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
     expect(bpmToggle.ariaChecked).toBe("false");
   });
 });
+
+describe("waveform notice", () => {
+  const getNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
+    wrapper.querySelector(".setting-row__notice") as HTMLParagraphElement;
+
+  it("is hidden when waveform starts off", () => {
+    const wrapper = buildPanel({ waveform: false });
+
+    expect(getNotice(wrapper).hidden).toBe(true);
+  });
+
+  it("is visible when waveform starts on", () => {
+    const wrapper = buildPanel({ waveform: true });
+
+    expect(getNotice(wrapper).hidden).toBe(false);
+  });
+
+  it("becomes visible when the waveform toggle is clicked on", () => {
+    const wrapper = buildPanel({ waveform: false });
+    getToggle(wrapper, "waveform").click();
+
+    expect(getNotice(wrapper).hidden).toBe(false);
+  });
+
+  it("becomes hidden when the waveform toggle is clicked off", () => {
+    const wrapper = buildPanel({ waveform: true });
+    getToggle(wrapper, "waveform").click();
+
+    expect(getNotice(wrapper).hidden).toBe(true);
+  });
+
+  it("becomes hidden after reset when waveform was on", () => {
+    const wrapper = buildPanel({ waveform: true });
+    const resetBtn = wrapper.querySelector<HTMLButtonElement>(".popup__reset-btn")!;
+    resetBtn.click();
+
+    expect(getNotice(wrapper).hidden).toBe(true);
+  });
+});

@@ -154,6 +154,53 @@ describe("renderWaveform", () => {
 
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
+
+  it("uses muted color for all bars when progressFraction is 0", () => {
+    const canvas = makeCanvas();
+    const ctx = makeMockCtx();
+    const filledColors: string[] = [];
+    Object.defineProperty(ctx, "fillStyle", {
+      set(v: string) {
+        filledColors.push(v);
+      },
+      get() {
+        return "";
+      },
+    });
+    vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+
+    renderWaveform(canvas, fakePeaks, 0, "#ff0000");
+
+    expect(filledColors.every((c) => c !== "#ff0000")).toBe(true);
+  });
+
+  it("uses accent color for all bars when progressFraction is 1", () => {
+    const canvas = makeCanvas();
+    const ctx = makeMockCtx();
+    const filledColors: string[] = [];
+    Object.defineProperty(ctx, "fillStyle", {
+      set(v: string) {
+        filledColors.push(v);
+      },
+      get() {
+        return "";
+      },
+    });
+    vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+
+    renderWaveform(canvas, fakePeaks, 1, "#ff0000");
+
+    expect(filledColors.every((c) => c === "#ff0000")).toBe(true);
+  });
+
+  it("handles empty peaks without throwing and draws nothing", () => {
+    const canvas = makeCanvas();
+    const ctx = makeMockCtx();
+    vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+
+    expect(() => renderWaveform(canvas, new Float32Array(0), 0, "#ff0000")).not.toThrow();
+    expect(ctx.fillRect).not.toHaveBeenCalled();
+  });
 });
 
 // ─── clearWaveform ────────────────────────────────────────────────────────────
@@ -298,6 +345,23 @@ describe("triggerWaveformDecode", () => {
 
     expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
     expect(ctx2.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
+  });
+
+  it("uses fast path on a second call to the same canvas without clearWaveform between", async () => {
+    mockDecodeWaveformForCurrentTrack.mockResolvedValue(fakePeaks);
+
+    const canvas = makeCanvas();
+    const ctx = makeMockCtx();
+    vi.spyOn(canvas, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
+
+    await triggerWaveformDecode(canvas);
+    mockDecodeWaveformForCurrentTrack.mockClear();
+    ctx.fillRect.mockClear();
+
+    await triggerWaveformDecode(canvas);
+
+    expect(mockDecodeWaveformForCurrentTrack).not.toHaveBeenCalled();
+    expect(ctx.fillRect).toHaveBeenCalledTimes(PEAK_COUNT);
   });
 });
 
