@@ -1,4 +1,5 @@
 export { shouldShowReleaseToast } from "@/app/use-cases/check-release-toast";
+export { decodeWaveformForCurrentTrack } from "@/app/use-cases/decode-waveform";
 export { cycleLoopMode } from "@/app/use-cases/cycle-loop-mode";
 export { cyclePlaybackSpeed } from "@/app/use-cases/cycle-playback-speed";
 export { navigateToTrack } from "@/app/use-cases/navigate-to-track";

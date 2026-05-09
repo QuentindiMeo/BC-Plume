@@ -220,6 +220,20 @@
       "DURATION": { "content": "$2" }
     }
   },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Звуковая форма волны" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Звуковая форма волны — загрузка..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Декодирование формы волны для: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Форма волны декодирована для: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Ошибка декодирования формы волны для: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Кнопка отключения звука не найдена" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Регулятор громкости или элемент отображения не найден" },
@@ -429,13 +443,18 @@
   },
 
   "POPUP__FEATURES__TAB_LABEL": { "message": "Функции" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Длительность" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Перейти к треку" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Список треков" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Быстрый переход (0–9)" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Прогресс-бар с формой волны" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Недоступно для треков длиннее $LIMIT_MINUTES$ мин.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Управление скоростью" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Режимы повтора" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Полноэкранный режим" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Быстрый переход (0–9)" },
-  "LABEL__FEATURES__RUNTIME": { "message": "Длительность" },
-  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Управление скоростью" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Определение BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Ошибка сохранения настроек функций" },
 

@@ -172,6 +172,14 @@ body {
   }
 }
 
+.setting-row__notice {
+  @apply text-2xs text-popup-text-muted leading-tight;
+
+  &[hidden] {
+    @apply hidden;
+  }
+}
+
 /* Footer (hotkeys tab reset section) */
 .popup__footer {
   @apply pt-5 px-4 pb-2 flex justify-end items-center gap-2;

@@ -12,9 +12,6 @@ vi.mock("@/app/stores/adapters", () => ({
 vi.mock("@/app/use-cases/seek-to-progress", () => ({ seekToProgress: vi.fn() }));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: {}, logger: vi.fn() }));
-vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: { tracklistDropdown: "div#plume-tracklist-dropdown" },
-}));
 
 import { bindingKey, setupHotkeys } from "@/app/features/keyboard";
 import { seekToProgress } from "@/app/use-cases/seek-to-progress";

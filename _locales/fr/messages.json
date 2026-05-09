@@ -224,6 +224,20 @@
       "DURATION": { "content": "$2" }
     }
   },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forme d'onde audio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forme d'onde audio — chargement..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Décodage de la forme d'onde pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forme d'onde décodée pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Échec du décodage de la forme d'onde pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Bouton de coupure du son non trouvé" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Élément de curseur de volume ou d'affichage non trouvé" },
@@ -438,13 +452,18 @@
   },
 
   "POPUP__FEATURES__TAB_LABEL": { "message": "Fonctionnalités" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Aller à la piste" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Barre de progression à forme d'onde" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Non disponible pour les pistes de plus de $LIMIT_MINUTES$ min.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
-  "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
-  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Détection de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 

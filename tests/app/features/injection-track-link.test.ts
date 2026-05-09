@@ -1,23 +1,6 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: {
-    plumeContainer: "div#plume-root",
-    headerContainer: "div#plume-header-container",
-    headerLogo: "a#plume-header-logo",
-    headerCurrent: "div#plume-header-current",
-    headerTitlePretext: "span#plume-header-title-pretext",
-    headerTitle: "span#plume-header-title",
-    headerTrackLink: "a#plume-header-track-link",
-    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
-    tracklistDropdown: "div#plume-tracklist-dropdown",
-    playbackManager: "div#plume-playback-manager",
-    progressContainer: "div#plume-progress-container",
-    bpmContainer: "div#plume-bpm-container",
-    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
-  },
-}));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
 vi.mock("@/shared/logger", () => ({ CPL: { WARN: "warn", LOG: "log", ERROR: "error" }, logger: vi.fn() }));
 vi.mock("@/shared/svg", () => ({

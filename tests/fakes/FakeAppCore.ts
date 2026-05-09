@@ -114,6 +114,9 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.CLEAR_TRACK_BPMS:
         this.updateState("trackBpms", {});
         break;
+      case CORE_ACTIONS.SET_IS_FULLSCREEN:
+        this.updateState("isFullscreen", action.payload);
+        break;
       case CORE_ACTIONS.SET_FEATURE_FLAGS:
         this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });
         break;

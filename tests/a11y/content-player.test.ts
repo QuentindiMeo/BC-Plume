@@ -28,36 +28,6 @@ vi.mock("@/svg/icons", () => ({
     speedGauge: "",
   },
 }));
-vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: {
-    playbackControls: "div#plume-playback-controls",
-    speedWrapper: "div#plume-speed-wrapper",
-    speedBtn: "button#plume-speed-btn",
-    speedBtnText: "span#plume-speed-btn__text",
-    speedPopover: "div.plume-speed-popover",
-    speedLabel: "span.plume-speed-label",
-    speedCustomInput: "input.plume-speed-custom-input",
-    speedSlider: "input.plume-speed-slider",
-    trackBwdBtn: "button#plume-track-bwd-btn",
-    timeBwdBtn: "button#plume-time-bwd-btn",
-    playPauseBtn: "button#plume-play-pause-btn",
-    timeFwdBtn: "button#plume-time-fwd-btn",
-    trackFwdBtn: "button#plume-track-fwd-btn",
-    loopBtn: "button#plume-loop-btn",
-    volumeContainer: "div#plume-volume-container",
-    muteBtn: "button#plume-mute-btn",
-    volumeSlider: "input#plume-volume-slider",
-    volumeValue: "div#plume-volume-value",
-    progressContainer: "div#plume-progress-container",
-    progressSlider: "input#plume-progress-slider",
-    timeDisplay: "div#plume-time-display",
-    elapsedDisplay: "span#plume-elapsed-display",
-    durationDisplay: "button#plume-duration-display",
-    fullscreenBtn: "button#plume-fullscreen-btn",
-    fullscreenBtnLabel: "span#plume-fullscreen-btn-label",
-    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
-  },
-}));
 
 let fakeAppCore = new FakeAppCore();
 const fakeMusicPlayer = new FakeMusicPlayer();

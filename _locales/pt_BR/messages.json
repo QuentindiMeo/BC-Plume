@@ -220,6 +220,20 @@
       "DURATION": { "content": "$2" }
     }
   },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forma de onda de áudio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forma de onda de áudio — carregando..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Decodificando forma de onda para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forma de onda decodificada para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Falha ao decodificar forma de onda para: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Botão de silenciar não encontrado" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Controle de volume ou elemento de exibição não encontrado" },
@@ -429,13 +443,18 @@
   },
 
   "POPUP__FEATURES__TAB_LABEL": { "message": "Funcionalidades" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Duração" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Ir para a faixa" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista de faixas" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Busca rápida (0–9)" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Barra de progresso com forma de onda" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Não disponível para faixas com mais de $LIMIT_MINUTES$ min.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Controle de velocidade" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Modos de repetição" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Tela cheia" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Busca rápida (0–9)" },
-  "LABEL__FEATURES__RUNTIME": { "message": "Duração" },
-  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Controle de velocidade" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Detecção de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Falha ao salvar preferências de funcionalidades" },
 
