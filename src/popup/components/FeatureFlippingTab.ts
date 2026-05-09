@@ -31,6 +31,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
   const toggleBtns = new Map<FeatureFlagKey, HTMLButtonElement>();
 
   let resetBtn: HTMLButtonElement | null = null;
+  let waveformNotice: HTMLParagraphElement | null = null;
 
   const syncResetVisibility = (): void => {
     if (resetBtn) resetBtn.hidden = areAllDefaults(currentFlags);
@@ -97,7 +98,22 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     section.className = "settings__section";
     section.ariaLabel = getString("POPUP__FEATURES__TAB_LABEL");
 
-    for (const config of FLAG_ORDER) section.appendChild(buildToggleRow(config));
+    for (const config of FLAG_ORDER) {
+      const toggleRow = buildToggleRow(config);
+      section.appendChild(toggleRow);
+
+      if (config.flagKey === "waveform") {
+        waveformNotice = document.createElement("p");
+        waveformNotice.className = "setting-row__notice";
+        waveformNotice.textContent = getString("LABEL__FEATURES__WAVEFORM__NOTICE");
+        waveformNotice.hidden = !currentFlags.waveform;
+        toggleRow.firstChild?.appendChild(waveformNotice);
+
+        toggleBtns.get("waveform")!.addEventListener("click", () => {
+          if (waveformNotice) waveformNotice.hidden = !currentFlags.waveform;
+        });
+      }
+    }
 
     return section;
   };
@@ -113,6 +129,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     resetBtn.addEventListener("click", () => {
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);
       for (const [flagKey, btn] of toggleBtns) btn.ariaChecked = String(currentFlags[flagKey]);
+      if (waveformNotice) waveformNotice.hidden = !currentFlags.waveform;
       persist(currentFlags);
       syncResetVisibility();
     });

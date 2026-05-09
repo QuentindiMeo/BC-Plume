@@ -355,6 +355,7 @@
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualiseur audio" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Forme d'onde" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Non disponible pour les pistes de plus de 20 min." },
   "ARIA__WAVEFORM_CANVAS": { "message": "Forme d'onde audio" },
   "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forme d'onde audio — chargement..." },
   "INFO__WAVEFORM__DECODE_START": {

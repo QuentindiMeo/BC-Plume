@@ -267,6 +267,15 @@ export const setupStoreSubscriptions = (): CleanupCallback => {
 
   logger(CPL.INFO, getString("INFO__STATE__SUBSCRIPTIONS_SETUP"));
 
+  // Subscriptions only fire on state *changes*. If waveform is already enabled when the page loads
+  // (featureFlags and trackNumber both already set), neither subscription fires and the decode never
+  // starts. Kick it off explicitly here so the initial page visit renders like subsequent ones.
+  if (appCore.getState().featureFlags.waveform) {
+    document.querySelectorAll<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas).forEach((canvas) => {
+      void triggerWaveformDecode(canvas);
+    });
+  }
+
   return () => {
     storeSubscriptions.forEach((unsubscribe) => unsubscribe());
   };

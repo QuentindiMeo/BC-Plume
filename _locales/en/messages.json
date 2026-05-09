@@ -346,6 +346,7 @@
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Audio Visualizer" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Waveform scrubber" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": { "message": "Not available for tracks over 20 min." },
   "ARIA__WAVEFORM_CANVAS": { "message": "Audio waveform" },
   "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Audio waveform — loading..." },
   "INFO__WAVEFORM__DECODE_START": {
