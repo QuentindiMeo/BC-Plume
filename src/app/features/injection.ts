@@ -22,8 +22,8 @@ import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
 import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
-import { applyTitleLang } from "@/shared/script-lang";
 import { CPL, logger } from "@/shared/logger";
+import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -38,6 +38,14 @@ interface PlumeView {
 
   tracklistCleanup: CleanupCallback;
 }
+
+const preloadFullscreenCoverArt = (): void => {
+  const bcPlayer = getBcPlayerInstance();
+  const artworkUrl = bcPlayer.getArtworkUrl();
+  if (!artworkUrl) return;
+
+  new Image().src = artworkUrl; // Preload the cover art to ensure it's cached and can be displayed immediately when entering fullscreen mode.
+};
 
 const notifyUnplayableTracks = () => {
   const bcPlayer = getBcPlayerInstance();
@@ -224,14 +232,14 @@ const mountPlumeView = (view: PlumeView, container: Element): void => {
 export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistCleanup: CleanupCallback }> => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
-
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
     logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
     return { ok: false, tracklistCleanup: () => {} };
   }
 
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const { featureFlags, pageType } = appCore.getState();
+  const isAlbumPage = pageType === "album";
 
   hideOriginalPlayerElements();
 
@@ -249,10 +257,11 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   if (isAlbumPage) {
     addRuntime();
     const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
-    if (runtimeSpan)
-      runtimeSpan.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !appCore.getState().featureFlags.runtime);
+    if (runtimeSpan) runtimeSpan.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !featureFlags.runtime);
     notifyUnplayableTracks();
   }
+
+  if (featureFlags.fullscreen) preloadFullscreenCoverArt();
 
   // Compensate the visual shift only when the name-section overflows past the leftColumn
   if (middleCol) {

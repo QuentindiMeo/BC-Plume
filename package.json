@@ -9,7 +9,7 @@
     "build:watch": "node scripts/build.js --dev --watch",
     "build:prod": "node scripts/build.js",
     "build:test": "node scripts/build.js --test",
-    "clean": "rimraf dist build",
+    "clean": "rimraf dist build *.zip",
     "sync-version": "node scripts/sync-version.js",
     "package": "tsc --noEmit && pnpm build:prod && node scripts/package-deployer.js",
     "deploy": "pnpm clean && pnpm sync-version && pnpm package",

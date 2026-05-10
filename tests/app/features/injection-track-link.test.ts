@@ -25,6 +25,7 @@ const fakeBcPlayer = {
   getTrackRowDurations: () => ["3:00"],
   getTrackPlayabilityMap: () => [true],
   getCurrentTrackUrl: () => mockTrackUrl,
+  getArtworkUrl: () => null,
   getTrackView: () => null,
   getInfoSection: () => null,
 };
