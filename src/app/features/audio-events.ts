@@ -1,15 +1,15 @@
+import { checkAndShowDonationToast } from "@/app/features/donation-toast";
 import type { CleanupCallback } from "@/app/features/types";
 import { syncProgressToStore } from "@/app/features/ui";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getBrowserInstance } from "@/app/stores/BrowserImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
 import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
-
-const { VOLUME_SLIDER_GRANULARITY } = PLUME_CONSTANTS;
 
 export interface AudioEventCallbacks {
   updateTrackDisplay: () => void;
@@ -46,7 +46,7 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
     if (!plume.volumeSlider) return;
 
     const currentVolume = musicPlayer.getVolume();
-    plume.volumeSlider.value = `${Math.round(currentVolume * VOLUME_SLIDER_GRANULARITY)}`;
+    plume.volumeSlider.value = `${Math.round(currentVolume * PLUME_CONSTANTS.VOLUME_SLIDER_GRANULARITY)}`;
     plumeUi.dispatch(guiActions.setVolumeSlider(plume.volumeSlider));
 
     const currentIsMuted = appCore.getState().isMuted;
@@ -65,6 +65,9 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
   };
 
   const handleEnded = () => {
+    const browserCache = getBrowserInstance().getState().cache;
+    void checkAndShowDonationToast(browserCache);
+
     const pageType = appCore.getState().pageType;
     const loopMode = appCore.getState().loopMode;
     if (pageType === "album" && loopMode !== LOOP_MODE.COLLECTION) return;
