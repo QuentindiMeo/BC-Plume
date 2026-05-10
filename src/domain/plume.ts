@@ -10,6 +10,9 @@ export const PLUME_CONSTANTS = {
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
   TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
   WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
+
+  DONATION_THRESHOLDS: [60, 250, 2000, 5000, 9000, 14000, 20000, 27000, 35000, 44000] as readonly number[],
+  DONATION_MAX_DISMISSALS: 10,
 } as const;
 
 export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr", "it", "pt_BR", "ro", "ru"] as const;
