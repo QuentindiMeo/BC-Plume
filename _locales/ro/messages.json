@@ -570,6 +570,14 @@
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Introdu un număr între 0,25 și 5." },
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "intrare personalizată invalidă" },
 
+  "LABEL__TOAST__DONATION__TITLE": { "message": "Sună bine?" },
+  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume este gratuit și va rămâne astfel. Dacă ți-a îmbunătățit experiența pe Bandcamp, un mic sprijin înseamnă mult." },
+  "LABEL__TOAST__DONATION__CTA": { "message": "Susține Plume" },
+  "META__TOAST__DONATION": { "message": "donație" },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": { "message": "Full play count incremented to $COUNT$", "placeholders": { "COUNT": { "content": "$1" } } },
+  "DEBUG__DONATION__THRESHOLD__REACHED": { "message": "Donation toast threshold reached at $COUNT$ plays", "placeholders": { "COUNT": { "content": "$1" } } },
+  "INFO__DONATION__DISMISSAL__PERSISTED": { "message": "Donation toast dismissed ($DISMISSAL_COUNT$ total)", "placeholders": { "DISMISSAL_COUNT": { "content": "$1" } } },
+
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },
   "LABEL__BPM__ERROR": { "message": "—" },
