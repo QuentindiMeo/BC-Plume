@@ -13,8 +13,3 @@ export const getDonationPlayCount = async (cache: IBrowserCache): Promise<number
   const result = await cache.get([PLUME_CACHE_KEYS.FULL_PLAY_COUNT]);
   return result[PLUME_CACHE_KEYS.FULL_PLAY_COUNT] ?? 0;
 };
-
-export const getDonationDismissalCount = async (cache: IBrowserCache): Promise<number> => {
-  const result = await cache.get([PLUME_CACHE_KEYS.DONATION_DISMISSAL_COUNT]);
-  return result[PLUME_CACHE_KEYS.DONATION_DISMISSAL_COUNT] ?? 0;
-};

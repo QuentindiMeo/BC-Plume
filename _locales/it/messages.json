@@ -572,9 +572,14 @@
   "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume è gratuita e lo sarà sempre. Se ha migliorato la tua esperienza su Bandcamp, un piccolo supporto significa tanto." },
   "LABEL__TOAST__DONATION__CTA": { "message": "Supporta Plume" },
   "META__TOAST__DONATION": { "message": "donazione" },
-  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": { "message": "Full play count incremented to $COUNT$", "placeholders": { "COUNT": { "content": "$1" } } },
-  "DEBUG__DONATION__THRESHOLD__REACHED": { "message": "Donation toast threshold reached at $COUNT$ plays", "placeholders": { "COUNT": { "content": "$1" } } },
-  "INFO__DONATION__DISMISSAL__PERSISTED": { "message": "Donation toast dismissed ($DISMISSAL_COUNT$ total)", "placeholders": { "DISMISSAL_COUNT": { "content": "$1" } } },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
+    "message": "Conteggio degli ascolti completi incrementato a $COUNT$",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+  "DEBUG__DONATION__THRESHOLD__REACHED": {
+    "message": "Soglia del messaggio di donazione raggiunta a $COUNT$ ascolti",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
 
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },

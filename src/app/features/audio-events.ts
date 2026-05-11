@@ -66,7 +66,12 @@ export const setupAudioEventListeners = (callbacks: AudioEventCallbacks): Cleanu
 
   const handleEnded = () => {
     const browserCache = getBrowserInstance().getState().cache;
-    void checkAndShowDonationToast(browserCache);
+    void checkAndShowDonationToast(browserCache).catch((error: unknown) => {
+      logger(
+        CPL.ERROR,
+        `Failed to check and show donation toast: ${error instanceof Error ? error.message : String(error)}`
+      );
+    });
 
     const pageType = appCore.getState().pageType;
     const loopMode = appCore.getState().loopMode;

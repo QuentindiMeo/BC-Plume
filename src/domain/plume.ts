@@ -1,18 +1,18 @@
 export const PLUME_CONSTANTS = {
-  SPA_REINIT_DELAY_MS: 1000, // delay before reinitializing after SPA navigation
-  TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // delay for track display refresh after navigation
-  AUDIO_RETRY_MS: 1000, // delay before retrying audio element lookup
-  AUDIO_RETRY_TOAST_THRESHOLD: 3, // show toast after this many failed audio retries
-  SEEK_PAUSE_GUARD_MS: 100, // delay before re-enabling play after seek
+  SPA_REINIT_DELAY_MS: 1000, // ? delay before reinitializing after SPA navigation
+  TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // ? delay for track display refresh after navigation
+  AUDIO_RETRY_MS: 1000, // ? delay before retrying audio element lookup
+  AUDIO_RETRY_TOAST_THRESHOLD: 3, // ? show toast after this many failed audio retries
+  SEEK_PAUSE_GUARD_MS: 100, // ? delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
-  WAVEFORM_PEAK_COLUMNS: 400, // number of amplitude bars rendered across the waveform canvas
-  WAVEFORM_MAX_DURATION_SECONDS: 20 * 60, // 20 minutes — tracks longer than this are skipped, they're too heavy to fetch/decode
+  WAVEFORM_PEAK_COLUMNS: 400, // ? number of amplitude bars rendered across the waveform canvas
+  WAVEFORM_MAX_DURATION_SECONDS: 20 * 60, // 20 minutes // ? tracks longer than this are skipped, they're too heavy to fetch/decode
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
-  TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
-  WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
+  TOAST_AUTO_DISMISS: 10, // ? seconds before auto-dismissing a toast
+  WCAG_INTERACTION_TIMEOUT_MS: 700, // ? WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
 
-  DONATION_THRESHOLDS: [60, 250, 2000, 5000, 9000, 14000, 20000, 27000, 35000, 44000] as readonly number[],
-  DONATION_MAX_DISMISSALS: 10,
+  DONATION_TOAST_AUTO_DISMISS: 60,
+  DONATION_THRESHOLDS: [60, 250, 2000, 5000, 9000, 14000, 20000, 27000, 35000, 44000] as const as readonly number[], // ? full-track-play milestones at which to show the donation toast
 } as const;
 
 export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr", "it", "pt_BR", "ro", "ru"] as const;

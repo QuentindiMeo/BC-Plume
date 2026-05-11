@@ -1,21 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import {
-  getDonationDismissalCount,
-  getDonationPlayCount,
-  shouldShowDonationToast,
-} from "@/app/use-cases/check-donation-toast";
+import { getDonationPlayCount, shouldShowDonationToast } from "@/app/use-cases/check-donation-toast";
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
 import type { IBrowserCache } from "@/domain/ports/browser";
 
 const makePlayCountCache = (playCount: number | undefined): IBrowserCache => ({
   get: vi.fn().mockResolvedValue({ [PLUME_CACHE_KEYS.FULL_PLAY_COUNT]: playCount }),
-  set: vi.fn(),
-  remove: vi.fn(),
-});
-
-const makeDismissalCountCache = (dismissalCount: number | undefined): IBrowserCache => ({
-  get: vi.fn().mockResolvedValue({ [PLUME_CACHE_KEYS.DONATION_DISMISSAL_COUNT]: dismissalCount }),
   set: vi.fn(),
   remove: vi.fn(),
 });
@@ -93,15 +83,5 @@ describe("getDonationPlayCount", () => {
 
   it("returns stored count when present", async () => {
     expect(await getDonationPlayCount(makePlayCountCache(42))).toBe(42);
-  });
-});
-
-describe("getDonationDismissalCount", () => {
-  it("returns 0 when cache key is absent", async () => {
-    expect(await getDonationDismissalCount(makeDismissalCountCache(undefined))).toBe(0);
-  });
-
-  it("returns stored count when present", async () => {
-    expect(await getDonationDismissalCount(makeDismissalCountCache(3))).toBe(3);
   });
 });
