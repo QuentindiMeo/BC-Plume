@@ -87,7 +87,7 @@ const addRuntime = () => {
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
-const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
+const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => {
   const appCore = getAppCoreInstance();
   const flags = appCore.getState().featureFlags;
 
@@ -116,19 +116,19 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   headerContainer.appendChild(headerLogo);
 
   const bcPlayer = getBcPlayerInstance();
-  const initialTrackTitle = getCurrentTrackTitle(isAlbumPage);
+  const initialTrackTitle = getCurrentTrackTitle(isCollectionPage);
   const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
   currentTitleSection.role = "group";
   currentTitleSection.tabIndex = 0;
-  currentTitleSection.ariaLabel = isAlbumPage
+  currentTitleSection.ariaLabel = isCollectionPage
     ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
   applyTitleLang(currentTitleSection, initialTrackTitle);
   const currentTitlePretext = document.createElement("span");
   currentTitlePretext.id = PLUME_ELEM_SELECTORS.headerTitlePretext.split("#")[1];
-  const initialTrackNumberText = isAlbumPage
+  const initialTrackNumberText = isCollectionPage
     ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
   currentTitlePretext.textContent = initialTrackNumberText;
@@ -138,7 +138,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const titleRow = document.createElement("div");
   titleRow.className = "plume-header-title-row";
 
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
     trackLink.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
@@ -177,7 +177,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
   let pendingDropdown: HTMLDivElement | undefined;
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
     toggleBtn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
     dropdownEl.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
@@ -204,7 +204,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const volumeContainer = await createVolumeControlSection();
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
 
-  const bpmSection = createBpmDisplaySection(isAlbumPage);
+  const bpmSection = createBpmDisplaySection(isCollectionPage);
   bpmSection.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.bpmDetect);
   plumeContainer.appendChild(bpmSection);
 
@@ -239,7 +239,7 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   }
 
   const { featureFlags, pageType } = appCore.getState();
-  const isAlbumPage = pageType === "album";
+  const isCollectionPage = pageType === "album";
 
   hideOriginalPlayerElements();
 
@@ -248,13 +248,13 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   const middleCol = trackView?.querySelector<HTMLElement>(`:scope > ${BC_ELEM_SELECTORS.middleColumn}`);
   if (middleCol) trackView!.appendChild(middleCol);
 
-  const view = await buildPlumeView(isAlbumPage);
+  const view = await buildPlumeView(isCollectionPage);
   hydratePlumeView(view, appCore, plumeUi);
   mountPlumeView(view, bcPlayerContainer);
 
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     addRuntime();
     const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
     if (runtimeSpan) runtimeSpan.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !featureFlags.runtime);

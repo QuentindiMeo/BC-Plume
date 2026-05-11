@@ -1,18 +1,19 @@
-import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
 import { describe, expect, it } from "vitest";
+
+import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 import { fakeBcPlayer } from "../../fakes/FakeBcPlayer";
 
 describe("updateTrackMetadata", () => {
-  it("album page: stores track title and current/total pattern in state", () => {
+  it("collection page: stores track title and current/total pattern in state", () => {
     const appCore = new FakeAppCore({ pageType: "album" });
-    const bcPlayer = fakeBcPlayer("Album Track");
+    const bcPlayer = fakeBcPlayer("Collection Track");
 
     const result = updateTrackMetadata(appCore, bcPlayer);
 
-    expect(appCore.getState().trackTitle).toBe("Album Track");
+    expect(appCore.getState().trackTitle).toBe("Collection Track");
     expect(appCore.getState().trackNumber).toContain("0/0");
-    expect(result.trackTitle).toBe("Album Track");
+    expect(result.trackTitle).toBe("Collection Track");
     expect(result.current).toBe(0);
     expect(result.total).toBe(0);
   });

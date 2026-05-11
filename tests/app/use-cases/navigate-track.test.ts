@@ -1,4 +1,8 @@
-import { isLastTrackOfAlbumPlaying, navigateTrackBackward, navigateTrackForward } from "@/app/use-cases/navigate-track";
+import {
+  isLastTrackOfCollectionPlaying,
+  navigateTrackBackward,
+  navigateTrackForward,
+} from "@/app/use-cases/navigate-track";
 import { LOOP_MODE } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import type { BcPlayerPort } from "@/domain/ports/bc-player";
@@ -31,10 +35,10 @@ const makeFakeBcPlayer = (overrides: Partial<BcPlayerPort> = {}): BcPlayerPort =
     ...overrides,
   }) as BcPlayerPort;
 
-describe("isLastTrackOfAlbumPlaying", () => {
+describe("isLastTrackOfCollectionPlaying", () => {
   it("returns false when there are no track rows", () => {
     const bcPlayer = makeFakeBcPlayer({ getTrackRowTitles: vi.fn(() => []) });
-    expect(isLastTrackOfAlbumPlaying(bcPlayer)).toBe(false);
+    expect(isLastTrackOfCollectionPlaying(bcPlayer)).toBe(false);
   });
 
   it("returns false when the current track title is null", () => {
@@ -42,7 +46,7 @@ describe("isLastTrackOfAlbumPlaying", () => {
       getTrackRowTitles: vi.fn(() => ["Track 1", "Track 2"]),
       getTrackTitle: vi.fn(() => null),
     });
-    expect(isLastTrackOfAlbumPlaying(bcPlayer)).toBe(false);
+    expect(isLastTrackOfCollectionPlaying(bcPlayer)).toBe(false);
   });
 
   it("returns true when current title matches the last row title", () => {
@@ -50,7 +54,7 @@ describe("isLastTrackOfAlbumPlaying", () => {
       getTrackRowTitles: vi.fn(() => ["Track 1", "Track 2", "Final Track"]),
       getTrackTitle: vi.fn(() => "Final Track"),
     });
-    expect(isLastTrackOfAlbumPlaying(bcPlayer)).toBe(true);
+    expect(isLastTrackOfCollectionPlaying(bcPlayer)).toBe(true);
   });
 
   it("returns false when current title matches a non-last row title", () => {
@@ -58,7 +62,7 @@ describe("isLastTrackOfAlbumPlaying", () => {
       getTrackRowTitles: vi.fn(() => ["Track 1", "Track 2", "Final Track"]),
       getTrackTitle: vi.fn(() => "Track 1"),
     });
-    expect(isLastTrackOfAlbumPlaying(bcPlayer)).toBe(false);
+    expect(isLastTrackOfCollectionPlaying(bcPlayer)).toBe(false);
   });
 });
 
@@ -133,7 +137,7 @@ describe("navigateTrackForward", () => {
     prevBtn = { click: vi.fn() };
   });
 
-  it("clicks the next button on a normal mid-album track", () => {
+  it("clicks the next button on a normal mid-collection track", () => {
     // loopMode defaults to NONE in FakeAppCore
     const bcPlayer = makeFakeBcPlayer({
       getTrackRowTitles: vi.fn(() => ["Track 1", "Track 2", "Track 3"]),
@@ -144,7 +148,7 @@ describe("navigateTrackForward", () => {
     expect(nextBtn.click).toHaveBeenCalledOnce();
   });
 
-  it("wraps to first track when on last track of album with loopMode COLLECTION", () => {
+  it("wraps to first track when on last track of collection with loopMode COLLECTION", () => {
     appCore.dispatch(coreActions.setLoopMode(LOOP_MODE.COLLECTION));
     const fakeRow = {} as HTMLTableRowElement;
     const bcPlayer = makeFakeBcPlayer({
@@ -198,7 +202,7 @@ describe("navigateTrackForward", () => {
   });
 
   it("logs a warning when next button is absent and no special case applies", () => {
-    // loopMode NONE, album page, not last track — falls through to warning
+    // loopMode NONE, collection page, not last track — falls through to warning
     const bcPlayer = makeFakeBcPlayer({
       getTrackRowTitles: vi.fn(() => ["Track 1", "Track 2"]),
       getTrackTitle: vi.fn(() => "Track 1"),

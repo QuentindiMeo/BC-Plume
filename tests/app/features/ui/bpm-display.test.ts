@@ -30,7 +30,7 @@ describe("createBpmDisplaySection", () => {
     expect(section.querySelector(`#${PLUME_ELEM_SELECTORS.bpmValue.split("#")[1]}`)).not.toBeNull();
   });
 
-  it("includes detect-all button on album pages", () => {
+  it("includes detect-all button on collection pages", () => {
     const section = createBpmDisplaySection(true);
     const btn = section.querySelector(`#${PLUME_ELEM_SELECTORS.bpmDetectAllBtn.split("#")[1]}`);
     expect(btn).not.toBeNull();

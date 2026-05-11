@@ -81,7 +81,7 @@ const resolveCurrentTrackUrl = (infos: TrackAudioInfo[]): string | null => {
   // Single-track page: only one entry
   if (infos.length === 1) return infos[0].trackUrl;
 
-  // Album page: match by current track number from store
+  // Collection page: match by current track number from store
   const appCore = getAppCoreInstance();
   const trackNumberText = appCore.getState().trackNumber;
   if (!trackNumberText) return null;
@@ -121,7 +121,7 @@ export const wireDetectAllBpmButton = (btn: HTMLButtonElement): void => {
   });
 };
 
-export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement => {
+export const createBpmDisplaySection = (isCollectionPage: boolean): HTMLDivElement => {
   const container = document.createElement("div");
   container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
 
@@ -137,7 +137,7 @@ export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement =>
   value.ariaLabel = getString("ARIA__BPM__DISPLAY");
   container.appendChild(value);
 
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     const detectAllBtn = document.createElement("button");
     detectAllBtn.id = PLUME_ELEM_SELECTORS.bpmDetectAllBtn.split("#")[1];
     detectAllBtn.type = "button";

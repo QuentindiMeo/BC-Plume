@@ -152,7 +152,7 @@ describe("decodeWaveformForCurrentTrack", () => {
     expect(fakeAudioContextClose).toHaveBeenCalledOnce();
   });
 
-  it("on an album page, resolves the current track by trackNumber from store", async () => {
+  it("on a collection page, resolves the current track by trackNumber from store", async () => {
     const track2 = { trackNumber: 2, trackUrl: "/track/b", audioStreamUrl: "https://audio-b.mp3" };
     fakeTrackAudio.getTrackAudioInfos.mockReturnValue([
       { trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: AUDIO_URL },
@@ -168,7 +168,7 @@ describe("decodeWaveformForCurrentTrack", () => {
     expect(mockSendMessage).toHaveBeenCalledWith({ action: BPM_FETCH_ACTION, url: track2.audioStreamUrl });
   });
 
-  it("returns null on an album page when trackNumber is null", async () => {
+  it("returns null on a collection page when trackNumber is null", async () => {
     fakeTrackAudio.getTrackAudioInfos.mockReturnValue([
       { trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: AUDIO_URL },
       { trackNumber: 2, trackUrl: "/track/b", audioStreamUrl: "https://audio-b.mp3" },
@@ -181,7 +181,7 @@ describe("decodeWaveformForCurrentTrack", () => {
     expect(mockSendMessage).not.toHaveBeenCalled();
   });
 
-  it("returns null on an album page when trackNumber does not match any track", async () => {
+  it("returns null on a collection page when trackNumber does not match any track", async () => {
     fakeTrackAudio.getTrackAudioInfos.mockReturnValue([
       { trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: AUDIO_URL },
       { trackNumber: 2, trackUrl: "/track/b", audioStreamUrl: "https://audio-b.mp3" },

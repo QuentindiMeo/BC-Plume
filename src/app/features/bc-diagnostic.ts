@@ -7,9 +7,9 @@ export interface BcHealthCheckResult {
   missing: Array<{ key: string; selector: string; required: boolean }>;
 }
 
-// Selectors that only exist on album pages (/album/*)
+// Selectors that only exist on collection pages (/album/*)
 const ALBUM_ONLY_KEYS = new Set<BcElementKey>([
-  "albumPageCurrentTrackTitle",
+  "collectionPageCurrentTrackTitle",
   "trackList",
   "trackRow",
   "playStatus",
@@ -19,14 +19,14 @@ const ALBUM_ONLY_KEYS = new Set<BcElementKey>([
   "trackDuration",
 ]);
 
-// Selectors that only exist on track pages belonging to an album
+// Selectors that only exist on track pages belonging to a collection
 const TRACK_WITH_ALBUM_ONLY_KEYS = new Set<BcElementKey>(["fromAlbum"]);
 
 // Selectors that only exist on track pages (/track/*)
 const TRACK_ONLY_KEYS = new Set<BcElementKey>(["songPageCurrentTrackTitle"]);
 
 export const checkBandcampElements = (): BcHealthCheckResult => {
-  const isAlbumPage = globalThis.location.pathname.includes("/album/");
+  const isCollectionPage = globalThis.location.pathname.includes("/album/");
 
   const bcElementKeys = Object.keys(BC_ELEM_SELECTORS) as Array<BcElementKey>;
   const checks = bcElementKeys.map((key) => {
@@ -35,8 +35,8 @@ export const checkBandcampElements = (): BcHealthCheckResult => {
     // Check is optional when the selector belongs to a page type that does not match the current page.
     const isOptional =
       TRACK_WITH_ALBUM_ONLY_KEYS.has(key) ||
-      (isAlbumPage && TRACK_ONLY_KEYS.has(key)) ||
-      (!isAlbumPage && ALBUM_ONLY_KEYS.has(key));
+      (isCollectionPage && TRACK_ONLY_KEYS.has(key)) ||
+      (!isCollectionPage && ALBUM_ONLY_KEYS.has(key));
 
     return { key, selector, required: !isOptional };
   });

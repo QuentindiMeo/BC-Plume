@@ -89,7 +89,7 @@ beforeEach(() => {
 });
 
 describe("track link in injection", () => {
-  it("creates a track link element on album pages", async () => {
+  it("creates a track link element on collection pages", async () => {
     const { ok } = await injectEnhancements();
     expect(ok).toBe(true);
 

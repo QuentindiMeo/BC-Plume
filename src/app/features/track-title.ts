@@ -13,7 +13,7 @@ const getArtistNameElement = (): HTMLSpanElement => {
   const bcPlayer = getBcPlayerInstance();
   const infoSection = bcPlayer.getInfoSection();
   const infoSectionLinks = infoSection?.querySelectorAll("span") ?? [];
-  const artistElementIdx = infoSectionLinks.length - 1; // 0 on album pages, 1 on track pages
+  const artistElementIdx = infoSectionLinks.length - 1; // 0 on collection pages, 1 on track pages
   return infoSectionLinks[artistElementIdx].querySelector("a")! as HTMLSpanElement;
 };
 
@@ -60,7 +60,7 @@ export const getAppropriateAccentColor = (): string => {
   }
 };
 
-export const getCurrentTrackTitle = (isAlbumPage: boolean): string => {
+export const getCurrentTrackTitle = (isCollectionPage: boolean): string => {
   const bcPlayer = getBcPlayerInstance();
-  return bcPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
+  return bcPlayer.getTrackTitle(isCollectionPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
 };

@@ -142,8 +142,8 @@ export const launchPlume = (): void => {
     plumeUi.dispatch(guiActions.setAudioElement(audioElement));
 
     // Set pageType before loading persisted state so the COLLECTION→TRACK guard in loadPersistedState works on track/single pages.
-    const isAlbumPage = globalThis.location.pathname.startsWith("/album/");
-    appCore.dispatch(coreActions.setPageType(isAlbumPage ? "album" : "track"));
+    const isCollectionPage = globalThis.location.pathname.startsWith("/album/");
+    appCore.dispatch(coreActions.setPageType(isCollectionPage ? "album" : "track"));
 
     // Load persisted state into store
     await appCore.loadPersistedState();

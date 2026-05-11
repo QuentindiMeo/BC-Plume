@@ -11,7 +11,7 @@ export enum BC_ELEM_SELECTORS {
   audioPlayer = "audio",
   playPause = "div.playbutton",
   songPageCurrentTrackTitle = "h2.trackTitle",
-  albumPageCurrentTrackTitle = "a.title_link",
+  collectionPageCurrentTrackTitle = "a.title_link",
   previousTrack = "div.prevbutton",
   nextTrack = "div.nextbutton",
   trackList = "table#track_table",

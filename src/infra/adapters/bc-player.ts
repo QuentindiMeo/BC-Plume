@@ -12,14 +12,16 @@ export class BcPlayerAdapter implements BcPlayerPort {
   }
 
   getCurrentTrackUrl(): string | null {
-    const el = this.query<HTMLAnchorElement>(BC_ELEM_SELECTORS.albumPageCurrentTrackTitle);
+    const el = this.query<HTMLAnchorElement>(BC_ELEM_SELECTORS.collectionPageCurrentTrackTitle);
     return el?.getAttribute("href") || null;
   }
 
-  // Album and track pages expose the current track title under different elements.
+  // Collection and track pages expose the current track title under different elements.
   getTrackTitle(pageType: BcPageType): string | null {
     const selector =
-      pageType === "album" ? BC_ELEM_SELECTORS.albumPageCurrentTrackTitle : BC_ELEM_SELECTORS.songPageCurrentTrackTitle;
+      pageType === "album"
+        ? BC_ELEM_SELECTORS.collectionPageCurrentTrackTitle
+        : BC_ELEM_SELECTORS.songPageCurrentTrackTitle;
 
     const el = this.query<HTMLElement>(selector);
     const text = el?.textContent?.trim();

@@ -273,7 +273,7 @@ const renderLoopButton = (elements: FullscreenElements, loopMode: LoopModeType):
 const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const plume = getGuiInstance().getState();
   const appCore = getAppCoreInstance();
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const isCollectionPage = appCore.getState().pageType === "album";
 
   const subscriptions: Array<SubscriptionCallback> = [];
   const elements: FullscreenElements = getFullscreenElements(clone);
@@ -357,10 +357,10 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
         );
         if (trackLink) {
           trackLink.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
-          if (flags.goToTrack && isAlbumPage) trackLink.style.color = getAppropriateAccentColor();
+          if (flags.goToTrack && isCollectionPage) trackLink.style.color = getAppropriateAccentColor();
         }
       }
-      if (isAlbumPage && flags.tracklist !== prevFlags.tracklist) {
+      if (isCollectionPage && flags.tracklist !== prevFlags.tracklist) {
         if (flags.tracklist) {
           initTracklist();
         } else {
@@ -450,7 +450,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   });
 
   // Apply the Bandcamp theme color to the track link in the fullscreen clone
-  if (flags.goToTrack && isAlbumPage) {
+  if (flags.goToTrack && isCollectionPage) {
     const fsTrackLink = elements.headerContainer.querySelector(
       PLUME_ELEM_SELECTORS.headerTrackLink
     ) as HTMLAnchorElement;
@@ -460,7 +460,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   // Re-initialize the tracklist for the fullscreen clone.
   // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another
   // inert clone of the toggle button. Replace both inert elements with a fresh instance.
-  if (flags.tracklist && isAlbumPage) initTracklist();
+  if (flags.tracklist && isCollectionPage) initTracklist();
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
   renderProgressSlider(elements, appCore.computed.progressPercentage());
@@ -485,7 +485,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 };
 
 // Pure DOM construction function - builds fullscreen overlay without side effects
-const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
+const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | null => {
   const bcPlayer = getBcPlayerInstance();
   const artworkUrl = bcPlayer.getArtworkUrl();
   if (!artworkUrl) {
@@ -533,7 +533,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const headTitle = adjustedNameSection.querySelector("h2")!;
   const releaseName = headTitle.textContent?.trim() || "";
   headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = `"${releaseName}"`;
+  if (!isCollectionPage) headTitle.textContent = `"${releaseName}"`;
   applyTitleLang(headTitle, releaseName);
 
   const coverArtImg = document.createElement("img");
@@ -654,8 +654,8 @@ export const toggleFullscreenMode = (): void => {
   }
 
   // Enter fullscreen - dispatch state change first, then build DOM
-  const isAlbumPage = appCore.getState().pageType === "album";
-  const overlay = buildFullscreenOverlay(isAlbumPage);
+  const isCollectionPage = appCore.getState().pageType === "album";
+  const overlay = buildFullscreenOverlay(isCollectionPage);
   if (!overlay) {
     appCore.dispatch(coreActions.setIsFullscreen(false));
     createToast({

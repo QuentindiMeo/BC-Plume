@@ -12,14 +12,14 @@ export interface TrackMetadataResult {
 
 // Dispatches current track title and track number from BC player state to the store
 export const updateTrackMetadata = (appCore: IAppCore, bcPlayer: BcPlayerPort): TrackMetadataResult => {
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const isCollectionPage = appCore.getState().pageType === "album";
 
-  const trackTitle = bcPlayer.getTrackTitle(isAlbumPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
+  const trackTitle = bcPlayer.getTrackTitle(isCollectionPage ? "album" : "track") ?? getString("LABEL__TRACK_UNKNOWN");
   appCore.dispatch(coreActions.setTrackTitle(trackTitle));
 
   const { current, total } = getTrackQuantifiers(trackTitle, bcPlayer);
 
-  const trackNumberText = isAlbumPage
+  const trackNumberText = isCollectionPage
     ? getString("LABEL__TRACK_CURRENT", [`${current}/${total}`])
     : getString("LABEL__TRACK");
 
