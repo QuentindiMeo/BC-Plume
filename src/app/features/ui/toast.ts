@@ -109,7 +109,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   const timer = document.createElement("div");
   timer.className = "plume-toast__timer";
   timer.ariaHidden = "true";
-  timer.style.setProperty("--toast-timer-duration", `${config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS}s`);
+  timer.style.setProperty("--toast-timer-duration", `${config.duration}s`);
 
   toast.appendChild(icon);
   toast.appendChild(body);
@@ -121,8 +121,10 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 };
 
 export const createToast = (config: ToastConfig): ToastHandle => {
+  config.duration ??= PLUME_CONSTANTS.TOAST_AUTO_DISMISS;
+
   const container = getToastContainer();
-  const durationMs = (config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS) * 1000;
+  const durationMs = config.duration * 1000;
   let remaining = durationMs;
   let segmentStart = Date.now();
   let timerId: ReturnType<typeof setTimeout> | null = null;

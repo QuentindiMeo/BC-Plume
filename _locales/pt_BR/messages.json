@@ -570,6 +570,19 @@
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Digite um número entre 0,25 e 5." },
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" },
 
+  "LABEL__TOAST__DONATION__TITLE": { "message": "Soa bem pra você?" },
+  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "O Plume é gratuito e sempre será. Se melhorou sua experiência no Bandcamp, um pequeno apoio significa muito." },
+  "LABEL__TOAST__DONATION__CTA": { "message": "Apoie o Plume" },
+  "META__TOAST__DONATION": { "message": "doação" },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
+    "message": "Contagem de reproduções completas incrementada para $COUNT$",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+  "DEBUG__DONATION__THRESHOLD__REACHED": {
+    "message": "Limite do toast de doação atingido em $COUNT$ reproduções",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },
   "LABEL__BPM__ERROR": { "message": "—" },

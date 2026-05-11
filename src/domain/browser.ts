@@ -20,6 +20,7 @@ export enum PLUME_CACHE_KEYS {
 
   // Meta
   LAST_SEEN_RELEASE = "plume_last_seen_release",
+  FULL_PLAY_COUNT = "plume_full_play_count",
 }
 
 export interface LocalStorage {
@@ -36,5 +37,6 @@ export interface LocalStorage {
   [PLUME_CACHE_KEYS.FEATURE_FLAGS]: FeatureFlags | undefined;
 
   [PLUME_CACHE_KEYS.LAST_SEEN_RELEASE]: string | undefined;
+  [PLUME_CACHE_KEYS.FULL_PLAY_COUNT]: number | undefined;
 }
 export type PlumeCacheKey = keyof LocalStorage;

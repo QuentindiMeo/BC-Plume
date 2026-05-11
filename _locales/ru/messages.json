@@ -570,6 +570,19 @@
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Введите число от 0,25 до 5." },
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "недопустимый ввод" },
 
+  "LABEL__TOAST__DONATION__TITLE": { "message": "Звучит хорошо?" },
+  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume бесплатен и таким останется. Если он сделал твоё прослушивание на Bandcamp лучше, небольшая поддержка значит очень много." },
+  "LABEL__TOAST__DONATION__CTA": { "message": "Поддержать Plume" },
+  "META__TOAST__DONATION": { "message": "пожертвование" },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
+    "message": "Счётчик полных прослушиваний увеличен до $COUNT$",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+  "DEBUG__DONATION__THRESHOLD__REACHED": {
+    "message": "Порог показа уведомления о пожертвовании достигнут на $COUNT$ прослушиваниях",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },
   "LABEL__BPM__ERROR": { "message": "—" },
