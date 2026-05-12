@@ -163,6 +163,7 @@ const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => 
     trackLink.target = "_self";
     trackLink.ariaLabel = getString("ARIA__TRACK_LINK");
     trackLink.title = getString("ARIA__TRACK_LINK");
+    trackLink.style.color = getAppropriateAccentColor();
     const linkSvg = createSafeSvgElement(PLUME_SVG.externalLink);
     if (linkSvg) trackLink.appendChild(linkSvg);
     titleRow.appendChild(trackLink);
