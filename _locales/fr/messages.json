@@ -144,7 +144,7 @@
   },
   "LABEL__RUNTIME__PLAYABLE": { "message": " lisibles" },
   "ARIA__RUNTIME__LABEL": {
-    "message": "Durée totale du projet : $MINUTES$ minutes et $SECONDES$ secondes",
+    "message": "Durée totale : $MINUTES$ minutes et $SECONDES$ secondes",
     "placeholders": {
       "minutes": {
         "content": "$1",
@@ -162,11 +162,11 @@
   "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Bouton Play/Pause non trouvé" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Bouton de piste suivante non trouvé" },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Bouton de piste précédente cliqué" },
-  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente dispatché" },
+  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente émis" },
   "DEBUG__TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Bouton Play/Pause cliqué" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
-  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
+  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante émis" },
   "LABEL__TRACK_BACKWARD": { "message": "Recommencer / Aller à la piste précédente" },
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
@@ -295,8 +295,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1,5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Bouton de vitesse cliqué" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Vitesse personnalisée refusée (hors plage ou non numérique)" },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Vitesse de lecture personnalisée" },
-  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Cliquer pour saisir une vitesse personnalisée" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Cliquez pour saisir une vitesse personnalisée" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Vitesse de lecture chargée :" },
   "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Vitesse invalide — réinitialisation à 1×" },
 
@@ -462,7 +463,7 @@
     "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
   },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
-  "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de répétition" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Détection de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
@@ -523,7 +524,7 @@
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
+  "INFO__RELEASE__PERSISTED": { "message": "Dernière version enregistrée dans le stockage" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ est maintenant disponible.",

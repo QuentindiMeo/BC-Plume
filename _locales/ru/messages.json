@@ -504,7 +504,7 @@
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "Последнее наблюдение обновления сохранено в хранилище" },
+  "INFO__RELEASE__PERSISTED": { "message": "Последнее обновление зафиксировано в хранилище" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Вышло обновление!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ теперь доступен.",
@@ -533,7 +533,7 @@
   "META__TOAST__FULLSCREEN_UNAVAILABLE": { "message": "полный экран недоступен" },
 
   "LABEL__TOAST__HEALTH_CHECK__TITLE": {
-    "message": "Проверка: отсутствует $MISSING_REQUIRED$ обязательных элементов",
+    "message": "Проверка: $MISSING_REQUIRED$ обязательных элементов отсутствует",
     "placeholders": { "missing_required": { "content": "$1", "example": "3" } }
   },
   "LABEL__TOAST__HEALTH_CHECK__DESCRIPTION": {

@@ -411,7 +411,7 @@
   "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Faixa anterior / Retroceder" },
   "LABEL__HOTKEY__TRACK_FORWARD": { "message": "Próxima faixa" },
   "LABEL__HOTKEY__FULLSCREEN": { "message": "Tela cheia" },
-  "LABEL__HOTKEY__MUTE": { "message": "Silenciar / Ativar" },
+  "LABEL__HOTKEY__MUTE": { "message": "Silenciar / Ativar som" },
   "LABEL__HOTKEY__LOOP_CYCLE": { "message": "Alternar modo de repetição" },
   "LABEL__HOTKEY__SPEED_CYCLE": { "message": "Alternar velocidade de reprodução" },
   "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Ir para 0%–90% (teclas numéricas)" },
@@ -504,7 +504,7 @@
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "Última observação de lançamento persistida no armazenamento" },
+  "INFO__RELEASE__PERSISTED": { "message": "Último lançamento registrado no armazenamento" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Uma atualização foi lançada!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ já está disponível.",

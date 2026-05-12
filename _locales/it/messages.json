@@ -58,7 +58,7 @@
 
   "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Contenitore dell'intestazione o numero di traccia non trovato" },
   "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Contenitore dell'intestazione o titolo della traccia non trovato" },
-  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Elemento pretesto dell'intestazione non trovato" },
+  "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Elemento pre-testo dell'intestazione non trovato" },
   "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Elemento titolo dell'intestazione non trovato" },
   "DEBUG__TRACK__QUANTIFIERS": {
     "message": "Numero traccia corrente: $TRACK_NUMBER$, Totale tracce: $TOTAL_TRACKS$",
@@ -402,8 +402,8 @@
     }
   },
   "LABEL__HOTKEY__PLAY_PAUSE": { "message": "Riproduci / Pausa" },
-  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Cerca indietro" },
-  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Cerca avanti" },
+  "LABEL__HOTKEY__TIME_BACKWARD": { "message": "Scorri indietro" },
+  "LABEL__HOTKEY__TIME_FORWARD": { "message": "Scorri avanti" },
   "LABEL__HOTKEY__VOLUME_UP": { "message": "Aumenta volume" },
   "LABEL__HOTKEY__VOLUME_DOWN": { "message": "Diminuisci volume" },
   "LABEL__HOTKEY__TRACK_BACKWARD": { "message": "Traccia precedente / Riavvolgi" },
@@ -502,7 +502,7 @@
     "placeholders": { "label": { "content": "$1", "example": "aggiornamento versione" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "L'ultima osservazione di rilascio è stata salvata nell'archivio" },
+  "INFO__RELEASE__PERSISTED": { "message": "L'ultima versione rilevata è stata salvata nell'archivio" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Aggiornamento disponibile!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ è ora disponibile.",

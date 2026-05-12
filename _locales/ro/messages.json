@@ -75,9 +75,9 @@
       }
     }
   },
-  "LABEL__TRACK": { "message": "se redă acum" },
+  "LABEL__TRACK": { "message": "în redare" },
   "LABEL__TRACK_CURRENT": {
-    "message": "se redă acum ($NUMBERING$)",
+    "message": "în redare ($NUMBERING$)",
     "placeholders": {
       "numbering": {
         "content": "$1",
@@ -89,7 +89,7 @@
   "ARIA__APP_NAME": { "message": "Plume - Playerul Bandcamp reinventat" },
   "ARIA__LOGO_LINK": { "message": "Află mai multe despre Plume" },
   "ARIA__TRACK": {
-    "message": "Piesa $TRACK_TITLE$ se redă acum",
+    "message": "Piesa $TRACK_TITLE$ este în redare",
     "placeholders": {
       "track_title": {
         "content": "$1",
@@ -98,7 +98,7 @@
     }
   },
   "ARIA__TRACK_CURRENT": {
-    "message": "Piesa $TRACK_TITLE$ se redă acum (piesa $TRACK_NUMBER$ din $TOTAL_TRACKS$)",
+    "message": "Piesa $TRACK_TITLE$ este în redare (piesa $TRACK_NUMBER$ din $TOTAL_TRACKS$)",
     "placeholders": {
       "track_number": {
         "content": "$1",
@@ -329,7 +329,7 @@
     }
   },
   "ARIA__TRACKLIST__ITEM_CURRENT": {
-    "message": "Piesa $NUMBER$: $TITLE$, se redă acum",
+    "message": "Piesa $NUMBER$: $TITLE$, în redare",
     "placeholders": {
       "number": { "content": "$1", "example": "3" },
       "title": { "content": "$2", "example": "Song Name" }
@@ -350,7 +350,7 @@
   "INFO__FULLSCREEN__EXITED": { "message": "Mod ecran complet dezactivat" },
   "ARIA__FULLSCREEN__ENTERED": { "message": "Mod ecran complet activat" },
   "ARIA__FULLSCREEN__EXITED": { "message": "Mod ecran complet dezactivat" },
-  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Ieșire din ecran complet" },
+  "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Ieși din ecran complet" },
   "ARIA__COVER_ART": { "message": "Imagine copertă" },
   "ARIA__COVER_ART_FOR": {
     "message": "Copertă pentru $RELEASE$",
@@ -358,15 +358,15 @@
       "release": { "content": "$1" }
     }
   },
-  "ARIA__FULLSCREEN_OVERLAY": { "message": "Redare muzică pe ecran complet" },
+  "ARIA__FULLSCREEN_OVERLAY": { "message": "Redare muzicală pe ecran complet" },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Vizualizator audio" },
 
   "POPUP_TITLE": { "message": "Panou de setări" },
   "ARIA__POPUP__TABLIST": { "message": "Secțiuni setări" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Reîncarcă pagina pentru a aplica modificarea." },
-  "LABEL__SETTING__RESET": { "message": "Resetare" },
-  "LABEL__TAB__RESET": { "message": "Resetare totală" },
+  "LABEL__SETTING__RESET": { "message": "Resetează" },
+  "LABEL__TAB__RESET": { "message": "Resetează tot" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
 
@@ -417,8 +417,8 @@
   "LABEL__HOTKEY__DIGIT_SEEK": { "message": "Avans la 0%–90% (taste cifre)" },
   "POPUP__HOTKEYS__PRESS_KEY": { "message": "Apasă o tastă..." },
   "POPUP__HOTKEYS__DISABLED": { "message": "Dezactivat" },
-  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmare" },
-  "POPUP__HOTKEYS__CANCEL": { "message": "Anulare" },
+  "POPUP__HOTKEYS__CONFIRM_CONFLICT": { "message": "Confirmă" },
+  "POPUP__HOTKEYS__CANCEL": { "message": "Anulează" },
   "ARIA__HOTKEY_ROW__BUTTON": {
     "message": "Reatribuire tastă $ACTION$ — momentan $BINDING$",
     "placeholders": {
@@ -504,7 +504,7 @@
     "placeholders": { "label": { "content": "$1", "example": "release update" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "Ultima observare a lansării persistată în stocare" },
+  "INFO__RELEASE__PERSISTED": { "message": "Ultima versiune observată salvată în stocare" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "O actualizare a fost lansată!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ este acum disponibil.",

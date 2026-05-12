@@ -26,7 +26,7 @@
   "LOG__ORIGINAL_PLAYER__RESTORED": { "message": "Elementos del reproductor original restaurados" },
 
   "ERROR__BC_HEALTH_CHECK__MISSING_REQUIRED": {
-    "message": "La respuesta de verificación de salud de Bandcamp no contiene el elemento requerido: $SELECTOR$",
+    "message": "Elemento de Bandcamp no encontrado (requerido): $SELECTOR$",
     "placeholders": {
       "selector": {
         "content": "$1",
@@ -93,7 +93,7 @@
   },
   "LABEL__TRACK_UNKNOWN": { "message": "pista desconocida" },
   "ARIA__APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
-  "ARIA__LOGO_LINK": { "message": "Aprende más sobre Plume" },
+  "ARIA__LOGO_LINK": { "message": "Más información sobre Plume" },
   "ARIA__TRACK": {
     "message": "La pista $TITULO_PISTA$ se está reproduciendo",
     "placeholders": {
@@ -299,6 +299,7 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Botón de velocidad pulsado" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Velocidad personalizada rechazada (fuera del rango o no numérica)" },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Velocidad de reproducción personalizada" },
   "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clic para introducir una velocidad personalizada" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocidad de reproducción cargada:" },
@@ -357,8 +358,8 @@
   "WARN__COVER_ART__NOT_FOUND": { "message": "Portada no encontrada" },
   "WARN__INFO_SECTION__NOT_FOUND": { "message": "Sección de información no encontrada para modo de pantalla completa" },
   "WARN__PLUME_CONTAINER__NOT_FOUND": { "message": "Contenedor de Plume no encontrado para modo de pantalla completa" },
-  "INFO__FULLSCREEN__ENTERED": { "message": "Pasar a pantalla completa" },
-  "INFO__FULLSCREEN__EXITED": { "message": "Salir de pantalla completa" },
+  "INFO__FULLSCREEN__ENTERED": { "message": "Modo pantalla completa activado" },
+  "INFO__FULLSCREEN__EXITED": { "message": "Modo pantalla completa desactivado" },
   "ARIA__FULLSCREEN__ENTERED": { "message": "Modo pantalla completa activado" },
   "ARIA__FULLSCREEN__EXITED": { "message": "Modo pantalla completa desactivado" },
   "ARIA__EXIT_FULLSCREEN_BTN": { "message": "Salir de pantalla completa" },
@@ -466,7 +467,7 @@
     "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
   },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Control de velocidad de reproducción" },
-  "LABEL__FEATURES__LOOP_MODES": { "message": "Modos de bucle" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modos de repetición" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Modo pantalla completa" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Detección de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
@@ -525,7 +526,7 @@
     "placeholders": { "label": { "content": "$1", "example": "actualización de versión" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "Lanzamiento guardado en el almacenamiento" },
+  "INFO__RELEASE__PERSISTED": { "message": "Última versión guardada en el almacenamiento" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "¡Una actualización ha sido lanzada!" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "La versión $RELEASE$ de Plume ya está disponible.",
@@ -587,12 +588,12 @@
 
   "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__TITLE": { "message": "Control de velocidad limitado" },
   "LABEL__TOAST__SPEED__SAFARI_UNSUPPORTED__DESCRIPTION": {
-    "message": "Safari limita la velocidad de reproducción a 0.5×–2×. Tu selección será ajustada."
+    "message": "Safari limita la velocidad de reproducción a 0,5×–2×. Tu selección será ajustada."
   },
   "META__TOAST__SPEED__SAFARI_UNSUPPORTED": { "message": "velocidad no soportada por Safari" },
 
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__TITLE": { "message": "Valor de velocidad inválido" },
-  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Por favor, ingrese un número entre 0.25 y 5." },
+  "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Por favor, ingrese un número entre 0,25 y 5." },
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "¿Te suena bien?" },
