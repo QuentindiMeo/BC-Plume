@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Il lettore Bandcamp reinventato" },
   "APP_DESCRIPTION": {
-    "message": "Estensione Bandcamp: volume, barra di avanzamento, modalità ripetizione, schermo intero e tasti rapidi per il player."
+    "message": "Estensione Bandcamp: volume, tasti rapidi, ripetizione, schermo intero, velocità, barra con forma d'onda e visualizzatore di ritmo."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "Nessuna API del browser rilevata" },

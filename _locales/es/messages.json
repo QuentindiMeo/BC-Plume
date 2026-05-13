@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - El reproductor Bandcamp mejorado" },
   "APP_DESCRIPTION": {
-    "message": "Complemento para Bandcamp: control de volumen, barra de progreso interactiva, modos de repetición, pantalla completa y atajos de teclado."
+    "message": "Complemento para Bandcamp: volumen, atajos de teclado, repetición, pantalla completa, velocidad, barra con forma de onda y visualizador de ritmo."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "No se detectó API del navegador" },

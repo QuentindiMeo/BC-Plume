@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - O player Bandcamp aprimorado" },
   "APP_DESCRIPTION": {
-    "message": "Extensão Bandcamp: controle de volume, barra de progresso interativa, modos de repetição, tela cheia e atalhos de teclado."
+    "message": "Extensão Bandcamp: volume, atalhos de teclado, repetição, tela cheia, velocidade, barra com forma de onda e visualizador de ritmo."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "Nenhuma API do navegador detectada" },

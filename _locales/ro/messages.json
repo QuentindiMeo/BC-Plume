@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Playerul Bandcamp reinventat" },
   "APP_DESCRIPTION": {
-    "message": "Extensie Bandcamp: control volum, bară de progres interactivă, moduri de repetare, ecran complet și taste rapide."
+    "message": "Extensie Bandcamp: volum, taste rapide, repetare, ecran complet, viteză, bară cu formă de undă și vizualizator de ritm."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "Nicio API de browser detectată" },

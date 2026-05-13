@@ -56,6 +56,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Unified player**: Completely replaces the Bandcamp player with an enhanced version
 - **Time navigation**: Click and drag to seek within the track seamlessly
   - **Time display mode**: Switch between track duration and remaining time (remembered across pages)
+  - **Waveform progress bar**: SoundCloud style! (toggleable via feature flags)
 - **Playback controls**: Play/Pause button, previous/next track, and seek backward/forward in a track
   - **... with fine-tuning in popup**: Configure seek jump duration, volume hotkey step, and track restart threshold
 - **Playback speed**: Choose from preset speeds (0.5× to 3×) or enter a custom value
@@ -74,6 +75,7 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Sticky player behavior**: Player sticks visually while scrolling for quicker access
 - **Accessibility-minded**: Visible focus outlines, ARIA semantics, reduced-motion and contrast preferences, screen reader support
 - **BPM detection**: Detects and displays the track's tempo live, with indicators in the tracklist
+  - **Beat visualizer**: A BPM-driven animation plays in sync with the music's tempo (toggleable via feature flags, fullscreen view only)
 - **Feature flags**: Toggle individual features on or off from the popup's Features tab
 - **Release notifications**: A non-intrusive toast notifies you when a new Plume release is available
 - **Several languages**: Enjoy Plume in 7 languages: en 🇺🇸, es 🇪🇸, fr 🇫🇷, it 🇮🇹, pt_BR 🇧🇷, ro 🇷🇴, ru 🇷🇺 (more on demand!)
@@ -126,6 +128,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find details about each release in [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md).
 
+- _**[1.13.0]** May 13 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)

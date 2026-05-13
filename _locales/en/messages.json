@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
   "APP_DESCRIPTION": {
-    "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player."
+    "message": "Bandcamp extension: volume slider, hotkeys, loop modes, fullscreen mode, playback speed, waveform progress bar & beat visualizer."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
