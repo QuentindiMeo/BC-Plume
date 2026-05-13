@@ -82,6 +82,16 @@ export const createTabBar = (tabs: TabDefinition[]): TabBarInstance => {
 
   tablist.addEventListener("keydown", (e: KeyboardEvent) => addKeyboardNavigation(e));
 
+  tablist.addEventListener(
+    "wheel",
+    (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      tablist.scrollLeft += e.deltaY;
+    },
+    { passive: false }
+  );
+
   // Activate the first tab by default
   if (tabs.length > 0) toggleTab(tabs[0].id);
 

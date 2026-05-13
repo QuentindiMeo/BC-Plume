@@ -384,7 +384,7 @@
   "LABEL__LANGUAGE__RU": { "message": "Русский" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Должно быть целым числом" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Горячие клавиши" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Клавиши" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Горячие клавиши" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
     "message": "Необработанное действие горячей клавиши: $ACTION$",

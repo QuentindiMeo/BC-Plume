@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Il lettore Bandcamp reinventato" },
   "APP_DESCRIPTION": {
-    "message": "Estensione Bandcamp: volume, barra di avanzamento, modalità ripetizione, schermo intero e tasti di scelta rapida per il player."
+    "message": "Estensione Bandcamp: volume, barra di avanzamento, modalità ripetizione, schermo intero e tasti rapidi per il player."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "Nessuna API del browser rilevata" },
@@ -293,7 +293,7 @@
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocità di riproduzione caricata:" },
   "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Velocità di riproduzione non valida — ripristino a 1×" },
 
-  "INFO__HOTKEYS__REGISTERED": { "message": "Tasti di scelta rapida registrati" },
+  "INFO__HOTKEYS__REGISTERED": { "message": "Tasti rapidi registrati" },
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Attiva/disattiva schermo intero" },
 
@@ -382,13 +382,13 @@
   "LABEL__LANGUAGE__RU": { "message": "Russo" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Deve essere un numero intero" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Tasti di scelta rapida" },
-  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Tasti di scelta rapida" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Scorciatoie" },
+  "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Tasti rapidi" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
-    "message": "Azione tasto di scelta rapida non gestita: $ACTION$",
+    "message": "Azione tasto rapido non gestita: $ACTION$",
     "placeholders": { "action": { "content": "$1", "example": "PLAY_PAUSE" } }
   },
-  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Impossibile persistere le associazioni dei tasti di scelta rapida" },
+  "ERROR__HOTKEYS__PERSISTENCE": { "message": "Impossibile persistere le associazioni dei tasti rapidi" },
   "WARN__HOTKEY_BINDINGS__INVALID_CACHE": {
     "message": "Voce cache delle associazioni tasti non valida, utilizzo dei valori predefiniti"
   },

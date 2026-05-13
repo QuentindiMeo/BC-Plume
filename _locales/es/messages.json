@@ -398,7 +398,7 @@
   "LABEL__LANGUAGE__RU": { "message": "Ruso" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
     "message": "Acción de atajo no gestionada: $ACTION$",

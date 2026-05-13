@@ -28,10 +28,10 @@ const ABOUT_LINKS: AboutLinkConfig[] = [
 
 const buildIdentityBlock = (): HTMLElement => {
   const identity = document.createElement("div");
-  identity.className = "about__identity";
+  identity.id = "identity";
 
   const logoWrap = document.createElement("span");
-  logoWrap.className = "about__logo";
+  logoWrap.id = "identity__logo";
   logoWrap.role = "img";
   logoWrap.ariaLabel = getString("ARIA__ABOUT__LOGO");
   const logoSvg = createSafeSvgElement(PLUME_SVG.logo);
@@ -39,24 +39,24 @@ const buildIdentityBlock = (): HTMLElement => {
   identity.appendChild(logoWrap);
 
   const name = document.createElement("p");
-  name.className = "about__name";
+  name.id = "identity__name";
   name.textContent = getString("APP_NAME");
   identity.appendChild(name);
 
   const version = document.createElement("p");
-  version.className = "about__version";
-  version.textContent = APP_VERSION;
+  version.id = "identity__version";
+  version.textContent = APP_VERSION.substring(0, APP_VERSION.lastIndexOf(".")); // show major.minor only
   identity.appendChild(version);
 
   const tagline = document.createElement("p");
-  tagline.className = "about__tagline";
+  tagline.id = "identity__tagline";
   tagline.textContent = getString("APP_DESCRIPTION");
   identity.appendChild(tagline);
 
   return identity;
 };
 
-const buildInfoRow = (labelKey: string, value: string, useBadge: boolean): HTMLElement => {
+const buildInfoRow = (labelKey: string, value: string): HTMLElement => {
   const row = document.createElement("div");
   row.className = "setting-row";
 
@@ -66,7 +66,7 @@ const buildInfoRow = (labelKey: string, value: string, useBadge: boolean): HTMLE
   row.appendChild(label);
 
   const valueEl = document.createElement("span");
-  valueEl.className = useBadge ? "setting-row__badge" : "about__info-value";
+  valueEl.className = "about__info-value";
   valueEl.textContent = value;
   row.appendChild(valueEl);
 
@@ -83,9 +83,9 @@ const buildInfoSection = (): HTMLElement => {
   title.textContent = getString("LABEL__ABOUT__SECTION__INFO");
   section.appendChild(title);
 
-  section.appendChild(buildInfoRow("LABEL__ABOUT__AUTHOR", PLUME_AUTHOR, false));
-  section.appendChild(buildInfoRow("LABEL__ABOUT__LICENSE", PLUME_LICENSE, false));
-  section.appendChild(buildInfoRow("LABEL__ABOUT__BROWSERS", PLUME_BROWSERS, false));
+  section.appendChild(buildInfoRow("LABEL__ABOUT__AUTHOR", PLUME_AUTHOR));
+  section.appendChild(buildInfoRow("LABEL__ABOUT__LICENSE", PLUME_LICENSE));
+  section.appendChild(buildInfoRow("LABEL__ABOUT__BROWSERS", PLUME_BROWSERS));
 
   return section;
 };
@@ -114,9 +114,24 @@ const buildLinksSection = (): HTMLElement => {
   section.appendChild(title);
 
   const linksList = document.createElement("div");
-  linksList.className = "about__links-list";
+  linksList.id = "about__links-list";
   for (const linkConfig of ABOUT_LINKS) {
-    linksList.appendChild(buildLinkRow(linkConfig));
+    const linkRow = buildLinkRow(linkConfig);
+    switch (linkConfig.href) {
+      case PLUME_GITHUB_URL:
+        linkRow.textContent = "🖥️ " + linkRow.textContent + " 🐙";
+        break;
+      case PLUME_CHANGELOG_URL:
+        linkRow.textContent = "📝 " + linkRow.textContent + " 🆕";
+        break;
+      case PLUME_ISSUES_URL:
+        linkRow.textContent = "⚠️ " + linkRow.textContent + " 🐛";
+        break;
+      case PLUME_DONATION_URL:
+        linkRow.textContent = "💖 " + linkRow.textContent + " 💸";
+        break;
+    }
+    linksList.appendChild(linkRow);
   }
   section.appendChild(linksList);
 

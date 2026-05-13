@@ -394,7 +394,7 @@
   "LABEL__LANGUAGE__RU": { "message": "Russe" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
     "message": "Action de raccourci non gérée : $ACTION$",

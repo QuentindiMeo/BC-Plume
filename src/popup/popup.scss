@@ -6,6 +6,11 @@
   @apply box-border m-0 p-0;
 }
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-popup-accent, #c8a96e) transparent;
+}
+
 body {
   @apply w-90 font-popup leading-normal text-sm text-popup-text bg-popup-bg;
 
@@ -40,12 +45,17 @@ body {
   }
 
   .popup__tablist {
-    @apply flex border-b border-popup-border;
+    @apply flex border-b border-popup-border overflow-x-auto overflow-y-hidden;
+    scrollbar-width: none;
+
+    &:hover {
+      scrollbar-width: thin; // ? show scrollbar only on hover
+    }
 
     .popup__tab {
       @apply
-        py-2 px-4 bg-transparent border-none border-b-2 border-b-transparent
-        flex-1
+        py-2 px-4 bg-transparent border-none border-b-4 border-b-transparent
+        min-w-max flex-1
         font-popup font-medium text-sm text-center text-popup-text-muted whitespace-nowrap
         transition-[color,background,border-color] duration-150
       ;
@@ -72,7 +82,7 @@ body {
   }
 }
 
-/* Settings sections (shared by both tabs) */
+/* Settings sections (shared by all tabs) */
 .settings__section {
   @apply pt-2 px-4 pb-0;
 
@@ -316,44 +326,49 @@ body {
 }
 
 #tabpanel-about {
-  .about__identity {
-    @apply flex flex-col items-center gap-2 pt-4 px-4 pb-3 border-b border-popup-border text-center;
-  }
 
-  .about__logo {
-    @apply w-48 h-24 -mt-6 flex items-center text-popup-accent;
-  }
+  #identity {
+    @apply px-4 pb-3 border-b border-popup-border flex flex-col items-center gap-2 pt-4 text-center;
 
-  .about__name {
-    @apply text-base font-semibold text-popup-text;
-  }
+    &__logo {
+      @apply w-48 h-24 -mt-6 flex items-center text-popup-accent;
+    }
 
-  .about__version {
-    @apply text-xs text-popup-text-muted;
-    margin-top: -0.375rem; /* tighten gap with name */
-  }
+    &__name {
+      @apply text-base font-semibold text-popup-text;
+    }
 
-  .about__tagline {
-    @apply text-xs italic text-popup-text-muted text-balance;
-  }
+    &__version {
+      @apply -mt-2 text-xs text-popup-text-muted;
+    }
 
-  .about__info-value {
-    @apply text-xs text-popup-text-muted text-right whitespace-nowrap;
-  }
-
-  .about__links-list {
-    @apply flex flex-col gap-1.5 py-2;
-  }
-
-  .about__link-btn {
-    @apply
-      block w-full px-3 py-1.5 bg-popup-surface rounded-popup border border-popup-border
-      font-popup font-medium text-xs text-popup-text text-center whitespace-nowrap no-underline
-      transition-[border-color,background] duration-150
-    ;
-
-    &:hover {
-      @apply bg-popup-surface-alt border-popup-accent-dim;
+    &__tagline {
+      @apply text-xs italic text-popup-text-muted text-balance;
     }
   }
+
+  section {
+    @apply pt-3;
+
+    .about__info-value {
+      @apply text-xs text-popup-text-muted text-right whitespace-nowrap;
+    }
+
+    #about__links-list {
+      @apply py-1 flex flex-col gap-1.5;
+
+      a {
+        @apply
+          block w-full px-3 py-1.5 bg-popup-surface rounded-popup border border-popup-border
+          font-popup font-medium text-xs text-popup-text text-center whitespace-nowrap no-underline
+          transition-[border-color,background] duration-150
+        ;
+
+        &:hover {
+          @apply bg-popup-surface-alt border-popup-accent-dim;
+        }
+      }
+    }
+  }
+
 }
