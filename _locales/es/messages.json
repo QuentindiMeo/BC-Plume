@@ -398,7 +398,7 @@
   "LABEL__LANGUAGE__RU": { "message": "Ruso" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Debe ser un número entero" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos de teclado" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Atajos" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Atajos de teclado" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
     "message": "Acción de atajo no gestionada: $ACTION$",
@@ -635,5 +635,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/alguna-pista" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "Acerca de" },
+  "ARIA__ABOUT__LOGO": { "message": "Logo de Plume" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "Acerca de" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Autor" },
+  "LABEL__ABOUT__LICENSE": { "message": "Licencia" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Navegadores" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Enlaces" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Código fuente" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "Ver el código fuente de Plume en GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Historial de cambios" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Ver las notas de versión de Plume en GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Reportar un problema" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Reportar un problema en GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Apoya a Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Apoya a Plume en Ko-fi" }
 }

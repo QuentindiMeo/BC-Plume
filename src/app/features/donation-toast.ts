@@ -2,7 +2,7 @@ import { createToast } from "@/app/features/ui/toast";
 import { getBrowserInstance } from "@/app/stores/BrowserImpl";
 import { getDonationPlayCount, shouldShowDonationToast } from "@/app/use-cases/check-donation-toast";
 import { PLUME_CACHE_KEYS } from "@/domain/browser";
-import { PLUME_KOFI_URL } from "@/domain/meta";
+import { PLUME_DONATION_URL } from "@/domain/meta";
 import { PLUME_CONSTANTS } from "@/domain/plume";
 import type { IBrowserCache } from "@/domain/ports/browser";
 import { browserActions } from "@/domain/ports/browser";
@@ -14,7 +14,7 @@ const showDonationToast = (): void => {
     label: getString("META__TOAST__DONATION"),
     title: getString("LABEL__TOAST__DONATION__TITLE"),
     description: getString("LABEL__TOAST__DONATION__DESCRIPTION"),
-    cta: { href: PLUME_KOFI_URL, label: getString("LABEL__TOAST__DONATION__CTA") },
+    cta: { href: PLUME_DONATION_URL, label: getString("LABEL__TOAST__DONATION__CTA") },
     duration: PLUME_CONSTANTS.DONATION_TOAST_AUTO_DISMISS,
   });
 };

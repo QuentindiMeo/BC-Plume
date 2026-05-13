@@ -384,7 +384,7 @@
   "LABEL__LANGUAGE__RU": { "message": "Русский" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Должно быть целым числом" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Горячие клавиши" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Клавиши" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Горячие клавиши" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
     "message": "Необработанное действие горячей клавиши: $ACTION$",
@@ -609,5 +609,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/some-track" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "О Plume" },
+  "ARIA__ABOUT__LOGO": { "message": "Логотип Plume" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "О Plume" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Автор" },
+  "LABEL__ABOUT__LICENSE": { "message": "Лицензия" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Браузеры" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Ссылки" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Исходный код" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "Исходный код Plume на GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "История изменений" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "История изменений Plume на GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Сообщить о проблеме" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Сообщить о проблеме на GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Поддержать Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Поддержать Plume на Ko-fi" }
 }

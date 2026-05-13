@@ -1,6 +1,7 @@
 import { KeyBindingMap } from "@/domain/hotkeys";
 import { FeatureFlags, PlumeLanguage, WholeNumber } from "@/domain/plume";
 import type { IMessageSender } from "@/domain/ports/messaging";
+import { createAboutTab } from "@/popup/components/AboutTab";
 import { createFeatureTab } from "@/popup/components/FeatureFlippingTab";
 import { createGeneralTab } from "@/popup/components/GeneralTab";
 import { createHotkeyTab } from "@/popup/components/HotkeyTab";
@@ -66,6 +67,11 @@ export const createSettingsPanel = (stored: StoredSettings, sender: IMessageSend
         id: "features",
         label: getString("POPUP__FEATURES__TAB_LABEL"),
         buildPanel: createFeatureTab(stored.featureFlags, sender),
+      },
+      {
+        id: "about",
+        label: getString("POPUP__ABOUT__TAB_LABEL"),
+        buildPanel: createAboutTab(),
       },
     ];
     el.appendChild(createTabBar(tabs).el);

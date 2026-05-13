@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PLUME_DEFAULTS } from "@/domain/plume";
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeMessageSender } from "../fakes/FakeMessageSender";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
 
@@ -230,5 +230,33 @@ describe("popup accessibility", () => {
       const logoSpan = container.querySelector(".popup__header-logo");
       expect(logoSpan?.getAttribute("aria-hidden")).toBe("true");
     });
+
+    it(
+      "About tab has no a11y violations when activated",
+      async () => {
+        const { createSettingsPanel } = await import("@/popup/components/SettingsPanel");
+        const container = document.createElement("div");
+        const panel = createSettingsPanel(
+          {
+            forcedLanguage: undefined,
+            seekJumpDuration: undefined,
+            volumeHotkeyStep: undefined,
+            trackRestartThreshold: undefined,
+            hotkeyBindings: undefined,
+            featureFlags: { ...PLUME_DEFAULTS.featureFlags },
+          },
+          sender
+        );
+        panel.mount(container);
+        document.body.appendChild(container);
+
+        const aboutTabBtn = container.querySelector<HTMLButtonElement>("#tab-about");
+        expect(aboutTabBtn).not.toBeNull();
+        aboutTabBtn!.click();
+
+        await checkA11y(container);
+      },
+      AXE_TEST_TIMEOUT
+    );
   });
 });

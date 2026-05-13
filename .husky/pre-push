@@ -1,5 +1,55 @@
 #!/usr/bin/env sh
 set -e
 
-pnpm prepare
-pnpm test
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+# Consume ALL pushed refs before deciding whether to skip.
+stdin_had_refs=false
+should_skip=true
+
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  stdin_had_refs=true
+  if [ "$local_sha" = "$remote_sha" ]; then
+    continue #? unchanged ref — no new commits
+  fi
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    continue #? new ref — no existing remote to compare against
+  fi
+  # This ref carries new commits to an existing remote ref — validation required.
+  should_skip=false
+done
+
+if $stdin_had_refs; then
+  if $should_skip; then
+    echo "No new commits to validate — skipping."
+    exit 0
+  fi
+else
+  # Fallback: stdin was not piped (loop body never ran) — infer branch state via git.
+  # Guard: empty CURRENT_BRANCH means detached HEAD — cannot determine branch state, so validate.
+  # Use $1 (the remote git passes to this hook) rather than hardcoding origin.
+  if [ -n "$CURRENT_BRANCH" ] && ! git ls-remote --exit-code --heads "$1" "$CURRENT_BRANCH" >/dev/null 2>&1; then
+    echo "New branch — skipping validation (setting upstream)."
+    exit 0
+  fi
+fi
+
+fail() {
+  echo ""
+  echo "╔══════════════════════════════════════════════════════════════╗"
+  echo "║                        PUSH BLOCKED                          ║"
+  echo "╠══════════════════════════════════════════════════════════════╣"
+  echo "║  $1"
+  echo "║                                                              ║"
+  echo "║  Fix the errors above, then try pushing again.               ║"
+  echo "╚══════════════════════════════════════════════════════════════╝"
+  echo ""
+  exit 1
+}
+
+if [ "$CURRENT_BRANCH" = "develop" ]; then
+  echo "Pushing directly on 'develop' branch — running full validation..."
+  (pnpm test && pnpm deploy) || fail "Validation failed on 'develop'.                             ║"
+else
+  (pnpm prepare && pnpm test) || fail "Build failed on branch '$CURRENT_BRANCH'."
+fi

@@ -609,5 +609,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/some-track" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "Despre" },
+  "ARIA__ABOUT__LOGO": { "message": "Logo-ul Plume" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "Despre" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Autor" },
+  "LABEL__ABOUT__LICENSE": { "message": "Licență" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Browsere" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Linkuri" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Cod sursă" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "Vizualizați codul sursă Plume pe GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Jurnal de modificări" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Vizualizați jurnalul de modificări Plume pe GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Raportează o problemă" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Raportează o problemă pe GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Susține Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Susține Plume pe Ko-fi" }
 }
