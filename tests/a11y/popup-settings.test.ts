@@ -251,7 +251,8 @@ describe("popup accessibility", () => {
         document.body.appendChild(container);
 
         const aboutTabBtn = container.querySelector<HTMLButtonElement>("#tab-about");
-        aboutTabBtn?.click();
+        expect(aboutTabBtn).not.toBeNull();
+        aboutTabBtn!.click();
 
         await checkA11y(container);
       },
