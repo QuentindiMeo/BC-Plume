@@ -3,23 +3,35 @@ set -e
 
 CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
 
-# Skip validation for branches without new commits, or for a first push that sets the upstream
+# Consume ALL pushed refs before deciding whether to skip.
+stdin_had_refs=false
+should_skip=true
+
 while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  stdin_had_refs=true
   if [ "$local_sha" = "$remote_sha" ]; then
-    echo "No new commits since last push — skipping validation."
-    exit 0
+    continue #? unchanged ref — no new commits
   fi
   if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    continue #? new ref — no existing remote to compare against
+  fi
+  # This ref carries new commits to an existing remote ref — validation required.
+  should_skip=false
+done
+
+if $stdin_had_refs; then
+  if $should_skip; then
+    echo "No new commits to validate — skipping."
+    exit 0
+  fi
+else
+  # Fallback: stdin was not piped (loop body never ran) — infer branch state via git.
+  # Guard: empty CURRENT_BRANCH means detached HEAD — cannot determine branch state, so validate.
+  # Use $1 (the remote git passes to this hook) rather than hardcoding origin.
+  if [ -n "$CURRENT_BRANCH" ] && ! git ls-remote --exit-code --heads "$1" "$CURRENT_BRANCH" >/dev/null 2>&1; then
     echo "New branch — skipping validation (setting upstream)."
     exit 0
   fi
-done
-
-# Fallback: if the while loop did not exit above (e.g. stdin not piped),
-# check via git whether the remote branch already exists.
-if ! git ls-remote --exit-code --heads origin "$CURRENT_BRANCH" >/dev/null 2>&1; then
-  echo "New branch — skipping validation (setting upstream)."
-  exit 0
 fi
 
 fail() {
@@ -37,7 +49,7 @@ fail() {
 
 if [ "$CURRENT_BRANCH" = "develop" ]; then
   echo "Pushing directly on 'develop' branch — running full validation..."
-  (pnpm prepare && pnpm test) || fail "Validation failed on 'develop'.                             ║"
+  (pnpm test && pnpm deploy) || fail "Validation failed on 'develop'.                             ║"
 else
   (pnpm prepare && pnpm test) || fail "Build failed on branch '$CURRENT_BRANCH'."
 fi
