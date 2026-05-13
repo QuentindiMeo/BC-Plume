@@ -607,5 +607,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/some-track" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "Info" },
+  "ARIA__ABOUT__LOGO": { "message": "Logo di Plume" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "Info" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Autore" },
+  "LABEL__ABOUT__LICENSE": { "message": "Licenza" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Browser" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Link" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Codice sorgente" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "Visualizza il codice sorgente di Plume su GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Registro modifiche" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Visualizza le note di rilascio di Plume su GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Segnala un problema" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Segnala un problema su GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Supporta Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Supporta Plume su Ko-fi" }
 }

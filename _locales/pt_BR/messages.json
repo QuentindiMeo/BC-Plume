@@ -609,5 +609,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/some-track" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "Sobre" },
+  "ARIA__ABOUT__LOGO": { "message": "Logo do Plume" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "Sobre" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Autor" },
+  "LABEL__ABOUT__LICENSE": { "message": "Licença" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Navegadores" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Links" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Código-fonte" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "Ver o código-fonte do Plume no GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Histórico de versões" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Ver o histórico de versões do Plume no GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Reportar um problema" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Reportar um problema no GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Apoie o Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Apoie o Plume no Ko-fi" }
 }
