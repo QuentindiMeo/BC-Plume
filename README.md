@@ -22,7 +22,7 @@
   <a href="https://addons.mozilla.org/fr/firefox/addon/bc-plume"><img alt="Firefox store rating" src="https://img.shields.io/amo/rating/bc-plume?logo=firefoxbrowser" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/QuentindiMeo/BC-Plume?style=flat&color=%23ffe937&logo=github" /></a>
   <a href="https://github.com/QuentindiMeo/BC-Plume/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/QuentindiMeo/BC-Plume?color=forestgreen&logo=target" /></a>
-  <a href="#%EF%B8%8F-roadmap"><img alt="project code coverage" src="https://img.shields.io/badge/coverage-100%25-forestgreen?logo=chianetwork" /></a>
+  <a href="#%EF%B8%8F-roadmap"><img alt="project code coverage" src="https://img.shields.io/badge/coverage-99%25-forestgreen?logo=chianetwork" /></a>
 </div>
 
 &#xa0;
