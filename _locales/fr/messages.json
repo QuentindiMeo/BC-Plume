@@ -644,7 +644,7 @@
   "LABEL__ABOUT__SECTION__LINKS": { "message": "Liens" },
   "LABEL__ABOUT__LINK__GITHUB": { "message": "Code source" },
   "ARIA__ABOUT__LINK__GITHUB": { "message": "Voir le code source de Plume sur GitHub" },
-  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Journal des modifications" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Notes de version" },
   "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Voir les notes de version de Plume sur GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Signaler un problème" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Signaler un problème sur GitHub" },

@@ -622,6 +622,6 @@
   "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Visualizza le note di rilascio di Plume su GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Segnala un problema" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Segnala un problema su GitHub" },
-  "LABEL__ABOUT__LINK__DONATION": { "message": "Supporta Plume" },
-  "ARIA__ABOUT__LINK__DONATION": { "message": "Supporta Plume su Ko-fi" }
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Sostieni Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Sostieni Plume su Ko-fi" }
 }

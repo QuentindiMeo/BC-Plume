@@ -17,13 +17,24 @@ interface AboutLinkConfig {
   labelKey: string;
   ariaKey: string;
   href: string;
+  emoji: string;
 }
 
 const ABOUT_LINKS: AboutLinkConfig[] = [
-  { labelKey: "LABEL__ABOUT__LINK__GITHUB", ariaKey: "ARIA__ABOUT__LINK__GITHUB", href: PLUME_GITHUB_URL },
-  { labelKey: "LABEL__ABOUT__LINK__CHANGELOG", ariaKey: "ARIA__ABOUT__LINK__CHANGELOG", href: PLUME_CHANGELOG_URL },
-  { labelKey: "LABEL__ABOUT__LINK__REPORT", ariaKey: "ARIA__ABOUT__LINK__REPORT", href: PLUME_ISSUES_URL },
-  { labelKey: "LABEL__ABOUT__LINK__DONATION", ariaKey: "ARIA__ABOUT__LINK__DONATION", href: PLUME_DONATION_URL },
+  { labelKey: "LABEL__ABOUT__LINK__GITHUB", ariaKey: "ARIA__ABOUT__LINK__GITHUB", href: PLUME_GITHUB_URL, emoji: "🐙" },
+  {
+    labelKey: "LABEL__ABOUT__LINK__CHANGELOG",
+    ariaKey: "ARIA__ABOUT__LINK__CHANGELOG",
+    href: PLUME_CHANGELOG_URL,
+    emoji: "📝",
+  },
+  { labelKey: "LABEL__ABOUT__LINK__REPORT", ariaKey: "ARIA__ABOUT__LINK__REPORT", href: PLUME_ISSUES_URL, emoji: "🐛" },
+  {
+    labelKey: "LABEL__ABOUT__LINK__DONATION",
+    ariaKey: "ARIA__ABOUT__LINK__DONATION",
+    href: PLUME_DONATION_URL,
+    emoji: "💸",
+  },
 ];
 
 const buildIdentityBlock = (): HTMLElement => {
@@ -98,7 +109,7 @@ const buildLinkRow = (config: AboutLinkConfig): HTMLAnchorElement => {
   link.href = href;
   link.target = "_blank";
   link.rel = "noreferrer noopener";
-  link.textContent = getString(labelKey);
+  link.textContent = getString(labelKey) + " " + config.emoji;
   link.ariaLabel = getString(ariaKey);
   return link;
 };
@@ -117,20 +128,6 @@ const buildLinksSection = (): HTMLElement => {
   linksList.id = "about__links-list";
   for (const linkConfig of ABOUT_LINKS) {
     const linkRow = buildLinkRow(linkConfig);
-    switch (linkConfig.href) {
-      case PLUME_GITHUB_URL:
-        linkRow.textContent = "🖥️ " + linkRow.textContent + " 🐙";
-        break;
-      case PLUME_CHANGELOG_URL:
-        linkRow.textContent = "📝 " + linkRow.textContent + " 🆕";
-        break;
-      case PLUME_ISSUES_URL:
-        linkRow.textContent = "⚠️ " + linkRow.textContent + " 🐛";
-        break;
-      case PLUME_DONATION_URL:
-        linkRow.textContent = "💖 " + linkRow.textContent + " 💸";
-        break;
-    }
     linksList.appendChild(linkRow);
   }
   section.appendChild(linksList);
