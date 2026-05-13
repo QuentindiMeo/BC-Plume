@@ -1,4 +1,5 @@
 import {
+  APP_RELEASE_DATE,
   APP_VERSION,
   PLUME_AUTHOR,
   PLUME_BROWSERS,
@@ -9,7 +10,7 @@ import {
   PLUME_LICENSE,
 } from "@/domain/meta";
 import type { TabDefinition } from "@/popup/components/TabBar";
-import { getString } from "@/shared/i18n";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -56,7 +57,15 @@ const buildIdentityBlock = (): HTMLElement => {
 
   const version = document.createElement("p");
   version.id = "identity__version";
-  version.textContent = APP_VERSION.substring(0, APP_VERSION.lastIndexOf(".")); // show major.minor only
+  const shortVersion = APP_VERSION.substring(0, APP_VERSION.lastIndexOf("."));
+  const locale = getActiveLocale().replaceAll("_", "-");
+  const fullReleaseDate = new Date(`${APP_RELEASE_DATE}T12:00:00`);
+  const localizedReleaseDate = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(fullReleaseDate);
+  version.textContent = `${shortVersion} — ${localizedReleaseDate}`;
   identity.appendChild(version);
 
   const tagline = document.createElement("p");

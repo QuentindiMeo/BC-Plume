@@ -5,7 +5,7 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
-- _**[1.13.0]** May 13 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)  
+- _**[1.13.0]** May 14 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)  
 A waveform (toggleable) can replace the regular progress bar, with audio peaks — only for tracks less than 20 minutes.  
 A BPM-driven audio visualizer (toggleable) is added to the fullscreen view: a pulse animation syncs its beat phase to the track.  
 4 new languages are added — Italian 🇮🇹, Brazilian Portuguese 🇧🇷, Romanian 🇷🇴, and Russian 🇷🇺 — bringing the total to 7.  

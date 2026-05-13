@@ -128,7 +128,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find details about each release in [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md).
 
-- _**[1.13.0]** May 13 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)
+- _**[1.13.0]** May 14 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
 - _**[1.10.0]** Mar 30 2026_: **Condo in Manhattan** [#127](https://github.com/QuentindiMeo/BC-Plume/pull/127)
