@@ -1,5 +1,43 @@
 #!/usr/bin/env sh
 set -e
 
-pnpm prepare
-pnpm test
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+# Skip validation for branches without new commits, or for a first push that sets the upstream
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" = "$remote_sha" ]; then
+    echo "No new commits since last push — skipping validation."
+    exit 0
+  fi
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    echo "New branch — skipping validation (setting upstream)."
+    exit 0
+  fi
+done
+
+# Fallback: if the while loop did not exit above (e.g. stdin not piped),
+# check via git whether the remote branch already exists.
+if ! git ls-remote --exit-code --heads origin "$CURRENT_BRANCH" >/dev/null 2>&1; then
+  echo "New branch — skipping validation (setting upstream)."
+  exit 0
+fi
+
+fail() {
+  echo ""
+  echo "╔══════════════════════════════════════════════════════════════╗"
+  echo "║                        PUSH BLOCKED                          ║"
+  echo "╠══════════════════════════════════════════════════════════════╣"
+  echo "║  $1"
+  echo "║                                                              ║"
+  echo "║  Fix the errors above, then try pushing again.               ║"
+  echo "╚══════════════════════════════════════════════════════════════╝"
+  echo ""
+  exit 1
+}
+
+if [ "$CURRENT_BRANCH" = "develop" ]; then
+  echo "Pushing directly on 'develop' branch — running full validation..."
+  (pnpm prepare && pnpm test) || fail "Validation failed on 'develop'.                             ║"
+else
+  (pnpm prepare && pnpm test) || fail "Build failed on branch '$CURRENT_BRANCH'."
+fi
