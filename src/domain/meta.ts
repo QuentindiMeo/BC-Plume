@@ -1,5 +1,5 @@
 export const APP_VERSION = "v1.13.0";
-export const APP_RELEASE_DATE = "2026-05-14";
+export const APP_RELEASE_DATE = "2026-05-15";
 export const PLUME_AUTHOR = "Quentin DI MEO";
 export const PLUME_LICENSE = "MIT";
 export const PLUME_BROWSERS = "Chrome · Firefox";

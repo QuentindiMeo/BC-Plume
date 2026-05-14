@@ -49,7 +49,7 @@ fail() {
 
 if [ "$CURRENT_BRANCH" = "develop" ]; then
   echo "Pushing directly on 'develop' branch — running full validation..."
-  (pnpm test && pnpm deploy) || fail "Validation failed on 'develop'.                             ║"
+  (pnpm test && pnpm ship) || fail "Validation failed on 'develop'.                             ║"
 else
   (pnpm prepare && pnpm test) || fail "Build failed on branch '$CURRENT_BRANCH'."
 fi

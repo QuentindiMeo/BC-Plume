@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: vi.fn(() => "en") }));
 vi.mock("@/shared/logger", () => ({ logger: vi.fn(), CPL: { ERROR: "ERROR" } }));
 vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),
@@ -9,6 +9,7 @@ vi.mock("@/shared/svg", () => ({
 vi.mock("@/svg/icons", () => ({ PLUME_SVG: { logo: "" } }));
 vi.mock("@/domain/meta", () => ({
   APP_VERSION: "v1.2.3",
+  APP_RELEASE_DATE: "2026-05-13",
   PLUME_AUTHOR: "Test Author",
   PLUME_LICENSE: "MIT",
   PLUME_BROWSERS: "Chrome · Firefox",
@@ -19,13 +20,22 @@ vi.mock("@/domain/meta", () => ({
 }));
 
 import { createAboutTab } from "@/popup/components/AboutTab";
+import * as i18n from "@/shared/i18n";
 
 const buildPanel = (): HTMLDivElement => createAboutTab()();
 
 const getLinkAnchors = (panel: HTMLDivElement): HTMLAnchorElement[] =>
   [...panel.querySelectorAll("#about__links-list a")] as HTMLAnchorElement[];
 
-beforeEach(() => vi.clearAllMocks());
+const formatReleaseDate = (locale: string): string =>
+  new Intl.DateTimeFormat(locale.replaceAll("_", "-"), { year: "numeric", month: "long", day: "numeric" }).format(
+    new Date("2026-05-13T12:00:00")
+  );
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(i18n.getActiveLocale).mockReturnValue("en");
+});
 
 describe("identity block", () => {
   it("renders the logo with an accessible name", () => {
@@ -44,12 +54,28 @@ describe("identity block", () => {
     expect(name?.textContent).toBe("APP_NAME");
   });
 
-  it("renders major.minor version only (no patch segment)", () => {
+  it("renders major.minor version with the localized release date appended", () => {
     const panel = buildPanel();
     const version = panel.querySelector("#identity__version");
 
-    // APP_VERSION = "v1.2.3" → substring before last dot → "v1.2"
-    expect(version?.textContent).toBe("v1.2");
+    // APP_VERSION = "v1.2.3" → substring before last dot → "v1.2", then "— <date>"
+    expect(version?.textContent).toBe(`v1.2 — ${formatReleaseDate("en")}`);
+  });
+
+  it("formats the release date in the active locale", () => {
+    vi.mocked(i18n.getActiveLocale).mockReturnValue("fr");
+    const panel = buildPanel();
+    const version = panel.querySelector("#identity__version");
+
+    expect(version?.textContent).toBe(`v1.2 — ${formatReleaseDate("fr")}`);
+  });
+
+  it("converts underscore locale codes to BCP-47 hyphens for Intl", () => {
+    vi.mocked(i18n.getActiveLocale).mockReturnValue("pt_BR");
+    const panel = buildPanel();
+    const version = panel.querySelector("#identity__version");
+
+    expect(version?.textContent).toBe(`v1.2 — ${formatReleaseDate("pt_BR")}`);
   });
 
   it("renders tagline from i18n key", () => {

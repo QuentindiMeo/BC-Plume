@@ -41,7 +41,7 @@ const downsampleToPeaks = (samples: Float32Array, peakCount: number): Float32Arr
 };
 
 const resolveCurrentTrackAudioInfo = (infos: TrackAudioInfo[]): TrackAudioInfo | null => {
-  if (infos.length === 1) return infos[0] ?? null;
+  if (infos.length === 1) return infos[0];
 
   const trackNumberText = getAppCoreInstance().getState().trackNumber;
   if (!trackNumberText) return null;

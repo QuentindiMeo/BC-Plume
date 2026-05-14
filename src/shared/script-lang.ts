@@ -48,8 +48,7 @@ export const detectScriptLang = (text: string): string => {
   const scriptsFound: Record<string, number> = {};
 
   for (const char of text) {
-    const cp = char.codePointAt(0);
-    if (cp === undefined) continue;
+    const cp: number = char.codePointAt(0)!;
 
     if (isKana(cp)) {
       scriptsFound["ja"] = (scriptsFound["ja"] ?? 0) + 1;

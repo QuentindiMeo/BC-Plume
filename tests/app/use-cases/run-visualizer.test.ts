@@ -74,6 +74,20 @@ describe("runVisualizer", () => {
 
     expect(mockStart).not.toHaveBeenCalled();
   });
+
+  it("is a no-op when trackNumber matches no entry in track audio infos", () => {
+    // trackNumber "7/12" but the audio infos only contain track #1 — find() returns undefined
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, visualizer: true },
+      trackNumber: "7/12",
+      trackBpms: { [TRACK_URL]: { bpm: 140, loading: false, error: false } },
+    });
+    mockGetTrackAudioInfos.mockReturnValue([{ trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: "" }]);
+
+    runVisualizer(fakeCanvas);
+
+    expect(mockStart).not.toHaveBeenCalled();
+  });
 });
 
 describe("stopVisualizer", () => {

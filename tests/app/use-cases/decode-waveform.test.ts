@@ -197,6 +197,22 @@ describe("decodeWaveformForCurrentTrack", () => {
     expect(mockSendMessage).not.toHaveBeenCalled();
   });
 
+  it("returns null on a collection page when trackNumber has no digits", async () => {
+    fakeTrackAudio.getTrackAudioInfos.mockReturnValue([
+      { trackNumber: 1, trackUrl: TRACK_URL, audioStreamUrl: AUDIO_URL },
+      { trackNumber: 2, trackUrl: "/track/b", audioStreamUrl: "https://audio-b.mp3" },
+    ]);
+    fakeAppCore = new FakeAppCore({
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags },
+      trackNumber: "no digits here",
+    });
+
+    const peaks = await decodeWaveformForCurrentTrack();
+
+    expect(peaks).toBeNull();
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
   it("returns null when background fetch response data is null", async () => {
     mockSendMessage.mockResolvedValue({ ok: true, data: null });
 

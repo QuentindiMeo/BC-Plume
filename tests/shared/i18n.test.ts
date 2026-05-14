@@ -8,6 +8,12 @@ describe("getString", () => {
     expect(result).toBe("currently playing (3/10)");
   });
 
+  it("falls back to empty when a placeholder references an out-of-range substitution index", () => {
+    // LABEL__TRACK_CURRENT references "$1" but we pass no subs
+    const result = getString("LABEL__TRACK_CURRENT", []);
+    expect(result).toBe("currently playing ()");
+  });
+
   it("returns the key and warns when the key does not exist", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const result = getString("KEY_THAT_DOES_NOT_EXIST");

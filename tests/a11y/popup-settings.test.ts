@@ -5,7 +5,7 @@ import { PLUME_DEFAULTS } from "@/domain/plume";
 import { FakeMessageSender } from "../fakes/FakeMessageSender";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
 vi.mock("@/shared/logger", () => ({ CPL: { ERROR: "error", WARN: "warn" }, logger: vi.fn() }));
 vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),

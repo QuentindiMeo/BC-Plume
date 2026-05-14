@@ -22,7 +22,7 @@ export const runVisualizer = (canvas: HTMLCanvasElement): void => {
   if (!bpm) return;
 
   const visualizer = getVisualizerInstance();
-  visualizer.start(canvas, bpm, appState.currentTime ?? 0);
+  visualizer.start(canvas, bpm, appState.currentTime);
 };
 
 export const stopVisualizer = (): void => {

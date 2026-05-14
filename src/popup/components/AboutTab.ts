@@ -15,10 +15,10 @@ import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
 interface AboutLinkConfig {
-  labelKey: string;
-  ariaKey: string;
   href: string;
   emoji: string;
+  labelKey: string;
+  ariaKey: string;
 }
 
 const ABOUT_LINKS: AboutLinkConfig[] = [
@@ -111,14 +111,14 @@ const buildInfoSection = (): HTMLElement => {
 };
 
 const buildLinkRow = (config: AboutLinkConfig): HTMLAnchorElement => {
-  const { labelKey, ariaKey, href } = config;
+  const { href, emoji, labelKey, ariaKey } = config;
 
   const link = document.createElement("a");
   link.className = "about__link-btn";
   link.href = href;
   link.target = "_blank";
   link.rel = "noreferrer noopener";
-  link.textContent = getString(labelKey) + " " + config.emoji;
+  link.textContent = getString(labelKey) + " " + emoji;
   link.ariaLabel = getString(ariaKey);
   return link;
 };

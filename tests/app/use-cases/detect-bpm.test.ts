@@ -60,8 +60,6 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals());
 
-// ─── detectBpmForTrack ────────────────────────────────────────────────────────
-
 describe("detectBpmForTrack", () => {
   it("dispatches LOADING then SUCCESS in order", async () => {
     const spy = vi.spyOn(fakeAppCore, "dispatch");
@@ -99,6 +97,14 @@ describe("detectBpmForTrack", () => {
     expect(fakeTrackAudio.setCachedBpm).not.toHaveBeenCalled();
   });
 
+  it("dispatches ERROR when background returns ok:false without an error message", async () => {
+    mockSendMessage.mockResolvedValue({ ok: false });
+    await detectBpmForTrack(TRACK_URL, AUDIO_URL);
+
+    expect(fakeAppCore.getState().trackBpms[TRACK_URL]).toEqual({ bpm: null, loading: false, error: true });
+    expect(fakeTrackAudio.setCachedBpm).not.toHaveBeenCalled();
+  });
+
   it("dispatches ERROR when sendMessage rejects", async () => {
     mockSendMessage.mockRejectedValue(new Error("Could not establish connection"));
     await detectBpmForTrack(TRACK_URL, AUDIO_URL);
@@ -128,8 +134,6 @@ describe("detectBpmForTrack", () => {
     expect(fakeAudioContextClose).toHaveBeenCalledOnce();
   });
 });
-
-// ─── detectBpmForAllTracks ────────────────────────────────────────────────────
 
 describe("detectBpmForAllTracks", () => {
   it("does nothing when there are no track infos", async () => {
