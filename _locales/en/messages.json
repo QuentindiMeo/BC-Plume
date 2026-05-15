@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Bandcamp Player Enhancer" },
   "APP_DESCRIPTION": {
-    "message": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkey for the player."
+    "message": "Bandcamp extension: volume slider, hotkeys, loop modes, fullscreen mode, playback speed, waveform progress bar & beat visualizer."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "No browser API detected" },
@@ -218,6 +218,20 @@
       "DURATION": { "content": "$2" }
     }
   },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Audio waveform" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Audio waveform — loading..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Decoding waveform for: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Waveform decoded for: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Waveform decode failed for: $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/some-track" } }
+  },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Mute button not found" },
   "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Volume slider or display element not found" },
@@ -344,6 +358,8 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Audio Visualizer" },
+
   "POPUP_TITLE": { "message": "Settings Panel" },
   "ARIA__POPUP__TABLIST": { "message": "Settings sections" },
   "INFO__SETTING__REFRESH_REQUIRED": { "message": "Refresh the page for the change to take effect." },
@@ -360,6 +376,10 @@
   "LABEL__LANGUAGE__EN": { "message": "English" },
   "LABEL__LANGUAGE__ES": { "message": "Spanish" },
   "LABEL__LANGUAGE__FR": { "message": "French" },
+  "LABEL__LANGUAGE__IT": { "message": "Italian" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Portuguese (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Romanian" },
+  "LABEL__LANGUAGE__RU": { "message": "Russian" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Must be a whole number" },
 
   "POPUP__HOTKEYS__TAB_LABEL": { "message": "Hotkeys" },
@@ -421,13 +441,18 @@
   },
 
   "POPUP__FEATURES__TAB_LABEL": { "message": "Features" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Go to track" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Tracklist" },
+  "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Waveform progress bar" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Not available for tracks over $LIMIT_MINUTES$ min.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
+  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
   "LABEL__FEATURES__LOOP_MODES": { "message": "Loop modes" },
   "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },
-  "LABEL__FEATURES__QUICK_SEEK": { "message": "Quick seek (0–9)" },
-  "LABEL__FEATURES__RUNTIME": { "message": "Runtime" },
-  "LABEL__FEATURES__SPEED_CONTROL": { "message": "Playback Speed Control" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "BPM Detection" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
 
@@ -543,6 +568,13 @@
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Please enter a number between 0.25 and 5." },
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "invalid custom input" },
 
+  "LABEL__TOAST__DONATION__TITLE": { "message": "Sound good to you?" },
+  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume is free and always will be. If it's made your Bandcamp listening better, a small tip means the world." },
+  "LABEL__TOAST__DONATION__CTA": { "message": "Support Plume" },
+  "META__TOAST__DONATION": { "message": "donation" },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": { "message": "Full play count incremented to $COUNT$", "placeholders": { "COUNT": { "content": "$1" } } },
+  "DEBUG__DONATION__THRESHOLD__REACHED": { "message": "Donation toast threshold reached at $COUNT$ plays", "placeholders": { "COUNT": { "content": "$1" } } },
+
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },
   "LABEL__BPM__ERROR": { "message": "—" },
@@ -569,5 +601,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/some-track" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "About" },
+  "ARIA__ABOUT__LOGO": { "message": "Plume logo" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "About" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Author" },
+  "LABEL__ABOUT__LICENSE": { "message": "License" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Browsers" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Links" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Source code" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "View Plume source code on GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Changelog" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "View Plume release notes on GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Report an issue" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Report an issue on GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Support Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Support Plume on Ko-fi" }
 }

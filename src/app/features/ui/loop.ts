@@ -1,16 +1,16 @@
+import { getMusicPlayerInstance } from "@/app/stores/adapters";
+import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
+import { getGuiInstance } from "@/app/stores/GuiImpl";
+import { cycleLoopMode } from "@/app/use-cases/cycle-loop-mode";
 import { LOOP_MODE, LoopModeType } from "@/domain/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
-import { getMusicPlayerInstance } from "@/app/stores/adapters";
-import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
-import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { cycleLoopMode } from "@/app/use-cases/cycle-loop-mode";
 
 export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType): void => {
   const appCore = getAppCoreInstance();
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const isCollectionPage = appCore.getState().pageType === "album";
   switch (loopMode) {
     case LOOP_MODE.NONE:
       const btnStringNone = getString("ARIA__LOOP__OFF");
@@ -20,7 +20,7 @@ export const applyLoopBtnState = (btn: HTMLButtonElement, loopMode: LoopModeType
       btn.title = btnStringNone;
       break;
     case LOOP_MODE.COLLECTION: {
-      const btnStringCollection = isAlbumPage
+      const btnStringCollection = isCollectionPage
         ? getString("ARIA__LOOP__COLLECTION_ALBUM")
         : getString("ARIA__LOOP__COLLECTION_TRACK");
       setSvgContent(btn, PLUME_SVG.loopCollection);

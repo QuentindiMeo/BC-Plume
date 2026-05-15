@@ -11,7 +11,7 @@ export interface BcPlayerPort {
   getCurrentTime(): number;
   getVolume(): number;
 
-  // Track list data — data-centric access to album track table
+  // Track list data — data-centric access to collection track table
   getTrackRows(): HTMLTableRowElement[];
   getTrackPlayabilityMap(): boolean[];
   getTrackRowTitles(): string[];
@@ -21,7 +21,7 @@ export interface BcPlayerPort {
   getAudioElement(): HTMLAudioElement | null;
   getPageBackground(): HTMLElement | null;
   getPlayerParent(): HTMLElement | null;
-  getInfoSection(): HTMLElement | null;
+  getInfoSection(): HTMLDivElement | null;
   getTrackTitleElement(): HTMLElement | null;
   getTrackView(): HTMLDivElement | null;
   getInlinePlayerTable(): HTMLTableElement | null;

@@ -1,4 +1,5 @@
 import { inferBrowserApi, isSafariBrowser, logDetectedBrowser } from "@/shared/browser";
+import { BrowserApiError } from "@/shared/errors";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -45,7 +46,7 @@ describe("inferBrowserApi", () => {
   it("throws when neither browser nor chrome is available", () => {
     vi.stubGlobal("browser", undefined);
     vi.stubGlobal("chrome", undefined);
-    expect(() => inferBrowserApi()).toThrow("No compatible browser API");
+    expect(() => inferBrowserApi()).toThrow(BrowserApiError);
   });
 
   it("returns chrome when only chrome is available", () => {

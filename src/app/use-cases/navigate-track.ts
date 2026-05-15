@@ -5,7 +5,7 @@ import type { MusicPlayerPort } from "@/domain/ports/music-player";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-export const isLastTrackOfAlbumPlaying = (bcPlayer: BcPlayerPort): boolean => {
+export const isLastTrackOfCollectionPlaying = (bcPlayer: BcPlayerPort): boolean => {
   const trackRowTitles = bcPlayer.getTrackRowTitles();
   if (trackRowTitles.length === 0) return false;
 
@@ -37,13 +37,13 @@ export const navigateTrackBackward = (appCore: IAppCore, player: MusicPlayerPort
 };
 
 // When loopMode is COLLECTION and the next track button is absent (last track),
-// wrap around to the first track by clicking the first track row in the album table.
+// wrap around to the first track by clicking the first track row in the collection table.
 export const navigateTrackForward = (appCore: IAppCore, musicPlayer: MusicPlayerPort, bcPlayer: BcPlayerPort): void => {
   const bcNextBtn = bcPlayer.getNextTrackButton();
   const { pageType, loopMode } = appCore.getState();
-  const currentIsLastTrackOfAlbum = isLastTrackOfAlbumPlaying(bcPlayer);
+  const currentIsLastTrackOfCollection = isLastTrackOfCollectionPlaying(bcPlayer);
 
-  if (currentIsLastTrackOfAlbum && loopMode !== LOOP_MODE.NONE) {
+  if (currentIsLastTrackOfCollection && loopMode !== LOOP_MODE.NONE) {
     // cycle back to first track when on last track of collection
     const bcPrevBtn = bcPlayer.getPreviousTrackButton();
     const tracks = bcPlayer.getTrackRows();

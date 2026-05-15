@@ -20,9 +20,10 @@ import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
+import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -37,6 +38,14 @@ interface PlumeView {
 
   tracklistCleanup: CleanupCallback;
 }
+
+const preloadFullscreenCoverArt = (): void => {
+  const bcPlayer = getBcPlayerInstance();
+  const artworkUrl = bcPlayer.getArtworkUrl();
+  if (!artworkUrl) return;
+
+  new Image().src = artworkUrl; // Preload the cover art to ensure it's cached and can be displayed immediately when entering fullscreen mode.
+};
 
 const notifyUnplayableTracks = () => {
   const bcPlayer = getBcPlayerInstance();
@@ -78,7 +87,7 @@ const addRuntime = () => {
   trackView.insertBefore(getInfoSectionWithRuntime(), trackView.firstChild);
 };
 
-const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
+const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => {
   const appCore = getAppCoreInstance();
   const flags = appCore.getState().featureFlags;
 
@@ -107,18 +116,19 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   headerContainer.appendChild(headerLogo);
 
   const bcPlayer = getBcPlayerInstance();
-  const initialTrackTitle = getCurrentTrackTitle(isAlbumPage);
+  const initialTrackTitle = getCurrentTrackTitle(isCollectionPage);
   const initialTq = getTrackQuantifiers(initialTrackTitle, bcPlayer);
   const currentTitleSection = document.createElement("div");
   currentTitleSection.id = PLUME_ELEM_SELECTORS.headerCurrent.split("#")[1];
   currentTitleSection.role = "group";
   currentTitleSection.tabIndex = 0;
-  currentTitleSection.ariaLabel = isAlbumPage
+  currentTitleSection.ariaLabel = isCollectionPage
     ? getString("ARIA__TRACK_CURRENT", [String(initialTq.current), String(initialTq.total), initialTrackTitle])
     : getString("ARIA__TRACK", [initialTrackTitle]);
+  applyTitleLang(currentTitleSection, initialTrackTitle);
   const currentTitlePretext = document.createElement("span");
   currentTitlePretext.id = PLUME_ELEM_SELECTORS.headerTitlePretext.split("#")[1];
-  const initialTrackNumberText = isAlbumPage
+  const initialTrackNumberText = isCollectionPage
     ? getString("LABEL__TRACK_CURRENT", [`${initialTq.current}/${initialTq.total}`])
     : getString("LABEL__TRACK");
   currentTitlePretext.textContent = initialTrackNumberText;
@@ -128,10 +138,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const titleRow = document.createElement("div");
   titleRow.className = "plume-header-title-row";
 
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     const trackLink = document.createElement("a");
     trackLink.id = PLUME_ELEM_SELECTORS.headerTrackLink.split("#")[1];
-    trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
+    trackLink.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
 
     if (trackLink) {
       const trackUrl = bcPlayer.getCurrentTrackUrl();
@@ -153,6 +163,7 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
     trackLink.target = "_self";
     trackLink.ariaLabel = getString("ARIA__TRACK_LINK");
     trackLink.title = getString("ARIA__TRACK_LINK");
+    trackLink.style.color = getAppropriateAccentColor();
     const linkSvg = createSafeSvgElement(PLUME_SVG.externalLink);
     if (linkSvg) trackLink.appendChild(linkSvg);
     titleRow.appendChild(trackLink);
@@ -167,10 +178,10 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
   let pendingDropdown: HTMLDivElement | undefined;
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     const { toggleBtn, dropdownEl, cleanup } = createTracklistToggle();
-    toggleBtn.classList.toggle("plume-feature-hidden", !flags.tracklist);
-    dropdownEl.classList.toggle("plume-feature-hidden", !flags.tracklist);
+    toggleBtn.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
+    dropdownEl.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.tracklist);
     titleRow.appendChild(toggleBtn);
     pendingDropdown = dropdownEl;
     tracklistCleanup = cleanup;
@@ -194,12 +205,12 @@ const buildPlumeView = async (isAlbumPage: boolean): Promise<PlumeView> => {
   const volumeContainer = await createVolumeControlSection();
   if (volumeContainer) plumeContainer.appendChild(volumeContainer);
 
-  const bpmSection = createBpmDisplaySection(isAlbumPage);
-  bpmSection.classList.toggle("plume-feature-hidden", !flags.bpmDetect);
+  const bpmSection = createBpmDisplaySection(isCollectionPage);
+  bpmSection.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.bpmDetect);
   plumeContainer.appendChild(bpmSection);
 
   const fullscreenBtnSection = createFullscreenButtonSection(toggleFullscreenMode);
-  fullscreenBtnSection.classList.toggle("plume-feature-hidden", !flags.fullscreen);
+  fullscreenBtnSection.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.fullscreen);
   plumeContainer.appendChild(fullscreenBtnSection);
 
   return { plumeContainer, headerContainer, headerLogo, initialTrackTitle, initialTrackNumberText, tracklistCleanup };
@@ -222,14 +233,14 @@ const mountPlumeView = (view: PlumeView, container: Element): void => {
 export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistCleanup: CleanupCallback }> => {
   const appCore = getAppCoreInstance();
   const plumeUi = getGuiInstance();
-
   const bcPlayerContainer = findOriginalPlayerContainer();
   if (!bcPlayerContainer) {
     logger(CPL.ERROR, getString("ERROR__UNABLE_TO_FIND_CONTAINER"));
     return { ok: false, tracklistCleanup: () => {} };
   }
 
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const { featureFlags, pageType } = appCore.getState();
+  const isCollectionPage = pageType === "album";
 
   hideOriginalPlayerElements();
 
@@ -238,18 +249,20 @@ export const injectEnhancements = async (): Promise<{ ok: boolean; tracklistClea
   const middleCol = trackView?.querySelector<HTMLElement>(`:scope > ${BC_ELEM_SELECTORS.middleColumn}`);
   if (middleCol) trackView!.appendChild(middleCol);
 
-  const view = await buildPlumeView(isAlbumPage);
+  const view = await buildPlumeView(isCollectionPage);
   hydratePlumeView(view, appCore, plumeUi);
   mountPlumeView(view, bcPlayerContainer);
 
   logger(CPL.LOG, getString("LOG__MOUNT__COMPLETE"));
 
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     addRuntime();
     const runtimeSpan = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.runtimeSpan);
-    if (runtimeSpan) runtimeSpan.classList.toggle("plume-feature-hidden", !appCore.getState().featureFlags.runtime);
+    if (runtimeSpan) runtimeSpan.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !featureFlags.runtime);
     notifyUnplayableTracks();
   }
+
+  if (featureFlags.fullscreen) preloadFullscreenCoverArt();
 
   // Compensate the visual shift only when the name-section overflows past the leftColumn
   if (middleCol) {

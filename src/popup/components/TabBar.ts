@@ -60,6 +60,11 @@ export const createTabBar = (tabs: TabDefinition[]): TabBarInstance => {
     tabPanels.set(tab.id, panel);
   }
 
+  const addWheelScroll = (e: WheelEvent): void => {
+    if (e.deltaY === 0) return;
+    e.preventDefault();
+    tablist.scrollBy({ left: e.deltaY, behavior: "smooth" });
+  };
   const addKeyboardNavigation = (e: KeyboardEvent): void => {
     const ids = tabs.map((t) => t.id);
     const activeId = [...tabBtns.entries()].find(([, btn]) => btn.ariaSelected === "true")?.[0];
@@ -77,10 +82,13 @@ export const createTabBar = (tabs: TabDefinition[]): TabBarInstance => {
     e.preventDefault();
     const nextId = ids[nextIndex];
     toggleTab(nextId);
-    tabBtns.get(nextId)?.focus();
+    const nextBtn = tabBtns.get(nextId);
+    nextBtn?.focus();
+    nextBtn?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
   };
 
   tablist.addEventListener("keydown", (e: KeyboardEvent) => addKeyboardNavigation(e));
+  tablist.addEventListener("wheel", (e: WheelEvent) => addWheelScroll(e), { passive: false });
 
   // Activate the first tab by default
   if (tabs.length > 0) toggleTab(tabs[0].id);

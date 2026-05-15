@@ -6,6 +6,7 @@ export enum PLUME_ELEM_SELECTORS {
   runtimeSpan = "span#plume-runtime-span",
   headerContainer = "div#plume-header-container",
   headerLogo = "a#plume-header-logo",
+  headerLogoVersion = "p#plume-header-logo__version",
   headerCurrent = "div#plume-header-current",
   headerTitlePretext = "span#plume-header-title-pretext",
   headerTitle = "span#plume-header-title",
@@ -18,6 +19,7 @@ export enum PLUME_ELEM_SELECTORS {
   playbackControls = "div#plume-playback-controls",
   progressContainer = "div#plume-progress-container",
   progressSlider = "input#plume-progress-slider",
+  waveformCanvas = "canvas#plume-waveform-canvas",
   timeDisplay = "div#plume-time-display",
   elapsedDisplay = "span#plume-elapsed-display",
   durationDisplay = "button#plume-duration-display",
@@ -52,6 +54,7 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenBtnContainer = "div#plume-fullscreen-btn-container",
   fullscreenOverlay = "div#plume-fullscreen-overlay",
   fullscreenBackground = "div#plume-fullscreen-background",
+  fullscreenVisualizerCanvas = "canvas#plume-fullscreen-visualizer-canvas",
   fullscreenContent = "div#plume-fullscreen-content",
   fullscreenExitBtn = "button#plume-fullscreen-exit-btn",
   fullscreenPresentationContainer = "div#plume-fullscreen-presentation",
@@ -60,4 +63,10 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenTitlingRelease = "h2#plume-fullscreen-titling__release",
   fullscreenTitlingArtist = "h3#plume-fullscreen-titling__artist",
   fullscreenClone = "div#plume-fullscreen-clone",
+}
+
+// CSS class names applied programmatically to Plume's injected elements.
+export enum PLUME_CSS_CLASSES {
+  featureHidden = "plume-feature-hidden",
+  waveformLoading = "plume-waveform-loading",
 }

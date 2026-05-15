@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AXE_TEST_TIMEOUT, checkA11y } from "./axe-helper";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string, _args?: string[]) => k }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string, _args?: string[]) => k, getActiveLocale: () => "en" }));
 vi.mock("@/shared/logger", () => ({ CPL: { INFO: "info", WARN: "warn" }, logger: vi.fn() }));
 vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),

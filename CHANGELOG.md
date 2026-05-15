@@ -5,6 +5,15 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+- _**[1.13.0]** May 15 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)  
+A waveform (toggleable) can replace the regular progress bar, with audio peaks — only for tracks less than 20 minutes.  
+A BPM-driven audio visualizer (toggleable) is added to the fullscreen view: a pulse animation syncs its beat phase to the track.  
+4 new languages are added — Italian 🇮🇹, Brazilian Portuguese 🇧🇷, Romanian 🇷🇴, and Russian 🇷🇺 — bringing the total to 7.  
+An About panel is added to the popup, displaying additional info about Plume and various links.  
+Script-language detection is applied to title elements, helping screen readers correctly read non-Latin artist and track names.  
+A donation toast is introduced to gently invite users to support the project; it remains non-intrusive.  
+Bare `Error` throws are replaced with typed custom error classes throughout.
+
   - _**[1.12.1]** May 02 2026_: Hotfixing invasive hotkeys in input fields [#158](https://github.com/QuentindiMeo/BC-Plume/pull/158)
 
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)  

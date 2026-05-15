@@ -2,14 +2,14 @@
   "author": "Quentin DI MEO",
   "name": "plume",
   "license": "MIT",
-  "version": "1.12.1",
-  "description": "Bandcamp extension: volume slider, click-to-seek progress bar, loop modes, fullscreen mode & hotkeys for the player.",
+  "version": "1.13.0",
+  "description": "Bandcamp extension: volume slider, hotkeys, loop modes, fullscreen mode, playback speed, waveform progress bar & beat visualizer.",
   "scripts": {
     "build": "node scripts/build.js --dev",
     "build:watch": "node scripts/build.js --dev --watch",
     "build:prod": "node scripts/build.js",
     "build:test": "node scripts/build.js --test",
-    "clean": "rimraf dist build",
+    "clean": "rimraf dist build *.zip",
     "sync-version": "node scripts/sync-version.js",
     "package": "tsc --noEmit && pnpm build:prod && node scripts/package-deployer.js",
     "deploy": "pnpm clean && pnpm sync-version && pnpm package",
@@ -20,12 +20,11 @@
     "prettier:fix": "prettier --write 'src/**/*.{ts,js,json,css,html}' 'tests/**/*.ts'",
     "format": "pnpm prettier:fix && pnpm eslint:fix",
     "prepare": "tsc --noEmit && husky",
+    "ship": "pnpm run deploy && node scripts/zip-sources.js",
     "test": "vitest run",
-    "test:watch": "vitest",
     "test:a11y": "pnpm test tests/a11y/",
     "test:cov": "pnpm test --coverage --coverage.skipFull",
-    "test:cov:report": "pnpm test:cov --reporter=verbose",
-    "zip": "node scripts/zip-sources.js"
+    "test:report": "pnpm test:cov --reporter=verbose"
   },
   "keywords": [
     "bandcamp",

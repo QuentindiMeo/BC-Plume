@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS } from "@/domain/plume";
-import { getString } from "@/shared/i18n";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
@@ -46,6 +46,7 @@ const getToastContainer = (): HTMLElement => {
 
   const container = document.createElement("div");
   container.id = "plume-toast-container";
+  container.lang = getActiveLocale() || document.documentElement.lang || "en";
   document.body.appendChild(container);
   return container;
 };
@@ -108,7 +109,7 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
   const timer = document.createElement("div");
   timer.className = "plume-toast__timer";
   timer.ariaHidden = "true";
-  timer.style.setProperty("--toast-timer-duration", `${config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS}s`);
+  timer.style.setProperty("--toast-timer-duration", `${config.duration}s`);
 
   toast.appendChild(icon);
   toast.appendChild(body);
@@ -120,8 +121,10 @@ const buildToastElement = (config: ToastConfig, onDismissClick: () => void): HTM
 };
 
 export const createToast = (config: ToastConfig): ToastHandle => {
+  config.duration ??= PLUME_CONSTANTS.TOAST_AUTO_DISMISS;
+
   const container = getToastContainer();
-  const durationMs = (config.duration ?? PLUME_CONSTANTS.TOAST_AUTO_DISMISS) * 1000;
+  const durationMs = config.duration * 1000;
   let remaining = durationMs;
   let segmentStart = Date.now();
   let timerId: ReturnType<typeof setTimeout> | null = null;

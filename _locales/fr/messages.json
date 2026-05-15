@@ -1,7 +1,7 @@
 {
   "APP_NAME": { "message": "Plume - Le lecteur Bandcamp réinventé" },
   "APP_DESCRIPTION": {
-    "message": "Extension Bandcamp : curseur de volume, barre de progression cliquable, modes de répétition, mode plein écran et raccourcis clavier."
+    "message": "Extension Bandcamp : volume, raccourcis clavier, modes de répétition, plein écran, vitesse de lecture, barre à forme d'onde et visualiseur de rythme."
   },
 
   "ERROR__NO_BROWSER_API": { "message": "Aucune API de navigateur détectée" },
@@ -144,7 +144,7 @@
   },
   "LABEL__RUNTIME__PLAYABLE": { "message": " lisibles" },
   "ARIA__RUNTIME__LABEL": {
-    "message": "Durée totale du projet : $MINUTES$ minutes et $SECONDES$ secondes",
+    "message": "Durée totale : $MINUTES$ minutes et $SECONDES$ secondes",
     "placeholders": {
       "minutes": {
         "content": "$1",
@@ -162,11 +162,11 @@
   "WARN__PLAY_PAUSE__NOT_FOUND": { "message": "Bouton Play/Pause non trouvé" },
   "WARN__NEXT_TRACK__NOT_FOUND": { "message": "Bouton de piste suivante non trouvé" },
   "DEBUG__PREV_TRACK__CLICKED": { "message": "Bouton de piste précédente cliqué" },
-  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente dispatché" },
+  "DEBUG__PREV_TRACK__DISPATCHED": { "message": "Événement de piste précédente émis" },
   "DEBUG__TRACK__RESTARTED": { "message": "Piste actuelle redémarrée" },
   "DEBUG__PLAY_PAUSE__CLICKED": { "message": "Bouton Play/Pause cliqué" },
   "DEBUG__NEXT_TRACK__CLICKED": { "message": "Bouton de piste suivante cliqué" },
-  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante dispatché" },
+  "DEBUG__NEXT_TRACK__DISPATCHED": { "message": "Événement de piste suivante émis" },
   "LABEL__TRACK_BACKWARD": { "message": "Recommencer / Aller à la piste précédente" },
   "LABEL__PLAY_PAUSE": { "message": "Lecture/Pause" },
   "LABEL__TRACK_FORWARD": { "message": "Aller à la piste suivante" },
@@ -223,6 +223,20 @@
       "ELAPSED": { "content": "$1" },
       "DURATION": { "content": "$2" }
     }
+  },
+  "ARIA__WAVEFORM_CANVAS": { "message": "Forme d'onde audio" },
+  "ARIA__WAVEFORM_CANVAS__LOADING": { "message": "Forme d'onde audio — chargement..." },
+  "INFO__WAVEFORM__DECODE_START": {
+    "message": "Décodage de la forme d'onde pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "INFO__WAVEFORM__DECODE_SUCCESS": {
+    "message": "Forme d'onde décodée pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
+  },
+  "WARN__WAVEFORM__DECODE_FAILED": {
+    "message": "Échec du décodage de la forme d'onde pour : $TRACK_URL$",
+    "placeholders": { "track_url": { "content": "$1", "example": "/track/un-morceau" } }
   },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Bouton de coupure du son non trouvé" },
@@ -281,8 +295,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1,5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Bouton de vitesse cliqué" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Vitesse personnalisée refusée (hors plage ou non numérique)" },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Vitesse de lecture personnalisée" },
-  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Cliquer pour saisir une vitesse personnalisée" },
+  "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Cliquez pour saisir une vitesse personnalisée" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Vitesse de lecture chargée :" },
   "WARN__PLAYBACK_SPEED__INVALID_VALUE": { "message": "Vitesse invalide — réinitialisation à 1×" },
 
@@ -353,6 +368,8 @@
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lecteur musical en plein écran" },
 
+  "LABEL__FEATURES__VISUALIZER": { "message": "Visualiseur audio" },
+
   "POPUP_TITLE": { "message": "Panneau de configuration" },
   "ARIA__POPUP__TABLIST": { "message": "Sections des paramètres" },
   "INFO__SETTING__REFRESH_REQUIRED": {
@@ -371,9 +388,13 @@
   "LABEL__LANGUAGE__EN": { "message": "Anglais" },
   "LABEL__LANGUAGE__ES": { "message": "Espagnol" },
   "LABEL__LANGUAGE__FR": { "message": "Français" },
+  "LABEL__LANGUAGE__IT": { "message": "Italien" },
+  "LABEL__LANGUAGE__PT_BR": { "message": "Portugais (🇧🇷)" },
+  "LABEL__LANGUAGE__RO": { "message": "Roumain" },
+  "LABEL__LANGUAGE__RU": { "message": "Russe" },
   "ERROR__GENERAL__NOT_INTEGER": { "message": "Doit être un nombre entier" },
 
-  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis clavier" },
+  "POPUP__HOTKEYS__TAB_LABEL": { "message": "Raccourcis" },
   "POPUP__HOTKEYS__SECTION_TITLE": { "message": "Raccourcis clavier" },
   "ERROR__HOTKEYS__UNHANDLED_ACTION": {
     "message": "Action de raccourci non gérée : $ACTION$",
@@ -432,13 +453,18 @@
   },
 
   "POPUP__FEATURES__TAB_LABEL": { "message": "Fonctionnalités" },
+  "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Aller à la piste" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
-  "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de boucle" },
-  "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
-  "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
+  "LABEL__FEATURES__WAVEFORM": { "message": "Barre de progression à forme d'onde" },
+  "LABEL__FEATURES__WAVEFORM__NOTICE": {
+    "message": "Non disponible pour les pistes de plus de $LIMIT_MINUTES$ min.",
+    "placeholders": { "limit_minutes": { "content": "$1", "example": "20" } }
+  },
   "LABEL__FEATURES__SPEED_CONTROL": { "message": "Contrôle de vitesse de lecture" },
+  "LABEL__FEATURES__LOOP_MODES": { "message": "Modes de répétition" },
+  "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Détection de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
 
@@ -498,7 +524,7 @@
     "placeholders": { "label": { "content": "$1", "example": "mise à jour de version" } }
   },
 
-  "INFO__RELEASE__PERSISTED": { "message": "Observation du dernier lancement enregistré dans le stockage" },
+  "INFO__RELEASE__PERSISTED": { "message": "Dernière version enregistrée dans le stockage" },
   "LABEL__TOAST__RELEASE__TITLE": { "message": "Une mise à jour a été déployée !" },
   "LABEL__TOAST__RELEASE__DESCRIPTION": {
     "message": "Plume $RELEASE$ est maintenant disponible.",
@@ -568,6 +594,19 @@
   "LABEL__TOAST__CUSTOM_INPUT__INVALID__DESCRIPTION": { "message": "Veuillez entrer un nombre entre 0,25 et 5." },
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrée personnalisée invalide" },
 
+  "LABEL__TOAST__DONATION__TITLE": { "message": "Ça te chante ?" },
+  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume est gratuit et le restera. Si ça a rendu ton écoute sur Bandcamp plus agréable, un petit coup de pouce nous ferait vraiment plaisir." },
+  "LABEL__TOAST__DONATION__CTA": { "message": "Soutenir Plume" },
+  "META__TOAST__DONATION": { "message": "donation" },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
+    "message": "Nombre total d'écoutes complètes incrémenté à $VALEUR$",
+    "placeholders": { "VALEUR": { "content": "$1" } }
+  },
+  "DEBUG__DONATION__THRESHOLD__REACHED": {
+    "message": "Seuil d'affichage de la notification de don atteint à $VALEUR$ écoutes",
+    "placeholders": { "VALEUR": { "content": "$1" } }
+  },
+
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },
   "LABEL__BPM__ERROR": { "message": "—" },
@@ -594,5 +633,21 @@
       "bpm": { "content": "$1", "example": "128" },
       "track_url": { "content": "$2", "example": "/track/un-morceau" }
     }
-  }
+  },
+
+  "POPUP__ABOUT__TAB_LABEL": { "message": "À propos" },
+  "ARIA__ABOUT__LOGO": { "message": "Logo de Plume" },
+  "LABEL__ABOUT__SECTION__INFO": { "message": "À propos" },
+  "LABEL__ABOUT__AUTHOR": { "message": "Auteur" },
+  "LABEL__ABOUT__LICENSE": { "message": "Licence" },
+  "LABEL__ABOUT__BROWSERS": { "message": "Navigateurs" },
+  "LABEL__ABOUT__SECTION__LINKS": { "message": "Liens" },
+  "LABEL__ABOUT__LINK__GITHUB": { "message": "Code source" },
+  "ARIA__ABOUT__LINK__GITHUB": { "message": "Voir le code source de Plume sur GitHub" },
+  "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Notes de version" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Voir les notes de version de Plume sur GitHub" },
+  "LABEL__ABOUT__LINK__REPORT": { "message": "Signaler un problème" },
+  "ARIA__ABOUT__LINK__REPORT": { "message": "Signaler un problème sur GitHub" },
+  "LABEL__ABOUT__LINK__DONATION": { "message": "Soutenir Plume" },
+  "ARIA__ABOUT__LINK__DONATION": { "message": "Soutenir Plume sur Ko-fi" }
 }

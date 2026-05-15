@@ -61,18 +61,53 @@ if (fs.existsSync(readmePath)) {
 const logoVersionConstantPath = path.join(__dirname, "..", "src", "domain", "meta.ts");
 if (fs.existsSync(logoVersionConstantPath)) {
   let constantsContent = fs.readFileSync(logoVersionConstantPath, "utf8");
+  let metaChanged = false;
+
   const versionConstRegex = /APP_VERSION = ['"]v(\d+\.\d+\.\d+)['"]/;
   const versionConstMatch = constantsContent.match(versionConstRegex);
-  if (versionConstMatch && versionConstMatch[1] === packageVersion) {
-  } else if (versionConstRegex.test(constantsContent)) {
+  if (versionConstMatch && versionConstMatch[1] !== packageVersion) {
     constantsContent = constantsContent.replace(versionConstRegex, `APP_VERSION = 'v${packageVersion}'`);
-    fs.writeFileSync(logoVersionConstantPath, constantsContent);
     console.log(`✅ Updated APP_VERSION constant to ${packageVersion}`);
-  } else {
+    metaChanged = true;
+  } else if (!versionConstMatch) {
     console.warn("⚠️ APP_VERSION constant not found in meta.ts, skipping update");
   }
+
+  const clgPath = path.join(__dirname, "..", "CHANGELOG.md");
+  if (fs.existsSync(clgPath)) {
+    const clgContent = fs.readFileSync(clgPath, "utf8");
+
+    const clgReleaseDateRegex = /_\*\*\[\d+\.\d+\.\d+\]\*\*\s+([A-Za-z]+) (\d{1,2}) (\d{4})_:/;
+    const clgReleaseDateMatch = clgContent.match(clgReleaseDateRegex);
+    if (clgReleaseDateMatch) {
+      const MONTH_MAP = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
+      const [, month, day, year] = clgReleaseDateMatch;
+      const monthNum = MONTH_MAP[month];
+      if (!monthNum) {
+        console.warn(`⚠️ Unrecognized month "${month}" in CHANGELOG.md, skipping date update`);
+      } else {
+        const isoDate = `${year}-${String(monthNum).padStart(2, "0")}-${String(Number(day)).padStart(2, "0")}`;
+        const releaseDateConstRegex = /APP_RELEASE_DATE = ['"][^'"]*['"]/;
+        const currentDateMatch = constantsContent.match(releaseDateConstRegex);
+        if (currentDateMatch) {
+          const currentDate = currentDateMatch[0].match(/['"]([^'"]*)['"]/)?.[1];
+          if (currentDate !== isoDate) {
+            constantsContent = constantsContent.replace(releaseDateConstRegex, `APP_RELEASE_DATE = '${isoDate}'`);
+            console.log(`✅ Updated APP_RELEASE_DATE to ${isoDate}`);
+            metaChanged = true;
+          }
+        } else {
+          console.warn("⚠️ APP_RELEASE_DATE constant not found in meta.ts, skipping update");
+        }
+      }
+    } else {
+      console.warn("⚠️ Could not parse release date from CHANGELOG.md, skipping update");
+    }
+  }
+
+  if (metaChanged) fs.writeFileSync(logoVersionConstantPath, constantsContent);
 } else {
-  console.warn("⚠️ src/domain/meta.ts not found, skipping APP_VERSION constant update");
+  console.warn("⚠️ src/domain/meta.ts not found, skipping meta.ts constant update");
 }
 
 console.log("✅ Version synchronization complete!");

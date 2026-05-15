@@ -1,3 +1,4 @@
+import { attachWaveformSeekHandler, createWaveformCanvas } from "@/app/features/ui/waveform";
 import { getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
@@ -62,12 +63,15 @@ export const createProgressBar = (): HTMLDivElement => {
 
   duration.addEventListener("click", handleDurationClick);
 
+  const waveformCanvas = createWaveformCanvas();
+  attachWaveformSeekHandler(waveformCanvas);
   plumeUi.dispatch(guiActions.setProgressSlider(progressSlider));
   plumeUi.dispatch(guiActions.setElapsedDisplay(elapsed));
   plumeUi.dispatch(guiActions.setDurationDisplay(duration));
 
   timeDisplay.appendChild(elapsed);
   timeDisplay.appendChild(duration);
+  container.appendChild(waveformCanvas);
   container.appendChild(progressSlider);
   container.appendChild(timeDisplay);
 

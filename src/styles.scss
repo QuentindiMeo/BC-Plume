@@ -49,6 +49,10 @@
     }
   }
 
+  ul.tralbumCommands h3.hd {
+    position: static !important;
+  }
+
   .progbar,
   .progbar_empty {
     @apply h-2! rounded! cursor-pointer!;
@@ -281,10 +285,31 @@
 #plume-progress-container {
   @apply relative m-0;
 
-  #plume-progress-slider {
-  --thumb-size: 0.75rem;
+  canvas#plume-waveform-canvas {
+    @apply z-0 absolute inset-x-0 -top-1 w-full h-5 pointer-events-none;
+    border-radius: inherit;
 
-  @apply relative w-full h-2 m-0 rounded cursor-pointer appearance-none;
+    &.plume-waveform-loading {
+      @apply animate-pulse;
+      background-color: rgba(128, 128, 128, 0.15);
+    }
+  }
+
+  // When waveform is visible, it becomes the progress bar: hide the slider, enable canvas interaction
+  &:has(canvas#plume-waveform-canvas:not(.plume-feature-hidden)) {
+    #plume-progress-slider {
+      @apply opacity-0 pointer-events-none;
+    }
+
+    canvas#plume-waveform-canvas {
+      @apply pointer-events-auto cursor-pointer;
+    }
+  }
+
+  #plume-progress-slider {
+    --thumb-size: 0.75rem;
+
+    @apply relative z-1 w-full h-2 m-0 rounded cursor-pointer appearance-none;
     -webkit-appearance: none;
     // Gradient stop follows the knob center: thumb-radius + fraction × (track − thumb-diameter).
     // This compensates for the browser offsetting the thumb inward by half its width on each end.
@@ -671,6 +696,15 @@
     @apply absolute top-0 left-0 w-screen h-screen scale-110 /* because blur shrinks the opaque zone */
       bg-black bg-cover bg-center bg-no-repeat blur-xl brightness-50 /* Heavy blur and dimming */
       pointer-events-none select-none;
+  }
+
+  canvas#plume-fullscreen-visualizer-canvas {
+    @apply absolute top-0 left-0 w-screen h-screen opacity-20 pointer-events-none select-none;
+    z-index: 1; /* above background, below content (z-10000) */
+
+    @media (prefers-reduced-motion: reduce) {
+      @apply hidden;
+    }
   }
 
   #plume-fullscreen-content {

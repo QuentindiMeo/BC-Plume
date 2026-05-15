@@ -46,23 +46,6 @@ vi.mock("@/app/features/observers", () => ({ updateTrackForwardBtnState: vi.fn()
 vi.mock("@/app/features/ui/loop", () => ({ syncLoopBtn: vi.fn() }));
 vi.mock("@/app/features/ui/bpm-display", () => ({ syncBpmDisplay: vi.fn() }));
 vi.mock("@/app/features/ui/volume", () => ({ syncMuteBtn: vi.fn() }));
-vi.mock("@/infra/elements/plume", () => ({
-  PLUME_ELEM_SELECTORS: {
-    runtimeSpan: "span#plume-runtime-span",
-    headerTrackLink: "a#plume-header-track-link",
-    tracklistToggleBtn: "button#plume-tracklist-toggle-btn",
-    tracklistDropdown: "div#plume-tracklist-dropdown",
-    playbackControls: "div#plume-playback-controls",
-    speedBtn: "button#plume-speed-btn",
-    speedLabel: "span.plume-speed-label",
-    speedSlider: "input.plume-speed-slider",
-    speedCustomInput: "input.plume-speed-custom-input",
-    speedPopover: "div.plume-speed-popover",
-    bpmContainer: "div#plume-bpm-container",
-    bpmBadge: "span.plume-bpm-badge",
-    fullscreenBtnContainer: "div#plume-fullscreen-btn-container",
-  },
-}));
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
 vi.mock("@/shared/logger", () => ({ CPL: {}, logger: vi.fn() }));
 vi.mock("@/shared/presenters", () => ({ presentFormattedTime: () => "0:00" }));

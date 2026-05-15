@@ -1,4 +1,5 @@
 import { getBcPlayerInstance } from "@/app/stores/adapters";
+import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { measureContrastRatioWCAG, WCAG_CONTRAST_LARGE } from "@/shared/colors";
 import { getString } from "@/shared/i18n";
@@ -61,7 +62,7 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
     runtimeInfo.calculated = true;
   }
 
-  const infoSectionId = "name-section";
+  const infoSectionId = BC_ELEM_SELECTORS.infoSection.split("#")[1];
   const infoSection = bcPlayer.getInfoSection();
   if (!infoSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));

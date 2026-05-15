@@ -1,3 +1,10 @@
-export const APP_VERSION = "v1.12.1";
+export const APP_VERSION = "v1.13.0";
+export const APP_RELEASE_DATE = "2026-05-15";
+export const PLUME_AUTHOR = "Quentin DI MEO";
+export const PLUME_LICENSE = "MIT";
+export const PLUME_BROWSERS = "Chrome · Firefox";
+export const PLUME_GITHUB_URL = "https://github.com/QuentindiMeo/BC-Plume";
+export const PLUME_ISSUES_URL = PLUME_GITHUB_URL + "/issues";
+export const PLUME_CHANGELOG_URL = PLUME_GITHUB_URL + "/blob/main/CHANGELOG.md";
 export const PLUME_LINKTREE_URL = "https://linktr.ee/bc_plume";
-export const PLUME_CHANGELOG_URL = "https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md";
+export const PLUME_DONATION_URL = "https://ko-fi.com/quentindimeo";

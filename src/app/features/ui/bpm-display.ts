@@ -81,7 +81,7 @@ const resolveCurrentTrackUrl = (infos: TrackAudioInfo[]): string | null => {
   // Single-track page: only one entry
   if (infos.length === 1) return infos[0].trackUrl;
 
-  // Album page: match by current track number from store
+  // Collection page: match by current track number from store
   const appCore = getAppCoreInstance();
   const trackNumberText = appCore.getState().trackNumber;
   if (!trackNumberText) return null;
@@ -100,19 +100,28 @@ export const syncBpmDisplay = (trackBpms: Record<string, TrackBpmEntry>): void =
   const speed = appCore.getState().playbackSpeed;
   const infos = getTrackAudioInstance().getTrackAudioInfos();
 
-  // Update main BPM display for current track
+  // Update all BPM value displays (main player + any fullscreen clones)
   const currentUrl = resolveCurrentTrackUrl(infos);
-  const valueEl = document.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.bpmValue);
-  if (valueEl) {
-    const entry = currentUrl ? trackBpms[currentUrl] : undefined;
+  const entry = currentUrl ? trackBpms[currentUrl] : undefined;
+  document.querySelectorAll<HTMLElement>(PLUME_ELEM_SELECTORS.bpmValue).forEach((valueEl) => {
     updateBpmElement(valueEl, entry, speed);
-  }
+  });
 
   // Update tracklist badges
   syncTracklistBpmBadges(trackBpms, speed, infos);
 };
 
-export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement => {
+export const wireDetectAllBpmButton = (btn: HTMLButtonElement): void => {
+  btn.addEventListener("click", () => {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    detectBpmForAllTracks().finally(() => {
+      btn.disabled = false;
+    });
+  });
+};
+
+export const createBpmDisplaySection = (isCollectionPage: boolean): HTMLDivElement => {
   const container = document.createElement("div");
   container.id = PLUME_ELEM_SELECTORS.bpmContainer.split("#")[1];
 
@@ -128,20 +137,13 @@ export const createBpmDisplaySection = (isAlbumPage: boolean): HTMLDivElement =>
   value.ariaLabel = getString("ARIA__BPM__DISPLAY");
   container.appendChild(value);
 
-  if (isAlbumPage) {
+  if (isCollectionPage) {
     const detectAllBtn = document.createElement("button");
     detectAllBtn.id = PLUME_ELEM_SELECTORS.bpmDetectAllBtn.split("#")[1];
     detectAllBtn.type = "button";
     detectAllBtn.textContent = getString("LABEL__BPM__DETECT_ALL");
     detectAllBtn.ariaLabel = getString("ARIA__BPM__DETECT_ALL_BTN");
-    detectAllBtn.addEventListener("click", () => {
-      if (detectAllBtn.disabled) return;
-      detectAllBtn.disabled = true;
-
-      detectBpmForAllTracks().finally(() => {
-        detectAllBtn.disabled = false;
-      });
-    });
+    wireDetectAllBpmButton(detectAllBtn);
     container.appendChild(detectAllBtn);
   }
 

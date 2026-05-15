@@ -1,11 +1,12 @@
 import type { BpmFetchRequest, BpmFetchResponse } from "@/domain/bpm-audio-messages";
 import { BPM_FETCH_ACTION } from "@/domain/bpm-audio-messages";
 import { inferBrowserApi } from "@/shared/browser";
+import { HttpFetchError } from "@/shared/errors";
 
 const handleBpmFetch = async (url: string): Promise<BpmFetchResponse> => {
   try {
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+    if (!response.ok) throw new HttpFetchError(response.status, url);
 
     const buffer = await response.arrayBuffer();
     return { ok: true, data: Array.from(new Uint8Array(buffer)) };

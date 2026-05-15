@@ -1,16 +1,21 @@
 export const PLUME_CONSTANTS = {
-  SPA_REINIT_DELAY_MS: 1000, // delay before reinitializing after SPA navigation
-  TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // delay for track display refresh after navigation
-  AUDIO_RETRY_MS: 1000, // delay before retrying audio element lookup
-  AUDIO_RETRY_TOAST_THRESHOLD: 3, // show toast after this many failed audio retries
-  SEEK_PAUSE_GUARD_MS: 100, // delay before re-enabling play after seek
+  SPA_REINIT_DELAY_MS: 1000, // ? delay before reinitializing after SPA navigation
+  TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // ? delay for track display refresh after navigation
+  AUDIO_RETRY_MS: 1000, // ? delay before retrying audio element lookup
+  AUDIO_RETRY_TOAST_THRESHOLD: 3, // ? show toast after this many failed audio retries
+  SEEK_PAUSE_GUARD_MS: 100, // ? delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
+  WAVEFORM_PEAK_COLUMNS: 400, // ? number of amplitude bars rendered across the waveform canvas
+  WAVEFORM_MAX_DURATION_SECONDS: 20 * 60, // 20 minutes // ? tracks longer than this are skipped, they're too heavy to fetch/decode
   VOLUME_SLIDER_GRANULARITY: 100, // percentage
-  TOAST_AUTO_DISMISS: 10, // seconds before auto-dismissing a toast
-  WCAG_INTERACTION_TIMEOUT_MS: 700, // WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
+  TOAST_AUTO_DISMISS: 10, // ? seconds before auto-dismissing a toast
+  WCAG_INTERACTION_TIMEOUT_MS: 700, // ? WCAG 1.4.13: content on hover/focus must persist long enough to be interacted with
+
+  DONATION_TOAST_AUTO_DISMISS: 60,
+  DONATION_THRESHOLDS: [60, 250, 2000, 5000, 9000, 14000, 20000, 27000, 35000, 44000] as const as readonly number[], // ? full-track-play milestones at which to show the donation toast
 } as const;
 
-export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr"] as const;
+export const PLUME_SUPPORTED_LANGUAGES = ["auto", "en", "es", "fr", "it", "pt_BR", "ro", "ru"] as const;
 export type PlumeLanguage = (typeof PLUME_SUPPORTED_LANGUAGES)[number];
 
 export enum LOOP_MODE {
@@ -50,11 +55,11 @@ export const TRACK_RESTART_THRESHOLD_MIN = 0 as WholeNumber;
 export const TRACK_RESTART_THRESHOLD_MAX = 10 as WholeNumber;
 
 export const PLAYBACK_SPEED_STEPS: readonly number[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3];
-export const PLAYBACK_SPEED_DEFAULT = 1 as const;
+export const PLAYBACK_SPEED_DEFAULT = 1;
 export const PLAYBACK_SPEED_MIN = PLAYBACK_SPEED_STEPS[0];
 export const PLAYBACK_SPEED_MAX = PLAYBACK_SPEED_STEPS[PLAYBACK_SPEED_STEPS.length - 1];
-export const PLAYBACK_SPEED_SAFARI_MIN = 0.5 as const;
-export const PLAYBACK_SPEED_SAFARI_MAX = 2.0 as const;
+export const PLAYBACK_SPEED_SAFARI_MIN = 0.5;
+export const PLAYBACK_SPEED_SAFARI_MAX = 2.0;
 export const isValidPlaybackSpeed = (speed: number): boolean =>
   Number.isFinite(speed) && speed >= PLAYBACK_SPEED_MIN && speed <= PLAYBACK_SPEED_MAX;
 
@@ -92,15 +97,17 @@ export const PLUME_DEFAULTS = {
   volumeHotkeyStep: 5 as WholeNumber, // in percent
   playbackSpeed: PLAYBACK_SPEED_DEFAULT,
   featureFlags: {
+    runtime: true,
     goToTrack: true,
     tracklist: true,
+    quickSeek: true,
+    waveform: false,
     speedControl: true,
     loopModes: true,
-    bpmDetect: false,
     fullscreen: true,
-    quickSeek: true,
-    runtime: true,
-  } as const,
+    visualizer: false,
+    bpmDetect: false,
+  },
 } as const;
 
 export interface TimeState {
@@ -110,13 +117,15 @@ export interface TimeState {
 }
 
 export type FeatureFlags = {
+  runtime: boolean;
   goToTrack: boolean;
   tracklist: boolean;
+  quickSeek: boolean;
+  waveform: boolean;
   speedControl: boolean;
   loopModes: boolean;
-  bpmDetect: boolean;
   fullscreen: boolean;
-  quickSeek: boolean;
-  runtime: boolean;
+  visualizer: boolean;
+  bpmDetect: boolean;
 };
 export type FeatureFlagKey = keyof FeatureFlags;

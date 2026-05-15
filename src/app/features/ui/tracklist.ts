@@ -3,6 +3,7 @@ import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { navigateToTrack } from "@/app/use-cases";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
+import { applyTitleLang } from "@/shared/script-lang";
 import { setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -121,6 +122,7 @@ export const createTracklistToggle = (): {
       item.ariaSelected = String(isActive);
       item.dataset["index"] = String(idx);
       item.dataset["title"] = title;
+      applyTitleLang(item, title);
 
       if (!isPlayable) {
         item.ariaDisabled = "true";

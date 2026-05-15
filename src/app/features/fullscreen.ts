@@ -1,5 +1,6 @@
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
+import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
 import { applyLoopBtnState, handleLoopCycle } from "@/app/features/ui/loop";
 import {
   applyPlaybackControlsSize,
@@ -17,18 +18,27 @@ import {
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { handleMuteToggle } from "@/app/features/ui/volume";
+import { attachWaveformSeekHandler, clearWaveform, triggerWaveformDecode } from "@/app/features/ui/waveform";
 import { getBcPlayerInstance, getMusicPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { seekToProgress, setVolume, toggleDurationDisplay } from "@/app/use-cases";
+import {
+  runVisualizer,
+  seekToProgress,
+  setVolume,
+  stopVisualizer,
+  syncVisualizerWithPlayback,
+  toggleDurationDisplay,
+} from "@/app/use-cases";
 import { APP_VERSION, PLUME_LINKTREE_URL } from "@/domain/meta";
 import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
-import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getString } from "@/shared/i18n";
+import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { getActiveLocale, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
+import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement, setSvgContent } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -59,9 +69,10 @@ let fullscreenLiveRegion: HTMLDivElement | null = null;
 const announceFullscreenState = (messageKey: string): void => {
   if (!fullscreenLiveRegion) {
     fullscreenLiveRegion = document.createElement("div");
-    fullscreenLiveRegion.ariaLive = "polite";
     fullscreenLiveRegion.role = "status";
+    fullscreenLiveRegion.ariaLive = "polite";
     fullscreenLiveRegion.className = "sr-live";
+    fullscreenLiveRegion.lang = getActiveLocale();
     document.body.appendChild(fullscreenLiveRegion);
   }
   // Clear then set to ensure re-announcement even if the same message is sent twice
@@ -78,6 +89,8 @@ const exitFullscreenMode = (): void => {
 
   const appCore = getAppCoreInstance();
   appCore.dispatch(coreActions.setIsFullscreen(false));
+
+  stopVisualizer();
 
   // Cleanup store subscriptions BEFORE removing DOM to prevent updates to non-existent elements
   if (fullscreenCleanupCallback) {
@@ -208,6 +221,7 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
 
   headerTitle.textContent = trackTitle;
   headerTitle.title = trackTitle;
+  applyTitleLang(headerTitle, trackTitle);
 };
 
 const renderTrackNumber = (elements: FullscreenElements, trackNumber: string | null): void => {
@@ -259,13 +273,15 @@ const renderLoopButton = (elements: FullscreenElements, loopMode: LoopModeType):
 const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   const plume = getGuiInstance().getState();
   const appCore = getAppCoreInstance();
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const isCollectionPage = appCore.getState().pageType === "album";
 
   const subscriptions: Array<SubscriptionCallback> = [];
   const elements: FullscreenElements = getFullscreenElements(clone);
 
   // Mutable ref for the tracklist cleanup — replaced each time the tracklist is re-initialized live.
   let tracklistCleanupRef: CleanupCallback = () => {};
+  // Last known currentTime — used to detect seeks (discontinuous jumps) and re-anchor the visualizer.
+  let lastCurrentTime = 0;
 
   const initTracklist = (): void => {
     const { toggleBtn: fsToggleBtn, dropdownEl: fsDropdownEl, cleanup } = createTracklistToggle();
@@ -281,22 +297,35 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   subscriptions.push(
     appCore.subscribe("pageType", () => {
       // because available loop modes depend on the page type
-      const withLoopModes = appCore.getState().featureFlags.loopModes;
-      if (withLoopModes) renderLoopButton(elements, appCore.getState().loopMode);
+      const { featureFlags, loopMode } = appCore.getState();
+      if (featureFlags.loopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("trackTitle", (trackTitle) => {
       renderTrackTitle(elements, trackTitle);
     }),
     appCore.subscribe("trackNumber", (trackNumber) => {
       renderTrackNumber(elements, trackNumber);
+      const { isPlaying, trackBpms } = appCore.getState();
+      // Track changed: stop the old BPM loop, then restart if BPM is already known for the new track
+      if (vizCanvas) {
+        stopVisualizer();
+        syncVisualizerWithPlayback(isPlaying, vizCanvas);
+      }
+      syncBpmDisplay(trackBpms);
     }),
     appCore.subscribe("isPlaying", (isPlaying) => {
       renderPlayPauseButton(elements, isPlaying);
+      if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
     }),
-    appCore.subscribe("currentTime", () => {
+    appCore.subscribe("currentTime", (currentTime) => {
       renderProgressSlider(elements, appCore.computed.progressPercentage());
       renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
+      // Re-anchor the visualizer's beat phase when a seek is detected (time jump > 2s)
+      if (vizCanvas && Math.abs(currentTime - lastCurrentTime) > 2) {
+        syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
+      }
+      lastCurrentTime = currentTime;
     }),
     appCore.subscribe("duration", () => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
@@ -305,7 +334,8 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
       renderDurationDisplay(elements, appCore.computed.formattedDuration());
     }),
     appCore.subscribe("loopMode", (loopMode) => {
-      const withLoopModes = appCore.getState().featureFlags.loopModes;
+      const { featureFlags } = appCore.getState();
+      const withLoopModes = featureFlags.loopModes;
       if (withLoopModes) renderLoopButton(elements, loopMode);
     }),
     appCore.subscribe("volume", (volume) => {
@@ -314,17 +344,23 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
     appCore.subscribe("isMuted", (isMuted) => {
       renderMuteButton(elements, isMuted);
     }),
+    appCore.subscribe("trackBpms", (trackBpms) => {
+      // BPM resolved for some track: update BPM display and (re-)start visualizer if the current track's BPM just became available
+      syncBpmDisplay(trackBpms);
+      const { isPlaying } = appCore.getState();
+      if (vizCanvas) syncVisualizerWithPlayback(isPlaying, vizCanvas);
+    }),
     appCore.subscribe("featureFlags", (flags, prevFlags) => {
       if (flags.goToTrack !== prevFlags.goToTrack) {
         const trackLink = elements.headerContainer?.querySelector<HTMLAnchorElement>(
           PLUME_ELEM_SELECTORS.headerTrackLink
         );
         if (trackLink) {
-          trackLink.classList.toggle("plume-feature-hidden", !flags.goToTrack);
-          if (flags.goToTrack && isAlbumPage) trackLink.style.color = getAppropriateAccentColor();
+          trackLink.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.goToTrack);
+          if (flags.goToTrack && isCollectionPage) trackLink.style.color = getAppropriateAccentColor();
         }
       }
-      if (isAlbumPage && flags.tracklist !== prevFlags.tracklist) {
+      if (isCollectionPage && flags.tracklist !== prevFlags.tracklist) {
         if (flags.tracklist) {
           initTracklist();
         } else {
@@ -332,12 +368,22 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
           tracklistCleanupRef = () => {};
           const btn = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistToggleBtn);
           const dd = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.tracklistDropdown);
-          if (btn) btn.classList.add("plume-feature-hidden");
-          if (dd) dd.classList.add("plume-feature-hidden");
+          if (btn) btn.classList.add(PLUME_CSS_CLASSES.featureHidden);
+          if (dd) dd.classList.add(PLUME_CSS_CLASSES.featureHidden);
         }
       }
       if (flags.loopModes && !prevFlags.loopModes) {
-        renderLoopButton(elements, appCore.getState().loopMode);
+        const { loopMode } = appCore.getState();
+        renderLoopButton(elements, loopMode);
+      }
+      if (flags.visualizer !== prevFlags.visualizer && vizCanvas) {
+        vizCanvas.classList.toggle(PLUME_CSS_CLASSES.featureHidden, !flags.visualizer);
+        if (flags.visualizer) runVisualizer(vizCanvas);
+        else stopVisualizer();
+      }
+      if (flags.waveform !== prevFlags.waveform && fsWaveformCanvas) {
+        if (flags.waveform) void triggerWaveformDecode(fsWaveformCanvas);
+        else clearWaveform(fsWaveformCanvas);
       }
       const fsControls = clone.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.playbackControls);
       if (fsControls) applyPlaybackControlsSize(fsControls);
@@ -380,10 +426,22 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   }
   elements.loopBtn?.addEventListener("click", handleLoopCycle);
 
+  const fsBpmDetectAllBtn = clone.querySelector<HTMLButtonElement>(PLUME_ELEM_SELECTORS.bpmDetectAllBtn);
+  if (fsBpmDetectAllBtn) wireDetectAllBpmButton(fsBpmDetectAllBtn);
+
   const flags = appCore.getState().featureFlags;
 
+  const vizCanvas =
+    clone
+      .closest<HTMLDivElement>(PLUME_ELEM_SELECTORS.fullscreenOverlay)
+      ?.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.fullscreenVisualizerCanvas) ?? null;
+  if (vizCanvas) syncVisualizerWithPlayback(appCore.getState().isPlaying, vizCanvas);
+
+  const fsWaveformCanvas = clone.querySelector<HTMLCanvasElement>(PLUME_ELEM_SELECTORS.waveformCanvas) ?? null;
+  if (fsWaveformCanvas) attachWaveformSeekHandler(fsWaveformCanvas);
+
   // Initialize fullscreen UI with current state using the same rendering functions
-  const state = appCore.getState();
+  const appState = appCore.getState();
 
   // Clone child nodes from controlled element instead of innerHTML
   elements.headerContainer.textContent = "";
@@ -392,7 +450,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   });
 
   // Apply the Bandcamp theme color to the track link in the fullscreen clone
-  if (flags.goToTrack && isAlbumPage) {
+  if (flags.goToTrack && isCollectionPage) {
     const fsTrackLink = elements.headerContainer.querySelector(
       PLUME_ELEM_SELECTORS.headerTrackLink
     ) as HTMLAnchorElement;
@@ -402,18 +460,22 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
   // Re-initialize the tracklist for the fullscreen clone.
   // cloneNode(true) copies DOM but not event listeners, and the header re-population above adds another
   // inert clone of the toggle button. Replace both inert elements with a fresh instance.
-  if (flags.tracklist && isAlbumPage) initTracklist();
+  if (flags.tracklist && isCollectionPage) initTracklist();
 
   // Apply initial state using pure rendering functions (same logic as subscriptions)
   renderProgressSlider(elements, appCore.computed.progressPercentage());
   renderElapsedDisplay(elements, appCore.computed.formattedElapsed());
   renderDurationDisplay(elements, appCore.computed.formattedDuration());
-  renderPlayPauseButton(elements, state.isPlaying);
-  renderVolume(elements, state.volume);
-  renderMuteButton(elements, state.isMuted);
-  renderTrackTitle(elements, state.trackTitle);
-  renderTrackNumber(elements, state.trackNumber);
-  if (flags.loopModes) renderLoopButton(elements, state.loopMode);
+  renderPlayPauseButton(elements, appState.isPlaying);
+  renderVolume(elements, appState.volume);
+  renderMuteButton(elements, appState.isMuted);
+  renderTrackTitle(elements, appState.trackTitle);
+  renderTrackNumber(elements, appState.trackNumber);
+  if (flags.loopModes) renderLoopButton(elements, appState.loopMode);
+  lastCurrentTime = appState.currentTime ?? 0;
+
+  // Render waveform on the fullscreen canvas if the feature is enabled (fast path when peaks cached)
+  if (fsWaveformCanvas && flags.waveform) void triggerWaveformDecode(fsWaveformCanvas);
 
   // Return cleanup function to unsubscribe all listeners
   return () => {
@@ -423,7 +485,7 @@ const setupFullscreenUi = (clone: HTMLElement): CleanupCallback => {
 };
 
 // Pure DOM construction function - builds fullscreen overlay without side effects
-const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => {
+const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | null => {
   const bcPlayer = getBcPlayerInstance();
   const artworkUrl = bcPlayer.getArtworkUrl();
   if (!artworkUrl) {
@@ -436,6 +498,7 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   overlay.role = "dialog";
   overlay.ariaModal = "true";
   overlay.ariaLabel = getString("ARIA__FULLSCREEN_OVERLAY");
+  overlay.lang = getActiveLocale();
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
@@ -443,13 +506,20 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   background.style.backgroundImage = `url("${encodeURI(artworkUrl)}")`;
   overlay.appendChild(background);
 
+  const vizCanvas = document.createElement("canvas");
+  vizCanvas.id = PLUME_ELEM_SELECTORS.fullscreenVisualizerCanvas.split("#")[1];
+  vizCanvas.ariaHidden = "true";
+  const { featureFlags } = getAppCoreInstance().getState();
+  if (!featureFlags.visualizer) vizCanvas.classList.add(PLUME_CSS_CLASSES.featureHidden);
+  overlay.appendChild(vizCanvas);
+
   const contentContainer = document.createElement("div");
   contentContainer.id = PLUME_ELEM_SELECTORS.fullscreenContent.split("#")[1];
 
   const presentationContainer = document.createElement("div");
   presentationContainer.id = PLUME_ELEM_SELECTORS.fullscreenPresentationContainer.split("#")[1];
 
-  const newNameSection = bcPlayer.getInfoSection() as HTMLDivElement | null;
+  const newNameSection = bcPlayer.getInfoSection();
   if (!newNameSection) {
     logger(CPL.WARN, getString("WARN__INFO_SECTION__NOT_FOUND"));
     return null;
@@ -459,10 +529,12 @@ const buildFullscreenOverlay = (isAlbumPage: boolean): HTMLDivElement | null => 
   const adjustedNameSection = newNameSection.cloneNode(true) as HTMLDivElement;
 
   adjustedNameSection.className = PLUME_ELEM_SELECTORS.fullscreenTitlingContainer.split(".")[1];
+  adjustedNameSection.lang = document.documentElement.lang;
   const headTitle = adjustedNameSection.querySelector("h2")!;
   const releaseName = headTitle.textContent?.trim() || "";
   headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
-  if (!isAlbumPage) headTitle.textContent = `"${releaseName}"`;
+  if (!isCollectionPage) headTitle.textContent = `"${releaseName}"`;
+  applyTitleLang(headTitle, releaseName);
 
   const coverArtImg = document.createElement("img");
   coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];
@@ -582,8 +654,8 @@ export const toggleFullscreenMode = (): void => {
   }
 
   // Enter fullscreen - dispatch state change first, then build DOM
-  const isAlbumPage = appCore.getState().pageType === "album";
-  const overlay = buildFullscreenOverlay(isAlbumPage);
+  const isCollectionPage = appCore.getState().pageType === "album";
+  const overlay = buildFullscreenOverlay(isCollectionPage);
   if (!overlay) {
     appCore.dispatch(coreActions.setIsFullscreen(false));
     createToast({
@@ -615,6 +687,9 @@ export const toggleFullscreenMode = (): void => {
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
   setupFullscreenFocusTrap(overlay);
+
+  // Initialize BPM display in the freshly mounted overlay (querySelectorAll now reaches the clone)
+  syncBpmDisplay(appCore.getState().trackBpms);
 
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));

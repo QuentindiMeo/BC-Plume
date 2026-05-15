@@ -18,7 +18,7 @@ import { handleLoopCycle } from "@/app/features/ui/loop";
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { getGuiInstance } from "@/app/stores/GuiImpl";
-import { isLastTrackOfAlbumPlaying } from "@/app/use-cases/navigate-track";
+import { isLastTrackOfCollectionPlaying } from "@/app/use-cases/navigate-track";
 import { updateTrackMetadata } from "@/app/use-cases/update-track-metadata";
 import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
 import { guiActions } from "@/domain/ports/plume-ui";
@@ -26,6 +26,7 @@ import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
+import { applyTitleLang } from "@/shared/script-lang";
 
 // Runs before GUI store is populated, queries the DOM directly.
 // All other code should read from the store instead of using querySelector on Plume selectors.
@@ -40,7 +41,7 @@ export const updateTrackForwardBtnState = () => {
 
   const isNotLooping = appCore.getState().loopMode === LOOP_MODE.NONE;
   const pageType = appCore.getState().pageType;
-  const shouldDisable = isNotLooping && (isLastTrackOfAlbumPlaying(bcPlayer) || pageType === "track");
+  const shouldDisable = isNotLooping && (isLastTrackOfCollectionPlaying(bcPlayer) || pageType === "track");
   trackFwdBtns.forEach((btn) => (btn.disabled = shouldDisable));
 };
 
@@ -55,21 +56,22 @@ const updateTrackDisplay = () => {
   const titleText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitle) as HTMLSpanElement;
   const preText = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTitlePretext) as HTMLSpanElement;
 
-  const isAlbumPage = appCore.getState().pageType === "album";
+  const isCollectionPage = appCore.getState().pageType === "album";
 
   if (preText) {
     preText.textContent = trackNumberText;
 
     const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerCurrent) as HTMLDivElement;
     if (headerCurrent) {
-      headerCurrent.ariaLabel = isAlbumPage
+      headerCurrent.ariaLabel = isCollectionPage
         ? getString("ARIA__TRACK_CURRENT", [String(current), String(total), newTrackTitle])
         : getString("ARIA__TRACK", [newTrackTitle]);
+      applyTitleLang(headerCurrent, newTrackTitle);
     }
   }
 
   if (titleText) {
-    if (isAlbumPage) {
+    if (isCollectionPage) {
       const trackLink = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerTrackLink) as HTMLAnchorElement;
       if (trackLink) {
         const trackUrl = bcPlayer.getCurrentTrackUrl();
@@ -176,7 +178,7 @@ export const createDomObserver = (handles: CleanupHandles, reinit: () => void): 
           if (!isPlumeInjected()) setTimeout(reinit, PLUME_CONSTANTS.TRACK_DISPLAY_UPDATE_DELAY_MS);
         }
 
-        const titleLinkSelector = BC_ELEM_SELECTORS.albumPageCurrentTrackTitle;
+        const titleLinkSelector = BC_ELEM_SELECTORS.collectionPageCurrentTrackTitle;
         // Check if the title section has changed (new track)
         if (
           mutation.target instanceof Element &&

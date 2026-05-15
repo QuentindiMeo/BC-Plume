@@ -1,24 +1,40 @@
-import { FeatureFlagKey, FeatureFlags, PLUME_DEFAULTS } from "@/domain/plume";
+import { FeatureFlagKey, FeatureFlags, PLUME_CONSTANTS, PLUME_DEFAULTS } from "@/domain/plume";
 import type { IMessageSender } from "@/domain/ports/messaging";
 import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
-interface ToggleRowConfig {
-  flagKey: FeatureFlagKey;
-  labelKey: string;
-}
+type ToggleRowConfig =
+  | {
+      flagKey: FeatureFlagKey;
+      labelKey: string;
+      noticeKey?: undefined;
+      noticeSubstitutions?: undefined;
+    }
+  | {
+      flagKey: FeatureFlagKey;
+      labelKey: string;
+      noticeKey: string;
+      noticeSubstitutions: string[];
+    };
 
 const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "runtime", labelKey: "LABEL__FEATURES__RUNTIME" },
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
+  {
+    flagKey: "waveform",
+    labelKey: "LABEL__FEATURES__WAVEFORM",
+    noticeKey: "LABEL__FEATURES__WAVEFORM__NOTICE",
+    noticeSubstitutions: [String(PLUME_CONSTANTS.WAVEFORM_MAX_DURATION_SECONDS / 60)],
+  },
   { flagKey: "speedControl", labelKey: "LABEL__FEATURES__SPEED_CONTROL" },
   { flagKey: "loopModes", labelKey: "LABEL__FEATURES__LOOP_MODES" },
-  { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
   { flagKey: "fullscreen", labelKey: "LABEL__FEATURES__FULLSCREEN" },
+  { flagKey: "visualizer", labelKey: "LABEL__FEATURES__VISUALIZER" },
+  { flagKey: "bpmDetect", labelKey: "LABEL__FEATURES__BPM_DETECT" },
 ] as const;
 
 const areAllDefaults = (flags: FeatureFlags): boolean =>
@@ -27,6 +43,7 @@ const areAllDefaults = (flags: FeatureFlags): boolean =>
 export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSender): TabDefinition["buildPanel"] => {
   const currentFlags: FeatureFlags = { ...storedFlags };
   const toggleBtns = new Map<FeatureFlagKey, HTMLButtonElement>();
+  const noticeRefs = new Map<FeatureFlagKey, HTMLParagraphElement>();
 
   let resetBtn: HTMLButtonElement | null = null;
 
@@ -41,7 +58,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
   };
 
   const buildToggleRow = (config: ToggleRowConfig): HTMLElement => {
-    const { flagKey, labelKey } = config;
+    const { flagKey, labelKey, noticeKey, noticeSubstitutions } = config;
 
     const row = document.createElement("div");
     row.className = "setting-row";
@@ -50,6 +67,15 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     label.className = "setting-row__label";
     label.textContent = getString(labelKey);
     label.id = `feature-label-${flagKey}`;
+
+    if (noticeKey) {
+      const notice = document.createElement("p");
+      notice.className = "setting-row__notice";
+      notice.textContent = getString(noticeKey, noticeSubstitutions);
+      notice.hidden = !currentFlags[flagKey];
+      label.appendChild(notice);
+      noticeRefs.set(flagKey, notice);
+    }
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -66,6 +92,21 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.addEventListener("click", () => {
       currentFlags[flagKey] = !currentFlags[flagKey];
       toggle.ariaChecked = String(currentFlags[flagKey]);
+
+      const notice = noticeRefs.get(flagKey);
+      if (notice) notice.hidden = !currentFlags[flagKey];
+
+      // visualizer requires bpmDetect: enforce the dependency in both directions
+      if (flagKey === "visualizer" && currentFlags.visualizer) {
+        currentFlags.bpmDetect = true;
+        const bpmBtn = toggleBtns.get("bpmDetect");
+        if (bpmBtn) bpmBtn.ariaChecked = "true";
+      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect) {
+        currentFlags.visualizer = false;
+        const vizBtn = toggleBtns.get("visualizer");
+        if (vizBtn) vizBtn.ariaChecked = "false";
+      }
+
       persist(currentFlags);
       syncResetVisibility();
     });
@@ -83,7 +124,10 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     section.className = "settings__section";
     section.ariaLabel = getString("POPUP__FEATURES__TAB_LABEL");
 
-    for (const config of FLAG_ORDER) section.appendChild(buildToggleRow(config));
+    for (const flagConfig of FLAG_ORDER) {
+      const flagToggleRow = buildToggleRow(flagConfig);
+      section.appendChild(flagToggleRow);
+    }
 
     return section;
   };
@@ -99,6 +143,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     resetBtn.addEventListener("click", () => {
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);
       for (const [flagKey, btn] of toggleBtns) btn.ariaChecked = String(currentFlags[flagKey]);
+      for (const [flagKey, notice] of noticeRefs) notice.hidden = !currentFlags[flagKey];
       persist(currentFlags);
       syncResetVisibility();
     });

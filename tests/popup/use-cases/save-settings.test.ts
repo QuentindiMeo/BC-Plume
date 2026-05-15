@@ -1,16 +1,23 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { BANDCAMP_TAB_PATTERN, PLUME_CACHE_KEYS } from "@/domain/browser";
 import { DEFAULT_HOTKEYS, HotkeyAction } from "@/domain/hotkeys";
 import { PLUME_MESSAGE_TYPE } from "@/domain/messages";
-import { type FeatureFlags, PLUME_DEFAULTS, type PlumeLanguage, type WholeNumber } from "@/domain/plume";
-import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
+import {
+  type FeatureFlags,
+  PLUME_DEFAULTS,
+  PLUME_SUPPORTED_LANGUAGES,
+  type PlumeLanguage,
+  type WholeNumber,
+} from "@/domain/plume";
 import { resetHotkeys } from "@/popup/use-cases/resetHotkeys";
+import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
 import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
 import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
 import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
 import { inferBrowserApi } from "@/shared/browser";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FakeBrowserLocalStorage } from "../../fakes/FakeBrowserLocalStorage";
 import { FakeMessageSender } from "../../fakes/FakeMessageSender";
 
@@ -28,7 +35,7 @@ beforeEach(() => {
 });
 
 describe("saveForcedLanguage", () => {
-  it.each(["auto", "en", "es", "fr"] as const)(
+  it.each(PLUME_SUPPORTED_LANGUAGES)(
     "persists valid language code '%s' under the correct key",
     async (lang: PlumeLanguage) => {
       await saveForcedLanguage(lang);
