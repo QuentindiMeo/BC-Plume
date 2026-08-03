@@ -175,3 +175,73 @@ describe("BcPlayerAdapter.getTrackPlayabilityMap", () => {
     expect(adapter.getTrackPlayabilityMap()).toEqual([]);
   });
 });
+
+describe("BcPlayerAdapter.getReleaseDate", () => {
+  let adapter: BcPlayerAdapter;
+
+  beforeEach(() => {
+    adapter = new BcPlayerAdapter();
+    document.body.innerHTML = "";
+  });
+
+  // Bandcamp exposes the release date through the [data-tralbum] JSON blob, not page text.
+  const buildTrAlbumData = (raw: string): void => {
+    const el = document.createElement("div");
+    el.dataset["tralbum"] = raw;
+    document.body.appendChild(el);
+  };
+
+  const buildTrAlbumJson = (data: unknown): void => buildTrAlbumData(JSON.stringify(data));
+
+  it("returns current.release_date for a track page", () => {
+    buildTrAlbumJson({ current: { release_date: "12 Apr 2019 00:00:00 GMT" } });
+    expect(adapter.getReleaseDate()).toBe("12 Apr 2019 00:00:00 GMT");
+  });
+
+  it("falls back to album_release_date when current has no release_date", () => {
+    buildTrAlbumJson({ current: {}, album_release_date: "01 Mar 2020 00:00:00 GMT" });
+    expect(adapter.getReleaseDate()).toBe("01 Mar 2020 00:00:00 GMT");
+  });
+
+  it("falls back to album_release_date when current.release_date is null", () => {
+    buildTrAlbumJson({ current: { release_date: null }, album_release_date: "01 Mar 2020 00:00:00 GMT" });
+    expect(adapter.getReleaseDate()).toBe("01 Mar 2020 00:00:00 GMT");
+  });
+
+  it("prefers current.release_date over album_release_date", () => {
+    buildTrAlbumJson({
+      current: { release_date: "12 Apr 2019 00:00:00 GMT" },
+      album_release_date: "01 Mar 2020 00:00:00 GMT",
+    });
+    expect(adapter.getReleaseDate()).toBe("12 Apr 2019 00:00:00 GMT");
+  });
+
+  it("returns null when both date fields are null", () => {
+    buildTrAlbumJson({ current: { release_date: null }, album_release_date: null });
+    expect(adapter.getReleaseDate()).toBeNull();
+  });
+
+  it("returns null when the blob carries no date fields at all", () => {
+    buildTrAlbumJson({ id: 1234, artist: "Some Artist" });
+    expect(adapter.getReleaseDate()).toBeNull();
+  });
+
+  it("returns null when no [data-tralbum] element exists", () => {
+    expect(adapter.getReleaseDate()).toBeNull();
+  });
+
+  it("returns null when the data-tralbum attribute is empty", () => {
+    buildTrAlbumData("");
+    expect(adapter.getReleaseDate()).toBeNull();
+  });
+
+  it("returns null when the blob is malformed JSON", () => {
+    buildTrAlbumData("{not-valid-json");
+    expect(adapter.getReleaseDate()).toBeNull();
+  });
+
+  it("returns null when the blob parses to a non-object", () => {
+    buildTrAlbumData("null");
+    expect(adapter.getReleaseDate()).toBeNull();
+  });
+});
