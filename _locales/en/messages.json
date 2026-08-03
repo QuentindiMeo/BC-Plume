@@ -42,6 +42,15 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "All Bandcamp elements found" },
+  "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
+    "message": "This browser does not parse Bandcamp's release date format correctly ($SAMPLE$: expected $EXPECTED$, got $PARSED$); release dates will be hidden",
+    "placeholders": {
+      "sample": { "content": "$1", "example": "12 Apr 2019 00:00:00 GMT" },
+      "expected": { "content": "$2", "example": "2019-04-12T00:00:00.000Z" },
+      "parsed": { "content": "$3", "example": "NaN" }
+    }
+  },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Bandcamp release date format parsed correctly by this browser" },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Unable to find a suitable container" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Player parent element not found" },

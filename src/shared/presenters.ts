@@ -1,4 +1,7 @@
 import { INITIAL_TIME_DISPLAY, TIME_DISPLAY_METHOD, TimeState } from "@/domain/plume";
+import { isNonIsoDateParsingSupported } from "@/shared/date-support";
+
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}(?:[T ]|$)/;
 
 // ? Internal helper: Format time as MM:SS
 export const presentFormattedTime = (seconds: number): string => {
@@ -26,6 +29,11 @@ export const presentFormattedDuration = (state: TimeState): string => {
 export const presentReleaseDate = (rawDate: string, locale: string): string | null => {
   const trimmedDate = rawDate.trim();
   if (!/^\d/.test(trimmedDate)) return null;
+
+  // ! ISO 8601 parsing is spec-mandated, Bandcamp's RFC-2822–style format is not: only trust the engine with the latter
+  // ! once it has passed the known-answer probe, so a non-conforming engine (e.g. an older Safari) hides the date
+  // ! instead of rendering a wrong one.
+  if (!ISO_DATE_PATTERN.test(trimmedDate) && !isNonIsoDateParsingSupported()) return null;
 
   const parsedDate = new Date(trimmedDate);
   if (Number.isNaN(parsedDate.getTime())) return null;
