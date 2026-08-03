@@ -15,6 +15,7 @@ import {
   setupSpeedLabelClickBehavior,
   setupSpeedPopoverBehavior,
 } from "@/app/features/ui/playback";
+import { appendReleaseDate } from "@/app/features/ui/release-date";
 import { createToast } from "@/app/features/ui/toast";
 import { createTracklistToggle } from "@/app/features/ui/tracklist";
 import { handleMuteToggle } from "@/app/features/ui/volume";
@@ -535,6 +536,8 @@ const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | nul
   headTitle.id = PLUME_ELEM_SELECTORS.fullscreenTitlingRelease.split("#")[1];
   if (!isCollectionPage) headTitle.textContent = `"${releaseName}"`;
   applyTitleLang(headTitle, releaseName);
+
+  appendReleaseDate(adjustedNameSection, bcPlayer.getReleaseDate());
 
   const coverArtImg = document.createElement("img");
   coverArtImg.id = PLUME_ELEM_SELECTORS.fullscreenCoverArt.split("#")[1];

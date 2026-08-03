@@ -357,6 +357,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Release date not found for fullscreen mode" },
+  "LABEL__RELEASE_DATE": {
+    "message": "Released $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "April 12, 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "Release date is $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "April 12, 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Audio Visualizer" },
 

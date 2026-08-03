@@ -367,6 +367,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lecteur musical en plein écran" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Date de sortie non trouvée pour le mode plein écran" },
+  "LABEL__RELEASE_DATE": {
+    "message": "Sorti le $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "12 avril 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "La date de sortie est $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "12 avril 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualiseur audio" },
 

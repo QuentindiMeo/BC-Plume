@@ -359,6 +359,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reprodutor de música em tela cheia" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Data de lançamento não encontrada para modo tela cheia" },
+  "LABEL__RELEASE_DATE": {
+    "message": "Lançado em $DATA$",
+    "placeholders": {
+      "data": { "content": "$1", "example": "12 de abril de 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "A data de lançamento é $DATA$",
+    "placeholders": {
+      "data": { "content": "$1", "example": "12 de abril de 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de áudio" },
 
