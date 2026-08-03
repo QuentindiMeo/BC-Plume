@@ -145,6 +145,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$HOURS$ h $MINUTES$ min $SECONDS$ s$PLAYABLE$",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "seconds": {
+        "content": "$3",
+        "example": "30"
+      },
+      "playable": {
+        "content": "$4",
+        "example": " playable"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " playable" },
   "ARIA__RUNTIME__LABEL": {
     "message": "Total runtime is $MINUTES$ minutes and $SECONDS$ seconds",
@@ -155,6 +176,23 @@
       },
       "seconds": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "Total runtime is $HOURS$ hours, $MINUTES$ minutes and $SECONDS$ seconds",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "seconds": {
+        "content": "$3",
         "example": "30"
       }
     }

@@ -153,6 +153,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$HORAS$ h $MINUTOS$ min $SEGUNDOS$ s$REPRODUCIBLE$",
+    "placeholders": {
+      "horas": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutos": {
+        "content": "$2",
+        "example": "18"
+      },
+      "segundos": {
+        "content": "$3",
+        "example": "30"
+      },
+      "reproducible": {
+        "content": "$4",
+        "example": " reproducible"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " reproducible" },
   "ARIA__RUNTIME__LABEL": {
     "message": "El tiempo total es de $MINUTOS$ minutos y $SEGUNDOS$ segundos",
@@ -163,6 +184,23 @@
       },
       "segundos": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "El tiempo total es de $HORAS$ horas, $MINUTOS$ minutos y $SEGUNDOS$ segundos",
+    "placeholders": {
+      "horas": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutos": {
+        "content": "$2",
+        "example": "18"
+      },
+      "segundos": {
+        "content": "$3",
         "example": "30"
       }
     }

@@ -145,6 +145,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$ORE$ h $MINUTI$ min $SECONDI$ s$RIPRODUCIBILI$",
+    "placeholders": {
+      "ore": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minuti": {
+        "content": "$2",
+        "example": "18"
+      },
+      "secondi": {
+        "content": "$3",
+        "example": "30"
+      },
+      "riproducibili": {
+        "content": "$4",
+        "example": " riproducibili"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " riproducibili" },
   "ARIA__RUNTIME__LABEL": {
     "message": "Durata totale: $MINUTES$ minuti e $SECONDS$ secondi",
@@ -155,6 +176,23 @@
       },
       "seconds": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "Durata totale: $HOURS$ ore, $MINUTES$ minuti e $SECONDS$ secondi",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "seconds": {
+        "content": "$3",
         "example": "30"
       }
     }

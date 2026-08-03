@@ -1,12 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { TIME_DISPLAY_METHOD } from "@/domain/plume";
+import { setForcedLanguage } from "@/shared/i18n";
 import {
   presentFormattedDuration,
   presentFormattedElapsed,
   presentFormattedTime,
   presentProgressPercentage,
   presentReleaseDate,
+  presentTotalRuntime,
 } from "@/shared/presenters";
 
 describe("presentFormattedTime", () => {
@@ -137,6 +139,79 @@ describe("presentProgressPercentage", () => {
     expect(
       presentProgressPercentage({ currentTime: 0, duration: 120, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })
     ).toBe(0);
+  });
+});
+
+describe("presentTotalRuntime", () => {
+  afterEach(() => {
+    setForcedLanguage("auto");
+  });
+
+  it("omits the hours component under an hour", () => {
+    expect(presentTotalRuntime(2730, false).label).toBe("45 min 30 s");
+  });
+
+  it("zero-pads single-digit seconds under an hour", () => {
+    expect(presentTotalRuntime(305, false).label).toBe("5 min 05 s");
+  });
+
+  it("adds the hours component at exactly one hour", () => {
+    expect(presentTotalRuntime(3600, false).label).toBe("1 h 00 min 00 s");
+  });
+
+  it("adds the hours component past an hour", () => {
+    expect(presentTotalRuntime(4710, false).label).toBe("1 h 18 min 30 s");
+  });
+
+  it("keeps the last minute under an hour as minutes only", () => {
+    expect(presentTotalRuntime(3599, false).label).toBe("59 min 59 s");
+  });
+
+  it("zero-pads the minutes when hours are shown", () => {
+    expect(presentTotalRuntime(3930, false).label).toBe("1 h 05 min 30 s");
+  });
+
+  it("counts multiple hours", () => {
+    expect(presentTotalRuntime(9296, false).label).toBe("2 h 34 min 56 s");
+  });
+
+  it("appends the playable suffix under an hour", () => {
+    expect(presentTotalRuntime(2730, true).label).toBe("45 min 30 s playable");
+  });
+
+  it("appends the playable suffix past an hour", () => {
+    expect(presentTotalRuntime(4710, true).label).toBe("1 h 18 min 30 s playable");
+  });
+
+  it("localizes the hours component", () => {
+    setForcedLanguage("fr");
+    expect(presentTotalRuntime(4710, false).label).toBe("1 h 18 min 30 s");
+    expect(presentTotalRuntime(4710, true).label).toBe("1 h 18 min 30 s lisibles");
+  });
+
+  it("names the hours in the aria label past an hour", () => {
+    expect(presentTotalRuntime(4710, false).ariaLabel).toBe("Total runtime is 1 hours, 18 minutes and 30 seconds");
+  });
+
+  it("omits the hours from the aria label under an hour", () => {
+    expect(presentTotalRuntime(2730, false).ariaLabel).toBe("Total runtime is 45 minutes and 30 seconds");
+  });
+
+  it("truncates fractional seconds", () => {
+    expect(presentTotalRuntime(4710.9, false).label).toBe("1 h 18 min 30 s");
+  });
+
+  it("treats a zero runtime as an empty duration", () => {
+    expect(presentTotalRuntime(0, false).label).toBe("0 min 00 s");
+  });
+
+  it("clamps a negative runtime to zero", () => {
+    expect(presentTotalRuntime(-1, false).label).toBe("0 min 00 s");
+  });
+
+  it("clamps a non-finite runtime to zero", () => {
+    expect(presentTotalRuntime(NaN, false).label).toBe("0 min 00 s");
+    expect(presentTotalRuntime(Infinity, false).label).toBe("0 min 00 s");
   });
 });
 
