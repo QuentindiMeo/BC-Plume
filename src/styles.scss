@@ -736,7 +736,8 @@
       }
 
       .plume-fullscreen-titling {
-        @apply absolute bottom-[-10vh] flex flex-col items-center gap-1;
+        @apply absolute flex flex-col items-center gap-1;
+        top: calc(100% + 0.5rem);
         animation: slideInRight 0.5s ease-out;
 
         h2,
