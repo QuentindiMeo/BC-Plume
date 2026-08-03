@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DateParseProbeFailure } from "@/shared/date-support";
-import type { CPL } from "@/shared/logger";
 
 let probeFailures: DateParseProbeFailure[] = [];
 
@@ -38,7 +37,7 @@ describe("checkReleaseDateParsing", () => {
     expect(result.failures).toHaveLength(1);
     expect(logger).toHaveBeenCalledTimes(1);
 
-    const [level, message] = vi.mocked(logger).mock.calls[0] as [CPL, string];
+    const [level, message] = vi.mocked(logger).mock.calls[0] as [string, string];
     expect(level).toBe("warn");
     expect(message).toContain(CANONICAL_SAMPLE);
     expect(message).toContain("2019-04-12T00:00:00.000Z"); // expected instant
@@ -50,7 +49,7 @@ describe("checkReleaseDateParsing", () => {
 
     checkReleaseDateParsing();
 
-    const [, message] = vi.mocked(logger).mock.calls[0] as [CPL, string];
+    const [, message] = vi.mocked(logger).mock.calls[0] as [string, string];
     expect(message).toContain("2019-04-11T18:00:00.000Z");
     expect(message).not.toContain("NaN");
   });
@@ -64,6 +63,6 @@ describe("checkReleaseDateParsing", () => {
     checkReleaseDateParsing();
 
     expect(logger).toHaveBeenCalledTimes(2);
-    expect(vi.mocked(logger).mock.calls.every(([level]: [CPL]) => level === "warn")).toBe(true);
+    expect(vi.mocked(logger).mock.calls.every(([level]: string[]) => level === "warn")).toBe(true);
   });
 });
