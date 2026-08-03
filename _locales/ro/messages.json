@@ -147,6 +147,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$ORE$ h $MINUTE$ min $SECUNDE$ s$REDABILE$",
+    "placeholders": {
+      "ore": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minute": {
+        "content": "$2",
+        "example": "18"
+      },
+      "secunde": {
+        "content": "$3",
+        "example": "30"
+      },
+      "redabile": {
+        "content": "$4",
+        "example": " redabile"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " redabile" },
   "ARIA__RUNTIME__LABEL": {
     "message": "Durata totală: $MINUTES$ minute și $SECONDS$ secunde",
@@ -157,6 +178,23 @@
       },
       "seconds": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "Durata totală: $HOURS$ ore, $MINUTES$ minute și $SECONDS$ secunde",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "seconds": {
+        "content": "$3",
         "example": "30"
       }
     }

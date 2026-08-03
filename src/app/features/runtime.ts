@@ -4,6 +4,7 @@ import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { measureContrastRatioWCAG, WCAG_CONTRAST_LARGE } from "@/shared/colors";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
+import { presentTotalRuntime } from "@/shared/presenters";
 
 interface RuntimeInfo {
   totalRuntime: number;
@@ -45,18 +46,10 @@ export const getInfoSectionWithRuntime = (): HTMLDivElement => {
       }
       runtimeInfo.totalRuntime += seconds;
     });
-    const minutes = Math.floor(runtimeInfo.totalRuntime / 60);
-    const seconds = runtimeInfo.totalRuntime % 60;
     const hasUnplayableTracks = playabilityMap.some((isTrackPlayable) => !isTrackPlayable);
-    runtimeInfo.formattedTotalRuntime = getString("LABEL__RUNTIME", [
-      String(minutes),
-      seconds < 10 ? "0" + seconds : seconds.toString(),
-      hasUnplayableTracks ? getString("LABEL__RUNTIME__PLAYABLE") : "",
-    ]);
-    runtimeInfo.ariaString = getString("ARIA__RUNTIME__LABEL", [
-      String(Math.floor(runtimeInfo.totalRuntime / 60)),
-      String(runtimeInfo.totalRuntime % 60),
-    ]);
+    const { label, ariaLabel } = presentTotalRuntime(runtimeInfo.totalRuntime, hasUnplayableTracks);
+    runtimeInfo.formattedTotalRuntime = label;
+    runtimeInfo.ariaString = ariaLabel;
     logger(CPL.INFO, getString("INFO__RUNTIME__CALCULATED"), runtimeInfo.formattedTotalRuntime);
 
     runtimeInfo.calculated = true;

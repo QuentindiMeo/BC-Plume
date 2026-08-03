@@ -151,6 +151,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$HEURES$ h $MINUTES$ min $SECONDES$ s$LISIBLES$",
+    "placeholders": {
+      "heures": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "secondes": {
+        "content": "$3",
+        "example": "30"
+      },
+      "lisibles": {
+        "content": "$4",
+        "example": " lisibles"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " lisibles" },
   "ARIA__RUNTIME__LABEL": {
     "message": "Durée totale : $MINUTES$ minutes et $SECONDES$ secondes",
@@ -161,6 +182,23 @@
       },
       "secondes": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "Durée totale : $HEURES$ heures, $MINUTES$ minutes et $SECONDES$ secondes",
+    "placeholders": {
+      "heures": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "secondes": {
+        "content": "$3",
         "example": "30"
       }
     }

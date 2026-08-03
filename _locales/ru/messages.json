@@ -147,6 +147,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$HOURS$ ч $MINUTES$ мин $SECONDS$ с$PLAYABLE$",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "seconds": {
+        "content": "$3",
+        "example": "30"
+      },
+      "playable": {
+        "content": "$4",
+        "example": " доступно"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " доступно" },
   "ARIA__RUNTIME__LABEL": {
     "message": "Общая длительность: $MINUTES$ минут и $SECONDS$ секунд",
@@ -157,6 +178,23 @@
       },
       "seconds": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "Общая длительность: $HOURS$ часов, $MINUTES$ минут и $SECONDS$ секунд",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "seconds": {
+        "content": "$3",
         "example": "30"
       }
     }
