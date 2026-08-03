@@ -44,6 +44,15 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Все элементы Bandcamp найдены" },
+  "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
+    "message": "Этот браузер некорректно разбирает формат даты выпуска Bandcamp ($OBRAZETS$: ожидалось $OZHIDALOS$, получено $POLUCHENO$); даты выпуска будут скрыты",
+    "placeholders": {
+      "obrazets": { "content": "$1", "example": "12 Apr 2019 00:00:00 GMT" },
+      "ozhidalos": { "content": "$2", "example": "2019-04-12T00:00:00.000Z" },
+      "polucheno": { "content": "$3", "example": "NaN" }
+    }
+  },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Формат даты выпуска Bandcamp корректно разобран этим браузером" },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Не удалось найти подходящий контейнер" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Родительский элемент плеера не найден" },
@@ -359,6 +368,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Полноэкранный музыкальный плеер" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Дата выпуска не найдена для полноэкранного режима" },
+  "LABEL__RELEASE_DATE": {
+    "message": "Выпущено $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "12 апреля 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "Дата выпуска: $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "12 апреля 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Аудио-визуализатор" },
 

@@ -263,7 +263,7 @@
     }
 
     &__number {
-      @apply shrink-0 min-w-6 text-right text-xs text-text-muted;
+      @apply shrink-0 min-w-6 text-right text-xs text-text-muted tabular-nums;
 
       .plume-tracklist-item--active & {
         @apply text-plume-light;
@@ -736,7 +736,8 @@
       }
 
       .plume-fullscreen-titling {
-        @apply absolute bottom-[-8vh] flex flex-col items-center gap-1;
+        @apply absolute flex flex-col items-center gap-1;
+        top: calc(100% + 0.5rem);
         animation: slideInRight 0.5s ease-out;
 
         h2,
@@ -751,6 +752,11 @@
           span.runtime {
             @apply text-xs font-medium not-italic text-white/70!;
           }
+        }
+
+        p#plume-fullscreen-titling__release-date {
+          @apply m-0 text-center text-xs font-medium text-white/70;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
         }
 
         @media (max-width: 768px) {

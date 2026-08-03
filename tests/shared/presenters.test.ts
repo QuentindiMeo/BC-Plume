@@ -1,11 +1,13 @@
+import { describe, expect, it } from "vitest";
+
 import { TIME_DISPLAY_METHOD } from "@/domain/plume";
 import {
   presentFormattedDuration,
   presentFormattedElapsed,
   presentFormattedTime,
   presentProgressPercentage,
+  presentReleaseDate,
 } from "@/shared/presenters";
-import { describe, expect, it } from "vitest";
 
 describe("presentFormattedTime", () => {
   it("returns '0:00' for 0 seconds", () => {
@@ -135,5 +137,45 @@ describe("presentProgressPercentage", () => {
     expect(
       presentProgressPercentage({ currentTime: 0, duration: 120, durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION })
     ).toBe(0);
+  });
+});
+
+describe("presentReleaseDate", () => {
+  it("formats Bandcamp's raw date in English", () => {
+    expect(presentReleaseDate("12 Apr 2019 00:00:00 GMT", "en")).toBe("April 12, 2019");
+  });
+
+  it("localizes the formatted date", () => {
+    expect(presentReleaseDate("12 Apr 2019 00:00:00 GMT", "fr")).toBe("12 avril 2019");
+  });
+
+  it("normalizes underscored locale tags to BCP-47 (pt_BR → pt-BR)", () => {
+    expect(presentReleaseDate("12 Apr 2019 00:00:00 GMT", "pt_BR")).toBe("12 de abril de 2019");
+  });
+
+  it("accepts an ISO date without a time component", () => {
+    expect(presentReleaseDate("2019-04-12", "en")).toBe("April 12, 2019");
+  });
+
+  // Both bounds of the GMT day must land on the same calendar day: in any non-UTC runner timezone,
+  // formatting without `timeZone: "UTC"` would shift one of them.
+  it("keeps the GMT calendar day at the start of the day", () => {
+    expect(presentReleaseDate("12 Apr 2019 00:00:00 GMT", "en")).toBe("April 12, 2019");
+  });
+
+  it("keeps the GMT calendar day at the end of the day", () => {
+    expect(presentReleaseDate("12 Apr 2019 23:59:00 GMT", "en")).toBe("April 12, 2019");
+  });
+
+  it("returns null for an empty string", () => {
+    expect(presentReleaseDate("", "en")).toBeNull();
+  });
+
+  it("returns null for a non-date string", () => {
+    expect(presentReleaseDate("not a date", "en")).toBeNull();
+  });
+
+  it("returns null for localized page text rather than a raw date", () => {
+    expect(presentReleaseDate("released April 12, 2019", "en")).toBeNull();
   });
 });

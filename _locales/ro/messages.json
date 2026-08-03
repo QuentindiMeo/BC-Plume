@@ -44,6 +44,15 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Toate elementele Bandcamp găsite" },
+  "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
+    "message": "Acest browser nu interpretează corect formatul datei de lansare de la Bandcamp ($MOSTRA$: se aștepta $ASTEPTAT$, s-a obținut $OBTINUT$); datele de lansare vor fi ascunse",
+    "placeholders": {
+      "mostra": { "content": "$1", "example": "12 Apr 2019 00:00:00 GMT" },
+      "asteptat": { "content": "$2", "example": "2019-04-12T00:00:00.000Z" },
+      "obtinut": { "content": "$3", "example": "NaN" }
+    }
+  },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Formatul datei de lansare de la Bandcamp a fost interpretat corect de acest browser" },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Nu s-a putut găsi un container potrivit" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elementul părinte al player-ului negăsit" },
@@ -359,6 +368,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Redare muzicală pe ecran complet" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Data lansării negăsită pentru modul ecran complet" },
+  "LABEL__RELEASE_DATE": {
+    "message": "Lansat pe $DATA$",
+    "placeholders": {
+      "data": { "content": "$1", "example": "12 aprilie 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "Data lansării este $DATA$",
+    "placeholders": {
+      "data": { "content": "$1", "example": "12 aprilie 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Vizualizator audio" },
 

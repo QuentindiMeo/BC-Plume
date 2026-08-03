@@ -7,6 +7,7 @@ export interface BcPlayerPort {
   getTrackTitle(pageType: BcPageType): string | null; // Track data — plain values, no DOM leakage
   getArtworkUrl(): string | null;
   getTrackDuration(): number | null;
+  getReleaseDate(): string | null;
   isPlaying(): boolean;
   getCurrentTime(): number;
   getVolume(): number;

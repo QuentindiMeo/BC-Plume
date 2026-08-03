@@ -13,6 +13,7 @@ export {
 } from "@/app/features/ui/playback";
 export { setupPlayerStickiness } from "@/app/features/ui/player-stickiness";
 export { createProgressBar, dispatchAudioProgressToStore as syncProgressToStore } from "@/app/features/ui/progress";
+export { appendReleaseDate } from "@/app/features/ui/release-date";
 export { createToast } from "@/app/features/ui/toast";
 export type { ToastBorderType, ToastConfig, ToastCta, ToastHandle } from "@/app/features/ui/toast";
 export { createTracklistToggle } from "@/app/features/ui/tracklist";

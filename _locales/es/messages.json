@@ -44,6 +44,15 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Todos los elementos de Bandcamp encontrados" },
+  "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
+    "message": "Este navegador no interpreta correctamente el formato de fecha de publicación de Bandcamp ($MUESTRA$: se esperaba $ESPERADO$, se obtuvo $OBTENIDO$); las fechas de publicación se ocultarán",
+    "placeholders": {
+      "muestra": { "content": "$1", "example": "12 Apr 2019 00:00:00 GMT" },
+      "esperado": { "content": "$2", "example": "2019-04-12T00:00:00.000Z" },
+      "obtenido": { "content": "$3", "example": "NaN" }
+    }
+  },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Formato de fecha de publicación de Bandcamp interpretado correctamente por este navegador" },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "No se puede encontrar un contenedor adecuado" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento padre del reproductor no encontrado" },
@@ -371,6 +380,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reproductor de música en pantalla completa" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Fecha de publicación no encontrada para modo de pantalla completa" },
+  "LABEL__RELEASE_DATE": {
+    "message": "Publicado el $FECHA$",
+    "placeholders": {
+      "fecha": { "content": "$1", "example": "12 de abril de 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "La fecha de publicación es $FECHA$",
+    "placeholders": {
+      "fecha": { "content": "$1", "example": "12 de abril de 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de audio" },
 
