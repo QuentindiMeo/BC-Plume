@@ -75,6 +75,12 @@
     "node": ">=18.0.0",
     "pnpm": ">=10.0.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild"
+    ]
+  },
   "lint-staged": {
     "src/**/*.{ts,js,json,css,html}": [
       "prettier --write"
