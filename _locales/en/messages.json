@@ -427,6 +427,7 @@
   "LABEL__TAB__RESET": { "message": "Reset all" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "tracks" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Failed to save language preference" },
@@ -540,6 +541,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Seconds within which the previous track button restarts the current track instead"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Failed to save tracklist dropdown height" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Invalid tracklist dropdown height value, using default"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Tracklist dropdown height loaded:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Tracklist dropdown height" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Number of tracks visible in the tracklist dropdown" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Failed to parse toast icon SVG" },
   "WARN__TOAST__ICON_SVG_INVALID": {

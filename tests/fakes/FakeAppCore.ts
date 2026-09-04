@@ -26,9 +26,10 @@ const DEFAULT_STATE: AppCore = {
   isFullscreen: false,
 
   // Persisted settings with defaults
+  tracklistDropdownHeight: PLUME_DEFAULTS.tracklistDropdownHeight,
+  trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
-  trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
   hotkeyBindings: DEFAULT_HOTKEYS,
   featureFlags: { ...PLUME_DEFAULTS.featureFlags } as FeatureFlags,
 };
@@ -67,11 +68,17 @@ export class FakeAppCore implements IAppCore {
       case CORE_ACTIONS.SET_PAGE_TYPE:
         this.updateState("pageType", action.payload);
         break;
-      case CORE_ACTIONS.SET_TRACK_TITLE:
-        this.updateState("trackTitle", action.payload);
+      case CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED:
+        this.updateState("isTracklistExpanded", action.payload);
+        break;
+      case CORE_ACTIONS.SET_TRACKLIST_DROPDOWN_HEIGHT:
+        this.updateState("tracklistDropdownHeight", action.payload);
         break;
       case CORE_ACTIONS.SET_TRACK_NUMBER:
         this.updateState("trackNumber", action.payload);
+        break;
+      case CORE_ACTIONS.SET_TRACK_TITLE:
+        this.updateState("trackTitle", action.payload);
         break;
       case CORE_ACTIONS.SET_CURRENT_TIME:
         this.updateState("currentTime", action.payload);
@@ -117,9 +124,6 @@ export class FakeAppCore implements IAppCore {
         break;
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         this.updateState("isFullscreen", action.payload);
-        break;
-      case CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED:
-        this.updateState("isTracklistExpanded", action.payload);
         break;
       case CORE_ACTIONS.SET_FEATURE_FLAGS:
         this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });

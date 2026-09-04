@@ -429,6 +429,7 @@
   "LABEL__TAB__RESET": { "message": "Resetează tot" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "piese" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Eroare la salvarea preferinței de limbă" },
@@ -542,6 +543,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Secunde în care butonul piesei anterioare repornește piesa curentă"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Eroare la salvarea înălțimii listei de piese" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valoare invalidă pentru înălțimea listei de piese, se folosește valoarea implicită"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Înălțimea listei de piese încărcată:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Înălțimea listei de piese" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Numărul de piese vizibile în lista de piese" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Eroare la parsarea SVG-ului iconiței de notificare" },
   "WARN__TOAST__ICON_SVG_INVALID": {

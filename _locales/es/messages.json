@@ -443,6 +443,7 @@
   "LABEL__TAB__RESET": { "message": "Restablecer todo" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "pistas" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Error al guardar la preferencia de idioma" },
@@ -564,6 +565,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Segundos dentro de los cuales el botón de pista anterior reinicia la pista actual"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Error al guardar la altura de la lista de pistas" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valor de altura de la lista de pistas no válido, usando el valor predeterminado"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Altura de la lista de pistas cargada:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Altura de la lista de pistas" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Número de pistas visibles en la lista de pistas" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Error al analizar el SVG del icono del toast" },
   "WARN__TOAST__ICON_SVG_INVALID": {

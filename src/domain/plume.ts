@@ -3,6 +3,7 @@ export const PLUME_CONSTANTS = {
   TRACK_DISPLAY_UPDATE_DELAY_MS: 500, // ? delay for track display refresh after navigation
   AUDIO_RETRY_MS: 1000, // ? delay before retrying audio element lookup
   AUDIO_RETRY_TOAST_THRESHOLD: 3, // ? show toast after this many failed audio retries
+  TRACKLIST_ROW_HEIGHT_REM: 2, // ? base measure per track row, matches tailwind.css's default --tracklist-max-height--unfolded (10rem ÷ 5 tracks)
   SEEK_PAUSE_GUARD_MS: 100, // ? delay before re-enabling play after seek
   PROGRESS_SLIDER_GRANULARITY: 1000, // use 1000 for better granularity: 1000s = 16m40s
   WAVEFORM_PEAK_COLUMNS: 400, // ? number of amplitude bars rendered across the waveform canvas
@@ -46,6 +47,8 @@ export function assertBoundedInteger(value: number, min: WholeNumber, max: Whole
   if (value < min || value > max) throw new RangeError(`${value} is out of range (${min}–${max})`);
 }
 
+export const TRACKLIST_DROPDOWN_HEIGHT_MIN = 2 as WholeNumber;
+export const TRACKLIST_DROPDOWN_HEIGHT_MAX = 10 as WholeNumber;
 export const SEEK_JUMP_DURATION_MIN = 1 as WholeNumber;
 export const SEEK_JUMP_DURATION_MAX = 300 as WholeNumber;
 export const VOLUME_HOTKEY_STEP_MIN = 1 as WholeNumber;
@@ -89,6 +92,7 @@ export const parseCustomPlaybackSpeed = (raw: string): number | null => {
 
 export const PLUME_DEFAULTS = {
   language: PLUME_SUPPORTED_LANGUAGES[0],
+  tracklistDropdownHeight: 5 as WholeNumber, // in visible tracks; 5 × TRACKLIST_ROW_HEIGHT_REM matches the previous fixed 10rem default
   durationDisplayMethod: TIME_DISPLAY_METHOD.DURATION,
   trackRestartThreshold: 5 as WholeNumber, // in seconds
   seekJumpDuration: 10 as WholeNumber, // in seconds

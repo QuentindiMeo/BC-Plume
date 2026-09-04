@@ -9,10 +9,11 @@ export interface AppPersistedState {
   loopMode: LoopModeType;
   volume: number;
 
-  hotkeyBindings: Record<HotkeyAction, KeyBinding>;
+  tracklistDropdownHeight: number;
+  trackRestartThreshold: number;
   seekJumpDuration: number;
   volumeHotkeyStep: number;
-  trackRestartThreshold: number;
+  hotkeyBindings: Record<HotkeyAction, KeyBinding>;
   featureFlags: FeatureFlags;
 }
 
@@ -58,9 +59,10 @@ export enum CORE_ACTIONS {
   CLEAR_TRACK_BPMS = "CLEAR_TRACK_BPMS",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
 
+  SET_TRACKLIST_DROPDOWN_HEIGHT = "SET_TRACKLIST_DROPDOWN_HEIGHT",
+  SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
   SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
   SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
-  SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
 }
@@ -85,9 +87,10 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_TRACK_BPM_ERROR, string>
   | IAction<CORE_ACTIONS.CLEAR_TRACK_BPMS>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
+  | IAction<CORE_ACTIONS.SET_TRACKLIST_DROPDOWN_HEIGHT, number>
+  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
   | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
-  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
   | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
   | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
 
@@ -114,9 +117,10 @@ interface ICoreActions {
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
   // Settings
+  setTracklistDropdownHeight: (height: number) => CoreAction;
+  setTrackRestartThreshold: (threshold: number) => CoreAction;
   setSeekJumpDuration: (duration: number) => CoreAction;
   setVolumeHotkeyStep: (step: number) => CoreAction;
-  setTrackRestartThreshold: (threshold: number) => CoreAction;
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setFeatureFlags: (flags: FeatureFlags) => CoreAction;
 }
@@ -166,9 +170,13 @@ export const coreActions: ICoreActions = {
     payload: isFullscreen,
   }),
 
-  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
-    type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
-    payload: bindings,
+  setTracklistDropdownHeight: (height: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACKLIST_DROPDOWN_HEIGHT,
+    payload: height,
+  }),
+  setTrackRestartThreshold: (threshold: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
+    payload: threshold,
   }),
   setSeekJumpDuration: (duration: number): CoreAction => ({
     type: CORE_ACTIONS.SET_SEEK_JUMP_DURATION,
@@ -178,9 +186,9 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP,
     payload: step,
   }),
-  setTrackRestartThreshold: (threshold: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
-    payload: threshold,
+  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
+    type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
+    payload: bindings,
   }),
   setFeatureFlags: (flags: FeatureFlags): CoreAction => ({
     type: CORE_ACTIONS.SET_FEATURE_FLAGS,

@@ -8,6 +8,8 @@ import {
   SEEK_JUMP_DURATION_MIN,
   TRACK_RESTART_THRESHOLD_MAX,
   TRACK_RESTART_THRESHOLD_MIN,
+  TRACKLIST_DROPDOWN_HEIGHT_MAX,
+  TRACKLIST_DROPDOWN_HEIGHT_MIN,
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
   WholeNumber,
@@ -18,6 +20,7 @@ import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
+import { saveTracklistDropdownHeight } from "@/popup/use-cases/saveTracklistDropdownHeight";
 import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -178,6 +181,111 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   return row;
 };
 
+interface SliderRowConfig {
+  labelKey: string;
+  ariaKey: string;
+  unitKey: string;
+  min: WholeNumber;
+  max: WholeNumber;
+  defaultValue: WholeNumber;
+  initialValue: WholeNumber;
+  errorPersistenceKey: string;
+  inputId: string;
+  onSave: (value: WholeNumber) => Promise<void>;
+}
+
+const buildSliderRow = (config: SliderRowConfig): HTMLElement => {
+  const { labelKey, ariaKey, unitKey, min, max, defaultValue, initialValue, errorPersistenceKey, inputId, onSave } =
+    config;
+
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const row = document.createElement("div");
+  row.className = "setting-row";
+
+  const label = document.createElement("span");
+  label.className = "setting-row__label";
+  label.textContent = getString(labelKey);
+
+  const value = document.createElement("div");
+  value.className = "setting-row__value";
+
+  const inputRow = document.createElement("div");
+  inputRow.className = "general-row__input-row";
+
+  const input = document.createElement("input");
+  input.type = "range";
+  input.className = "general-row__slider";
+  input.min = String(min);
+  input.max = String(max);
+  input.step = "1";
+  input.value = String(initialValue);
+  input.id = inputId;
+  input.ariaLabel = getString(ariaKey);
+
+  const valueDisplay = document.createElement("span");
+  valueDisplay.className = "general-row__slider-value";
+  valueDisplay.ariaHidden = "true";
+
+  const resetBtn = document.createElement("button");
+  resetBtn.className = "general-row__reset-link";
+  resetBtn.textContent = getString("LABEL__SETTING__RESET");
+  resetBtn.hidden = initialValue === defaultValue;
+
+  const renderValue = (raw: WholeNumber): void => {
+    const text = `${raw} ${getString(unitKey)}`;
+    valueDisplay.textContent = text;
+    input.setAttribute("aria-valuetext", text);
+  };
+  renderValue(initialValue);
+
+  const persist = (nextValue: WholeNumber): void => {
+    resetBtn.hidden = nextValue === defaultValue;
+    onSave(nextValue).catch(() => {
+      logger(CPL.ERROR, getString(errorPersistenceKey));
+    });
+  };
+
+  input.addEventListener("input", () => {
+    const nextValue = Number(input.value) as WholeNumber;
+    renderValue(nextValue);
+    resetBtn.hidden = nextValue === defaultValue;
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      persist(nextValue);
+      debounceTimer = null;
+    }, PLUME_CONSTANTS.WCAG_INTERACTION_TIMEOUT_MS);
+  });
+
+  // ? Fires on release (mouseup / arrow-key commit): persist immediately instead of waiting for the debounce
+  input.addEventListener("change", () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+    persist(Number(input.value) as WholeNumber);
+  });
+
+  resetBtn.addEventListener("click", () => {
+    input.value = String(defaultValue);
+    renderValue(defaultValue);
+    if (debounceTimer) clearTimeout(debounceTimer);
+    persist(defaultValue);
+  });
+
+  inputRow.appendChild(input);
+  inputRow.appendChild(valueDisplay);
+
+  value.appendChild(inputRow);
+  value.appendChild(resetBtn);
+
+  row.appendChild(label);
+  row.appendChild(value);
+
+  return row;
+};
+
 interface SelectRowConfig<T extends string> {
   labelKey: string;
   ariaKey: string;
@@ -253,10 +361,11 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
  * Call the returned function once to produce the tab panel element.
  */
 export const createGeneralTab = (
+  storedForcedLanguage: PlumeLanguage | undefined,
+  storedTracklistDropdownHeight: WholeNumber | undefined,
+  storedTrackRestartThreshold: WholeNumber | undefined,
   storedSeekJumpDuration: WholeNumber | undefined,
   storedVolumeHotkeyStep: WholeNumber | undefined,
-  storedTrackRestartThreshold: WholeNumber | undefined,
-  storedForcedLanguage: PlumeLanguage | undefined,
   sender: IMessageSender
 ): TabDefinition["buildPanel"] => {
   const buildSection = (): HTMLElement => {
@@ -286,6 +395,31 @@ export const createGeneralTab = (
       },
     });
 
+    const tracklistHeightRow = buildSliderRow({
+      labelKey: "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT",
+      ariaKey: "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER",
+      unitKey: "META__TRACKS_UNIT",
+      min: TRACKLIST_DROPDOWN_HEIGHT_MIN,
+      max: TRACKLIST_DROPDOWN_HEIGHT_MAX,
+      defaultValue: PLUME_DEFAULTS.tracklistDropdownHeight,
+      initialValue: storedTracklistDropdownHeight ?? PLUME_DEFAULTS.tracklistDropdownHeight,
+      errorPersistenceKey: "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE",
+      inputId: "tracklist-dropdown-height-slider",
+      onSave: (value) => saveTracklistDropdownHeight(value, sender),
+    });
+    const trackRestartRow = buildNumericRow({
+      labelKey: "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD",
+      ariaKey: "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT",
+      unitKey: "META__SECONDS_UNIT",
+      min: TRACK_RESTART_THRESHOLD_MIN,
+      max: TRACK_RESTART_THRESHOLD_MAX,
+      defaultValue: PLUME_DEFAULTS.trackRestartThreshold,
+      initialValue: storedTrackRestartThreshold ?? PLUME_DEFAULTS.trackRestartThreshold,
+      errorOutOfRangeKey: "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE",
+      errorPersistenceKey: "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE",
+      inputId: "track-restart-threshold-input",
+      onSave: (value) => saveTrackRestartThreshold(value, sender),
+    });
     const seekJumpRow = buildNumericRow({
       labelKey: "LABEL__PLAYBACK__SEEK_JUMP_DURATION",
       ariaKey: "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT",
@@ -312,25 +446,13 @@ export const createGeneralTab = (
       inputId: "volume-step-input",
       onSave: (value) => saveVolumeHotkeyStep(value, sender),
     });
-    const trackRestartRow = buildNumericRow({
-      labelKey: "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD",
-      ariaKey: "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT",
-      unitKey: "META__SECONDS_UNIT",
-      min: TRACK_RESTART_THRESHOLD_MIN,
-      max: TRACK_RESTART_THRESHOLD_MAX,
-      defaultValue: PLUME_DEFAULTS.trackRestartThreshold,
-      initialValue: storedTrackRestartThreshold ?? PLUME_DEFAULTS.trackRestartThreshold,
-      errorOutOfRangeKey: "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE",
-      errorPersistenceKey: "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE",
-      inputId: "track-restart-threshold-input",
-      onSave: (value) => saveTrackRestartThreshold(value, sender),
-    });
 
     section.appendChild(refreshNotice);
     section.appendChild(languageRow);
+    section.appendChild(tracklistHeightRow);
+    section.appendChild(trackRestartRow);
     section.appendChild(seekJumpRow);
     section.appendChild(volumeStepRow);
-    section.appendChild(trackRestartRow);
 
     return section;
   };

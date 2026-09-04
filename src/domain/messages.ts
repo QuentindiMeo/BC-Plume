@@ -3,15 +3,26 @@ import { FeatureFlags } from "@/domain/plume";
 
 export enum PLUME_MESSAGE_TYPE {
   HOTKEYS_UPDATED = "HOTKEYS_UPDATED",
+  TRACKLIST_DROPDOWN_HEIGHT_UPDATED = "TRACKLIST_DROPDOWN_HEIGHT_UPDATED",
+  TRACK_RESTART_THRESHOLD_UPDATED = "TRACK_RESTART_THRESHOLD_UPDATED",
   SEEK_JUMP_DURATION_UPDATED = "SEEK_JUMP_DURATION_UPDATED",
   VOLUME_HOTKEY_STEP_UPDATED = "VOLUME_HOTKEY_STEP_UPDATED",
-  TRACK_RESTART_THRESHOLD_UPDATED = "TRACK_RESTART_THRESHOLD_UPDATED",
   FEATURE_FLAGS_UPDATED = "FEATURE_FLAGS_UPDATED",
 }
 
 interface HotkeysUpdatedMessage {
   type: PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED;
   bindings: Record<HotkeyAction, KeyBinding>;
+}
+
+interface TracklistDropdownHeightUpdatedMessage {
+  type: PLUME_MESSAGE_TYPE.TRACKLIST_DROPDOWN_HEIGHT_UPDATED;
+  tracklistDropdownHeight: number;
+}
+
+interface TrackRestartThresholdUpdatedMessage {
+  type: PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED;
+  trackRestartThreshold: number;
 }
 
 interface SeekJumpDurationUpdatedMessage {
@@ -24,11 +35,6 @@ interface VolumeHotkeyStepUpdatedMessage {
   volumeHotkeyStep: number;
 }
 
-interface TrackRestartThresholdUpdatedMessage {
-  type: PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED;
-  trackRestartThreshold: number;
-}
-
 interface FeatureFlagsUpdatedMessage {
   type: PLUME_MESSAGE_TYPE.FEATURE_FLAGS_UPDATED;
   featureFlags: FeatureFlags;
@@ -36,7 +42,8 @@ interface FeatureFlagsUpdatedMessage {
 
 export type PlumeMessage =
   | HotkeysUpdatedMessage
+  | TracklistDropdownHeightUpdatedMessage
+  | TrackRestartThresholdUpdatedMessage
   | SeekJumpDurationUpdatedMessage
   | VolumeHotkeyStepUpdatedMessage
-  | TrackRestartThresholdUpdatedMessage
   | FeatureFlagsUpdatedMessage;

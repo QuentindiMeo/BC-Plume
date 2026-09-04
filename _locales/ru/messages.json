@@ -429,6 +429,7 @@
   "LABEL__TAB__RESET": { "message": "Сбросить всё" },
   "META__SECONDS_UNIT": { "message": "с" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "треков" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "Основные" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Ошибка сохранения языковых настроек" },
@@ -542,6 +543,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Секунды, в течение которых кнопка предыдущего трека перезапускает текущий"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Не удалось сохранить высоту списка треков" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Недопустимое значение высоты списка треков, используется значение по умолчанию"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Высота списка треков загружена:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Высота списка треков" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Количество треков, видимых в списке треков" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Ошибка разбора SVG иконки уведомления" },
   "WARN__TOAST__ICON_SVG_INVALID": {

@@ -14,9 +14,10 @@ export type SettingsPanelInstance = { mount: (el: HTMLElement) => void };
 
 export interface StoredSettings {
   forcedLanguage: PlumeLanguage | undefined;
+  tracklistDropdownHeight: WholeNumber | undefined;
+  trackRestartThreshold: WholeNumber | undefined;
   seekJumpDuration: WholeNumber | undefined;
   volumeHotkeyStep: WholeNumber | undefined;
-  trackRestartThreshold: WholeNumber | undefined;
   hotkeyBindings: KeyBindingMap | undefined;
   featureFlags: FeatureFlags;
 }
@@ -51,10 +52,11 @@ export const createSettingsPanel = (stored: StoredSettings, sender: IMessageSend
         id: "general",
         label: getString("POPUP__GENERAL__TAB_LABEL"),
         buildPanel: createGeneralTab(
+          stored.forcedLanguage,
+          stored.tracklistDropdownHeight,
+          stored.trackRestartThreshold,
           stored.seekJumpDuration,
           stored.volumeHotkeyStep,
-          stored.trackRestartThreshold,
-          stored.forcedLanguage,
           sender
         ),
       },

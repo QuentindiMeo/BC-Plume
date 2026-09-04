@@ -1,6 +1,7 @@
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { navigateToTrack } from "@/app/use-cases";
+import { PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
@@ -13,7 +14,8 @@ const TOGGLE_BTN_ID = PLUME_ELEM_SELECTORS.tracklistToggleBtn.split("#")[1];
 const ITEM_CLASS = PLUME_ELEM_SELECTORS.tracklistItem.split(".")[1];
 const ITEM_ACTIVE_CLASS = `${ITEM_CLASS}--active`;
 const ITEM_UNPLAYABLE_CLASS = `${ITEM_CLASS}--unplayable`;
-const EDGE_TRACK_COUNT = 2; // Tracks within this many positions of either end are not centered (first/last 2 tracks)
+const EDGE_TRACK_COUNT = 2; // ? Tracks within this many positions of either end are not centered (first/last X tracks)
+const MAX_HEIGHT_UNFOLDED_PROPERTY = "--tracklist-max-height--unfolded"; // ? CSS custom property overridden per-instance to reflect the user's configured dropdown height (see @/tailwind.css)
 
 export const createTracklistToggle = (): {
   toggleBtn: HTMLButtonElement;
@@ -36,6 +38,14 @@ export const createTracklistToggle = (): {
   dropdownEl.ariaHidden = "true";
 
   let isOpen = false;
+
+  // Applies the configured dropdown height (in tracks) as the hover-expanded max-height.
+  const applyDropdownHeight = (heightInTracks: number): void => {
+    dropdownEl.style.setProperty(
+      MAX_HEIGHT_UNFOLDED_PROPERTY,
+      `${heightInTracks * PLUME_CONSTANTS.TRACKLIST_ROW_HEIGHT_REM}rem`
+    );
+  };
 
   const getPlayableItems = (): HTMLDivElement[] =>
     Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
@@ -258,9 +268,16 @@ export const createTracklistToggle = (): {
     applyOpenState(true);
   }
 
+  // ? Apply the configured dropdown height on mount, and keep it in sync with live setting changes (broadcast from the popup).
+  applyDropdownHeight(getAppCoreInstance().getState().tracklistDropdownHeight);
+  const unsubscribeDropdownHeight = getAppCoreInstance().subscribe("tracklistDropdownHeight", (height) => {
+    applyDropdownHeight(height);
+  });
+
   const cleanup = (): void => {
     unsubscribeTrackTitle();
     unsubscribeTracklistExpanded();
+    unsubscribeDropdownHeight();
   };
 
   return { toggleBtn, dropdownEl, cleanup };

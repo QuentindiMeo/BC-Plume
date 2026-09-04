@@ -142,7 +142,7 @@ describe("popup accessibility", () => {
       "has no a11y violations",
       async () => {
         const { createGeneralTab } = await import("@/popup/components/GeneralTab");
-        const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, sender);
+        const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, undefined, sender);
         const panel = buildPanel();
         document.body.appendChild(panel);
         await checkA11y(panel);
@@ -152,7 +152,7 @@ describe("popup accessibility", () => {
 
     it("numeric inputs have aria-describedby linked to error elements", async () => {
       const { createGeneralTab } = await import("@/popup/components/GeneralTab");
-      const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, sender);
+      const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, undefined, sender);
       const panel = buildPanel();
       document.body.appendChild(panel);
 
@@ -169,7 +169,7 @@ describe("popup accessibility", () => {
 
     it("numeric inputs have aria-invalid=false by default", async () => {
       const { createGeneralTab } = await import("@/popup/components/GeneralTab");
-      const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, sender);
+      const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, undefined, sender);
       const panel = buildPanel();
 
       const inputs = panel.querySelectorAll("input[type='number']");
@@ -195,9 +195,10 @@ describe("popup accessibility", () => {
         const panel = createSettingsPanel(
           {
             forcedLanguage: undefined,
+            tracklistDropdownHeight: undefined,
+            trackRestartThreshold: undefined,
             seekJumpDuration: undefined,
             volumeHotkeyStep: undefined,
-            trackRestartThreshold: undefined,
             hotkeyBindings: undefined,
             featureFlags: { ...PLUME_DEFAULTS.featureFlags },
           },
@@ -216,9 +217,10 @@ describe("popup accessibility", () => {
       const panel = createSettingsPanel(
         {
           forcedLanguage: undefined,
+          tracklistDropdownHeight: undefined,
+          trackRestartThreshold: undefined,
           seekJumpDuration: undefined,
           volumeHotkeyStep: undefined,
-          trackRestartThreshold: undefined,
           hotkeyBindings: undefined,
           featureFlags: { ...PLUME_DEFAULTS.featureFlags },
         },
@@ -239,9 +241,10 @@ describe("popup accessibility", () => {
         const panel = createSettingsPanel(
           {
             forcedLanguage: undefined,
+            tracklistDropdownHeight: undefined,
+            trackRestartThreshold: undefined,
             seekJumpDuration: undefined,
             volumeHotkeyStep: undefined,
-            trackRestartThreshold: undefined,
             hotkeyBindings: undefined,
             featureFlags: { ...PLUME_DEFAULTS.featureFlags },
           },

@@ -170,12 +170,14 @@ export const setupHotkeys = (
     if (message.type === PLUME_MESSAGE_TYPE.HOTKEYS_UPDATED) {
       currentBindings = { ...message.bindings };
       codeToAction = buildCodeToActionMap(currentBindings);
+    } else if (message.type === PLUME_MESSAGE_TYPE.TRACKLIST_DROPDOWN_HEIGHT_UPDATED) {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(message.tracklistDropdownHeight));
     } else if (message.type === PLUME_MESSAGE_TYPE.SEEK_JUMP_DURATION_UPDATED) {
       appCore.dispatch(coreActions.setSeekJumpDuration(message.seekJumpDuration));
-    } else if (message.type === PLUME_MESSAGE_TYPE.VOLUME_HOTKEY_STEP_UPDATED) {
-      appCore.dispatch(coreActions.setVolumeHotkeyStep(message.volumeHotkeyStep));
     } else if (message.type === PLUME_MESSAGE_TYPE.TRACK_RESTART_THRESHOLD_UPDATED) {
       appCore.dispatch(coreActions.setTrackRestartThreshold(message.trackRestartThreshold));
+    } else if (message.type === PLUME_MESSAGE_TYPE.VOLUME_HOTKEY_STEP_UPDATED) {
+      appCore.dispatch(coreActions.setVolumeHotkeyStep(message.volumeHotkeyStep));
     } else if (message.type === PLUME_MESSAGE_TYPE.FEATURE_FLAGS_UPDATED) {
       appCore.dispatch(coreActions.setFeatureFlags(message.featureFlags));
     }
