@@ -23,8 +23,9 @@ export interface TrackBpmEntry {
 }
 export interface AppTransientState {
   pageType: BcPageType | null;
-  trackTitle: string | null;
   trackNumber: string | null;
+  trackTitle: string | null;
+  isTracklistExpanded: boolean;
   duration: number;
   currentTime: number;
   isPlaying: boolean;
@@ -38,8 +39,9 @@ export interface AppCore extends AppPersistedState, AppTransientState {}
 
 export enum CORE_ACTIONS {
   SET_PAGE_TYPE = "SET_PAGE_TYPE",
-  SET_TRACK_TITLE = "SET_TRACK_TITLE",
   SET_TRACK_NUMBER = "SET_TRACK_NUMBER",
+  SET_TRACK_TITLE = "SET_TRACK_TITLE",
+  SET_IS_TRACKLIST_EXPANDED = "SET_IS_TRACKLIST_EXPANDED",
   SET_DURATION = "SET_DURATION",
   SET_CURRENT_TIME = "SET_CURRENT_TIME",
   SET_IS_PLAYING = "SET_IS_PLAYING",
@@ -65,8 +67,9 @@ export enum CORE_ACTIONS {
 
 export type CoreAction =
   | IAction<CORE_ACTIONS.SET_PAGE_TYPE, BcPageType | null>
-  | IAction<CORE_ACTIONS.SET_TRACK_TITLE, string | null>
   | IAction<CORE_ACTIONS.SET_TRACK_NUMBER, string | null>
+  | IAction<CORE_ACTIONS.SET_TRACK_TITLE, string | null>
+  | IAction<CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED, boolean>
   | IAction<CORE_ACTIONS.SET_DURATION, number>
   | IAction<CORE_ACTIONS.SET_CURRENT_TIME, number>
   | IAction<CORE_ACTIONS.SET_IS_PLAYING, boolean>
@@ -91,8 +94,9 @@ export type CoreAction =
 interface ICoreActions {
   // State
   setPageType: (pageType: BcPageType | null) => CoreAction;
-  setTrackTitle: (title: string | null) => CoreAction;
   setTrackNumber: (number: string | null) => CoreAction;
+  setTrackTitle: (title: string | null) => CoreAction;
+  setIsTracklistExpanded: (isExpanded: boolean) => CoreAction;
   setDuration: (duration: number) => CoreAction;
   setCurrentTime: (time: number) => CoreAction;
   setIsPlaying: (isPlaying: boolean) => CoreAction;
@@ -119,8 +123,12 @@ interface ICoreActions {
 
 export const coreActions: ICoreActions = {
   setPageType: (pageType: BcPageType | null): CoreAction => ({ type: CORE_ACTIONS.SET_PAGE_TYPE, payload: pageType }),
-  setTrackTitle: (title: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_TITLE, payload: title }),
   setTrackNumber: (number: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_NUMBER, payload: number }),
+  setTrackTitle: (title: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_TITLE, payload: title }),
+  setIsTracklistExpanded: (isExpanded: boolean): CoreAction => ({
+    type: CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED,
+    payload: isExpanded,
+  }),
   setDuration: (duration: number): CoreAction => ({ type: CORE_ACTIONS.SET_DURATION, payload: duration }),
   setCurrentTime: (time: number): CoreAction => ({ type: CORE_ACTIONS.SET_CURRENT_TIME, payload: time }),
   setIsPlaying: (isPlaying: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_PLAYING, payload: isPlaying }),

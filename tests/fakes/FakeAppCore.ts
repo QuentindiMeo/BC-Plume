@@ -16,6 +16,7 @@ const DEFAULT_STATE: AppCore = {
   isMuted: false,
 
   // Additional state
+  isTracklistExpanded: false,
   durationDisplayMethod: PLUME_DEFAULTS.durationDisplayMethod,
   playbackSpeed: PLUME_DEFAULTS.playbackSpeed,
   loopMode: PLUME_DEFAULTS.loopMode,
@@ -116,6 +117,9 @@ export class FakeAppCore implements IAppCore {
         break;
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         this.updateState("isFullscreen", action.payload);
+        break;
+      case CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED:
+        this.updateState("isTracklistExpanded", action.payload);
         break;
       case CORE_ACTIONS.SET_FEATURE_FLAGS:
         this.updateState("featureFlags", { ...PLUME_DEFAULTS.featureFlags, ...action.payload });

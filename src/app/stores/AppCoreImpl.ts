@@ -33,6 +33,7 @@ const INITIAL_STATE: AppCore = {
   pageType: null,
   trackTitle: null,
   trackNumber: null,
+  isTracklistExpanded: false,
   duration: 0,
   currentTime: 0,
   isPlaying: false,
@@ -203,13 +204,8 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_TRACK_NUMBER:
         updateState("trackNumber", action.payload);
         break;
-      case CORE_ACTIONS.SET_VOLUME:
-        const volume = action.payload;
-        if (!isValidVolume(volume)) {
-          logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
-          return;
-        }
-        updateState("volume", action.payload);
+      case CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED:
+        updateState("isTracklistExpanded", action.payload);
         break;
       case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         updateState("durationDisplayMethod", action.payload);
@@ -233,23 +229,6 @@ const createAppCoreInstance = (): IAppCore => {
         updateState("playbackSpeed", Math.round(speed * 100) / 100);
         break;
       }
-      case CORE_ACTIONS.SET_IS_MUTED:
-        updateState("isMuted", action.payload);
-        break;
-      case CORE_ACTIONS.TOGGLE_MUTE: {
-        if (state.isMuted) {
-          // Unmute: restore previous volume
-          const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
-          updateState("volume", restoredVolume);
-          updateState("isMuted", false);
-        } else {
-          // Mute: save current volume and set to 0
-          updateState("volumeBeforeMute", state.volume);
-          updateState("volume", 0);
-          updateState("isMuted", true);
-        }
-        break;
-      }
       case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
         updateState("trackBpms", {
           ...state.trackBpms,
@@ -270,6 +249,47 @@ const createAppCoreInstance = (): IAppCore => {
         break;
       case CORE_ACTIONS.CLEAR_TRACK_BPMS:
         updateState("trackBpms", {});
+        break;
+      case CORE_ACTIONS.SET_LOOP_MODE:
+        updateState("loopMode", action.payload);
+        break;
+      case CORE_ACTIONS.CYCLE_LOOP_MODE: {
+        const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
+        const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
+        const nextMode = LOOP_MODE_CYCLE[nextIndex];
+
+        // If current page is track, skip to track loop (collection loop doesn't make sense on track page)
+        if (state.pageType === "track" && nextMode === LOOP_MODE.COLLECTION) {
+          updateState("loopMode", LOOP_MODE.TRACK);
+        } else {
+          updateState("loopMode", nextMode);
+        }
+        break;
+      }
+      case CORE_ACTIONS.SET_IS_MUTED:
+        updateState("isMuted", action.payload);
+        break;
+      case CORE_ACTIONS.TOGGLE_MUTE: {
+        if (state.isMuted) {
+          // Unmute: restore previous volume
+          const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
+          updateState("volume", restoredVolume);
+          updateState("isMuted", false);
+        } else {
+          // Mute: save current volume and set to 0
+          updateState("volumeBeforeMute", state.volume);
+          updateState("volume", 0);
+          updateState("isMuted", true);
+        }
+        break;
+      }
+      case CORE_ACTIONS.SET_VOLUME:
+        const volume = action.payload;
+        if (!isValidVolume(volume)) {
+          logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
+          return;
+        }
+        updateState("volume", action.payload);
         break;
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
@@ -306,22 +326,6 @@ const createAppCoreInstance = (): IAppCore => {
           updateState("trackRestartThreshold", defaultTrackRestartThreshold);
         }
         break;
-      case CORE_ACTIONS.SET_LOOP_MODE:
-        updateState("loopMode", action.payload);
-        break;
-      case CORE_ACTIONS.CYCLE_LOOP_MODE: {
-        const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
-        const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
-        const nextMode = LOOP_MODE_CYCLE[nextIndex];
-
-        // If current page is track, skip to track loop (collection loop doesn't make sense on track page)
-        if (state.pageType === "track" && nextMode === LOOP_MODE.COLLECTION) {
-          updateState("loopMode", LOOP_MODE.TRACK);
-        } else {
-          updateState("loopMode", nextMode);
-        }
-        break;
-      }
       case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
         updateState("hotkeyBindings", action.payload);
         break;

@@ -141,6 +141,52 @@ describe("createTracklistToggle", () => {
   });
 });
 
+describe("expand/collapse state syncs across instances (main view <-> fullscreen)", () => {
+  it("a second instance mounts already expanded when the shared state is expanded", () => {
+    const first = setup();
+    first.toggleBtn.click(); // expand via the first (e.g. main view) instance
+    expect(first.dropdownEl.classList.contains("is-open")).toBe(true);
+
+    const second = createTracklistToggle(); // e.g. entering fullscreen
+    expect(second.dropdownEl.classList.contains("is-open")).toBe(true);
+    expect(second.toggleBtn.ariaExpanded).toBe("true");
+    second.cleanup();
+  });
+
+  it("collapsing the second instance also collapses the first (still-mounted) instance", () => {
+    const first = setup();
+    first.toggleBtn.click(); // expand via the first instance
+    const second = createTracklistToggle(); // mounts expanded
+    second.toggleBtn.click(); // collapse via the second instance (e.g. fullscreen)
+
+    expect(second.dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(first.dropdownEl.classList.contains("is-open")).toBe(false);
+    expect(first.toggleBtn.ariaExpanded).toBe("false");
+    second.cleanup();
+  });
+
+  it("expanding the second instance also expands the first (still-mounted) instance", () => {
+    const first = setup();
+    const second = createTracklistToggle(); // both start collapsed
+    second.toggleBtn.click(); // expand via the second instance (e.g. fullscreen)
+
+    expect(second.dropdownEl.classList.contains("is-open")).toBe(true);
+    expect(first.dropdownEl.classList.contains("is-open")).toBe(true);
+    expect(first.toggleBtn.ariaExpanded).toBe("true");
+    second.cleanup();
+  });
+
+  it("a cleaned-up instance no longer reacts to shared state changes", () => {
+    const first = setup();
+    const second = createTracklistToggle();
+    second.cleanup();
+    first.toggleBtn.click(); // expand via the first instance
+
+    expect(first.dropdownEl.classList.contains("is-open")).toBe(true);
+    expect(second.dropdownEl.classList.contains("is-open")).toBe(false);
+  });
+});
+
 describe("scroll centering on open", () => {
   let scrollToSpy: ReturnType<typeof vi.spyOn>;
 

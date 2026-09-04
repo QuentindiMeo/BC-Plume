@@ -1,6 +1,7 @@
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { navigateToTrack } from "@/app/use-cases";
+import { coreActions } from "@/domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { applyTitleLang } from "@/shared/script-lang";
@@ -35,16 +36,6 @@ export const createTracklistToggle = (): {
   dropdownEl.ariaHidden = "true";
 
   let isOpen = false;
-
-  const close = (refocus = true): void => {
-    dropdownEl.classList.remove("is-open");
-    dropdownEl.ariaHidden = "true";
-    toggleBtn.ariaExpanded = "false";
-    toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
-    toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
-    isOpen = false;
-    if (refocus) toggleBtn.focus();
-  };
 
   const getPlayableItems = (): HTMLDivElement[] =>
     Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
@@ -159,14 +150,38 @@ export const createTracklistToggle = (): {
     });
   };
 
+  // Applies the open/closed visuals and ARIA state without touching focus or the shared expand/collapse state — used both by
+  // user-triggered open()/close() and by passive sync (initial mount, or another tracklist instance toggling the shared state).
+  const applyOpenState = (nextOpen: boolean): void => {
+    if (nextOpen) {
+      renderItems();
+    }
+    const label = nextOpen ? getString("ARIA__TRACKLIST__TOGGLE_CLOSE") : getString("ARIA__TRACKLIST__TOGGLE_OPEN");
+
+    dropdownEl.classList.toggle("is-open", nextOpen);
+    dropdownEl.ariaHidden = String(!nextOpen);
+    toggleBtn.ariaExpanded = String(nextOpen);
+    toggleBtn.ariaLabel = label;
+    toggleBtn.title = label;
+    isOpen = nextOpen;
+  };
+
+  const close = (refocus = true): void => {
+    applyOpenState(false);
+
+    const appCore = getAppCoreInstance();
+    appCore.dispatch(coreActions.setIsTracklistExpanded(false));
+
+    if (refocus) {
+      toggleBtn.focus();
+    }
+  };
+
   const open = (): void => {
-    renderItems();
-    dropdownEl.classList.add("is-open");
-    dropdownEl.ariaHidden = "false";
-    toggleBtn.ariaExpanded = "true";
-    toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
-    toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
-    isOpen = true;
+    applyOpenState(true);
+
+    const appCore = getAppCoreInstance();
+    appCore.dispatch(coreActions.setIsTracklistExpanded(true));
 
     const activePlayableItem = dropdownEl.querySelector<HTMLDivElement>(
       `.${ITEM_ACTIVE_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`
@@ -232,8 +247,20 @@ export const createTracklistToggle = (): {
     if (isOpen) updateActiveItem();
   });
 
+  // * Keeps this instance's expand/collapse state in sync with the shared state, so that
+  // * toggling the tracklist in one view (main panel or fullscreen) is reflected in the other.
+  const unsubscribeTracklistExpanded = getAppCoreInstance().subscribe("isTracklistExpanded", (nextOpen) => {
+    if (nextOpen !== isOpen) applyOpenState(nextOpen);
+  });
+
+  // ? Adopt the shared expand/collapse state on mount.
+  if (getAppCoreInstance().getState().isTracklistExpanded) {
+    applyOpenState(true);
+  }
+
   const cleanup = (): void => {
     unsubscribeTrackTitle();
+    unsubscribeTracklistExpanded();
   };
 
   return { toggleBtn, dropdownEl, cleanup };
