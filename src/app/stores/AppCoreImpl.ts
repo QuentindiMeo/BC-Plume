@@ -468,6 +468,10 @@ const createAppCoreInstance = (): IAppCore => {
       if (storedFlags !== undefined && typeof storedFlags === "object" && storedFlags !== null) {
         dispatch(coreActions.setFeatureFlags(storedFlags));
       }
+
+      if (state.featureFlags.tracklist && state.featureFlags.tracklistExpandedByDefault) {
+        dispatch(coreActions.setIsTracklistExpanded(true));
+      }
     } catch (error) {
       logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);
     }

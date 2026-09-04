@@ -100,6 +100,7 @@ export const PLUME_DEFAULTS = {
     runtime: true,
     goToTrack: true,
     tracklist: true,
+    tracklistExpandedByDefault: false,
     quickSeek: true,
     waveform: false,
     speedControl: true,
@@ -120,6 +121,7 @@ export type FeatureFlags = {
   runtime: boolean;
   goToTrack: boolean;
   tracklist: boolean;
+  tracklistExpandedByDefault: boolean;
   quickSeek: boolean;
   waveform: boolean;
   speedControl: boolean;

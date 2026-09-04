@@ -23,6 +23,7 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "runtime", labelKey: "LABEL__FEATURES__RUNTIME" },
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
+  { flagKey: "tracklistExpandedByDefault", labelKey: "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT" },
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
   {
     flagKey: "waveform",
@@ -55,6 +56,21 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     saveFeatureFlags(flags, sender).catch(() => {
       logger(CPL.ERROR, getString("ERROR__FEATURE_FLAGS__PERSISTENCE"));
     });
+  };
+
+  // tracklistExpandedByDefault only makes sense when tracklist itself is enabled:
+  // force it off and lock its toggle whenever the parent flag is off.
+  const syncTracklistExpandedAvailability = (): void => {
+    const expandedBtn = toggleBtns.get("tracklistExpandedByDefault");
+    if (!expandedBtn) return;
+
+    expandedBtn.disabled = !currentFlags.tracklist;
+    expandedBtn.ariaDisabled = String(!currentFlags.tracklist);
+
+    if (!currentFlags.tracklist && currentFlags.tracklistExpandedByDefault) {
+      currentFlags.tracklistExpandedByDefault = false;
+      expandedBtn.ariaChecked = "false";
+    }
   };
 
   const buildToggleRow = (config: ToggleRowConfig): HTMLElement => {
@@ -90,6 +106,8 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.appendChild(thumb);
 
     toggle.addEventListener("click", () => {
+      if (toggle.disabled) return;
+
       currentFlags[flagKey] = !currentFlags[flagKey];
       toggle.ariaChecked = String(currentFlags[flagKey]);
 
@@ -106,6 +124,9 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
         const vizBtn = toggleBtns.get("visualizer");
         if (vizBtn) vizBtn.ariaChecked = "false";
       }
+
+      // tracklistExpandedByDefault depends on tracklist: keep it off and locked while disabled
+      if (flagKey === "tracklist") syncTracklistExpandedAvailability();
 
       persist(currentFlags);
       syncResetVisibility();
@@ -129,6 +150,8 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       section.appendChild(flagToggleRow);
     }
 
+    syncTracklistExpandedAvailability();
+
     return section;
   };
 
@@ -144,6 +167,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);
       for (const [flagKey, btn] of toggleBtns) btn.ariaChecked = String(currentFlags[flagKey]);
       for (const [flagKey, notice] of noticeRefs) notice.hidden = !currentFlags[flagKey];
+      syncTracklistExpandedAvailability();
       persist(currentFlags);
       syncResetVisibility();
     });

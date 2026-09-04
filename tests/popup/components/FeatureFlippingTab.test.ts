@@ -85,6 +85,78 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
   });
 });
 
+describe("tracklistExpandedByDefault flipper", () => {
+  it("persists as enabled when toggled on", () => {
+    const wrapper = buildPanel({ tracklistExpandedByDefault: false });
+    getToggle(wrapper, "tracklistExpandedByDefault").click();
+
+    const persisted = mockSaveFeatureFlags.mock.calls[0][0] as FeatureFlags;
+    expect(persisted.tracklistExpandedByDefault).toBe(true);
+  });
+
+  it("reflects the initial off state", () => {
+    const wrapper = buildPanel({ tracklistExpandedByDefault: false });
+    expect(getToggle(wrapper, "tracklistExpandedByDefault").ariaChecked).toBe("false");
+  });
+
+  it("reflects the initial on state", () => {
+    const wrapper = buildPanel({ tracklistExpandedByDefault: true });
+    expect(getToggle(wrapper, "tracklistExpandedByDefault").ariaChecked).toBe("true");
+  });
+});
+
+describe("tracklist ↔ tracklistExpandedByDefault dependency enforcement", () => {
+  it("is disabled when tracklist starts off", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistExpandedByDefault: false });
+    expect(getToggle(wrapper, "tracklistExpandedByDefault").disabled).toBe(true);
+  });
+
+  it("starts forced off when tracklist starts off, even if it was stored as on", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistExpandedByDefault: true });
+    const expandedToggle = getToggle(wrapper, "tracklistExpandedByDefault");
+    expect(expandedToggle.ariaChecked).toBe("false");
+    expect(expandedToggle.disabled).toBe(true);
+  });
+
+  it("is enabled when tracklist starts on", () => {
+    const wrapper = buildPanel({ tracklist: true });
+    expect(getToggle(wrapper, "tracklistExpandedByDefault").disabled).toBe(false);
+  });
+
+  it("turning tracklist off forces tracklistExpandedByDefault off, disables it, and persists both", () => {
+    const wrapper = buildPanel({ tracklist: true, tracklistExpandedByDefault: true });
+    const expandedToggle = getToggle(wrapper, "tracklistExpandedByDefault");
+
+    getToggle(wrapper, "tracklist").click();
+
+    expect(expandedToggle.ariaChecked).toBe("false");
+    expect(expandedToggle.disabled).toBe(true);
+    const persisted = mockSaveFeatureFlags.mock.calls[0][0] as FeatureFlags;
+    expect(persisted.tracklist).toBe(false);
+    expect(persisted.tracklistExpandedByDefault).toBe(false);
+  });
+
+  it("turning tracklist back on re-enables the tracklistExpandedByDefault toggle", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistExpandedByDefault: false });
+    const tracklistToggle = getToggle(wrapper, "tracklist");
+    const expandedToggle = getToggle(wrapper, "tracklistExpandedByDefault");
+
+    tracklistToggle.click(); // turn tracklist on
+
+    expect(expandedToggle.disabled).toBe(false);
+  });
+
+  it("clicking a disabled tracklistExpandedByDefault toggle has no effect", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistExpandedByDefault: false });
+    const expandedToggle = getToggle(wrapper, "tracklistExpandedByDefault");
+
+    expandedToggle.click();
+
+    expect(expandedToggle.ariaChecked).toBe("false");
+    expect(mockSaveFeatureFlags).not.toHaveBeenCalled();
+  });
+});
+
 describe("flipper notice (noticeKey)", () => {
   const getWaveformNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
     wrapper.querySelector("#feature-label-waveform .setting-row__notice") as HTMLParagraphElement;

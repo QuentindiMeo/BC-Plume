@@ -150,7 +150,7 @@ body {
   }
 
   .setting-row__conflict {
-    @apply max-w-[180px] flex flex-col gap-1 text-xs text-right text-popup-danger;
+    @apply max-w-45 flex flex-col gap-1 text-xs text-right text-popup-danger;
 
     .setting-row__conflict-msg {
       line-height: 1.3;
@@ -234,7 +234,7 @@ body {
 
 .general-row__input {
   @apply
-    w-15 px-[3px] py-1
+    w-15 px-0.75 py-1
     bg-popup-surface border border-popup-border rounded-popup
     font-popup font-medium text-xs text-popup-text text-center
     transition-[border-color] duration-150
@@ -318,6 +318,14 @@ body {
 
   &:hover {
     @apply border-popup-accent-dim;
+  }
+
+  &:disabled {
+    @apply cursor-not-allowed opacity-50;
+
+    &:hover {
+      @apply border-popup-border;
+    }
   }
 }
 

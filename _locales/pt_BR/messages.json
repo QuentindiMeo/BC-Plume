@@ -506,6 +506,7 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Duração" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Ir para a faixa" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista de faixas" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Lista de faixas aberta por padrão" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Busca rápida (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barra de progresso com forma de onda" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {

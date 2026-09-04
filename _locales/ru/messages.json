@@ -506,6 +506,7 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Длительность" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Перейти к треку" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Список треков" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Список треков открыт по умолчанию" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Быстрый переход (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Прогресс-бар с формой волны" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {

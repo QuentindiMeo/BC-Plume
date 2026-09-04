@@ -520,6 +520,7 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Duración total" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Ir a la pista" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista de pistas" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Lista de pistas abierta por defecto" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Búsqueda rápida (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barra de progreso con forma de onda" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {

@@ -664,4 +664,42 @@ describe("AppCoreImpl — playbackSpeed persist/load integration", () => {
       })
     );
   });
+
+  it("starts the tracklist expanded when tracklistExpandedByDefault is enabled", async () => {
+    seedStorage({
+      [PLUME_CACHE_KEYS.FEATURE_FLAGS]: { ...PLUME_DEFAULTS.featureFlags, tracklistExpandedByDefault: true },
+    });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(true);
+  });
+
+  it("keeps the tracklist collapsed when tracklistExpandedByDefault is disabled", async () => {
+    seedStorage({
+      [PLUME_CACHE_KEYS.FEATURE_FLAGS]: { ...PLUME_DEFAULTS.featureFlags, tracklistExpandedByDefault: false },
+    });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(false);
+  });
+
+  it("keeps the tracklist collapsed when no feature flags were persisted", async () => {
+    seedStorage({});
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(false);
+  });
+
+  it("keeps the tracklist collapsed when tracklistExpandedByDefault is on but tracklist itself is off", async () => {
+    seedStorage({
+      [PLUME_CACHE_KEYS.FEATURE_FLAGS]: {
+        ...PLUME_DEFAULTS.featureFlags,
+        tracklist: false,
+        tracklistExpandedByDefault: true,
+      },
+    });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(false);
+  });
 });
