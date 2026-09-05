@@ -5,10 +5,10 @@ import { applyMarqueeText } from "@/app/features/marquee";
 
 const nextFrame = (): Promise<void> => new Promise((resolve) => requestAnimationFrame(() => resolve()));
 
-// ! happy-dom does not compute layout, so clientWidth/scrollWidth are stubbed per test scenario.
+// ! happy-dom does not compute layout, so clientWidth/getBoundingClientRect are stubbed per test scenario.
 const withWidths = (container: HTMLElement, textSpan: HTMLElement, containerWidth: number, textWidth: number): void => {
   Object.defineProperty(container, "clientWidth", { value: containerWidth, configurable: true });
-  Object.defineProperty(textSpan, "scrollWidth", { value: textWidth, configurable: true });
+  textSpan.getBoundingClientRect = () => ({ width: textWidth }) as DOMRect;
 };
 
 describe("applyMarqueeText", () => {

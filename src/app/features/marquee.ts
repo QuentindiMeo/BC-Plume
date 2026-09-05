@@ -17,7 +17,10 @@ export const applyMarqueeText = (container: HTMLElement, text: string): void => 
 
   // ? Deferred to the next frame: the container may not be mounted/laid out yet at call time.
   requestAnimationFrame(() => {
-    const overflow = textSpan.scrollWidth - container.clientWidth;
+    // ! getBoundingClientRect(), not scrollWidth/offsetWidth: textSpan is `display: inline` at rest (required for
+    // ! correct ellipsis rendering — see .plume-marquee__text in styles.scss), and non-replaced inline elements
+    // ! are specified to report 0 for scrollWidth/offsetWidth/clientWidth regardless of their real content size.
+    const overflow = textSpan.getBoundingClientRect().width - container.clientWidth;
     const isOverflowing = overflow > 1; // ? tolerance for subpixel rounding
 
     container.classList.toggle(MARQUEE_OVERFLOWING_CLASS, isOverflowing);

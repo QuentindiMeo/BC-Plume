@@ -15,10 +15,13 @@
 }
 
 /* Long-title horizontal auto-scroll: shared inner text wrapper for header + tracklist item titles.
-   The distance/duration custom properties are set per-instance by applyMarqueeText(). */
+   The distance/duration custom properties are set per-instance by applyMarqueeText(). Stays `display: inline`
+   at rest (identical to plain text) so the base ellipsis truncation renders exactly as it did before the
+   marquee wrapper existed — an atomic `inline-block` box can get dropped whole at the clip point instead of
+   partially revealed. It only switches to `inline-block` where animated (required for `transform` to apply —
+   see the `:hover`/`:focus` rules below), matching the pre-marquee ellipsis method as the base state. */
 .plume-marquee__text {
-  @apply inline-block whitespace-nowrap;
-  will-change: transform;
+  @apply inline whitespace-nowrap;
 }
 
 /*********** Bandcamp native element overrides ***********/
@@ -200,7 +203,9 @@
     text-overflow: clip;
 
     .plume-marquee__text {
+      display: inline-block;
       animation: plume-marquee-scroll var(--plume-marquee-duration, 6s) ease-in-out infinite alternate;
+      will-change: transform;
     }
   }
 }
@@ -292,14 +297,19 @@
   }
 }
 
-/* Written flat because Sass expands every `&` to the full ancestor chain: nesting this here would double up the prefix into an unmatchable selector. */
+/* Written flat (not nested under #plume-tracklist-dropdown .plume-tracklist-item) because Sass expands every `&`
+   to the full ancestor chain: nesting this here would double up the prefix into an unmatchable selector. Also
+   needs the #plume-tracklist-dropdown + &__title prefix to out-specificity the base &__title rule above (1 ID),
+   otherwise text-overflow: clip never wins and the ellipsis stays drawn over the sliding text while hovering. */
 @media (prefers-reduced-motion: no-preference) {
-  .plume-tracklist-item:hover .plume-marquee--overflowing,
-  .plume-tracklist-item:focus .plume-marquee--overflowing {
+  #plume-tracklist-dropdown .plume-tracklist-item:hover .plume-tracklist-item__title.plume-marquee--overflowing,
+  #plume-tracklist-dropdown .plume-tracklist-item:focus .plume-tracklist-item__title.plume-marquee--overflowing {
     text-overflow: clip;
 
     .plume-marquee__text {
+      display: inline-block;
       animation: plume-marquee-scroll var(--plume-marquee-duration, 6s) ease-in-out infinite alternate;
+      will-change: transform;
     }
   }
 }
