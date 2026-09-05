@@ -44,6 +44,9 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Toate elementele Bandcamp găsite" },
+  "INFO__BC_HEALTH_CHECK__ERROR_PAGE": {
+    "message": "Pagină de eroare Bandcamp detectată (tralbum necunoscut sau eliminat); verificarea stării este omisă"
+  },
   "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
     "message": "Acest browser nu interpretează corect formatul datei de lansare de la Bandcamp ($MOSTRA$: se aștepta $ASTEPTAT$, s-a obținut $OBTINUT$); datele de lansare vor fi ascunse",
     "placeholders": {
