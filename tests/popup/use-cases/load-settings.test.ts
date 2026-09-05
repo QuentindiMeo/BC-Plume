@@ -8,6 +8,7 @@ import { loadForcedLanguage } from "@/popup/use-cases/loadForcedLanguage";
 import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
+import { loadTracklistDropdownHeight } from "@/popup/use-cases/loadTracklistDropdownHeight";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
 import { inferBrowserApi } from "@/shared/browser";
 import { FakeBrowserLocalStorage } from "../../fakes/FakeBrowserLocalStorage";
@@ -123,6 +124,42 @@ describe("loadTrackRestartThreshold", () => {
   it("returns undefined for a float", async () => {
     fakeStorage.store[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] = 1.5;
     expect(await loadTrackRestartThreshold()).toBeUndefined();
+  });
+});
+
+describe("loadTracklistDropdownHeight", () => {
+  it("returns the stored value when valid", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = 8;
+    expect(await loadTracklistDropdownHeight()).toBe(8);
+  });
+
+  it("returns undefined when key is absent", async () => {
+    expect(await loadTracklistDropdownHeight()).toBeUndefined();
+  });
+
+  it("returns undefined when value is below MIN (1 < 2)", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = 1;
+    expect(await loadTracklistDropdownHeight()).toBeUndefined();
+  });
+
+  it("returns undefined when value exceeds MAX (11 > 10)", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = 11;
+    expect(await loadTracklistDropdownHeight()).toBeUndefined();
+  });
+
+  it("returns undefined for a float", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = 5.5;
+    expect(await loadTracklistDropdownHeight()).toBeUndefined();
+  });
+
+  it("accepts MIN boundary (2)", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = 2;
+    expect(await loadTracklistDropdownHeight()).toBe(2);
+  });
+
+  it("accepts MAX boundary (10)", async () => {
+    fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = 10;
+    expect(await loadTracklistDropdownHeight()).toBe(10);
   });
 });
 

@@ -429,6 +429,7 @@
   "LABEL__TAB__RESET": { "message": "Redefinir tudo" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "faixas" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "Geral" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Falha ao salvar preferência de idioma" },
@@ -506,6 +507,8 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Duração" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Ir para a faixa" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista de faixas" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Lista de faixas aberta por padrão" },
+  "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE": { "message": "Lista de faixas sempre grande" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Busca rápida (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barra de progresso com forma de onda" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {
@@ -541,6 +544,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Segundos dentro dos quais o botão de faixa anterior reinicia a faixa atual"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Falha ao salvar a altura da lista de faixas" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valor de altura da lista de faixas inválido, usando o padrão"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Altura da lista de faixas carregada:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Altura da lista de faixas" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Número de faixas visíveis na lista de faixas" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Falha ao analisar SVG do ícone de notificação" },
   "WARN__TOAST__ICON_SVG_INVALID": {

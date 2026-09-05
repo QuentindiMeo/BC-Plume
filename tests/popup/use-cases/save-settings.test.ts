@@ -16,6 +16,7 @@ import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveHotkeys } from "@/popup/use-cases/saveHotkeys";
 import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
+import { saveTracklistDropdownHeight } from "@/popup/use-cases/saveTracklistDropdownHeight";
 import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
 import { inferBrowserApi } from "@/shared/browser";
 import { FakeBrowserLocalStorage } from "../../fakes/FakeBrowserLocalStorage";
@@ -110,6 +111,41 @@ describe("saveTrackRestartThreshold", () => {
 
   it("throws and does not persist when value exceeds MAX", async () => {
     await expect(saveTrackRestartThreshold(11 as WholeNumber, fakeSender)).rejects.toThrow(RangeError);
+    expect(Object.keys(fakeStorage.store)).toHaveLength(0);
+  });
+});
+
+describe("saveTracklistDropdownHeight", () => {
+  it("persists the value under the correct storage key", async () => {
+    await saveTracklistDropdownHeight(5 as WholeNumber, fakeSender);
+    expect(fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT]).toBe(5);
+  });
+
+  it("broadcasts TRACKLIST_DROPDOWN_HEIGHT_UPDATED with the saved value", async () => {
+    await saveTracklistDropdownHeight(5 as WholeNumber, fakeSender);
+    expect(fakeSender.broadcasts[0]).toEqual({
+      urlPattern: BANDCAMP_TAB_PATTERN,
+      message: { type: PLUME_MESSAGE_TYPE.TRACKLIST_DROPDOWN_HEIGHT_UPDATED, tracklistDropdownHeight: 5 },
+    });
+  });
+
+  it("accepts the minimum boundary (2)", async () => {
+    await saveTracklistDropdownHeight(2 as WholeNumber, fakeSender);
+    expect(fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT]).toBe(2);
+  });
+
+  it("accepts the maximum boundary (10)", async () => {
+    await saveTracklistDropdownHeight(10 as WholeNumber, fakeSender);
+    expect(fakeStorage.store[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT]).toBe(10);
+  });
+
+  it("throws and does not persist when value is below MIN", async () => {
+    await expect(saveTracklistDropdownHeight(1 as WholeNumber, fakeSender)).rejects.toThrow(RangeError);
+    expect(Object.keys(fakeStorage.store)).toHaveLength(0);
+  });
+
+  it("throws and does not persist when value exceeds MAX", async () => {
+    await expect(saveTracklistDropdownHeight(11 as WholeNumber, fakeSender)).rejects.toThrow(RangeError);
     expect(Object.keys(fakeStorage.store)).toHaveLength(0);
   });
 });

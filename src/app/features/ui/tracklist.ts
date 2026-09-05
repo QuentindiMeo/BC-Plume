@@ -1,6 +1,8 @@
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { navigateToTrack } from "@/app/use-cases";
+import { PLUME_CONSTANTS } from "@/domain/plume";
+import { coreActions } from "@/domain/ports/app-core";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 import { getString } from "@/shared/i18n";
 import { applyTitleLang } from "@/shared/script-lang";
@@ -12,7 +14,8 @@ const TOGGLE_BTN_ID = PLUME_ELEM_SELECTORS.tracklistToggleBtn.split("#")[1];
 const ITEM_CLASS = PLUME_ELEM_SELECTORS.tracklistItem.split(".")[1];
 const ITEM_ACTIVE_CLASS = `${ITEM_CLASS}--active`;
 const ITEM_UNPLAYABLE_CLASS = `${ITEM_CLASS}--unplayable`;
-const EDGE_TRACK_COUNT = 2; // Tracks within this many positions of either end are not centered (first/last 2 tracks)
+const EDGE_TRACK_COUNT = 2; // ? Tracks within this many positions of either end are not centered (first/last X tracks)
+const MAX_HEIGHT_UNFOLDED_PROPERTY = "--tracklist-max-height--unfolded"; // ? CSS custom property overridden per-instance to reflect the user's configured dropdown height (see @/tailwind.css)
 
 export const createTracklistToggle = (): {
   toggleBtn: HTMLButtonElement;
@@ -36,20 +39,25 @@ export const createTracklistToggle = (): {
 
   let isOpen = false;
 
-  const close = (refocus = true): void => {
-    dropdownEl.classList.remove("is-open");
-    dropdownEl.ariaHidden = "true";
-    toggleBtn.ariaExpanded = "false";
-    toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
-    toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_OPEN");
-    isOpen = false;
-    if (refocus) toggleBtn.focus();
+  const applyDropdownHeight = (heightInTracks: number): void => {
+    dropdownEl.style.setProperty(
+      MAX_HEIGHT_UNFOLDED_PROPERTY,
+      `${heightInTracks * PLUME_CONSTANTS.TRACKLIST_ROW_HEIGHT_REM}rem`
+    );
+  };
+
+  // Tracked separately from the "is-large" class so the mouseleave handler below can tell,
+  // without touching the DOM, whether leaving the dropdown will actually shrink it.
+  let alwaysLarge = false;
+  const applyAlwaysLarge = (nextAlwaysLarge: boolean): void => {
+    alwaysLarge = nextAlwaysLarge;
+    dropdownEl.classList.toggle("is-large", nextAlwaysLarge);
   };
 
   const getPlayableItems = (): HTMLDivElement[] =>
     Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
 
-  // Scrolls the active (playing) track into the center of the visible dropdown area.
+  // ? Scrolls the active (playing) track into the center of the visible dropdown area.
   const scrollActiveItemToCenter = (): void => {
     const allItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
     if (allItems.length === 0) return;
@@ -159,14 +167,38 @@ export const createTracklistToggle = (): {
     });
   };
 
+  // Applies the open/closed visuals and ARIA state without touching focus or the shared expand/collapse state — used both by
+  // user-triggered open()/close() and by passive sync (initial mount, or another tracklist instance toggling the shared state).
+  const applyOpenState = (nextOpen: boolean): void => {
+    if (nextOpen) {
+      renderItems();
+    }
+    const label = nextOpen ? getString("ARIA__TRACKLIST__TOGGLE_CLOSE") : getString("ARIA__TRACKLIST__TOGGLE_OPEN");
+
+    dropdownEl.classList.toggle("is-open", nextOpen);
+    dropdownEl.ariaHidden = String(!nextOpen);
+    toggleBtn.ariaExpanded = String(nextOpen);
+    toggleBtn.ariaLabel = label;
+    toggleBtn.title = label;
+    isOpen = nextOpen;
+  };
+
+  const close = (refocus = true): void => {
+    applyOpenState(false);
+
+    const appCore = getAppCoreInstance();
+    appCore.dispatch(coreActions.setIsTracklistExpanded(false));
+
+    if (refocus) {
+      toggleBtn.focus();
+    }
+  };
+
   const open = (): void => {
-    renderItems();
-    dropdownEl.classList.add("is-open");
-    dropdownEl.ariaHidden = "false";
-    toggleBtn.ariaExpanded = "true";
-    toggleBtn.ariaLabel = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
-    toggleBtn.title = getString("ARIA__TRACKLIST__TOGGLE_CLOSE");
-    isOpen = true;
+    applyOpenState(true);
+
+    const appCore = getAppCoreInstance();
+    appCore.dispatch(coreActions.setIsTracklistExpanded(true));
 
     const activePlayableItem = dropdownEl.querySelector<HTMLDivElement>(
       `.${ITEM_ACTIVE_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`
@@ -221,6 +253,14 @@ export const createTracklistToggle = (): {
 
   dropdownEl.addEventListener("mouseleave", () => {
     if (!isOpen) return;
+
+    // With tracklistAlwaysLarge on, the dropdown stays at its unfolded height regardless of hover, so
+    // leaving never triggers a "max-height" transition to wait for — recenter now.
+    if (alwaysLarge) {
+      scrollActiveItemToCenter();
+      return;
+    }
+
     const onTransitionEnd = (e: TransitionEvent): void => {
       if (e.propertyName !== "max-height") return;
       if (isOpen) scrollActiveItemToCenter();
@@ -232,8 +272,34 @@ export const createTracklistToggle = (): {
     if (isOpen) updateActiveItem();
   });
 
+  // * Keeps this instance's expand/collapse state in sync with the shared state, so that
+  // * toggling the tracklist in one view (main panel or fullscreen) is reflected in the other.
+  const unsubscribeTracklistExpanded = getAppCoreInstance().subscribe("isTracklistExpanded", (nextOpen) => {
+    if (nextOpen !== isOpen) applyOpenState(nextOpen);
+  });
+
+  // ? Adopt the shared expand/collapse state on mount.
+  if (getAppCoreInstance().getState().isTracklistExpanded) {
+    applyOpenState(true);
+  }
+
+  // ? Apply the configured dropdown height on mount, and keep it in sync with live setting changes (broadcast from the popup).
+  applyDropdownHeight(getAppCoreInstance().getState().tracklistDropdownHeight);
+  const unsubscribeDropdownHeight = getAppCoreInstance().subscribe("tracklistDropdownHeight", (height) => {
+    applyDropdownHeight(height);
+  });
+
+  // ? Apply the "always large" feature flag on mount, and keep it in sync with live flag changes.
+  applyAlwaysLarge(getAppCoreInstance().getState().featureFlags.tracklistAlwaysLarge);
+  const unsubscribeFeatureFlags = getAppCoreInstance().subscribe("featureFlags", (flags, prevFlags) => {
+    if (flags.tracklistAlwaysLarge !== prevFlags.tracklistAlwaysLarge) applyAlwaysLarge(flags.tracklistAlwaysLarge);
+  });
+
   const cleanup = (): void => {
     unsubscribeTrackTitle();
+    unsubscribeTracklistExpanded();
+    unsubscribeDropdownHeight();
+    unsubscribeFeatureFlags();
   };
 
   return { toggleBtn, dropdownEl, cleanup };

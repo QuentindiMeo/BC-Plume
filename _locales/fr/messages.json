@@ -439,6 +439,7 @@
   "LABEL__TAB__RESET": { "message": "Tout réinitialiser " },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "pistes" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "Général" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Échec de la sauvegarde de la préférence de langue" },
@@ -516,6 +517,8 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Aller à la piste" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Liste des pistes ouverte par défaut" },
+  "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE": { "message": "Liste des pistes toujours grande" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barre de progression à forme d'onde" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {
@@ -560,6 +563,18 @@
   "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Seuil de redémarrage de piste" },
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Secondes pendant lesquelles le bouton de piste précédente redémarre la piste actuelle"
+  },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": {
+    "message": "Échec de l'enregistrement de la hauteur de la liste des pistes"
+  },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valeur de hauteur de la liste des pistes invalide, utilisation de la valeur par défaut"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Hauteur de la liste des pistes chargée :" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Hauteur de la liste des pistes" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": {
+    "message": "Nombre de pistes visibles dans la liste des pistes"
   },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Échec de l'analyse du SVG de l'icône du toast" },

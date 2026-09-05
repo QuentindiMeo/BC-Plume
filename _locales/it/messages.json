@@ -427,6 +427,7 @@
   "LABEL__TAB__RESET": { "message": "Ripristina tutto" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "tracce" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "Generale" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Impossibile salvare la preferenza di lingua" },
@@ -504,6 +505,8 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Durata" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Vai alla traccia" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista tracce" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Lista tracce aperta per impostazione predefinita" },
+  "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE": { "message": "Lista tracce sempre grande" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Ricerca rapida (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barra di avanzamento a forma d'onda" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {
@@ -539,6 +542,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Secondi entro i quali il tasto traccia precedente riavvia la traccia corrente"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Impossibile salvare l'altezza della lista tracce" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valore altezza lista tracce non valido, uso il valore predefinito"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Altezza lista tracce caricata:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Altezza lista tracce" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Numero di tracce visibili nella lista tracce" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Impossibile analizzare l'SVG dell'icona di notifica" },
   "WARN__TOAST__ICON_SVG_INVALID": {
