@@ -35,10 +35,8 @@
 
   .inline_player {
     /* parent component */
-    @apply
-      z-9 /* ensure it stays above other contents, especially the album collection promotion */
-      sticky! top-0 my-4! mx-0! rounded-lg
-    ;
+    @apply z-9 /* ensure it stays above other contents, especially the album collection promotion */
+      sticky! top-0 my-4! mx-0! rounded-lg;
     transition:
       background-color 0.2s ease,
       margin 0.2s ease !important;
@@ -105,6 +103,13 @@
 
   @media (prefers-contrast: more) {
     @apply border-contrast-border;
+  }
+
+  /* Long-title horizontal auto-scroll: shared inner text wrapper for header + tracklist item titles.
+    The distance/duration custom properties are set per-instance by applyMarqueeText(). */
+  .plume-marquee__text {
+    @apply inline-block whitespace-nowrap;
+    will-change: transform;
   }
 
   #plume-header-current {
@@ -191,6 +196,17 @@
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  #plume-header-current:hover #plume-header-title.plume-marquee--overflowing,
+  #plume-header-current:has(:focus-visible) #plume-header-title.plume-marquee--overflowing {
+    text-overflow: clip;
+
+    .plume-marquee__text {
+      animation: plume-marquee-scroll var(--plume-marquee-duration, 6s) ease-in-out infinite alternate;
+    }
+  }
+}
+
 #plume-tracklist-dropdown {
   @apply max-h-0 overflow-hidden opacity-0 rounded-b-lg bg-glass-bg;
   transition:
@@ -258,7 +274,8 @@
     }
 
     @media (prefers-contrast: more) {
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         @apply bg-white/15;
       }
     }
@@ -275,6 +292,17 @@
     }
     &__duration {
       @apply shrink-0 text-xs tabular-nums text-text-muted;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      &:hover &__title.plume-marquee--overflowing,
+      &:focus &__title.plume-marquee--overflowing {
+        text-overflow: clip;
+
+        .plume-marquee__text {
+          animation: plume-marquee-scroll var(--plume-marquee-duration, 6s) ease-in-out infinite alternate;
+        }
+      }
     }
   }
 }
@@ -328,7 +356,8 @@
       @apply outline-offset-4;
     }
 
-    &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
+    // ! must be declared separately from the moz one to work on both engines
+    &::-webkit-slider-thumb {
       @apply
         size-(--thumb-size) bg-white rounded-full shadow-thumb
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
@@ -561,7 +590,8 @@
       @apply outline-offset-8;
     }
 
-    &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
+    // ! must be declared separately from the moz one to work on both engines
+    &::-webkit-slider-thumb {
       @apply
         size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
         cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
@@ -623,11 +653,9 @@
   }
 
   #plume-bpm-detect-all-btn {
-    @apply
-      h-6 px-2 py-0 ml-auto bg-white/5 border border-white/15 rounded
+    @apply h-6 px-2 py-0 ml-auto bg-white/5 border border-white/15 rounded
       font-sans font-medium text-xs text-plume-dimmed
-      transition-[color,background,border-color]
-    ;
+      transition-[color,background,border-color];
 
     &:hover {
       @apply bg-white/15 border-white/30 text-white;

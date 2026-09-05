@@ -1,3 +1,4 @@
+import { applyMarqueeText } from "@/app/features/marquee";
 import { getBcPlayerInstance } from "@/app/stores/adapters";
 import { getAppCoreInstance } from "@/app/stores/AppCoreImpl";
 import { navigateToTrack } from "@/app/use-cases";
@@ -152,8 +153,8 @@ export const createTracklistToggle = (): {
 
       const titleSpan = document.createElement("span");
       titleSpan.className = `${ITEM_CLASS}__title`;
-      titleSpan.textContent = title;
       titleSpan.ariaHidden = "true";
+      applyMarqueeText(titleSpan, title);
 
       const durationSpan = document.createElement("span");
       durationSpan.className = `${ITEM_CLASS}__duration`;

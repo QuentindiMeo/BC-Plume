@@ -1,4 +1,5 @@
 import { toggleFullscreenMode } from "@/app/features/fullscreen";
+import { applyMarqueeText } from "@/app/features/marquee";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/features/original-player";
 import { getInfoSectionWithRuntime } from "@/app/features/runtime";
 import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
@@ -171,9 +172,9 @@ const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => 
 
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
-  currentTitleText.textContent = initialTrackTitle;
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
+  applyMarqueeText(currentTitleText, initialTrackTitle);
   titleRow.appendChild(currentTitleText);
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type
