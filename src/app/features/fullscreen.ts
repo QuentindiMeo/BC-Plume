@@ -1,3 +1,4 @@
+import { applyMarqueeText } from "@/app/features/marquee";
 import { getAppropriateAccentColor } from "@/app/features/track-title";
 import { CleanupCallback, SubscriptionCallback } from "@/app/features/types";
 import { syncBpmDisplay, wireDetectAllBpmButton } from "@/app/features/ui/bpm-display";
@@ -220,7 +221,7 @@ const renderTrackTitle = (elements: FullscreenElements, trackTitle: string | nul
     return;
   }
 
-  headerTitle.textContent = trackTitle;
+  applyMarqueeText(headerTitle, trackTitle);
   headerTitle.title = trackTitle;
   applyTitleLang(headerTitle, trackTitle);
 };
@@ -548,7 +549,7 @@ const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | nul
   presentationContainer.appendChild(adjustedNameSection);
   contentContainer.appendChild(presentationContainer);
 
-  // Clone the plume module (right side)
+  // ? Clone the plume module (to put it on the right side of the fullscreen view)
   const plume = getGuiInstance().getState();
   const plumeContainer = plume.plumeContainer;
   if (!plumeContainer) {
@@ -556,7 +557,7 @@ const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | nul
     return null;
   }
 
-  // Clone returns Node, but we know it's an HTMLDivElement with the same structure as the original
+  // ? Clone returns a tree node, but we know it's an HTMLDivElement with the same structure as the original
   const plumeClone = plumeContainer.cloneNode(true) as HTMLDivElement;
   plumeClone.id = PLUME_ELEM_SELECTORS.fullscreenClone.split("#")[1];
 

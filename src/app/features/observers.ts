@@ -1,6 +1,7 @@
 import { setupAudioEventListeners } from "@/app/features/audio-events";
 import { cleanupFullscreenMode, toggleFullscreenMode } from "@/app/features/fullscreen";
 import { setupHotkeys } from "@/app/features/keyboard";
+import { applyMarqueeText } from "@/app/features/marquee";
 import { setupStoreSubscriptions } from "@/app/features/store-subscriptions";
 import { cleanupReleaseToast } from "@/app/features/toast";
 import { CleanupCallback } from "@/app/features/types";
@@ -91,7 +92,7 @@ const updateTrackDisplay = () => {
     } else {
       logger(CPL.WARN, getString("WARN__TRACK_LINK__NOT_FOUND"));
     }
-    titleText.textContent = newTrackTitle;
+    applyMarqueeText(titleText, newTrackTitle);
     titleText.title = newTrackTitle; // allow the user to see the full title on hover, in case the title is truncated
   }
 };
