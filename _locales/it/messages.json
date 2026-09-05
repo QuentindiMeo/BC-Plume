@@ -42,6 +42,9 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tutti gli elementi Bandcamp trovati" },
+  "INFO__BC_HEALTH_CHECK__ERROR_PAGE": {
+    "message": "Pagina di errore Bandcamp rilevata (tralbum sconosciuto o rimosso); controllo di integrità ignorato"
+  },
   "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
     "message": "Questo browser non interpreta correttamente il formato della data di pubblicazione di Bandcamp ($CAMPIONE$: atteso $ATTESO$, ottenuto $OTTENUTO$); le date di pubblicazione saranno nascoste",
     "placeholders": {

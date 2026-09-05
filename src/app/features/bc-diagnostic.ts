@@ -8,6 +8,17 @@ export interface BcHealthCheckResult {
   missing: Array<{ key: string; selector: string; required: boolean }>;
 }
 
+// ? Bandcamp renders unknown/deleted tralbum URLs with this generic, plain-HTML page instead of a tralbum page.
+const BC_ERROR_PAGE_SELECTOR = "#pgBd > div.content";
+
+/**
+ * ? Detects Bandcamp's generic "page not found" error page.
+ *
+ * * Must be checked before checkBandcampElements: on this page none of Bandcamp's tralbum elements
+ * * exist by design, so running the regular health check here would produce a false-positive failure.
+ */
+export const isBcErrorPage = (): boolean => document.querySelector(BC_ERROR_PAGE_SELECTOR) !== null;
+
 export interface BcDateParsingHealthCheckResult {
   canParseReleaseDates: boolean;
   failures: DateParseProbeFailure[];

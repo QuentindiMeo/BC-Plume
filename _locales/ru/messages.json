@@ -44,6 +44,9 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Все элементы Bandcamp найдены" },
+  "INFO__BC_HEALTH_CHECK__ERROR_PAGE": {
+    "message": "Обнаружена страница ошибки Bandcamp (неизвестный или удалённый tralbum); проверка состояния пропущена"
+  },
   "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
     "message": "Этот браузер некорректно разбирает формат даты выпуска Bandcamp ($OBRAZETS$: ожидалось $OZHIDALOS$, получено $POLUCHENO$); даты выпуска будут скрыты",
     "placeholders": {
