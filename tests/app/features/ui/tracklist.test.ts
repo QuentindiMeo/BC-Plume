@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PLUME_DEFAULTS } from "@/domain/plume";
 import { FakeAppCore } from "../../../fakes/FakeAppCore";
 
 vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
@@ -187,6 +188,66 @@ describe("expand/collapse state syncs across instances (main view <-> fullscreen
   });
 });
 
+describe("tracklistAlwaysLarge feature flag", () => {
+  it("applies the is-large class on mount when the flag is enabled", () => {
+    fakeAppCore = new FakeAppCore({
+      trackTitle: "Track A",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: true },
+    });
+    const { dropdownEl } = setup();
+    expect(dropdownEl.classList.contains("is-large")).toBe(true);
+  });
+
+  it("does not apply the is-large class on mount when the flag is disabled", () => {
+    fakeAppCore = new FakeAppCore({
+      trackTitle: "Track A",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: false },
+    });
+    const { dropdownEl } = setup();
+    expect(dropdownEl.classList.contains("is-large")).toBe(false);
+  });
+
+  it("adds the is-large class live when the flag is turned on after mount", () => {
+    const { dropdownEl } = setup();
+    expect(dropdownEl.classList.contains("is-large")).toBe(false);
+
+    fakeAppCore.dispatch({
+      type: "SET_FEATURE_FLAGS" as never,
+      payload: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: true } as never,
+    });
+
+    expect(dropdownEl.classList.contains("is-large")).toBe(true);
+  });
+
+  it("removes the is-large class live when the flag is turned off after mount", () => {
+    fakeAppCore = new FakeAppCore({
+      trackTitle: "Track A",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: true },
+    });
+    const { dropdownEl } = setup();
+    expect(dropdownEl.classList.contains("is-large")).toBe(true);
+
+    fakeAppCore.dispatch({
+      type: "SET_FEATURE_FLAGS" as never,
+      payload: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: false } as never,
+    });
+
+    expect(dropdownEl.classList.contains("is-large")).toBe(false);
+  });
+
+  it("stops reacting to feature flag changes after cleanup", () => {
+    const { dropdownEl, cleanup } = setup();
+    cleanup();
+
+    fakeAppCore.dispatch({
+      type: "SET_FEATURE_FLAGS" as never,
+      payload: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: true } as never,
+    });
+
+    expect(dropdownEl.classList.contains("is-large")).toBe(false);
+  });
+});
+
 describe("scroll centering on open", () => {
   let scrollToSpy: ReturnType<typeof vi.spyOn>;
 
@@ -238,6 +299,39 @@ describe("scroll centering on open", () => {
     const { dropdownEl } = setup();
     dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
     fireTransitionEnd(dropdownEl);
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  it("recenters immediately on mouseleave when tracklistAlwaysLarge is on (no shrink transition to wait for)", () => {
+    fakeAppCore = new FakeAppCore({
+      trackTitle: "Track A",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: true },
+    });
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    scrollToSpy.mockClear();
+
+    dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+
+    // Recenters right away — the dropdown never shrinks in this mode, so there's no
+    // "max-height" transitionend to wait for.
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
+  });
+
+  it("does not register a transitionend listener for mouseleave when tracklistAlwaysLarge is on", () => {
+    fakeAppCore = new FakeAppCore({
+      trackTitle: "Track A",
+      featureFlags: { ...PLUME_DEFAULTS.featureFlags, tracklistAlwaysLarge: true },
+    });
+    const { toggleBtn, dropdownEl } = setup();
+    toggleBtn.click();
+    fireTransitionEnd(dropdownEl); // consume the one-time "open" transitionend listener
+    dropdownEl.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    scrollToSpy.mockClear();
+
+    // No listener left to consume — a stray transitionend must not trigger another recenter.
+    fireTransitionEnd(dropdownEl);
+
     expect(scrollToSpy).not.toHaveBeenCalled();
   });
 

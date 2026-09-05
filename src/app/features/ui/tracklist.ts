@@ -39,7 +39,6 @@ export const createTracklistToggle = (): {
 
   let isOpen = false;
 
-  // Applies the configured dropdown height (in tracks) as the hover-expanded max-height.
   const applyDropdownHeight = (heightInTracks: number): void => {
     dropdownEl.style.setProperty(
       MAX_HEIGHT_UNFOLDED_PROPERTY,
@@ -47,10 +46,18 @@ export const createTracklistToggle = (): {
     );
   };
 
+  // Tracked separately from the "is-large" class so the mouseleave handler below can tell,
+  // without touching the DOM, whether leaving the dropdown will actually shrink it.
+  let alwaysLarge = false;
+  const applyAlwaysLarge = (nextAlwaysLarge: boolean): void => {
+    alwaysLarge = nextAlwaysLarge;
+    dropdownEl.classList.toggle("is-large", nextAlwaysLarge);
+  };
+
   const getPlayableItems = (): HTMLDivElement[] =>
     Array.from(dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}:not(.${ITEM_UNPLAYABLE_CLASS})`));
 
-  // Scrolls the active (playing) track into the center of the visible dropdown area.
+  // ? Scrolls the active (playing) track into the center of the visible dropdown area.
   const scrollActiveItemToCenter = (): void => {
     const allItems = dropdownEl.querySelectorAll<HTMLDivElement>(`.${ITEM_CLASS}`);
     if (allItems.length === 0) return;
@@ -246,6 +253,14 @@ export const createTracklistToggle = (): {
 
   dropdownEl.addEventListener("mouseleave", () => {
     if (!isOpen) return;
+
+    // With tracklistAlwaysLarge on, the dropdown stays at its unfolded height regardless of hover, so
+    // leaving never triggers a "max-height" transition to wait for — recenter now.
+    if (alwaysLarge) {
+      scrollActiveItemToCenter();
+      return;
+    }
+
     const onTransitionEnd = (e: TransitionEvent): void => {
       if (e.propertyName !== "max-height") return;
       if (isOpen) scrollActiveItemToCenter();
@@ -274,10 +289,17 @@ export const createTracklistToggle = (): {
     applyDropdownHeight(height);
   });
 
+  // ? Apply the "always large" feature flag on mount, and keep it in sync with live flag changes.
+  applyAlwaysLarge(getAppCoreInstance().getState().featureFlags.tracklistAlwaysLarge);
+  const unsubscribeFeatureFlags = getAppCoreInstance().subscribe("featureFlags", (flags, prevFlags) => {
+    if (flags.tracklistAlwaysLarge !== prevFlags.tracklistAlwaysLarge) applyAlwaysLarge(flags.tracklistAlwaysLarge);
+  });
+
   const cleanup = (): void => {
     unsubscribeTrackTitle();
     unsubscribeTracklistExpanded();
     unsubscribeDropdownHeight();
+    unsubscribeFeatureFlags();
   };
 
   return { toggleBtn, dropdownEl, cleanup };

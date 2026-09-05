@@ -26,7 +26,7 @@ import { FakeMessageSender } from "../../fakes/FakeMessageSender";
 const sender = new FakeMessageSender();
 
 const buildPanel = (tracklistDropdownHeight: number | undefined = undefined): HTMLDivElement =>
-  createGeneralTab(undefined, undefined, undefined, tracklistDropdownHeight as never, undefined, sender)();
+  createGeneralTab(undefined, tracklistDropdownHeight as never, undefined, undefined, undefined, sender)();
 
 const getSlider = (panel: HTMLElement): HTMLInputElement =>
   panel.querySelector("#tracklist-dropdown-height-slider") as HTMLInputElement;

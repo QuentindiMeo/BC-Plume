@@ -24,6 +24,7 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
   { flagKey: "tracklistExpandedByDefault", labelKey: "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT" },
+  { flagKey: "tracklistAlwaysLarge", labelKey: "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE" },
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
   {
     flagKey: "waveform",
@@ -58,18 +59,21 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     });
   };
 
-  // tracklistExpandedByDefault only makes sense when tracklist itself is enabled:
-  // force it off and lock its toggle whenever the parent flag is off.
-  const syncTracklistExpandedAvailability = (): void => {
-    const expandedBtn = toggleBtns.get("tracklistExpandedByDefault");
-    if (!expandedBtn) return;
+  // tracklistExpandedByDefault and tracklistAlwaysLarge only make sense when tracklist itself is
+  // enabled: force them off and lock their toggles whenever the parent flag is off.
+  const TRACKLIST_DEPENDENT_FLAGS: readonly FeatureFlagKey[] = ["tracklistExpandedByDefault", "tracklistAlwaysLarge"];
+  const syncTracklistDependentFlagsAvailability = (): void => {
+    for (const depFlag of TRACKLIST_DEPENDENT_FLAGS) {
+      const depBtn = toggleBtns.get(depFlag);
+      if (!depBtn) continue;
 
-    expandedBtn.disabled = !currentFlags.tracklist;
-    expandedBtn.ariaDisabled = String(!currentFlags.tracklist);
+      depBtn.disabled = !currentFlags.tracklist;
+      depBtn.ariaDisabled = String(!currentFlags.tracklist);
 
-    if (!currentFlags.tracklist && currentFlags.tracklistExpandedByDefault) {
-      currentFlags.tracklistExpandedByDefault = false;
-      expandedBtn.ariaChecked = "false";
+      if (!currentFlags.tracklist && currentFlags[depFlag]) {
+        currentFlags[depFlag] = false;
+        depBtn.ariaChecked = "false";
+      }
     }
   };
 
@@ -125,8 +129,8 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
         if (vizBtn) vizBtn.ariaChecked = "false";
       }
 
-      // tracklistExpandedByDefault depends on tracklist: keep it off and locked while disabled
-      if (flagKey === "tracklist") syncTracklistExpandedAvailability();
+      // tracklist-dependent flags: keep them off and locked whenever tracklist itself is off
+      if (flagKey === "tracklist") syncTracklistDependentFlagsAvailability();
 
       persist(currentFlags);
       syncResetVisibility();
@@ -150,7 +154,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       section.appendChild(flagToggleRow);
     }
 
-    syncTracklistExpandedAvailability();
+    syncTracklistDependentFlagsAvailability();
 
     return section;
   };
@@ -167,7 +171,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);
       for (const [flagKey, btn] of toggleBtns) btn.ariaChecked = String(currentFlags[flagKey]);
       for (const [flagKey, notice] of noticeRefs) notice.hidden = !currentFlags[flagKey];
-      syncTracklistExpandedAvailability();
+      syncTracklistDependentFlagsAvailability();
       persist(currentFlags);
       syncResetVisibility();
     });

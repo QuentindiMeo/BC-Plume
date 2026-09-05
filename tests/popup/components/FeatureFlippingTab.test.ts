@@ -157,6 +157,83 @@ describe("tracklist ↔ tracklistExpandedByDefault dependency enforcement", () =
   });
 });
 
+describe("tracklistAlwaysLarge flipper", () => {
+  it("persists as enabled when toggled on", () => {
+    const wrapper = buildPanel({ tracklistAlwaysLarge: false });
+    getToggle(wrapper, "tracklistAlwaysLarge").click();
+
+    const persisted = mockSaveFeatureFlags.mock.calls[0][0] as FeatureFlags;
+    expect(persisted.tracklistAlwaysLarge).toBe(true);
+  });
+
+  it("reflects the initial off state", () => {
+    const wrapper = buildPanel({ tracklistAlwaysLarge: false });
+    expect(getToggle(wrapper, "tracklistAlwaysLarge").ariaChecked).toBe("false");
+  });
+
+  it("reflects the initial on state", () => {
+    const wrapper = buildPanel({ tracklistAlwaysLarge: true });
+    expect(getToggle(wrapper, "tracklistAlwaysLarge").ariaChecked).toBe("true");
+  });
+});
+
+describe("tracklist ↔ tracklistAlwaysLarge dependency enforcement", () => {
+  it("is disabled when tracklist starts off", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistAlwaysLarge: false });
+    expect(getToggle(wrapper, "tracklistAlwaysLarge").disabled).toBe(true);
+  });
+
+  it("starts forced off when tracklist starts off, even if it was stored as on", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistAlwaysLarge: true });
+    const alwaysLargeToggle = getToggle(wrapper, "tracklistAlwaysLarge");
+    expect(alwaysLargeToggle.ariaChecked).toBe("false");
+    expect(alwaysLargeToggle.disabled).toBe(true);
+  });
+
+  it("is enabled when tracklist starts on", () => {
+    const wrapper = buildPanel({ tracklist: true });
+    expect(getToggle(wrapper, "tracklistAlwaysLarge").disabled).toBe(false);
+  });
+
+  it("turning tracklist off forces both dependent flags off and disables both toggles", () => {
+    const wrapper = buildPanel({ tracklist: true, tracklistExpandedByDefault: true, tracklistAlwaysLarge: true });
+    const expandedToggle = getToggle(wrapper, "tracklistExpandedByDefault");
+    const alwaysLargeToggle = getToggle(wrapper, "tracklistAlwaysLarge");
+
+    getToggle(wrapper, "tracklist").click();
+
+    expect(expandedToggle.ariaChecked).toBe("false");
+    expect(expandedToggle.disabled).toBe(true);
+    expect(alwaysLargeToggle.ariaChecked).toBe("false");
+    expect(alwaysLargeToggle.disabled).toBe(true);
+
+    const persisted = mockSaveFeatureFlags.mock.calls[0][0] as FeatureFlags;
+    expect(persisted.tracklist).toBe(false);
+    expect(persisted.tracklistExpandedByDefault).toBe(false);
+    expect(persisted.tracklistAlwaysLarge).toBe(false);
+  });
+
+  it("turning tracklist back on re-enables the tracklistAlwaysLarge toggle", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistAlwaysLarge: false });
+    const tracklistToggle = getToggle(wrapper, "tracklist");
+    const alwaysLargeToggle = getToggle(wrapper, "tracklistAlwaysLarge");
+
+    tracklistToggle.click(); // turn tracklist on
+
+    expect(alwaysLargeToggle.disabled).toBe(false);
+  });
+
+  it("clicking a disabled tracklistAlwaysLarge toggle has no effect", () => {
+    const wrapper = buildPanel({ tracklist: false, tracklistAlwaysLarge: false });
+    const alwaysLargeToggle = getToggle(wrapper, "tracklistAlwaysLarge");
+
+    alwaysLargeToggle.click();
+
+    expect(alwaysLargeToggle.ariaChecked).toBe("false");
+    expect(mockSaveFeatureFlags).not.toHaveBeenCalled();
+  });
+});
+
 describe("flipper notice (noticeKey)", () => {
   const getWaveformNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
     wrapper.querySelector("#feature-label-waveform .setting-row__notice") as HTMLParagraphElement;

@@ -215,7 +215,8 @@
       opacity-100 transition-[max-height,opacity]
     ;
 
-    &:hover {
+    &:hover,
+    &.is-large {
       @apply max-h-(--tracklist-max-height--unfolded);
     }
 
@@ -914,7 +915,7 @@
     }
 
     &__timer {
-      @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
+      @apply absolute h-0.75 bottom-0 left-0 w-full pointer-events-none;
       background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed));
       animation: plume-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
     }
