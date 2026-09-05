@@ -8,6 +8,11 @@ const MARQUEE_MAX_DURATION_S = 12;
 // ? When the text is wider than the container, toggles the `plume-marquee--overflowing` class and sets the CSS custom
 // ? properties that drive the hover/focus horizontal auto-scroll (see .plume-marquee__text rules in styles.scss).
 export const applyMarqueeText = (container: HTMLElement, text: string): void => {
+  // ? Clear potential stale state.
+  container.classList.remove(MARQUEE_OVERFLOWING_CLASS);
+  container.style.removeProperty("--plume-marquee-distance");
+  container.style.removeProperty("--plume-marquee-duration");
+
   container.textContent = "";
 
   const textSpan = document.createElement("span");
