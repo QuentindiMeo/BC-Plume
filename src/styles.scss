@@ -335,6 +335,11 @@
   &:has(canvas#plume-waveform-canvas:not(.plume-feature-hidden)) {
     #plume-progress-slider {
       @apply opacity-0 pointer-events-none;
+
+      // Focus makes the real control visible again — the canvas is decorative at that point
+      &:focus-visible {
+        @apply opacity-100;
+      }
     }
 
     canvas#plume-waveform-canvas {
