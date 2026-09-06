@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getActiveLocale, getString, setForcedLanguage } from "@/shared/i18n";
+import { getActiveLangTag, getActiveLocale, getString, setForcedLanguage } from "@/shared/i18n";
 
 describe("getString", () => {
   it("resolves placeholders using the substitutions array", () => {
@@ -103,6 +103,27 @@ describe("getActiveLocale", () => {
     setForcedLanguage("fr");
     setForcedLanguage(null);
     expect(getActiveLocale()).toBe("en");
+  });
+});
+
+describe("getActiveLangTag", () => {
+  afterEach(() => {
+    setForcedLanguage("auto");
+  });
+
+  it("returns the locale unchanged when it has no underscore", () => {
+    setForcedLanguage("fr");
+    expect(getActiveLangTag()).toBe("fr");
+  });
+
+  it("converts the underscore region subtag to a BCP-47 hyphen", () => {
+    setForcedLanguage("pt_BR");
+    expect(getActiveLangTag()).toBe("pt-BR");
+  });
+
+  it("produces a tag Intl.getCanonicalLocales accepts", () => {
+    setForcedLanguage("pt_BR");
+    expect(() => Intl.getCanonicalLocales(getActiveLangTag())).not.toThrow();
   });
 });
 

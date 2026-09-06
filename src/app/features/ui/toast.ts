@@ -1,5 +1,5 @@
 import { PLUME_CONSTANTS } from "@/domain/plume";
-import { getActiveLocale, getString } from "@/shared/i18n";
+import { getActiveLangTag, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
@@ -46,7 +46,7 @@ const getToastContainer = (): HTMLElement => {
 
   const container = document.createElement("div");
   container.id = "plume-toast-container";
-  container.lang = getActiveLocale() || document.documentElement.lang || "en";
+  container.lang = getActiveLangTag() || document.documentElement.lang || "en";
   document.body.appendChild(container);
   return container;
 };

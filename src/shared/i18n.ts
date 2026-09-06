@@ -75,6 +75,9 @@ export const getActiveLocale = (): string => {
   return baseLang && baseLang in LOCALE_MAPS ? baseLang : "en";
 };
 
+// ? BCP-47 form of the active locale, for `lang` attributes and Intl constructors.
+export const getActiveLangTag = (): string => getActiveLocale().replaceAll("_", "-");
+
 export const getString = (key: string, substitutions?: string[]): string => {
   // Forced locale takes priority over the browser API
   if (forcedLocale) {
