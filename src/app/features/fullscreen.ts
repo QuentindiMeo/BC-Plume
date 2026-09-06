@@ -37,6 +37,7 @@ import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { announce } from "@/shared/announce";
 import { getActiveLangTag, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
@@ -74,23 +75,6 @@ let fullscreenOpener: HTMLElement | null = null;
 // ? Bound to `document` (not the overlay) so it still fires even if focus is ever lost to <body>;
 // ? must be explicitly removed on exit or it leaks and re-toggles fullscreen on the next Escape press.
 let fullscreenEscapeListener: ((e: KeyboardEvent) => void) | null = null;
-
-let fullscreenLiveRegion: HTMLDivElement | null = null;
-const announceFullscreenState = (messageKey: string): void => {
-  if (!fullscreenLiveRegion) {
-    fullscreenLiveRegion = document.createElement("div");
-    fullscreenLiveRegion.role = "status";
-    fullscreenLiveRegion.ariaLive = "polite";
-    fullscreenLiveRegion.className = "sr-live";
-    fullscreenLiveRegion.lang = getActiveLangTag();
-    document.body.appendChild(fullscreenLiveRegion);
-  }
-  // Clear then set to ensure re-announcement even if the same message is sent twice
-  fullscreenLiveRegion.textContent = "";
-  requestAnimationFrame(() => {
-    fullscreenLiveRegion!.textContent = getString(messageKey);
-  });
-};
 
 const exitFullscreenMode = (): void => {
   const plumeUi = getGuiInstance();
@@ -676,7 +660,7 @@ export const toggleFullscreenMode = (): void => {
 
   if (isCurrentlyFullscreen) {
     exitFullscreenMode();
-    announceFullscreenState("ARIA__FULLSCREEN__EXITED");
+    announce(getString("ARIA__FULLSCREEN__EXITED"));
     logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
     return;
   }
@@ -724,6 +708,6 @@ export const toggleFullscreenMode = (): void => {
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));
 
-  announceFullscreenState("ARIA__FULLSCREEN__ENTERED");
+  announce(getString("ARIA__FULLSCREEN__ENTERED"));
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

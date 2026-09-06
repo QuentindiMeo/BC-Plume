@@ -38,8 +38,12 @@ export const createHotkeyTab = (
 
   const showSaveError = (): void => {
     if (!saveError) return;
-    saveError.textContent = getString("ERROR__HOTKEYS__PERSISTENCE");
+    // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
+    // ? tree, so filling it first means the mutation happens while nothing is watching.
     saveError.hidden = false;
+    requestAnimationFrame(() => {
+      saveError!.textContent = getString("ERROR__HOTKEYS__PERSISTENCE");
+    });
   };
 
   const clearSaveError = (): void => {
@@ -156,8 +160,12 @@ export const createHotkeyTab = (
     resetBtn.textContent = getString("LABEL__TAB__RESET");
     resetBtn.addEventListener("click", () => {
       resetBtn.hidden = true;
-      confirmText.textContent = getString("LABEL__TAB__RESET") + "?";
+      // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
+      // ? tree, so filling it first means the mutation happens while nothing is watching.
       confirmText.hidden = false;
+      requestAnimationFrame(() => {
+        confirmText.textContent = getString("LABEL__TAB__RESET") + "?";
+      });
       cancelBtn.hidden = false;
       confirmResetBtn.hidden = false;
       confirmResetBtn.focus();

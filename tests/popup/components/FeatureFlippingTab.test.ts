@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLangTag: () => "en" }));
 vi.mock("@/shared/logger", () => ({ logger: vi.fn(), CPL: { ERROR: "ERROR" } }));
 
 const mockSaveFeatureFlags = vi.fn().mockResolvedValue(undefined);
@@ -24,6 +24,8 @@ const getToggle = (wrapper: HTMLElement, flagKey: string): HTMLButtonElement =>
 
 beforeEach(() => vi.clearAllMocks());
 
+const flushAnnounceFrame = () => new Promise<void>((resolve) => setTimeout(resolve, 50));
+
 describe("visualizer ↔ bpmDetect dependency enforcement", () => {
   it("enabling visualizer automatically enables bpmDetect", () => {
     const wrapper = buildPanel({ visualizer: false, bpmDetect: false });
@@ -34,6 +36,14 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
 
     expect(vizToggle.ariaChecked).toBe("true");
     expect(bpmToggle.ariaChecked).toBe("true");
+  });
+
+  it("announces the automatic bpmDetect side effect", async () => {
+    const wrapper = buildPanel({ visualizer: false, bpmDetect: false });
+    getToggle(wrapper, "visualizer").click();
+
+    await flushAnnounceFrame();
+    expect(document.querySelector(".sr-live")?.textContent).toBe("ARIA__FEATURES__BPM_AUTO_ENABLED");
   });
 
   it("enabling visualizer persists both flags as true", () => {
@@ -54,6 +64,14 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
 
     expect(bpmToggle.ariaChecked).toBe("false");
     expect(vizToggle.ariaChecked).toBe("false");
+  });
+
+  it("announces the automatic visualizer side effect", async () => {
+    const wrapper = buildPanel({ visualizer: true, bpmDetect: true });
+    getToggle(wrapper, "bpmDetect").click();
+
+    await flushAnnounceFrame();
+    expect(document.querySelector(".sr-live")?.textContent).toBe("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED");
   });
 
   it("disabling bpmDetect persists both flags as false", () => {

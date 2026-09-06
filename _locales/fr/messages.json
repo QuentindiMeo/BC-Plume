@@ -55,7 +55,9 @@
       "obtenu": { "content": "$3", "example": "NaN" }
     }
   },
-  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Format de date de sortie de Bandcamp correctement interprété par ce navigateur" },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Format de date de sortie de Bandcamp correctement interprété par ce navigateur"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossible de trouver un conteneur approprié" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Élément parent du lecteur non trouvé" },
@@ -533,6 +535,12 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Détection de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Détection de BPM activée automatiquement : requise par le Visualiseur audio"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Visualiseur audio désactivé automatiquement : il nécessite la Détection de BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Doit valoir entre 1 et 300" },
@@ -673,7 +681,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrée personnalisée invalide" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "Ça te chante ?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume est gratuit et le restera. Si ça a rendu ton écoute sur Bandcamp plus agréable, un petit coup de pouce nous ferait vraiment plaisir." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume est gratuit et le restera. Si ça a rendu ton écoute sur Bandcamp plus agréable, un petit coup de pouce nous ferait vraiment plaisir."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Soutenir Plume" },
   "META__TOAST__DONATION": { "message": "donation" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {

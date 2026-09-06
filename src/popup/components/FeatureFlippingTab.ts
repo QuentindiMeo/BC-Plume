@@ -2,6 +2,7 @@ import { FeatureFlagKey, FeatureFlags, PLUME_CONSTANTS, PLUME_DEFAULTS } from "@
 import type { IMessageSender } from "@/domain/ports/messaging";
 import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
+import { announce } from "@/shared/announce";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
@@ -123,10 +124,12 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
         currentFlags.bpmDetect = true;
         const bpmBtn = toggleBtns.get("bpmDetect");
         if (bpmBtn) bpmBtn.ariaChecked = "true";
+        announce(getString("ARIA__FEATURES__BPM_AUTO_ENABLED"));
       } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect) {
         currentFlags.visualizer = false;
         const vizBtn = toggleBtns.get("visualizer");
         if (vizBtn) vizBtn.ariaChecked = "false";
+        announce(getString("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED"));
       }
 
       // tracklist-dependent flags: keep them off and locked whenever tracklist itself is off

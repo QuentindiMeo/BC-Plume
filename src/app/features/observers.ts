@@ -25,6 +25,7 @@ import { LOOP_MODE, PLUME_CONSTANTS } from "@/domain/plume";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS } from "@/infra/elements/bandcamp";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
+import { announce } from "@/shared/announce";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { applyTitleLang } from "@/shared/script-lang";
@@ -64,10 +65,12 @@ const updateTrackDisplay = () => {
 
     const headerCurrent = plume.titleDisplay?.querySelector(PLUME_ELEM_SELECTORS.headerCurrent) as HTMLDivElement;
     if (headerCurrent) {
-      headerCurrent.ariaLabel = isCollectionPage
+      const trackLabel = isCollectionPage
         ? getString("ARIA__TRACK_CURRENT", [String(current), String(total), newTrackTitle])
         : getString("ARIA__TRACK", [newTrackTitle]);
+      headerCurrent.ariaLabel = trackLabel;
       applyTitleLang(headerCurrent, newTrackTitle);
+      announce(trackLabel);
     }
   }
 
@@ -97,7 +100,6 @@ const updateTrackDisplay = () => {
   }
 };
 
-// Holds all active cleanup callbacks so observers and the unload handler can reach them
 export interface CleanupHandles {
   audioEvents: CleanupCallback | null;
   storeSubscriptions: CleanupCallback | null;
@@ -107,8 +109,6 @@ export interface CleanupHandles {
   toast: CleanupCallback | null;
 }
 
-// Wires audio event listeners and updates handles in-place. This avoids leaking listeners of the old element.
-// Re-setup audio event listeners: cleanup old → update store → attach new
 const rewireAudioEventListeners = (handles: CleanupHandles, newAudio?: HTMLAudioElement): void => {
   handles.audioEvents?.();
   handles.audioEvents = null;

@@ -125,3 +125,82 @@ describe("tracklist dropdown height slider", () => {
     expect(resetBtn.hidden).toBe(true);
   });
 });
+
+describe("numeric input error message", () => {
+  const getSeekJumpInput = (panel: HTMLElement): HTMLInputElement =>
+    panel.querySelector("#seek-jump-duration-input") as HTMLInputElement;
+
+  const getSeekJumpError = (panel: HTMLElement): HTMLElement =>
+    panel.querySelector("#seek-jump-duration-input-error") as HTMLElement;
+
+  it("reveals the error region before writing its text, one frame apart", async () => {
+    const panel = buildPanel();
+    const input = getSeekJumpInput(panel);
+    const error = getSeekJumpError(panel);
+    expect(error.hidden).toBe(true);
+
+    input.value = "0"; // below SEEK_JUMP_DURATION_MIN
+    input.dispatchEvent(new Event("input"));
+
+    // Revealed synchronously...
+    expect(error.hidden).toBe(false);
+    // ...but not yet filled — the mutation is deferred so it happens after the region
+    // is already in the accessibility tree, not before.
+    expect(error.textContent).toBe("");
+
+    await vi.advanceTimersByTimeAsync(20);
+    expect(error.textContent).toBe("ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE");
+  });
+
+  it("hides the error immediately (no deferred write needed) once the value becomes valid", async () => {
+    const panel = buildPanel();
+    const input = getSeekJumpInput(panel);
+    const error = getSeekJumpError(panel);
+
+    input.value = "0";
+    input.dispatchEvent(new Event("input"));
+    await vi.advanceTimersByTimeAsync(20);
+    expect(error.hidden).toBe(false);
+
+    input.value = "10";
+    input.dispatchEvent(new Event("input"));
+    expect(error.hidden).toBe(true);
+    expect(error.textContent).toBe("");
+  });
+});
+
+describe("refresh-required notice", () => {
+  const getRefreshNotice = (panel: HTMLElement): HTMLElement =>
+    panel.querySelector(".general-row__refresh-notice") as HTMLElement;
+
+  const getLanguageSelect = (panel: HTMLElement): HTMLSelectElement =>
+    panel.querySelector("#forced-language-select") as HTMLSelectElement;
+
+  it("has role=status and starts hidden", () => {
+    const panel = buildPanel();
+    const notice = getRefreshNotice(panel);
+
+    expect(notice.getAttribute("role")).toBe("status");
+    expect(notice.hidden).toBe(true);
+  });
+
+  it("reveals before writing its text, one frame apart, after a language change", async () => {
+    const panel = buildPanel();
+    const notice = getRefreshNotice(panel);
+    const select = getLanguageSelect(panel);
+
+    select.value = "fr";
+    select.dispatchEvent(new Event("change"));
+
+    // ? Flush the awaited saveForcedLanguage() microtask without advancing fake timers yet,
+    // ? so the deferred rAF text write has not fired.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(notice.hidden).toBe(false);
+    expect(notice.textContent).toBe("");
+
+    await vi.advanceTimersByTimeAsync(20);
+    expect(notice.textContent).toBe("INFO__SETTING__REFRESH_REQUIRED");
+  });
+});

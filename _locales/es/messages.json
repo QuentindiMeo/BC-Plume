@@ -55,7 +55,9 @@
       "obtenido": { "content": "$3", "example": "NaN" }
     }
   },
-  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Formato de fecha de publicación de Bandcamp interpretado correctamente por este navegador" },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Formato de fecha de publicación de Bandcamp interpretado correctamente por este navegador"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "No se puede encontrar un contenedor adecuado" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento padre del reproductor no encontrado" },
@@ -349,7 +351,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Botón de velocidad pulsado" },
-  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Velocidad personalizada rechazada (fuera del rango o no numérica)" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": {
+    "message": "Velocidad personalizada rechazada (fuera del rango o no numérica)"
+  },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Velocidad de reproducción personalizada" },
   "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clic para introducir una velocidad personalizada" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocidad de reproducción cargada:" },
@@ -537,6 +541,12 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Modo pantalla completa" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Detección de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Detección de BPM activada automáticamente: la requiere el Visualizador de audio"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Visualizador de audio desactivado automáticamente: requiere la Detección de BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 300" },
@@ -671,7 +681,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "¿Te suena bien?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume es gratuita y siempre lo será. Si ha mejorado tu experiencia en Bandcamp, un pequeño apoyo significa mucho." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume es gratuita y siempre lo será. Si ha mejorado tu experiencia en Bandcamp, un pequeño apoyo significa mucho."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Apoya a Plume" },
   "META__TOAST__DONATION": { "message": "donación" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {

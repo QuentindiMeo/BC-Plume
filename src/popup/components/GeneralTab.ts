@@ -114,8 +114,12 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
 
   const setError = (msg: string | null): void => {
     if (msg) {
-      error.textContent = msg;
+      // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
+      // ? tree, so filling it first means the mutation happens while nothing is watching.
       error.hidden = false;
+      requestAnimationFrame(() => {
+        error.textContent = msg;
+      });
       input.classList.add("is-invalid");
       input.ariaInvalid = "true";
     } else {
@@ -375,7 +379,7 @@ export const createGeneralTab = (
 
     const refreshNotice = document.createElement("p");
     refreshNotice.className = "general-row__refresh-notice";
-    refreshNotice.textContent = getString("INFO__SETTING__REFRESH_REQUIRED");
+    refreshNotice.role = "status";
     refreshNotice.hidden = true;
 
     const languageRow = buildSelectRow({
@@ -391,7 +395,12 @@ export const createGeneralTab = (
       selectId: "forced-language-select",
       onSave: async (value) => {
         await saveForcedLanguage(value);
+        // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
+        // ? tree, so filling it first means the mutation happens while nothing is watching.
         refreshNotice.hidden = false;
+        requestAnimationFrame(() => {
+          refreshNotice.textContent = getString("INFO__SETTING__REFRESH_REQUIRED");
+        });
       },
     });
 
