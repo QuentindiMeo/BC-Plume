@@ -639,7 +639,7 @@
       @apply text-plume-dimmed animate-pulse;
     }
     &.error {
-      @apply text-red-400/70;
+      @apply text-red-700;
     }
   }
 
@@ -670,7 +670,7 @@
     @apply animate-pulse;
   }
   &.error {
-    @apply text-red-400/50;
+    @apply text-red-700;
   }
 }
 

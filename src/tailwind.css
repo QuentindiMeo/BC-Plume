@@ -18,7 +18,7 @@
   --color-progbar-bg: rgba(0, 0, 0, 0.85);
   --color-tracklist-scrollbar: #2bb8dbd9;
   --color-glass-bg: rgba(0, 0, 0, 0.2);
-  --color-text-muted: rgba(255, 255, 255, 0.45);
+  --color-text-muted: rgba(255, 255, 255, 0.75);
   --color-item-hover-bg: rgba(255, 255, 255, 0.07);
   --color-contrast-border: rgba(255, 255, 255, 0.6);
   --color-toast-accent: rgba(32, 160, 195, 0.35);
@@ -35,7 +35,7 @@
   --color-popup-bg: #1a1a1a;
   --color-popup-surface: #242424;
   --color-popup-surface-alt: #2e2e2e;
-  --color-popup-border: #3a3a3a;
+  --color-popup-border: #707070;
   --color-popup-text: #e8e8e8;
   --color-popup-text-muted: #9a9a9a;
   --color-popup-accent: #c8a96e;
