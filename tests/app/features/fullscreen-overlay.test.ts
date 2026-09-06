@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GUI_ACTIONS } from "@/domain/ports/plume-ui";
 import { FakeAppCore } from "../../fakes/FakeAppCore";
 
 let fakeAppCore = new FakeAppCore();
@@ -9,7 +10,13 @@ let releaseDate: string | null = "12 Apr 2019 00:00:00 GMT";
 let artworkUrl: string | null = "https://f4.bcbits.com/img/a123_10.jpg";
 let infoSection: HTMLDivElement | null = null;
 
-const guiDispatch = vi.fn();
+// Applies just enough of the real reducer behavior for setFullscreenOverlay so exitFullscreenMode()'s
+// `if (!existingOverlay) return;` guard reflects reality — needed for the focus-management tests below.
+const guiDispatch = vi.fn((action: { type: string; payload: unknown }) => {
+  if (action.type === GUI_ACTIONS.SET_FULLSCREEN_OVERLAY) {
+    guiState["fullscreenOverlay"] = action.payload;
+  }
+});
 
 vi.mock("@/app/stores/AppCoreImpl", () => ({ getAppCoreInstance: () => fakeAppCore }));
 vi.mock("@/app/stores/GuiImpl", () => ({
@@ -72,7 +79,7 @@ vi.mock("@/shared/svg", () => ({
 }));
 vi.mock("@/svg/icons", () => ({ PLUME_SVG: new Proxy({}, { get: () => "" }) }));
 
-import { toggleFullscreenMode } from "@/app/features/fullscreen";
+import { cleanupFullscreenMode, toggleFullscreenMode } from "@/app/features/fullscreen";
 import { PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
 
 const idOf = (selector: PLUME_ELEM_SELECTORS): string => selector.split("#")[1] as string;
@@ -166,6 +173,12 @@ beforeEach(() => {
   };
 });
 
+afterEach(() => {
+  // The Escape listener is bound to `document`, not the overlay, so it must be
+  // explicitly torn down or it leaks into the next test (which now binds its own).
+  cleanupFullscreenMode();
+});
+
 describe("buildFullscreenOverlay release date", () => {
   it("renders the release date inside the titling block when Bandcamp exposes one", () => {
     const overlay = enterFullscreen();
@@ -210,5 +223,59 @@ describe("buildFullscreenOverlay release date", () => {
 
     expect(document.querySelector(`#${idOf(PLUME_ELEM_SELECTORS.fullscreenOverlay)}`)).toBeNull();
     expect(document.querySelector(`#${RELEASE_DATE_ID}`)).toBeNull();
+  });
+});
+
+describe("fullscreen focus management (H2d, H5)", () => {
+  const EXIT_BTN_ID = idOf(PLUME_ELEM_SELECTORS.fullscreenExitBtn);
+  const OVERLAY_ID = idOf(PLUME_ELEM_SELECTORS.fullscreenOverlay);
+
+  // The initial-focus assignment happens in a setTimeout(0) inside setupFullscreenFocusTrap.
+  const flushInitialFocusTimer = () => new Promise<void>((resolve) => setTimeout(resolve, 10));
+
+  it("focuses the exit button on open rather than the first focusable element in DOM order", async () => {
+    const overlay = enterFullscreen();
+    await flushInitialFocusTimer();
+
+    const exitBtn = overlay.querySelector(`#${EXIT_BTN_ID}`);
+    expect(exitBtn).not.toBeNull();
+    expect(document.activeElement).toBe(exitBtn);
+  });
+
+  it("restores focus to whatever had focus before fullscreen was opened, after exiting", async () => {
+    const trigger = document.createElement("button");
+    document.body.appendChild(trigger);
+    trigger.focus();
+    expect(document.activeElement).toBe(trigger);
+
+    enterFullscreen();
+    await flushInitialFocusTimer();
+
+    toggleFullscreenMode(); // exit
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("Escape still exits fullscreen even if focus was lost to <body>", async () => {
+    enterFullscreen();
+    await flushInitialFocusTimer();
+
+    // Simulate the focused control becomes unreachable and focus resets
+    // to <body>, which used to mean the overlay-bound Escape listener was dead too.
+    (document.activeElement as HTMLElement | null)?.blur();
+    expect(document.activeElement).toBe(document.body);
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { code: "Escape", bubbles: true }));
+
+    expect(document.querySelector(`#${OVERLAY_ID}`)).toBeNull();
+  });
+
+  it("does not leak the document-level Escape listener after exiting normally", async () => {
+    enterFullscreen();
+    await flushInitialFocusTimer();
+    toggleFullscreenMode(); // exit via the same path as the exit button / hotkey
+
+    // A stray Escape after exit must not silently re-enter fullscreen.
+    document.dispatchEvent(new KeyboardEvent("keydown", { code: "Escape", bubbles: true }));
+    expect(document.querySelector(`#${OVERLAY_ID}`)).toBeNull();
   });
 });

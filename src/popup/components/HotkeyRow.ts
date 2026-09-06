@@ -106,6 +106,7 @@ export const createHotkeyRow = (
     capturedShift = false;
     capturedAlt = false;
     btn.classList.remove("setting-row__btn--capturing");
+    btn.focus(); // back to the remap button before the conflict prompt (if open) removes its contents
     conflictContainer.hidden = true;
     conflictContainer.innerHTML = "";
     refreshBtn();
