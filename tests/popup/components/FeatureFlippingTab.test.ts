@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLangTag: () => "en" }));
 vi.mock("@/shared/logger", () => ({ logger: vi.fn(), CPL: { ERROR: "ERROR" } }));
 
 const mockSaveFeatureFlags = vi.fn().mockResolvedValue(undefined);
@@ -24,6 +24,8 @@ const getToggle = (wrapper: HTMLElement, flagKey: string): HTMLButtonElement =>
 
 beforeEach(() => vi.clearAllMocks());
 
+const flushAnnounceFrame = () => new Promise<void>((resolve) => setTimeout(resolve, 50));
+
 describe("visualizer ↔ bpmDetect dependency enforcement", () => {
   it("enabling visualizer automatically enables bpmDetect", () => {
     const wrapper = buildPanel({ visualizer: false, bpmDetect: false });
@@ -34,6 +36,34 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
 
     expect(vizToggle.ariaChecked).toBe("true");
     expect(bpmToggle.ariaChecked).toBe("true");
+  });
+
+  it("announces the automatic bpmDetect side effect", async () => {
+    const wrapper = buildPanel({ visualizer: false, bpmDetect: false });
+    getToggle(wrapper, "visualizer").click();
+
+    await flushAnnounceFrame();
+    expect(document.querySelector(".sr-live")?.textContent).toBe("ARIA__FEATURES__BPM_AUTO_ENABLED");
+  });
+
+  it("does not announce bpmDetect as auto-enabled when it was already enabled", async () => {
+    const wrapper = buildPanel({ visualizer: false, bpmDetect: true });
+    document.querySelectorAll(".sr-live").forEach((el) => (el.textContent = ""));
+    getToggle(wrapper, "visualizer").click();
+
+    await flushAnnounceFrame();
+    expect(getToggle(wrapper, "visualizer").ariaChecked).toBe("true");
+    expect(document.body.textContent).not.toContain("ARIA__FEATURES__BPM_AUTO_ENABLED");
+  });
+
+  it("does not announce visualizer as auto-disabled when it was already disabled", async () => {
+    const wrapper = buildPanel({ visualizer: false, bpmDetect: true });
+    document.querySelectorAll(".sr-live").forEach((el) => (el.textContent = ""));
+    getToggle(wrapper, "bpmDetect").click();
+
+    await flushAnnounceFrame();
+    expect(getToggle(wrapper, "bpmDetect").ariaChecked).toBe("false");
+    expect(document.body.textContent).not.toContain("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED");
   });
 
   it("enabling visualizer persists both flags as true", () => {
@@ -54,6 +84,14 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
 
     expect(bpmToggle.ariaChecked).toBe("false");
     expect(vizToggle.ariaChecked).toBe("false");
+  });
+
+  it("announces the automatic visualizer side effect", async () => {
+    const wrapper = buildPanel({ visualizer: true, bpmDetect: true });
+    getToggle(wrapper, "bpmDetect").click();
+
+    await flushAnnounceFrame();
+    expect(document.querySelector(".sr-live")?.textContent).toBe("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED");
   });
 
   it("disabling bpmDetect persists both flags as false", () => {
@@ -236,20 +274,25 @@ describe("tracklist ↔ tracklistAlwaysLarge dependency enforcement", () => {
 
 describe("flipper notice (noticeKey)", () => {
   const getWaveformNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
-    wrapper.querySelector("#feature-label-waveform .setting-row__notice") as HTMLParagraphElement;
+    wrapper.querySelector("#feature-notice-waveform") as HTMLParagraphElement;
 
   it("is not rendered for flippers without a noticeKey", () => {
     const wrapper = buildPanel();
-    const runtimeLabel = wrapper.querySelector("#feature-label-runtime");
 
-    expect(runtimeLabel?.querySelector(".setting-row__notice")).toBeNull();
+    expect(wrapper.querySelector("#feature-notice-runtime")).toBeNull();
   });
 
-  it("is rendered inside the flipper label for flippers with a noticeKey", () => {
+  it("is rendered as a sibling of the label, not a child (M7), and referenced via aria-describedby", () => {
     const wrapper = buildPanel({ waveform: false });
-    const waveformLabel = wrapper.querySelector("#feature-label-waveform");
+    const label = wrapper.querySelector("#feature-label-waveform")!;
+    const notice = getWaveformNotice(wrapper);
+    const toggle = getToggle(wrapper, "waveform");
 
-    expect(waveformLabel?.querySelector(".setting-row__notice")).not.toBeNull();
+    expect(notice).not.toBeNull();
+    expect(notice.parentElement).toBe(label.parentElement); // sibling, not a descendant of the label
+    expect(label.contains(notice)).toBe(false);
+    expect(toggle.getAttribute("aria-describedby")).toBe(notice.id);
+    expect(toggle.getAttribute("aria-labelledby")).toBe(label.id); // name stays stable regardless of the notice
   });
 
   it("is hidden when the feature starts off", () => {

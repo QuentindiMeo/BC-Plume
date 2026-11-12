@@ -222,32 +222,32 @@ export const createTracklistToggle = (): {
     else open();
   });
 
+  const ACCEPTED_KEYS = ["ArrowDown", "ArrowUp", "Home", "End", "Enter", " ", "Escape"];
   dropdownEl.addEventListener("keydown", (e: KeyboardEvent) => {
     const playableItems = getPlayableItems();
     const focused = document.activeElement as HTMLDivElement | null;
     const currentIdx = focused ? playableItems.indexOf(focused) : -1;
 
+    if (!ACCEPTED_KEYS.includes(e.key)) return;
     switch (e.key) {
       case "ArrowDown":
-        e.preventDefault();
         playableItems[currentIdx + 1]?.focus();
         break;
       case "ArrowUp":
-        e.preventDefault();
         playableItems[currentIdx - 1]?.focus();
         break;
       case "Home":
-        e.preventDefault();
         playableItems[0]?.focus();
         break;
       case "End":
-        e.preventDefault();
         playableItems.at(-1)?.focus();
         break;
       case "Enter":
       case " ":
-        e.preventDefault();
         if (focused && playableItems.includes(focused)) focused.click();
+        break;
+      case "Escape":
+        close();
         break;
     }
   });

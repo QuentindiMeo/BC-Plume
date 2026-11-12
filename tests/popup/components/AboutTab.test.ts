@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: vi.fn(() => "en") }));
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLangTag: vi.fn(() => "en") }));
 vi.mock("@/shared/logger", () => ({ logger: vi.fn(), CPL: { ERROR: "ERROR" } }));
 vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),
@@ -27,14 +27,14 @@ const buildPanel = (): HTMLDivElement => createAboutTab()();
 const getLinkAnchors = (panel: HTMLDivElement): HTMLAnchorElement[] =>
   [...panel.querySelectorAll("#about__links-list a")] as HTMLAnchorElement[];
 
-const formatReleaseDate = (locale: string): string =>
-  new Intl.DateTimeFormat(locale.replaceAll("_", "-"), { year: "numeric", month: "long", day: "numeric" }).format(
+const formatReleaseDate = (langTag: string): string =>
+  new Intl.DateTimeFormat(langTag, { year: "numeric", month: "long", day: "numeric" }).format(
     new Date("2026-05-13T12:00:00")
   );
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(i18n.getActiveLocale).mockReturnValue("en");
+  vi.mocked(i18n.getActiveLangTag).mockReturnValue("en");
 });
 
 describe("identity block", () => {
@@ -63,19 +63,19 @@ describe("identity block", () => {
   });
 
   it("formats the release date in the active locale", () => {
-    vi.mocked(i18n.getActiveLocale).mockReturnValue("fr");
+    vi.mocked(i18n.getActiveLangTag).mockReturnValue("fr");
     const panel = buildPanel();
     const version = panel.querySelector("#identity__version");
 
     expect(version?.textContent).toBe(`v1.2 — ${formatReleaseDate("fr")}`);
   });
 
-  it("converts underscore locale codes to BCP-47 hyphens for Intl", () => {
-    vi.mocked(i18n.getActiveLocale).mockReturnValue("pt_BR");
+  it("passes the BCP-47 lang tag straight through to Intl (no further conversion in this component)", () => {
+    vi.mocked(i18n.getActiveLangTag).mockReturnValue("pt-BR");
     const panel = buildPanel();
     const version = panel.querySelector("#identity__version");
 
-    expect(version?.textContent).toBe(`v1.2 — ${formatReleaseDate("pt_BR")}`);
+    expect(version?.textContent).toBe(`v1.2 — ${formatReleaseDate("pt-BR")}`);
   });
 
   it("renders tagline from i18n key", () => {

@@ -7,7 +7,7 @@ import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
 import { loadTracklistDropdownHeight } from "@/popup/use-cases/loadTracklistDropdownHeight";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
-import { getActiveLocale, setForcedLanguage } from "@/shared/i18n";
+import { getActiveLangTag, setForcedLanguage } from "@/shared/i18n";
 
 (async () => {
   const [
@@ -29,7 +29,7 @@ import { getActiveLocale, setForcedLanguage } from "@/shared/i18n";
   ]);
 
   setForcedLanguage(forcedLanguage ?? null);
-  document.documentElement.lang = getActiveLocale();
+  document.documentElement.lang = getActiveLangTag();
 
   const messageSender = createTabsMessageSender();
 

@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment happy-dom
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { buildLabel, labelForKeyEvent } from "@/popup/components/HotkeyRow";
+vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k }));
+
+import { HotkeyAction } from "@/domain/hotkeys";
+import { buildLabel, createHotkeyRow, labelForKeyEvent } from "@/popup/components/HotkeyRow";
 
 const key = (code: string, key: string) => ({ code, key });
 
@@ -68,5 +72,54 @@ describe("buildLabel", () => {
 
   it("works with multi-char key labels", () => {
     expect(buildLabel(false, true, false, "Space")).toBe("Shift+Space");
+  });
+});
+
+describe("createHotkeyRow — conflict dialog focus restoration", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("cancelling a conflict prompt refocuses the remap button that opened it", () => {
+    const conflictingBinding = { code: "KeyB", label: "B" };
+    const allBindings = () => ({ [HotkeyAction.PLAY_PAUSE]: conflictingBinding });
+
+    const row = createHotkeyRow(
+      HotkeyAction.MUTE,
+      { code: "KeyA", label: "A" },
+      allBindings,
+      () => {},
+      () => {}
+    );
+    document.body.appendChild(row.el); // focus restoration only observable on connected elements
+
+    const remapBtn = row.el.querySelector<HTMLButtonElement>(".setting-row__btn")!;
+    remapBtn.click(); // starts capture
+    document.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyB", key: "b", bubbles: true }));
+
+    const cancelBtn = row.el.querySelector<HTMLButtonElement>(".setting-row__conflict-btn--cancel");
+    expect(cancelBtn).not.toBeNull(); // conflict prompt is showing
+
+    cancelBtn!.click();
+
+    expect(row.el.querySelector(".setting-row__conflict-btn--cancel")).toBeNull(); // prompt is gone
+    expect(document.activeElement).toBe(remapBtn);
+  });
+
+  it("the row's role=group gets a name via aria-labelledby (M12 — buttons aren't labelable)", () => {
+    const row = createHotkeyRow(
+      HotkeyAction.MUTE,
+      { code: "KeyA", label: "A" },
+      () => ({}),
+      () => {},
+      () => {}
+    );
+
+    const labelledbyId = row.el.getAttribute("aria-labelledby");
+    expect(labelledbyId).toBeTruthy();
+
+    const label = row.el.querySelector(`#${labelledbyId}`);
+    expect(label).not.toBeNull();
+    expect(label?.textContent).toBe("LABEL__HOTKEY__MUTE");
   });
 });

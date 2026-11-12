@@ -14,9 +14,10 @@ const getLuminance = (rgb: [number, number, number]): number => {
 // Assumed dark background for WCAG contrast calculations (Bandcamp's page background).
 const ASSUMED_BG_RGB: [number, number, number] = [18, 18, 18];
 
-export const measureContrastRatioWCAG = (rgb: [number, number, number]): number => {
-  const bgRgb = ASSUMED_BG_RGB;
-
+export const measureContrastRatioWCAG = (
+  rgb: [number, number, number],
+  bgRgb: [number, number, number] = ASSUMED_BG_RGB
+): number => {
   const L1 = getLuminance(rgb);
   const L2 = getLuminance(bgRgb);
   return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);

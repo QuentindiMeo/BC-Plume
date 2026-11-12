@@ -50,7 +50,7 @@ describe("appendReleaseDate", () => {
   it("renders the localized label and an accessible name", () => {
     const el = appendReleaseDate(buildTitlingContainer(), RAW_DATE);
 
-    expect(el?.textContent).toBe("Released April 12, 2019");
+    expect(el?.textContent).toBe("released April 12, 2019");
     expect(el?.getAttribute("aria-label")).toBe("Release date is April 12, 2019");
     expect(el?.getAttribute("role")).toBe("note");
   });

@@ -2,6 +2,7 @@ import { FeatureFlagKey, FeatureFlags, PLUME_CONSTANTS, PLUME_DEFAULTS } from "@
 import type { IMessageSender } from "@/domain/ports/messaging";
 import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
+import { announce } from "@/shared/announce";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
@@ -83,19 +84,13 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     const row = document.createElement("div");
     row.className = "setting-row";
 
-    const label = document.createElement("span");
-    label.className = "setting-row__label";
-    label.textContent = getString(labelKey);
-    label.id = `feature-label-${flagKey}`;
+    const labelWrap = document.createElement("div");
+    labelWrap.className = "setting-row__label";
 
-    if (noticeKey) {
-      const notice = document.createElement("p");
-      notice.className = "setting-row__notice";
-      notice.textContent = getString(noticeKey, noticeSubstitutions);
-      notice.hidden = !currentFlags[flagKey];
-      label.appendChild(notice);
-      noticeRefs.set(flagKey, notice);
-    }
+    const label = document.createElement("span");
+    label.id = `feature-label-${flagKey}`;
+    label.textContent = getString(labelKey);
+    labelWrap.appendChild(label);
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -103,6 +98,17 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.className = "feature-toggle";
     toggle.ariaChecked = String(currentFlags[flagKey]);
     toggle.setAttribute("aria-labelledby", label.id);
+
+    if (noticeKey) {
+      const notice = document.createElement("p");
+      notice.className = "setting-row__notice";
+      notice.id = `feature-notice-${flagKey}`;
+      notice.textContent = getString(noticeKey, noticeSubstitutions);
+      notice.hidden = !currentFlags[flagKey];
+      labelWrap.appendChild(notice); // sibling of the label, not a child — keeps the accessible name stable
+      noticeRefs.set(flagKey, notice);
+      toggle.setAttribute("aria-describedby", notice.id); // caveat as description, not name
+    }
 
     const thumb = document.createElement("span");
     thumb.className = "feature-toggle__thumb";
@@ -119,14 +125,16 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       if (notice) notice.hidden = !currentFlags[flagKey];
 
       // visualizer requires bpmDetect: enforce the dependency in both directions
-      if (flagKey === "visualizer" && currentFlags.visualizer) {
+      if (flagKey === "visualizer" && currentFlags.visualizer && !currentFlags.bpmDetect) {
         currentFlags.bpmDetect = true;
         const bpmBtn = toggleBtns.get("bpmDetect");
         if (bpmBtn) bpmBtn.ariaChecked = "true";
-      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect) {
+        announce(getString("ARIA__FEATURES__BPM_AUTO_ENABLED"));
+      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect && currentFlags.visualizer) {
         currentFlags.visualizer = false;
         const vizBtn = toggleBtns.get("visualizer");
         if (vizBtn) vizBtn.ariaChecked = "false";
+        announce(getString("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED"));
       }
 
       // tracklist-dependent flags: keep them off and locked whenever tracklist itself is off
@@ -138,7 +146,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
 
     toggleBtns.set(flagKey, toggle);
 
-    row.appendChild(label);
+    row.appendChild(labelWrap);
     row.appendChild(toggle);
 
     return row;

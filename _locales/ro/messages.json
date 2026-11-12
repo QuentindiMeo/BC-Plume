@@ -55,7 +55,9 @@
       "obtinut": { "content": "$3", "example": "NaN" }
     }
   },
-  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Formatul datei de lansare de la Bandcamp a fost interpretat corect de acest browser" },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Formatul datei de lansare de la Bandcamp a fost interpretat corect de acest browser"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Nu s-a putut găsi un container potrivit" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elementul părinte al player-ului negăsit" },
@@ -70,7 +72,9 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controale potențiale găsite:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== SFÂRȘIT DEBUG ===" },
 
-  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Containerul antetului sau numărul piesei negăsit" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": {
+    "message": "Containerul antetului sau numărul piesei negăsit"
+  },
   "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Containerul antetului sau titlul piesei negăsit" },
   "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Elementul de pre-text al antetului negăsit" },
   "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Elementul de titlu al antetului negăsit" },
@@ -324,7 +328,9 @@
   "ARIA__UNMUTE": { "message": "Activare sunet" },
 
   "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Butonul de repetare negăsit" },
-  "INFO__LOOP_MODE__COERCED": { "message": "Mod repetare încărcat ca album dar aplicat ca piesă (pagină cu o singură piesă)" },
+  "INFO__LOOP_MODE__COERCED": {
+    "message": "Mod repetare încărcat ca album dar aplicat ca piesă (pagină cu o singură piesă)"
+  },
   "DEBUG__LOOP__CYCLED": { "message": "Mod repetare schimbat" },
   "LABEL__LOOP": { "message": "Repetare" },
   "ARIA__LOOP__OFF": { "message": "Repetare: dezactivată" },
@@ -339,7 +345,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Buton viteză apăsat" },
-  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Viteză personalizată respinsă (în afara intervalului sau non-numerică)" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": {
+    "message": "Viteză personalizată respinsă (în afara intervalului sau non-numerică)"
+  },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Viteză personalizată" },
   "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clic pentru a introduce o viteză personalizată" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Viteză de redare încărcată:" },
@@ -349,7 +357,9 @@
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Activare/dezactivare ecran complet" },
 
-  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Listă piese: piesa curentă este necunoscută, navigarea nu este posibilă" },
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": {
+    "message": "Listă piese: piesa curentă este necunoscută, navigarea nu este posibilă"
+  },
   "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
     "message": "Listă piese: indexul piesei $INDEX$ este în afara limitelor",
     "placeholders": {
@@ -411,7 +421,7 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Redare muzicală pe ecran complet" },
   "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Data lansării negăsită pentru modul ecran complet" },
   "LABEL__RELEASE_DATE": {
-    "message": "Lansat pe $DATA$",
+    "message": "lansat pe $DATA$",
     "placeholders": {
       "data": { "content": "$1", "example": "12 aprilie 2019" }
     }
@@ -523,25 +533,37 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Ecran complet" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Detectare BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Eroare la salvarea preferințelor de funcționalități" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Detectarea BPM a fost activată automat: este necesară pentru Vizualizatorul audio"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Vizualizatorul audio a fost dezactivat automat: necesită Detectarea BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Trebuie să fie un număr întreg" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Trebuie să fie între 1 și 300" },
   "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Eroare la salvarea duratei de avans" },
-  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Valoare de durată de avans invalidă, se folosește valoarea implicită" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": {
+    "message": "Valoare de durată de avans invalidă, se folosește valoarea implicită"
+  },
   "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Durată de avans încărcată:" },
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Pas avans" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Durata pasului de avans în secunde" },
 
   "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Trebuie să fie între 1 și 20" },
   "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Eroare la salvarea pasului de volum" },
-  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Valoare de pas de volum invalidă, se folosește valoarea implicită" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": {
+    "message": "Valoare de pas de volum invalidă, se folosește valoarea implicită"
+  },
   "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Pas de volum încărcat:" },
   "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Pas volum" },
   "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Procentul de volum per apăsare de tastă" },
 
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Trebuie să fie între 0 și 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Eroare la salvarea pragului de repornire a piesei" },
-  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valoare de prag de repornire invalidă, se folosește valoarea implicită" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": {
+    "message": "Valoare de prag de repornire invalidă, se folosește valoarea implicită"
+  },
   "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Prag de repornire a piesei încărcat:" },
   "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Prag repornire piesă" },
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
@@ -593,11 +615,15 @@
   "META__TOAST__RELEASE": { "message": "actualizare lansată" },
 
   "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume nu s-a putut încărca" },
-  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "Nu s-a găsit un container de player potrivit pe această pagină." },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": {
+    "message": "Nu s-a găsit un container de player potrivit pe această pagină."
+  },
   "META__TOAST__INJECTION_FAILED": { "message": "eroare de injecție" },
 
   "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Se așteaptă audio" },
-  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "Niciun element audio detectat. Controalele de redare sunt inactive." },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": {
+    "message": "Niciun element audio detectat. Controalele de redare sunt inactive."
+  },
   "META__TOAST__AUDIO_NOT_FOUND": { "message": "audio negăsit" },
 
   "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Ecran complet indisponibil" },
@@ -645,7 +671,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "intrare personalizată invalidă" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "Sună bine?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume este gratuit și va rămâne astfel. Dacă ți-a îmbunătățit experiența pe Bandcamp, un mic sprijin înseamnă mult." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume este gratuit și va rămâne astfel. Dacă ți-a îmbunătățit experiența pe Bandcamp, un mic sprijin înseamnă mult."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Susține Plume" },
   "META__TOAST__DONATION": { "message": "donație" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
@@ -695,7 +723,7 @@
   "LABEL__ABOUT__LINK__GITHUB": { "message": "Cod sursă" },
   "ARIA__ABOUT__LINK__GITHUB": { "message": "Vizualizați codul sursă Plume pe GitHub" },
   "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Jurnal de modificări" },
-  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Vizualizați jurnalul de modificări Plume pe GitHub" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Vizualizați jurnal de modificări Plume pe GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Raportează o problemă" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Raportează o problemă pe GitHub" },
   "LABEL__ABOUT__LINK__DONATION": { "message": "Susține Plume" },
