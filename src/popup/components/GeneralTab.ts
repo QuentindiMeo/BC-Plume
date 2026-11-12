@@ -60,8 +60,9 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   const row = document.createElement("div");
   row.className = "setting-row";
 
-  const label = document.createElement("span");
+  const label = document.createElement("label");
   label.className = "setting-row__label";
+  label.htmlFor = inputId;
   label.textContent = getString(labelKey);
 
   const value = document.createElement("div");
@@ -77,9 +78,13 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   input.max = String(max);
   input.value = String(currentValue);
   input.id = inputId;
-  input.ariaLabel = getString(ariaKey);
-  input.setAttribute("aria-describedby", `${inputId}-error`);
+  input.setAttribute("aria-describedby", `${inputId}-hint ${inputId}-error`);
   input.ariaInvalid = "false";
+
+  const hint = document.createElement("span");
+  hint.id = `${inputId}-hint`;
+  hint.className = "sr-live"; // visually hidden, already defined in popup.scss
+  hint.textContent = getString(ariaKey);
 
   const unit = document.createElement("span");
   unit.className = "general-row__unit";
@@ -176,6 +181,7 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   inputRow.appendChild(unit);
 
   value.appendChild(inputRow);
+  value.appendChild(hint);
   value.appendChild(error);
   value.appendChild(resetBtn);
 
@@ -207,8 +213,9 @@ const buildSliderRow = (config: SliderRowConfig): HTMLElement => {
   const row = document.createElement("div");
   row.className = "setting-row";
 
-  const label = document.createElement("span");
+  const label = document.createElement("label");
   label.className = "setting-row__label";
+  label.htmlFor = inputId;
   label.textContent = getString(labelKey);
 
   const value = document.createElement("div");
@@ -225,7 +232,12 @@ const buildSliderRow = (config: SliderRowConfig): HTMLElement => {
   input.step = "1";
   input.value = String(initialValue);
   input.id = inputId;
-  input.ariaLabel = getString(ariaKey);
+  input.setAttribute("aria-describedby", `${inputId}-hint`);
+
+  const hint = document.createElement("span");
+  hint.id = `${inputId}-hint`;
+  hint.className = "sr-live"; // visually hidden, already defined in popup.scss
+  hint.textContent = getString(ariaKey);
 
   const valueDisplay = document.createElement("span");
   valueDisplay.className = "general-row__slider-value";
@@ -282,6 +294,7 @@ const buildSliderRow = (config: SliderRowConfig): HTMLElement => {
   inputRow.appendChild(valueDisplay);
 
   value.appendChild(inputRow);
+  value.appendChild(hint);
   value.appendChild(resetBtn);
 
   row.appendChild(label);
@@ -307,8 +320,9 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
   const row = document.createElement("div");
   row.className = "setting-row";
 
-  const label = document.createElement("span");
+  const label = document.createElement("label");
   label.className = "setting-row__label";
+  label.htmlFor = selectId;
   label.textContent = getString(labelKey);
 
   const value = document.createElement("div");
@@ -320,7 +334,12 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
   const select = document.createElement("select");
   select.className = "general-row__select";
   select.id = selectId;
-  select.ariaLabel = getString(ariaKey);
+  select.setAttribute("aria-describedby", `${selectId}-hint`);
+
+  const hint = document.createElement("span");
+  hint.id = `${selectId}-hint`;
+  hint.className = "sr-live"; // visually hidden, already defined in popup.scss
+  hint.textContent = getString(ariaKey);
 
   for (const opt of options) {
     const option = document.createElement("option");
@@ -352,6 +371,7 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
 
   inputRow.appendChild(select);
   value.appendChild(inputRow);
+  value.appendChild(hint);
   value.appendChild(resetBtn);
 
   row.appendChild(label);

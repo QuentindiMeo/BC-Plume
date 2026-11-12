@@ -76,7 +76,9 @@ export const createHotkeyRow = (
 
   const label = document.createElement("span");
   label.className = "setting-row__label";
+  label.id = `hotkey-row-label-${action}`;
   label.textContent = getString(`LABEL__HOTKEY__${action}`);
+  root.setAttribute("aria-labelledby", label.id); // buttons aren't labelable, so the group carries the name instead
 
   const value = document.createElement("div");
   value.className = "setting-row__value";

@@ -254,20 +254,25 @@ describe("tracklist ↔ tracklistAlwaysLarge dependency enforcement", () => {
 
 describe("flipper notice (noticeKey)", () => {
   const getWaveformNotice = (wrapper: HTMLElement): HTMLParagraphElement =>
-    wrapper.querySelector("#feature-label-waveform .setting-row__notice") as HTMLParagraphElement;
+    wrapper.querySelector("#feature-notice-waveform") as HTMLParagraphElement;
 
   it("is not rendered for flippers without a noticeKey", () => {
     const wrapper = buildPanel();
-    const runtimeLabel = wrapper.querySelector("#feature-label-runtime");
 
-    expect(runtimeLabel?.querySelector(".setting-row__notice")).toBeNull();
+    expect(wrapper.querySelector("#feature-notice-runtime")).toBeNull();
   });
 
-  it("is rendered inside the flipper label for flippers with a noticeKey", () => {
+  it("is rendered as a sibling of the label, not a child (M7), and referenced via aria-describedby", () => {
     const wrapper = buildPanel({ waveform: false });
-    const waveformLabel = wrapper.querySelector("#feature-label-waveform");
+    const label = wrapper.querySelector("#feature-label-waveform")!;
+    const notice = getWaveformNotice(wrapper);
+    const toggle = getToggle(wrapper, "waveform");
 
-    expect(waveformLabel?.querySelector(".setting-row__notice")).not.toBeNull();
+    expect(notice).not.toBeNull();
+    expect(notice.parentElement).toBe(label.parentElement); // sibling, not a descendant of the label
+    expect(label.contains(notice)).toBe(false);
+    expect(toggle.getAttribute("aria-describedby")).toBe(notice.id);
+    expect(toggle.getAttribute("aria-labelledby")).toBe(label.id); // name stays stable regardless of the notice
   });
 
   it("is hidden when the feature starts off", () => {

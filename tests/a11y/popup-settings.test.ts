@@ -86,6 +86,13 @@ describe("popup accessibility", () => {
       expect(tab1.getAttribute("aria-controls")).toBe("tabpanel-t1");
       expect(panel1.getAttribute("aria-labelledby")).toBe("tab-t1");
     });
+
+    it("the tab bar is contained by a landmark (M11 — <main>, not a bare <div>)", async () => {
+      const { createTabBar } = await import("@/popup/components/TabBar");
+      const tabBar = createTabBar([{ id: "t1", label: "Tab 1", buildPanel: () => document.createElement("div") }]);
+
+      expect(tabBar.el.tagName).toBe("MAIN");
+    });
   });
 
   describe("createHotkeyRow", () => {
@@ -154,7 +161,7 @@ describe("popup accessibility", () => {
       AXE_TEST_TIMEOUT
     );
 
-    it("numeric inputs have aria-describedby linked to error elements", async () => {
+    it("numeric inputs have aria-describedby linked to a hint and an error element (M12)", async () => {
       const { createGeneralTab } = await import("@/popup/components/GeneralTab");
       const buildPanel = createGeneralTab(undefined, undefined, undefined, undefined, undefined, sender);
       const panel = buildPanel();
@@ -165,9 +172,20 @@ describe("popup accessibility", () => {
       for (const input of inputs) {
         const describedBy = input.getAttribute("aria-describedby");
         expect(describedBy).toBeTruthy();
-        const errorEl = panel.querySelector(`#${describedBy}`);
-        expect(errorEl).not.toBeNull();
-        expect(errorEl?.getAttribute("role")).toBe("alert");
+        const referencedIds = describedBy!.split(/\s+/);
+        expect(referencedIds).toHaveLength(2);
+
+        const referencedEls = referencedIds.map((id) => panel.querySelector(`#${id}`));
+        expect(referencedEls.every((el) => el !== null)).toBe(true);
+
+        const errorEl = referencedEls.find((el) => el?.getAttribute("role") === "alert");
+        expect(errorEl).toBeDefined();
+
+        // The input's own name now comes from a real <label for>, not aria-label (M12) —
+        // the other referenced id is the hint carrying the elaborating text as a description.
+        const label = panel.querySelector<HTMLLabelElement>(`label[for="${input.id}"]`);
+        expect(label).not.toBeNull();
+        expect(input.hasAttribute("aria-label")).toBe(false);
       }
     });
 

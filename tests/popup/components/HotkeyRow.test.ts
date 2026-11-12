@@ -105,4 +105,21 @@ describe("createHotkeyRow — conflict dialog focus restoration", () => {
     expect(row.el.querySelector(".setting-row__conflict-btn--cancel")).toBeNull(); // prompt is gone
     expect(document.activeElement).toBe(remapBtn);
   });
+
+  it("the row's role=group gets a name via aria-labelledby (M12 — buttons aren't labelable)", () => {
+    const row = createHotkeyRow(
+      HotkeyAction.MUTE,
+      { code: "KeyA", label: "A" },
+      () => ({}),
+      () => {},
+      () => {}
+    );
+
+    const labelledbyId = row.el.getAttribute("aria-labelledby");
+    expect(labelledbyId).toBeTruthy();
+
+    const label = row.el.querySelector(`#${labelledbyId}`);
+    expect(label).not.toBeNull();
+    expect(label?.textContent).toBe("LABEL__HOTKEY__MUTE");
+  });
 });

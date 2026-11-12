@@ -425,7 +425,7 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lettore musicale a schermo intero" },
   "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Data di pubblicazione non trovata per la modalità schermo intero" },
   "LABEL__RELEASE_DATE": {
-    "message": "Pubblicato il $DATA$",
+    "message": "pubblicato il $DATA$",
     "placeholders": {
       "data": { "content": "$1", "example": "12 aprile 2019" }
     }
@@ -729,7 +729,7 @@
   "LABEL__ABOUT__LINK__GITHUB": { "message": "Codice sorgente" },
   "ARIA__ABOUT__LINK__GITHUB": { "message": "Visualizza il codice sorgente di Plume su GitHub" },
   "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Registro modifiche" },
-  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Visualizza le note di rilascio di Plume su GitHub" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Visualizza il registro modifiche di Plume su GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Segnala un problema" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Segnala un problema su GitHub" },
   "LABEL__ABOUT__LINK__DONATION": { "message": "Sostieni Plume" },

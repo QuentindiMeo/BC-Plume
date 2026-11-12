@@ -84,19 +84,13 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     const row = document.createElement("div");
     row.className = "setting-row";
 
-    const label = document.createElement("span");
-    label.className = "setting-row__label";
-    label.textContent = getString(labelKey);
-    label.id = `feature-label-${flagKey}`;
+    const labelWrap = document.createElement("div");
+    labelWrap.className = "setting-row__label";
 
-    if (noticeKey) {
-      const notice = document.createElement("p");
-      notice.className = "setting-row__notice";
-      notice.textContent = getString(noticeKey, noticeSubstitutions);
-      notice.hidden = !currentFlags[flagKey];
-      label.appendChild(notice);
-      noticeRefs.set(flagKey, notice);
-    }
+    const label = document.createElement("span");
+    label.id = `feature-label-${flagKey}`;
+    label.textContent = getString(labelKey);
+    labelWrap.appendChild(label);
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -104,6 +98,17 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.className = "feature-toggle";
     toggle.ariaChecked = String(currentFlags[flagKey]);
     toggle.setAttribute("aria-labelledby", label.id);
+
+    if (noticeKey) {
+      const notice = document.createElement("p");
+      notice.className = "setting-row__notice";
+      notice.id = `feature-notice-${flagKey}`;
+      notice.textContent = getString(noticeKey, noticeSubstitutions);
+      notice.hidden = !currentFlags[flagKey];
+      labelWrap.appendChild(notice); // sibling of the label, not a child — keeps the accessible name stable
+      noticeRefs.set(flagKey, notice);
+      toggle.setAttribute("aria-describedby", notice.id); // caveat as description, not name
+    }
 
     const thumb = document.createElement("span");
     thumb.className = "feature-toggle__thumb";
@@ -141,7 +146,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
 
     toggleBtns.set(flagKey, toggle);
 
-    row.appendChild(label);
+    row.appendChild(labelWrap);
     row.appendChild(toggle);
 
     return row;

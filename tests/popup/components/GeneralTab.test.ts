@@ -204,3 +204,42 @@ describe("refresh-required notice", () => {
     expect(notice.textContent).toBe("INFO__SETTING__REFRESH_REQUIRED");
   });
 });
+
+describe("label associations (M12 — real <label for>, not aria-label)", () => {
+  it.each([
+    ["seek-jump-duration-input", "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT"],
+    ["volume-step-input", "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT"],
+    ["track-restart-threshold-input", "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT"],
+  ])("numeric input #%s has a real <label for> and no aria-label", (inputId, ariaKey) => {
+    const panel = buildPanel();
+    const input = panel.querySelector(`#${inputId}`) as HTMLInputElement;
+    const label = panel.querySelector<HTMLLabelElement>(`label[for="${inputId}"]`);
+
+    expect(input).not.toBeNull();
+    expect(label).not.toBeNull();
+    expect(label?.htmlFor).toBe(inputId);
+    expect(input.hasAttribute("aria-label")).toBe(false);
+    expect(input.getAttribute("aria-describedby")).toBe(`${inputId}-hint ${inputId}-error`);
+    expect(panel.querySelector(`#${inputId}-hint`)?.textContent).toBe(ariaKey);
+  });
+
+  it("the tracklist dropdown height slider has a real <label for> and no aria-label", () => {
+    const panel = buildPanel();
+    const slider = getSlider(panel);
+    const label = panel.querySelector<HTMLLabelElement>('label[for="tracklist-dropdown-height-slider"]');
+
+    expect(label).not.toBeNull();
+    expect(slider.hasAttribute("aria-label")).toBe(false);
+    expect(slider.getAttribute("aria-describedby")).toBe("tracklist-dropdown-height-slider-hint");
+  });
+
+  it("the language select has a real <label for> and no aria-label", () => {
+    const panel = buildPanel();
+    const select = panel.querySelector("#forced-language-select") as HTMLSelectElement;
+    const label = panel.querySelector<HTMLLabelElement>('label[for="forced-language-select"]');
+
+    expect(label).not.toBeNull();
+    expect(select.hasAttribute("aria-label")).toBe(false);
+    expect(select.getAttribute("aria-describedby")).toBe("forced-language-select-hint");
+  });
+});

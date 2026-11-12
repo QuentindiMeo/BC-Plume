@@ -421,7 +421,7 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Полноэкранный музыкальный плеер" },
   "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Дата выпуска не найдена для полноэкранного режима" },
   "LABEL__RELEASE_DATE": {
-    "message": "Выпущено $DATE$",
+    "message": "выпущено $DATE$",
     "placeholders": {
       "date": { "content": "$1", "example": "12 апреля 2019" }
     }
