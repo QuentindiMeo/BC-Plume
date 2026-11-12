@@ -242,6 +242,29 @@ describe("fullscreen focus management (H2d, H5)", () => {
     expect(document.activeElement).toBe(exitBtn);
   });
 
+  it("keeps the exit button in the Tab cycle (position: fixed has no offsetParent, but has client rects)", async () => {
+    // happy-dom has no layout: pretend every element is rendered while offsetParent stays null, as for a fixed element.
+    vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([{}] as unknown as DOMRectList);
+    const overlay = enterFullscreen();
+    await flushInitialFocusTimer();
+
+    const exitBtn = overlay.querySelector<HTMLElement>(`#${EXIT_BTN_ID}`);
+    expect(document.activeElement).toBe(exitBtn);
+
+    // Shift+Tab from the first focusable must wrap to the last one, i.e. the exit button.
+    const first = overlay.querySelector<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    expect(first).not.toBe(exitBtn);
+    first?.focus();
+    first?.dispatchEvent(new KeyboardEvent("keydown", { code: "Tab", shiftKey: true, bubbles: true }));
+    expect(document.activeElement).toBe(exitBtn);
+
+    // Tab from the exit button wraps back to the first focusable.
+    exitBtn?.dispatchEvent(new KeyboardEvent("keydown", { code: "Tab", bubbles: true }));
+    expect(document.activeElement).toBe(first);
+  });
+
   it("restores focus to whatever had focus before fullscreen was opened, after exiting", async () => {
     const trigger = document.createElement("button");
     document.body.appendChild(trigger);

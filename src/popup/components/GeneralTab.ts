@@ -117,12 +117,21 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
     return { valid: true, value: num as WholeNumber };
   };
 
+  // Pending frame that fills the live region; cancelled on every setError so a stale message can't land late.
+  let errorFrame: number | null = null;
+
   const setError = (msg: string | null): void => {
+    if (errorFrame !== null) {
+      cancelAnimationFrame(errorFrame);
+      errorFrame = null;
+    }
     if (msg) {
       // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
       // ? tree, so filling it first means the mutation happens while nothing is watching.
+      error.textContent = "";
       error.hidden = false;
-      requestAnimationFrame(() => {
+      errorFrame = requestAnimationFrame(() => {
+        errorFrame = null;
         error.textContent = msg;
       });
       input.classList.add("is-invalid");

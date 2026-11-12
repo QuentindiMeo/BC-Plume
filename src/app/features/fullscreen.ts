@@ -600,10 +600,10 @@ const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | nul
   return overlay;
 };
 
-// `offsetParent` is null for `display:none` in every engine Plume supports (also for `position: fixed`,
-// which is why the exit button is focused explicitly below rather than relying on this filter).
+// `getClientRects()` is empty for `display:none` (own or ancestor) but, unlike `offsetParent`, stays non-empty
+// for `position: fixed` elements such as the exit button, so they remain part of the focus trap.
 const isVisible = (el: HTMLElement): boolean =>
-  !!el.offsetParent && !el.closest("[inert]") && getComputedStyle(el).visibility !== "hidden";
+  el.getClientRects().length > 0 && !el.closest("[inert]") && getComputedStyle(el).visibility !== "hidden";
 
 // Setup keyboard navigation for fullscreen overlay
 const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {

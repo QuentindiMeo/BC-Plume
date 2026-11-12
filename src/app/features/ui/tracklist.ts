@@ -222,12 +222,13 @@ export const createTracklistToggle = (): {
     else open();
   });
 
+  const ACCEPTED_KEYS = ["ArrowDown", "ArrowUp", "Home", "End", "Enter", " ", "Escape"];
   dropdownEl.addEventListener("keydown", (e: KeyboardEvent) => {
     const playableItems = getPlayableItems();
     const focused = document.activeElement as HTMLDivElement | null;
     const currentIdx = focused ? playableItems.indexOf(focused) : -1;
 
-    e.preventDefault();
+    if (!ACCEPTED_KEYS.includes(e.key)) return;
     switch (e.key) {
       case "ArrowDown":
         playableItems[currentIdx + 1]?.focus();

@@ -125,12 +125,12 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       if (notice) notice.hidden = !currentFlags[flagKey];
 
       // visualizer requires bpmDetect: enforce the dependency in both directions
-      if (flagKey === "visualizer" && currentFlags.visualizer) {
+      if (flagKey === "visualizer" && currentFlags.visualizer && !currentFlags.bpmDetect) {
         currentFlags.bpmDetect = true;
         const bpmBtn = toggleBtns.get("bpmDetect");
         if (bpmBtn) bpmBtn.ariaChecked = "true";
         announce(getString("ARIA__FEATURES__BPM_AUTO_ENABLED"));
-      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect) {
+      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect && currentFlags.visualizer) {
         currentFlags.visualizer = false;
         const vizBtn = toggleBtns.get("visualizer");
         if (vizBtn) vizBtn.ariaChecked = "false";

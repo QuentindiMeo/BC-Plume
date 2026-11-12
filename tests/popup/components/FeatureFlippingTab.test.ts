@@ -46,6 +46,26 @@ describe("visualizer ↔ bpmDetect dependency enforcement", () => {
     expect(document.querySelector(".sr-live")?.textContent).toBe("ARIA__FEATURES__BPM_AUTO_ENABLED");
   });
 
+  it("does not announce bpmDetect as auto-enabled when it was already enabled", async () => {
+    const wrapper = buildPanel({ visualizer: false, bpmDetect: true });
+    document.querySelectorAll(".sr-live").forEach((el) => (el.textContent = ""));
+    getToggle(wrapper, "visualizer").click();
+
+    await flushAnnounceFrame();
+    expect(getToggle(wrapper, "visualizer").ariaChecked).toBe("true");
+    expect(document.body.textContent).not.toContain("ARIA__FEATURES__BPM_AUTO_ENABLED");
+  });
+
+  it("does not announce visualizer as auto-disabled when it was already disabled", async () => {
+    const wrapper = buildPanel({ visualizer: false, bpmDetect: true });
+    document.querySelectorAll(".sr-live").forEach((el) => (el.textContent = ""));
+    getToggle(wrapper, "bpmDetect").click();
+
+    await flushAnnounceFrame();
+    expect(getToggle(wrapper, "bpmDetect").ariaChecked).toBe("false");
+    expect(document.body.textContent).not.toContain("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED");
+  });
+
   it("enabling visualizer persists both flags as true", () => {
     const wrapper = buildPanel({ visualizer: false, bpmDetect: false });
     getToggle(wrapper, "visualizer").click();

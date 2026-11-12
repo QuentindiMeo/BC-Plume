@@ -243,3 +243,32 @@ describe("label associations (M12 — real <label for>, not aria-label)", () => 
     expect(select.getAttribute("aria-describedby")).toBe("forced-language-select-hint");
   });
 });
+
+describe("numeric input error live region", () => {
+  const getInput = (panel: HTMLElement): HTMLInputElement =>
+    panel.querySelector("#seek-jump-duration-input") as HTMLInputElement;
+  const getError = (input: HTMLInputElement): HTMLElement =>
+    input.closest(".setting-row")!.querySelector(".general-row__error") as HTMLElement;
+  const type = (input: HTMLInputElement, value: string) => {
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  };
+
+  it("never writes a stale error message after a valid input hid it (invalid → valid → invalid)", () => {
+    const panel = buildPanel();
+    const input = getInput(panel);
+    const error = getError(input);
+
+    type(input, "99999"); // invalid: schedules the frame that writes the message
+    type(input, "5"); // valid before the frame fires: hides + clears
+    vi.advanceTimersByTime(50);
+    expect(error.hidden).toBe(true);
+    expect(error.textContent).toBe("");
+
+    type(input, "abc"); // invalid again: blank on reveal, filled only by its own frame
+    expect(error.hidden).toBe(false);
+    expect(error.textContent).toBe("");
+    vi.advanceTimersByTime(50);
+    expect(error.textContent).not.toBe("");
+  });
+});
