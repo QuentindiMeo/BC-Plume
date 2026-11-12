@@ -185,7 +185,7 @@ describe("buildFullscreenOverlay release date", () => {
 
     const releaseDateEl = overlay.querySelector(`#${RELEASE_DATE_ID}`);
     expect(releaseDateEl).not.toBeNull();
-    expect(releaseDateEl?.textContent).toBe("Released April 12, 2019");
+    expect(releaseDateEl?.textContent).toBe("released April 12, 2019");
     expect(releaseDateEl?.closest(`.${TITLING_CLASS}`)).not.toBeNull();
   });
 

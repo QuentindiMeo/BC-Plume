@@ -1,4 +1,4 @@
-export const APP_VERSION = "v1.13.1";
+export const APP_VERSION = "v1.14.0";
 export const APP_RELEASE_DATE = "2026-05-15";
 export const PLUME_AUTHOR = "Quentin DI MEO";
 export const PLUME_LICENSE = "MIT";
