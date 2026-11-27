@@ -1,4 +1,4 @@
-import { checkBandcampElements } from "@/app/features/bc-diagnostic";
+import { checkBandcampElements, isBcErrorPage } from "@/app/features/bc-diagnostic";
 import { debugBandcampControls } from "@/app/features/debug";
 import { injectEnhancements } from "@/app/features/injection";
 import {
@@ -99,6 +99,12 @@ export const launchPlume = (): void => {
     if (document.readyState !== "complete") {
       isInitializing = false;
       window.addEventListener("load", init, { once: true });
+      return;
+    }
+
+    if (isBcErrorPage()) {
+      logger(CPL.INFO, getString("INFO__BC_HEALTH_CHECK__ERROR_PAGE"));
+      isInitializing = false;
       return;
     }
 

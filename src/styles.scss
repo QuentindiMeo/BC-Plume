@@ -14,6 +14,16 @@
   display: none !important;
 }
 
+/* Long-title horizontal auto-scroll: shared inner text wrapper for header + tracklist item titles.
+   The distance/duration custom properties are set per-instance by applyMarqueeText(). Stays `display: inline`
+   at rest (identical to plain text) so the base ellipsis truncation renders exactly as it did before the
+   marquee wrapper existed — an atomic `inline-block` box can get dropped whole at the clip point instead of
+   partially revealed. It only switches to `inline-block` where animated (required for `transform` to apply —
+   see the `:hover`/`:focus` rules below), matching the pre-marquee ellipsis method as the base state. */
+.plume-marquee__text {
+  @apply inline whitespace-nowrap;
+}
+
 /*********** Bandcamp native element overrides ***********/
 @layer plume.base {
   div#name-section {
@@ -35,10 +45,8 @@
 
   .inline_player {
     /* parent component */
-    @apply
-      z-9 /* ensure it stays above other contents, especially the album collection promotion */
-      sticky! top-0 my-4! mx-0! rounded-lg
-    ;
+    @apply z-9 /* ensure it stays above other contents, especially the album collection promotion */
+      sticky! top-0 my-4! mx-0! rounded-lg;
     transition:
       background-color 0.2s ease,
       margin 0.2s ease !important;
@@ -133,11 +141,9 @@
   }
 
   #plume-tracklist-toggle-btn {
-    @apply
-      shrink-0 size-5 p-0 pt-1 bg-transparent! m-0 border-none!
+    @apply shrink-0 size-5 p-0 pt-1 bg-transparent! m-0 border-none!
       flex items-center justify-center
-      text-white/70! cursor-pointer
-    ;
+      text-white/70! cursor-pointer;
 
     &:hover {
       @apply text-white;
@@ -191,6 +197,19 @@
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  #plume-header-current:hover #plume-header-title.plume-marquee--overflowing,
+  #plume-header-current:has(:focus-visible) #plume-header-title.plume-marquee--overflowing {
+    text-overflow: clip;
+
+    .plume-marquee__text {
+      display: inline-block;
+      animation: plume-marquee-scroll var(--plume-marquee-duration, 6s) ease-in-out infinite alternate;
+      will-change: transform;
+    }
+  }
+}
+
 #plume-tracklist-dropdown {
   @apply max-h-0 overflow-hidden opacity-0 rounded-b-lg bg-glass-bg;
   transition:
@@ -210,12 +229,11 @@
   }
 
   &.is-open {
-    @apply
-      max-h-(--tracklist-max-height--folded) border-t border-t-white/8 overflow-y-auto
-      opacity-100 transition-[max-height,opacity]
-    ;
+    @apply max-h-(--tracklist-max-height--folded) border-t border-t-white/8 overflow-y-auto
+      opacity-100 transition-[max-height,opacity];
 
-    &:hover {
+    &:hover,
+    &.is-large {
       @apply max-h-(--tracklist-max-height--unfolded);
     }
 
@@ -257,13 +275,14 @@
     }
 
     @media (prefers-contrast: more) {
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         @apply bg-white/15;
       }
     }
 
     &__number {
-      @apply shrink-0 min-w-6 text-right text-xs text-text-muted;
+      @apply shrink-0 min-w-6 text-right text-xs text-text-muted tabular-nums;
 
       .plume-tracklist-item--active & {
         @apply text-plume-light;
@@ -274,6 +293,23 @@
     }
     &__duration {
       @apply shrink-0 text-xs tabular-nums text-text-muted;
+    }
+  }
+}
+
+/* Written flat (not nested under #plume-tracklist-dropdown .plume-tracklist-item) because Sass expands every `&`
+   to the full ancestor chain: nesting this here would double up the prefix into an unmatchable selector. Also
+   needs the #plume-tracklist-dropdown + &__title prefix to out-specificity the base &__title rule above (1 ID),
+   otherwise text-overflow: clip never wins and the ellipsis stays drawn over the sliding text while hovering. */
+@media (prefers-reduced-motion: no-preference) {
+  #plume-tracklist-dropdown .plume-tracklist-item:hover .plume-tracklist-item__title.plume-marquee--overflowing,
+  #plume-tracklist-dropdown .plume-tracklist-item:focus .plume-tracklist-item__title.plume-marquee--overflowing {
+    text-overflow: clip;
+
+    .plume-marquee__text {
+      display: inline-block;
+      animation: plume-marquee-scroll var(--plume-marquee-duration, 6s) ease-in-out infinite alternate;
+      will-change: transform;
     }
   }
 }
@@ -299,6 +335,11 @@
   &:has(canvas#plume-waveform-canvas:not(.plume-feature-hidden)) {
     #plume-progress-slider {
       @apply opacity-0 pointer-events-none;
+
+      // Focus makes the real control visible again — the canvas is decorative at that point
+      &:focus-visible {
+        @apply opacity-100;
+      }
     }
 
     canvas#plume-waveform-canvas {
@@ -327,11 +368,10 @@
       @apply outline-offset-4;
     }
 
-    &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
-      @apply
-        size-(--thumb-size) bg-white rounded-full shadow-thumb
-        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-      ;
+    // ! must be declared separately from the moz one to work on both engines
+    &::-webkit-slider-thumb {
+      @apply size-(--thumb-size) bg-white rounded-full shadow-thumb
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity];
       -webkit-appearance: none;
 
       &:hover {
@@ -342,10 +382,8 @@
       }
     }
     &::-moz-range-thumb {
-      @apply
-        size-(--thumb-size) bg-white border-none rounded-full shadow-thumb
-        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-      ;
+      @apply size-(--thumb-size) bg-white border-none rounded-full shadow-thumb
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity];
       -webkit-appearance: none;
 
       &:hover {
@@ -379,11 +417,9 @@
   @apply mb-1 flex justify-center items-center gap-3;
 
   button {
-    @apply
-      size-10 bg-white/10! rounded-full mr-0! border-2 border-white/20!
+    @apply size-10 bg-white/10! rounded-full mr-0! border-2 border-white/20!
       flex items-center justify-center
-      text-white! transition-[transform,background,border-color,box-shadow,opacity] backdrop-blur-[10px]
-    ;
+      text-white! transition-[transform,background,border-color,box-shadow,opacity] backdrop-blur-[10px];
 
     &:hover {
       @apply scale-110 bg-white/15! border-plume-dimmed!;
@@ -457,12 +493,10 @@
   }
 
   .plume-speed-popover {
-    @apply
-      z-50 absolute left-1/2 -translate-x-1/2
+    @apply z-50 absolute left-1/2 -translate-x-1/2
       w-32 px-3 py-2 bg-black/85 border border-white/15 rounded-lg backdrop-blur-sm
       flex flex-col gap-2 items-center
-      opacity-0 pointer-events-none transition-opacity
-    ;
+      opacity-0 pointer-events-none transition-opacity;
     top: calc(100% + 0.5rem);
 
     &--visible {
@@ -478,10 +512,8 @@
       -webkit-appearance: none;
 
       &::-webkit-slider-thumb {
-        @apply
-          size-3 bg-plume-dimmed border-none rounded-full
-          appearance-none cursor-grab transition-[transform,background]
-        ;
+        @apply size-3 bg-plume-dimmed border-none rounded-full
+          appearance-none cursor-grab transition-[transform,background];
         -webkit-appearance: none;
 
         &:hover {
@@ -525,11 +557,9 @@
   @apply relative py-3 px-4 m-0 flex items-center gap-3 rounded-lg bg-glass-bg;
 
   #plume-mute-btn {
-    @apply
-      size-8 p-0 m-0 bg-transparent! border-none!
+    @apply size-8 p-0 m-0 bg-transparent! border-none!
       flex shrink-0 items-center justify-center
-      text-white! transition-[color,opacity]
-    ;
+      text-white! transition-[color,opacity];
 
     &:hover {
       @apply text-plume-light!;
@@ -560,11 +590,10 @@
       @apply outline-offset-8;
     }
 
-    &::-webkit-slider-thumb { // ! must be declared separately from the moz one to work on both engines
-      @apply
-        size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
-        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-      ;
+    // ! must be declared separately from the moz one to work on both engines
+    &::-webkit-slider-thumb {
+      @apply size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity];
       -webkit-appearance: none;
 
       &:hover {
@@ -575,10 +604,8 @@
       }
     }
     &::-moz-range-thumb {
-      @apply
-        size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
-        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity]
-      ;
+      @apply size-4 bg-plume-dimmed border-none rounded-[25%] shadow-thumb-sm
+        cursor-grab appearance-none transition-[transform,background,border-color,box-shadow,opacity];
       -webkit-appearance: none;
 
       &:hover {
@@ -617,16 +644,14 @@
       @apply text-plume-dimmed animate-pulse;
     }
     &.error {
-      @apply text-red-400/70;
+      @apply text-red-700;
     }
   }
 
   #plume-bpm-detect-all-btn {
-    @apply
-      h-6 px-2 py-0 ml-auto bg-white/5 border border-white/15 rounded
+    @apply h-6 px-2 py-0 ml-auto bg-white/5 border border-white/15 rounded
       font-sans font-medium text-xs text-plume-dimmed
-      transition-[color,background,border-color]
-    ;
+      transition-[color,background,border-color];
 
     &:hover {
       @apply bg-white/15 border-white/30 text-white;
@@ -641,18 +666,16 @@
 }
 
 .plume-bpm-badge {
-  @apply
-    ml-1 px-1.5 py-0 rounded bg-white/5 border border-white/10
+  @apply ml-1 px-1.5 py-0 rounded bg-white/5 border border-white/10
     inline-flex items-center justify-center
     font-sans font-semibold text-2xs text-plume-dimmed tabular-nums
-    leading-tight whitespace-nowrap
-  ;
+    leading-tight whitespace-nowrap;
 
   &.detecting {
     @apply animate-pulse;
   }
   &.error {
-    @apply text-red-400/50;
+    @apply text-red-700;
   }
 }
 
@@ -660,11 +683,9 @@
   @apply flex justify-center py-2;
 
   #plume-fullscreen-btn {
-    @apply
-      z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg border border-white/15!
+    @apply z-10 h-8! w-min! py-0 px-2 bg-white/5! m-0 rounded-lg border border-white/15!
       flex items-center gap-2
-      text-white! backdrop-blur-sm transition-transform
-    ;
+      text-white! backdrop-blur-sm transition-transform;
 
     &:hover {
       @apply scale-[102.5%] bg-white/15! border-white/30!;
@@ -736,7 +757,8 @@
       }
 
       .plume-fullscreen-titling {
-        @apply absolute bottom-[-8vh] flex flex-col items-center gap-1;
+        @apply absolute flex flex-col items-center gap-1;
+        top: calc(100% + 0.5rem);
         animation: slideInRight 0.5s ease-out;
 
         h2,
@@ -751,6 +773,11 @@
           span.runtime {
             @apply text-xs font-medium not-italic text-white/70!;
           }
+        }
+
+        p#plume-fullscreen-titling__release-date {
+          @apply m-0 text-center text-xs font-medium text-white/70;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
         }
 
         @media (max-width: 768px) {
@@ -796,12 +823,10 @@
   }
 
   #plume-fullscreen-exit-btn {
-    @apply
-      z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full border-2 border-white/30
+    @apply z-10001 fixed top-6 right-6 size-12 bg-black/70 rounded-full border-2 border-white/30
       flex items-center justify-center
       text-white backdrop-blur-sm
-      transition-[transform,background,border-color,box-shadow,opacity]
-    ;
+      transition-[transform,background,border-color,box-shadow,opacity];
     animation: fadeIn 0.3s ease-out;
 
     &:hover {
@@ -831,12 +856,10 @@
   }
 
   .plume-toast {
-    @apply
-      relative overflow-hidden
+    @apply relative overflow-hidden
       w-[calc(100vw-2.5rem)] max-w-sm py-3.5 px-4 rounded-lg bg-toast-bg border border-toast-accent
       flex items-start
-      font-sans backdrop-blur-sm transition-[background,box-shadow]
-    ;
+      font-sans backdrop-blur-sm transition-[background,box-shadow];
     box-shadow:
       0 4px 24px rgba(0, 0, 0, 0.5),
       0 0 0 1px var(--color-plume-15);
@@ -895,12 +918,10 @@
     }
 
     &__dismiss {
-      @apply
-        shrink-0 size-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
+      @apply shrink-0 size-11 bg-transparent mx-0 -my-3 border-none rounded-focusable
         flex items-center justify-center
         leading-none text-xl text-white/50
-        cursor-pointer transition-colors
-      ;
+        cursor-pointer transition-colors;
 
       &:hover {
         @apply text-white;
@@ -908,7 +929,7 @@
     }
 
     &__timer {
-      @apply absolute h-[3px] bottom-0 left-0 w-full pointer-events-none;
+      @apply absolute h-0.75 bottom-0 left-0 w-full pointer-events-none;
       background: linear-gradient(90deg, var(--color-plume-light), var(--color-plume-dimmed));
       animation: plume-toast-timer-drain var(--toast-timer-duration, 10s) linear forwards;
     }

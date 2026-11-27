@@ -18,6 +18,8 @@ import {
   type TimeDisplayMethodType,
   TRACK_RESTART_THRESHOLD_MAX,
   TRACK_RESTART_THRESHOLD_MIN,
+  TRACKLIST_DROPDOWN_HEIGHT_MAX,
+  TRACKLIST_DROPDOWN_HEIGHT_MIN,
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
 } from "@/domain/plume";
@@ -33,6 +35,7 @@ const INITIAL_STATE: AppCore = {
   pageType: null,
   trackTitle: null,
   trackNumber: null,
+  isTracklistExpanded: false,
   duration: 0,
   currentTime: 0,
   isPlaying: false,
@@ -48,6 +51,7 @@ const INITIAL_STATE: AppCore = {
   seekJumpDuration: PLUME_DEFAULTS.seekJumpDuration,
   volumeHotkeyStep: PLUME_DEFAULTS.volumeHotkeyStep,
   trackRestartThreshold: PLUME_DEFAULTS.trackRestartThreshold,
+  tracklistDropdownHeight: PLUME_DEFAULTS.tracklistDropdownHeight,
   hotkeyBindings: { ...DEFAULT_HOTKEYS },
   featureFlags: { ...PLUME_DEFAULTS.featureFlags },
 };
@@ -61,6 +65,7 @@ const PERSISTED_KEYS: ReadonlySet<keyof AppCore> = new Set<keyof AppCore>([
   "seekJumpDuration",
   "volumeHotkeyStep",
   "trackRestartThreshold",
+  "tracklistDropdownHeight",
   "hotkeyBindings",
   "featureFlags",
 ]);
@@ -111,6 +116,8 @@ const createAppCoreInstance = (): IAppCore => {
           toSave[PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP] = state.volumeHotkeyStep;
         } else if (key === "trackRestartThreshold") {
           toSave[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] = state.trackRestartThreshold;
+        } else if (key === "tracklistDropdownHeight") {
+          toSave[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] = state.tracklistDropdownHeight;
         } else if (key === "hotkeyBindings") {
           toSave[PLUME_CACHE_KEYS.HOTKEY_BINDINGS] = state.hotkeyBindings;
         }
@@ -203,13 +210,8 @@ const createAppCoreInstance = (): IAppCore => {
       case CORE_ACTIONS.SET_TRACK_NUMBER:
         updateState("trackNumber", action.payload);
         break;
-      case CORE_ACTIONS.SET_VOLUME:
-        const volume = action.payload;
-        if (!isValidVolume(volume)) {
-          logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
-          return;
-        }
-        updateState("volume", action.payload);
+      case CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED:
+        updateState("isTracklistExpanded", action.payload);
         break;
       case CORE_ACTIONS.SET_DURATION_DISPLAY_METHOD:
         updateState("durationDisplayMethod", action.payload);
@@ -233,23 +235,6 @@ const createAppCoreInstance = (): IAppCore => {
         updateState("playbackSpeed", Math.round(speed * 100) / 100);
         break;
       }
-      case CORE_ACTIONS.SET_IS_MUTED:
-        updateState("isMuted", action.payload);
-        break;
-      case CORE_ACTIONS.TOGGLE_MUTE: {
-        if (state.isMuted) {
-          // Unmute: restore previous volume
-          const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
-          updateState("volume", restoredVolume);
-          updateState("isMuted", false);
-        } else {
-          // Mute: save current volume and set to 0
-          updateState("volumeBeforeMute", state.volume);
-          updateState("volume", 0);
-          updateState("isMuted", true);
-        }
-        break;
-      }
       case CORE_ACTIONS.SET_TRACK_BPM_LOADING:
         updateState("trackBpms", {
           ...state.trackBpms,
@@ -270,6 +255,47 @@ const createAppCoreInstance = (): IAppCore => {
         break;
       case CORE_ACTIONS.CLEAR_TRACK_BPMS:
         updateState("trackBpms", {});
+        break;
+      case CORE_ACTIONS.SET_LOOP_MODE:
+        updateState("loopMode", action.payload);
+        break;
+      case CORE_ACTIONS.CYCLE_LOOP_MODE: {
+        const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
+        const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
+        const nextMode = LOOP_MODE_CYCLE[nextIndex];
+
+        // If current page is track, skip to track loop (collection loop doesn't make sense on track page)
+        if (state.pageType === "track" && nextMode === LOOP_MODE.COLLECTION) {
+          updateState("loopMode", LOOP_MODE.TRACK);
+        } else {
+          updateState("loopMode", nextMode);
+        }
+        break;
+      }
+      case CORE_ACTIONS.SET_IS_MUTED:
+        updateState("isMuted", action.payload);
+        break;
+      case CORE_ACTIONS.TOGGLE_MUTE: {
+        if (state.isMuted) {
+          // Unmute: restore previous volume
+          const restoredVolume = state.volumeBeforeMute > 0 ? state.volumeBeforeMute : PLUME_DEFAULTS.savedVolume;
+          updateState("volume", restoredVolume);
+          updateState("isMuted", false);
+        } else {
+          // Mute: save current volume and set to 0
+          updateState("volumeBeforeMute", state.volume);
+          updateState("volume", 0);
+          updateState("isMuted", true);
+        }
+        break;
+      }
+      case CORE_ACTIONS.SET_VOLUME:
+        const volume = action.payload;
+        if (!isValidVolume(volume)) {
+          logger(CPL.WARN, getString("WARN__VOLUME__INVALID_VALUE"), [action.payload]);
+          return;
+        }
+        updateState("volume", action.payload);
         break;
       case CORE_ACTIONS.SET_IS_FULLSCREEN:
         updateState("isFullscreen", action.payload);
@@ -306,22 +332,16 @@ const createAppCoreInstance = (): IAppCore => {
           updateState("trackRestartThreshold", defaultTrackRestartThreshold);
         }
         break;
-      case CORE_ACTIONS.SET_LOOP_MODE:
-        updateState("loopMode", action.payload);
-        break;
-      case CORE_ACTIONS.CYCLE_LOOP_MODE: {
-        const currentIndex = LOOP_MODE_CYCLE.indexOf(state.loopMode);
-        const nextIndex = (currentIndex + 1) % LOOP_MODE_CYCLE.length;
-        const nextMode = LOOP_MODE_CYCLE[nextIndex];
-
-        // If current page is track, skip to track loop (collection loop doesn't make sense on track page)
-        if (state.pageType === "track" && nextMode === LOOP_MODE.COLLECTION) {
-          updateState("loopMode", LOOP_MODE.TRACK);
-        } else {
-          updateState("loopMode", nextMode);
+      case CORE_ACTIONS.SET_TRACKLIST_DROPDOWN_HEIGHT:
+        try {
+          assertBoundedInteger(action.payload, TRACKLIST_DROPDOWN_HEIGHT_MIN, TRACKLIST_DROPDOWN_HEIGHT_MAX);
+          updateState("tracklistDropdownHeight", action.payload);
+        } catch {
+          logger(CPL.WARN, getString("WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE"));
+          const defaultTracklistDropdownHeight = PLUME_DEFAULTS.tracklistDropdownHeight;
+          updateState("tracklistDropdownHeight", defaultTracklistDropdownHeight);
         }
         break;
-      }
       case CORE_ACTIONS.SET_HOTKEY_BINDINGS:
         updateState("hotkeyBindings", action.payload);
         break;
@@ -345,6 +365,7 @@ const createAppCoreInstance = (): IAppCore => {
         PLUME_CACHE_KEYS.SEEK_JUMP_DURATION,
         PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP,
         PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD,
+        PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT,
         PLUME_CACHE_KEYS.HOTKEY_BINDINGS,
         PLUME_CACHE_KEYS.FEATURE_FLAGS,
       ];
@@ -400,6 +421,32 @@ const createAppCoreInstance = (): IAppCore => {
         logger(CPL.INFO, getString("INFO__VOLUME__LOADED"), [`${Math.round(clampedVolume * 100)}%`]);
       }
 
+      if (result[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT] !== undefined) {
+        const value = result[PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT];
+        try {
+          assertBoundedInteger(value, TRACKLIST_DROPDOWN_HEIGHT_MIN, TRACKLIST_DROPDOWN_HEIGHT_MAX);
+          dispatch(coreActions.setTracklistDropdownHeight(value));
+          logger(CPL.INFO, getString("INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED"), `${value}`);
+        } catch {
+          logger(CPL.WARN, getString("WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE"));
+          const defaultHeight = PLUME_DEFAULTS.tracklistDropdownHeight;
+          dispatch(coreActions.setTracklistDropdownHeight(defaultHeight));
+        }
+      }
+
+      if (result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] !== undefined) {
+        const value = result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD];
+        try {
+          assertBoundedInteger(value, TRACK_RESTART_THRESHOLD_MIN, TRACK_RESTART_THRESHOLD_MAX);
+          dispatch(coreActions.setTrackRestartThreshold(value));
+          logger(CPL.INFO, getString("INFO__TRACK_RESTART_THRESHOLD__LOADED"), `${value}s`);
+        } catch {
+          logger(CPL.WARN, getString("WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE"));
+          const defaultThreshold = PLUME_DEFAULTS.trackRestartThreshold;
+          dispatch(coreActions.setTrackRestartThreshold(defaultThreshold));
+        }
+      }
+
       if (result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION] !== undefined) {
         const value = result[PLUME_CACHE_KEYS.SEEK_JUMP_DURATION];
         try {
@@ -423,19 +470,6 @@ const createAppCoreInstance = (): IAppCore => {
           logger(CPL.WARN, getString("WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE"));
           const defaultVolumeStep = PLUME_DEFAULTS.volumeHotkeyStep;
           dispatch(coreActions.setVolumeHotkeyStep(defaultVolumeStep));
-        }
-      }
-
-      if (result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD] !== undefined) {
-        const value = result[PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD];
-        try {
-          assertBoundedInteger(value, TRACK_RESTART_THRESHOLD_MIN, TRACK_RESTART_THRESHOLD_MAX);
-          dispatch(coreActions.setTrackRestartThreshold(value));
-          logger(CPL.INFO, getString("INFO__TRACK_RESTART_THRESHOLD__LOADED"), `${value}s`);
-        } catch {
-          logger(CPL.WARN, getString("WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE"));
-          const defaultThreshold = PLUME_DEFAULTS.trackRestartThreshold;
-          dispatch(coreActions.setTrackRestartThreshold(defaultThreshold));
         }
       }
 
@@ -463,6 +497,10 @@ const createAppCoreInstance = (): IAppCore => {
       const storedFlags = result[PLUME_CACHE_KEYS.FEATURE_FLAGS];
       if (storedFlags !== undefined && typeof storedFlags === "object" && storedFlags !== null) {
         dispatch(coreActions.setFeatureFlags(storedFlags));
+      }
+
+      if (state.featureFlags.tracklist && state.featureFlags.tracklistExpandedByDefault) {
+        dispatch(coreActions.setIsTracklistExpanded(true));
       }
     } catch (error) {
       logger(CPL.ERROR, getString("ERROR__STATE__LOAD_FAILED"), error);

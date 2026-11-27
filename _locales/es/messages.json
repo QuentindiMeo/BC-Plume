@@ -44,6 +44,20 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Todos los elementos de Bandcamp encontrados" },
+  "INFO__BC_HEALTH_CHECK__ERROR_PAGE": {
+    "message": "Página de error de Bandcamp detectada (tralbum desconocido o eliminado); se omite la comprobación de estado"
+  },
+  "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
+    "message": "Este navegador no interpreta correctamente el formato de fecha de publicación de Bandcamp ($MUESTRA$: se esperaba $ESPERADO$, se obtuvo $OBTENIDO$); las fechas de publicación se ocultarán",
+    "placeholders": {
+      "muestra": { "content": "$1", "example": "12 Apr 2019 00:00:00 GMT" },
+      "esperado": { "content": "$2", "example": "2019-04-12T00:00:00.000Z" },
+      "obtenido": { "content": "$3", "example": "NaN" }
+    }
+  },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Formato de fecha de publicación de Bandcamp interpretado correctamente por este navegador"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "No se puede encontrar un contenedor adecuado" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento padre del reproductor no encontrado" },
@@ -144,6 +158,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$HORAS$ h $MINUTOS$ min $SEGUNDOS$ s$REPRODUCIBLE$",
+    "placeholders": {
+      "horas": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutos": {
+        "content": "$2",
+        "example": "18"
+      },
+      "segundos": {
+        "content": "$3",
+        "example": "30"
+      },
+      "reproducible": {
+        "content": "$4",
+        "example": " reproducible"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " reproducible" },
   "ARIA__RUNTIME__LABEL": {
     "message": "El tiempo total es de $MINUTOS$ minutos y $SEGUNDOS$ segundos",
@@ -154,6 +189,23 @@
       },
       "segundos": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "El tiempo total es de $HORAS$ horas, $MINUTOS$ minutos y $SEGUNDOS$ segundos",
+    "placeholders": {
+      "horas": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutos": {
+        "content": "$2",
+        "example": "18"
+      },
+      "segundos": {
+        "content": "$3",
         "example": "30"
       }
     }
@@ -299,7 +351,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Botón de velocidad pulsado" },
-  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Velocidad personalizada rechazada (fuera del rango o no numérica)" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": {
+    "message": "Velocidad personalizada rechazada (fuera del rango o no numérica)"
+  },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Velocidad de reproducción personalizada" },
   "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clic para introducir una velocidad personalizada" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocidad de reproducción cargada:" },
@@ -371,6 +425,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reproductor de música en pantalla completa" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Fecha de publicación no encontrada para modo de pantalla completa" },
+  "LABEL__RELEASE_DATE": {
+    "message": "publicado el $FECHA$",
+    "placeholders": {
+      "fecha": { "content": "$1", "example": "12 de abril de 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "La fecha de publicación es $FECHA$",
+    "placeholders": {
+      "fecha": { "content": "$1", "example": "12 de abril de 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualizador de audio" },
 
@@ -383,6 +450,7 @@
   "LABEL__TAB__RESET": { "message": "Restablecer todo" },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "pistas" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "General" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Error al guardar la preferencia de idioma" },
@@ -460,6 +528,8 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Duración total" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Ir a la pista" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Lista de pistas" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Lista de pistas abierta por defecto" },
+  "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE": { "message": "Lista de pistas siempre grande" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Búsqueda rápida (0–9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barra de progreso con forma de onda" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {
@@ -471,6 +541,12 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Modo pantalla completa" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Detección de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Error al guardar las preferencias de funciones" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Detección de BPM activada automáticamente: la requiere el Visualizador de audio"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Visualizador de audio desactivado automáticamente: requiere la Detección de BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Debe ser un número entero" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Debe estar entre 1 y 300" },
@@ -503,6 +579,14 @@
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Segundos dentro de los cuales el botón de pista anterior reinicia la pista actual"
   },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": { "message": "Error al guardar la altura de la lista de pistas" },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valor de altura de la lista de pistas no válido, usando el valor predeterminado"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Altura de la lista de pistas cargada:" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Altura de la lista de pistas" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Número de pistas visibles en la lista de pistas" },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Error al analizar el SVG del icono del toast" },
   "WARN__TOAST__ICON_SVG_INVALID": {
@@ -597,7 +681,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "¿Te suena bien?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume es gratuita y siempre lo será. Si ha mejorado tu experiencia en Bandcamp, un pequeño apoyo significa mucho." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume es gratuita y siempre lo será. Si ha mejorado tu experiencia en Bandcamp, un pequeño apoyo significa mucho."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Apoya a Plume" },
   "META__TOAST__DONATION": { "message": "donación" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
@@ -647,7 +733,7 @@
   "LABEL__ABOUT__LINK__GITHUB": { "message": "Código fuente" },
   "ARIA__ABOUT__LINK__GITHUB": { "message": "Ver el código fuente de Plume en GitHub" },
   "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Historial de cambios" },
-  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Ver las notas de versión de Plume en GitHub" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Ver el historial de cambios de Plume en GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Reportar un problema" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Reportar un problema en GitHub" },
   "LABEL__ABOUT__LINK__DONATION": { "message": "Apoya a Plume" },

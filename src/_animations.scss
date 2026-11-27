@@ -69,3 +69,14 @@
     width: 0%;
   }
 }
+
+@keyframes plume-marquee-scroll {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+  88%,
+  100% {
+    transform: translateX(var(--plume-marquee-distance, 0px));
+  }
+}

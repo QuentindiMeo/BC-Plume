@@ -62,6 +62,7 @@ export enum PLUME_ELEM_SELECTORS {
   fullscreenTitlingContainer = "div.plume-fullscreen-titling",
   fullscreenTitlingRelease = "h2#plume-fullscreen-titling__release",
   fullscreenTitlingArtist = "h3#plume-fullscreen-titling__artist",
+  fullscreenTitlingReleaseDate = "p#plume-fullscreen-titling__release-date",
   fullscreenClone = "div#plume-fullscreen-clone",
 }
 

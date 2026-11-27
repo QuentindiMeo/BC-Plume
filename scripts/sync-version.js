@@ -66,7 +66,7 @@ if (fs.existsSync(logoVersionConstantPath)) {
   const versionConstRegex = /APP_VERSION = ['"]v(\d+\.\d+\.\d+)['"]/;
   const versionConstMatch = constantsContent.match(versionConstRegex);
   if (versionConstMatch && versionConstMatch[1] !== packageVersion) {
-    constantsContent = constantsContent.replace(versionConstRegex, `APP_VERSION = 'v${packageVersion}'`);
+    constantsContent = constantsContent.replace(versionConstRegex, `APP_VERSION = "v${packageVersion}"`);
     console.log(`✅ Updated APP_VERSION constant to ${packageVersion}`);
     metaChanged = true;
   } else if (!versionConstMatch) {

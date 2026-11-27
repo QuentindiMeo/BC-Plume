@@ -1,4 +1,5 @@
 import { toggleFullscreenMode } from "@/app/features/fullscreen";
+import { applyMarqueeText } from "@/app/features/marquee";
 import { findOriginalPlayerContainer, hideOriginalPlayerElements } from "@/app/features/original-player";
 import { getInfoSectionWithRuntime } from "@/app/features/runtime";
 import { getTrackQuantifiers } from "@/app/features/track-quantifiers";
@@ -21,7 +22,7 @@ import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
 import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getActiveLocale, getString } from "@/shared/i18n";
+import { getActiveLangTag, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement } from "@/shared/svg";
@@ -93,7 +94,7 @@ const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => 
 
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
-  plumeContainer.lang = getActiveLocale();
+  plumeContainer.lang = getActiveLangTag();
   plumeContainer.role = "region";
   plumeContainer.ariaLabel = getString("ARIA__APP_NAME");
 
@@ -171,9 +172,9 @@ const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => 
 
   const currentTitleText = document.createElement("span");
   currentTitleText.id = PLUME_ELEM_SELECTORS.headerTitle.split("#")[1];
-  currentTitleText.textContent = initialTrackTitle;
   currentTitleText.title = initialTrackTitle; // see full title on hover in case title is truncated
   currentTitleText.ariaHidden = "true"; // hide from screen readers to avoid redundancy
+  applyMarqueeText(currentTitleText, initialTrackTitle);
   titleRow.appendChild(currentTitleText);
 
   let tracklistCleanup: CleanupCallback = () => {}; // not optional because of return type

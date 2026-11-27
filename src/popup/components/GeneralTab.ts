@@ -8,6 +8,8 @@ import {
   SEEK_JUMP_DURATION_MIN,
   TRACK_RESTART_THRESHOLD_MAX,
   TRACK_RESTART_THRESHOLD_MIN,
+  TRACKLIST_DROPDOWN_HEIGHT_MAX,
+  TRACKLIST_DROPDOWN_HEIGHT_MIN,
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
   WholeNumber,
@@ -18,6 +20,7 @@ import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveForcedLanguage } from "@/popup/use-cases/saveForcedLanguage";
 import { saveSeekJumpDuration } from "@/popup/use-cases/saveSeekJumpDuration";
 import { saveTrackRestartThreshold } from "@/popup/use-cases/saveTrackRestartThreshold";
+import { saveTracklistDropdownHeight } from "@/popup/use-cases/saveTracklistDropdownHeight";
 import { saveVolumeHotkeyStep } from "@/popup/use-cases/saveVolumeHotkeyStep";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
@@ -57,8 +60,9 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   const row = document.createElement("div");
   row.className = "setting-row";
 
-  const label = document.createElement("span");
+  const label = document.createElement("label");
   label.className = "setting-row__label";
+  label.htmlFor = inputId;
   label.textContent = getString(labelKey);
 
   const value = document.createElement("div");
@@ -74,9 +78,13 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   input.max = String(max);
   input.value = String(currentValue);
   input.id = inputId;
-  input.ariaLabel = getString(ariaKey);
-  input.setAttribute("aria-describedby", `${inputId}-error`);
+  input.setAttribute("aria-describedby", `${inputId}-hint ${inputId}-error`);
   input.ariaInvalid = "false";
+
+  const hint = document.createElement("span");
+  hint.id = `${inputId}-hint`;
+  hint.className = "sr-live"; // visually hidden, already defined in popup.scss
+  hint.textContent = getString(ariaKey);
 
   const unit = document.createElement("span");
   unit.className = "general-row__unit";
@@ -109,10 +117,23 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
     return { valid: true, value: num as WholeNumber };
   };
 
+  // Pending frame that fills the live region; cancelled on every setError so a stale message can't land late.
+  let errorFrame: number | null = null;
+
   const setError = (msg: string | null): void => {
+    if (errorFrame !== null) {
+      cancelAnimationFrame(errorFrame);
+      errorFrame = null;
+    }
     if (msg) {
-      error.textContent = msg;
+      // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
+      // ? tree, so filling it first means the mutation happens while nothing is watching.
+      error.textContent = "";
       error.hidden = false;
+      errorFrame = requestAnimationFrame(() => {
+        errorFrame = null;
+        error.textContent = msg;
+      });
       input.classList.add("is-invalid");
       input.ariaInvalid = "true";
     } else {
@@ -169,7 +190,120 @@ const buildNumericRow = (config: NumericRowConfig): HTMLElement => {
   inputRow.appendChild(unit);
 
   value.appendChild(inputRow);
+  value.appendChild(hint);
   value.appendChild(error);
+  value.appendChild(resetBtn);
+
+  row.appendChild(label);
+  row.appendChild(value);
+
+  return row;
+};
+
+interface SliderRowConfig {
+  labelKey: string;
+  ariaKey: string;
+  unitKey: string;
+  min: WholeNumber;
+  max: WholeNumber;
+  defaultValue: WholeNumber;
+  initialValue: WholeNumber;
+  errorPersistenceKey: string;
+  inputId: string;
+  onSave: (value: WholeNumber) => Promise<void>;
+}
+
+const buildSliderRow = (config: SliderRowConfig): HTMLElement => {
+  const { labelKey, ariaKey, unitKey, min, max, defaultValue, initialValue, errorPersistenceKey, inputId, onSave } =
+    config;
+
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const row = document.createElement("div");
+  row.className = "setting-row";
+
+  const label = document.createElement("label");
+  label.className = "setting-row__label";
+  label.htmlFor = inputId;
+  label.textContent = getString(labelKey);
+
+  const value = document.createElement("div");
+  value.className = "setting-row__value";
+
+  const inputRow = document.createElement("div");
+  inputRow.className = "general-row__input-row";
+
+  const input = document.createElement("input");
+  input.type = "range";
+  input.className = "general-row__slider";
+  input.min = String(min);
+  input.max = String(max);
+  input.step = "1";
+  input.value = String(initialValue);
+  input.id = inputId;
+  input.setAttribute("aria-describedby", `${inputId}-hint`);
+
+  const hint = document.createElement("span");
+  hint.id = `${inputId}-hint`;
+  hint.className = "sr-live"; // visually hidden, already defined in popup.scss
+  hint.textContent = getString(ariaKey);
+
+  const valueDisplay = document.createElement("span");
+  valueDisplay.className = "general-row__slider-value";
+  valueDisplay.ariaHidden = "true";
+
+  const resetBtn = document.createElement("button");
+  resetBtn.className = "general-row__reset-link";
+  resetBtn.textContent = getString("LABEL__SETTING__RESET");
+  resetBtn.hidden = initialValue === defaultValue;
+
+  const renderValue = (raw: WholeNumber): void => {
+    const text = `${raw} ${getString(unitKey)}`;
+    valueDisplay.textContent = text;
+    input.setAttribute("aria-valuetext", text);
+  };
+  renderValue(initialValue);
+
+  const persist = (nextValue: WholeNumber): void => {
+    resetBtn.hidden = nextValue === defaultValue;
+    onSave(nextValue).catch(() => {
+      logger(CPL.ERROR, getString(errorPersistenceKey));
+    });
+  };
+
+  input.addEventListener("input", () => {
+    const nextValue = Number(input.value) as WholeNumber;
+    renderValue(nextValue);
+    resetBtn.hidden = nextValue === defaultValue;
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      persist(nextValue);
+      debounceTimer = null;
+    }, PLUME_CONSTANTS.WCAG_INTERACTION_TIMEOUT_MS);
+  });
+
+  // ? Fires on release (mouseup / arrow-key commit): persist immediately instead of waiting for the debounce
+  input.addEventListener("change", () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+    persist(Number(input.value) as WholeNumber);
+  });
+
+  resetBtn.addEventListener("click", () => {
+    input.value = String(defaultValue);
+    renderValue(defaultValue);
+    if (debounceTimer) clearTimeout(debounceTimer);
+    persist(defaultValue);
+  });
+
+  inputRow.appendChild(input);
+  inputRow.appendChild(valueDisplay);
+
+  value.appendChild(inputRow);
+  value.appendChild(hint);
   value.appendChild(resetBtn);
 
   row.appendChild(label);
@@ -195,8 +329,9 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
   const row = document.createElement("div");
   row.className = "setting-row";
 
-  const label = document.createElement("span");
+  const label = document.createElement("label");
   label.className = "setting-row__label";
+  label.htmlFor = selectId;
   label.textContent = getString(labelKey);
 
   const value = document.createElement("div");
@@ -208,7 +343,12 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
   const select = document.createElement("select");
   select.className = "general-row__select";
   select.id = selectId;
-  select.ariaLabel = getString(ariaKey);
+  select.setAttribute("aria-describedby", `${selectId}-hint`);
+
+  const hint = document.createElement("span");
+  hint.id = `${selectId}-hint`;
+  hint.className = "sr-live"; // visually hidden, already defined in popup.scss
+  hint.textContent = getString(ariaKey);
 
   for (const opt of options) {
     const option = document.createElement("option");
@@ -240,6 +380,7 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
 
   inputRow.appendChild(select);
   value.appendChild(inputRow);
+  value.appendChild(hint);
   value.appendChild(resetBtn);
 
   row.appendChild(label);
@@ -253,10 +394,11 @@ const buildSelectRow = <T extends string>(config: SelectRowConfig<T>): HTMLEleme
  * Call the returned function once to produce the tab panel element.
  */
 export const createGeneralTab = (
+  storedForcedLanguage: PlumeLanguage | undefined,
+  storedTracklistDropdownHeight: WholeNumber | undefined,
+  storedTrackRestartThreshold: WholeNumber | undefined,
   storedSeekJumpDuration: WholeNumber | undefined,
   storedVolumeHotkeyStep: WholeNumber | undefined,
-  storedTrackRestartThreshold: WholeNumber | undefined,
-  storedForcedLanguage: PlumeLanguage | undefined,
   sender: IMessageSender
 ): TabDefinition["buildPanel"] => {
   const buildSection = (): HTMLElement => {
@@ -266,7 +408,7 @@ export const createGeneralTab = (
 
     const refreshNotice = document.createElement("p");
     refreshNotice.className = "general-row__refresh-notice";
-    refreshNotice.textContent = getString("INFO__SETTING__REFRESH_REQUIRED");
+    refreshNotice.role = "status";
     refreshNotice.hidden = true;
 
     const languageRow = buildSelectRow({
@@ -282,10 +424,40 @@ export const createGeneralTab = (
       selectId: "forced-language-select",
       onSave: async (value) => {
         await saveForcedLanguage(value);
+        // ? Reveal before writing: a live region that's still `hidden` isn't in the accessibility
+        // ? tree, so filling it first means the mutation happens while nothing is watching.
         refreshNotice.hidden = false;
+        requestAnimationFrame(() => {
+          refreshNotice.textContent = getString("INFO__SETTING__REFRESH_REQUIRED");
+        });
       },
     });
 
+    const tracklistHeightRow = buildSliderRow({
+      labelKey: "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT",
+      ariaKey: "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER",
+      unitKey: "META__TRACKS_UNIT",
+      min: TRACKLIST_DROPDOWN_HEIGHT_MIN,
+      max: TRACKLIST_DROPDOWN_HEIGHT_MAX,
+      defaultValue: PLUME_DEFAULTS.tracklistDropdownHeight,
+      initialValue: storedTracklistDropdownHeight ?? PLUME_DEFAULTS.tracklistDropdownHeight,
+      errorPersistenceKey: "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE",
+      inputId: "tracklist-dropdown-height-slider",
+      onSave: (value) => saveTracklistDropdownHeight(value, sender),
+    });
+    const trackRestartRow = buildNumericRow({
+      labelKey: "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD",
+      ariaKey: "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT",
+      unitKey: "META__SECONDS_UNIT",
+      min: TRACK_RESTART_THRESHOLD_MIN,
+      max: TRACK_RESTART_THRESHOLD_MAX,
+      defaultValue: PLUME_DEFAULTS.trackRestartThreshold,
+      initialValue: storedTrackRestartThreshold ?? PLUME_DEFAULTS.trackRestartThreshold,
+      errorOutOfRangeKey: "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE",
+      errorPersistenceKey: "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE",
+      inputId: "track-restart-threshold-input",
+      onSave: (value) => saveTrackRestartThreshold(value, sender),
+    });
     const seekJumpRow = buildNumericRow({
       labelKey: "LABEL__PLAYBACK__SEEK_JUMP_DURATION",
       ariaKey: "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT",
@@ -312,25 +484,13 @@ export const createGeneralTab = (
       inputId: "volume-step-input",
       onSave: (value) => saveVolumeHotkeyStep(value, sender),
     });
-    const trackRestartRow = buildNumericRow({
-      labelKey: "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD",
-      ariaKey: "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT",
-      unitKey: "META__SECONDS_UNIT",
-      min: TRACK_RESTART_THRESHOLD_MIN,
-      max: TRACK_RESTART_THRESHOLD_MAX,
-      defaultValue: PLUME_DEFAULTS.trackRestartThreshold,
-      initialValue: storedTrackRestartThreshold ?? PLUME_DEFAULTS.trackRestartThreshold,
-      errorOutOfRangeKey: "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE",
-      errorPersistenceKey: "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE",
-      inputId: "track-restart-threshold-input",
-      onSave: (value) => saveTrackRestartThreshold(value, sender),
-    });
 
     section.appendChild(refreshNotice);
     section.appendChild(languageRow);
+    section.appendChild(tracklistHeightRow);
+    section.appendChild(trackRestartRow);
     section.appendChild(seekJumpRow);
     section.appendChild(volumeStepRow);
-    section.appendChild(trackRestartRow);
 
     return section;
   };

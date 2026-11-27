@@ -12,9 +12,10 @@ export enum PLUME_CACHE_KEYS {
 
   // Settings
   FORCED_LANGUAGE = "plume_forced_language",
+  TRACKLIST_DROPDOWN_HEIGHT = "plume_tracklist_dropdown_height",
+  TRACK_RESTART_THRESHOLD = "plume_track_restart_threshold",
   SEEK_JUMP_DURATION = "plume_seek_jump_duration",
   VOLUME_HOTKEY_STEP = "plume_volume_step",
-  TRACK_RESTART_THRESHOLD = "plume_track_restart_threshold",
   HOTKEY_BINDINGS = "plume_hotkey_bindings",
   FEATURE_FLAGS = "plume_feature_flags",
 
@@ -30,9 +31,10 @@ export interface LocalStorage {
   [PLUME_CACHE_KEYS.PLAYBACK_SPEED]: number | undefined;
 
   [PLUME_CACHE_KEYS.FORCED_LANGUAGE]: PlumeLanguage | undefined;
+  [PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT]: number | undefined;
+  [PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD]: number | undefined;
   [PLUME_CACHE_KEYS.SEEK_JUMP_DURATION]: number | undefined;
   [PLUME_CACHE_KEYS.VOLUME_HOTKEY_STEP]: number | undefined;
-  [PLUME_CACHE_KEYS.TRACK_RESTART_THRESHOLD]: number | undefined;
   [PLUME_CACHE_KEYS.HOTKEY_BINDINGS]: KeyBindingMap | undefined;
   [PLUME_CACHE_KEYS.FEATURE_FLAGS]: FeatureFlags | undefined;
 

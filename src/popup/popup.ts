@@ -5,30 +5,40 @@ import { loadForcedLanguage } from "@/popup/use-cases/loadForcedLanguage";
 import { loadHotkeys } from "@/popup/use-cases/loadHotkeys";
 import { loadSeekJumpDuration } from "@/popup/use-cases/loadSeekJumpDuration";
 import { loadTrackRestartThreshold } from "@/popup/use-cases/loadTrackRestartThreshold";
+import { loadTracklistDropdownHeight } from "@/popup/use-cases/loadTracklistDropdownHeight";
 import { loadVolumeHotkeyStep } from "@/popup/use-cases/loadVolumeHotkeyStep";
-import { getActiveLocale, setForcedLanguage } from "@/shared/i18n";
+import { getActiveLangTag, setForcedLanguage } from "@/shared/i18n";
 
 (async () => {
-  const [forcedLanguage, seekJumpDuration, volumeHotkeyStep, trackRestartThreshold, hotkeyBindings, featureFlags] =
-    await Promise.all([
-      loadForcedLanguage(),
-      loadSeekJumpDuration(),
-      loadVolumeHotkeyStep(),
-      loadTrackRestartThreshold(),
-      loadHotkeys(),
-      loadFeatureFlags(),
-    ]);
+  const [
+    forcedLanguage,
+    tracklistDropdownHeight,
+    trackRestartThreshold,
+    seekJumpDuration,
+    volumeHotkeyStep,
+    hotkeyBindings,
+    featureFlags,
+  ] = await Promise.all([
+    loadForcedLanguage(),
+    loadTracklistDropdownHeight(),
+    loadTrackRestartThreshold(),
+    loadSeekJumpDuration(),
+    loadVolumeHotkeyStep(),
+    loadHotkeys(),
+    loadFeatureFlags(),
+  ]);
 
   setForcedLanguage(forcedLanguage ?? null);
-  document.documentElement.lang = getActiveLocale();
+  document.documentElement.lang = getActiveLangTag();
 
   const messageSender = createTabsMessageSender();
 
   const storedSettings = {
     forcedLanguage,
+    tracklistDropdownHeight,
+    trackRestartThreshold,
     seekJumpDuration,
     volumeHotkeyStep,
-    trackRestartThreshold,
     hotkeyBindings,
     featureFlags,
   };

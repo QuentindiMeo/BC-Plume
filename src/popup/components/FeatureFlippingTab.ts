@@ -2,6 +2,7 @@ import { FeatureFlagKey, FeatureFlags, PLUME_CONSTANTS, PLUME_DEFAULTS } from "@
 import type { IMessageSender } from "@/domain/ports/messaging";
 import type { TabDefinition } from "@/popup/components/TabBar";
 import { saveFeatureFlags } from "@/popup/use-cases/saveFeatureFlags";
+import { announce } from "@/shared/announce";
 import { getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 
@@ -23,6 +24,8 @@ const FLAG_ORDER: ToggleRowConfig[] = [
   { flagKey: "runtime", labelKey: "LABEL__FEATURES__RUNTIME" },
   { flagKey: "goToTrack", labelKey: "LABEL__FEATURES__GO_TO_TRACK" },
   { flagKey: "tracklist", labelKey: "LABEL__FEATURES__TRACKLIST" },
+  { flagKey: "tracklistExpandedByDefault", labelKey: "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT" },
+  { flagKey: "tracklistAlwaysLarge", labelKey: "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE" },
   { flagKey: "quickSeek", labelKey: "LABEL__FEATURES__QUICK_SEEK" },
   {
     flagKey: "waveform",
@@ -57,25 +60,37 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     });
   };
 
+  // tracklistExpandedByDefault and tracklistAlwaysLarge only make sense when tracklist itself is
+  // enabled: force them off and lock their toggles whenever the parent flag is off.
+  const TRACKLIST_DEPENDENT_FLAGS: readonly FeatureFlagKey[] = ["tracklistExpandedByDefault", "tracklistAlwaysLarge"];
+  const syncTracklistDependentFlagsAvailability = (): void => {
+    for (const depFlag of TRACKLIST_DEPENDENT_FLAGS) {
+      const depBtn = toggleBtns.get(depFlag);
+      if (!depBtn) continue;
+
+      depBtn.disabled = !currentFlags.tracklist;
+      depBtn.ariaDisabled = String(!currentFlags.tracklist);
+
+      if (!currentFlags.tracklist && currentFlags[depFlag]) {
+        currentFlags[depFlag] = false;
+        depBtn.ariaChecked = "false";
+      }
+    }
+  };
+
   const buildToggleRow = (config: ToggleRowConfig): HTMLElement => {
     const { flagKey, labelKey, noticeKey, noticeSubstitutions } = config;
 
     const row = document.createElement("div");
     row.className = "setting-row";
 
-    const label = document.createElement("span");
-    label.className = "setting-row__label";
-    label.textContent = getString(labelKey);
-    label.id = `feature-label-${flagKey}`;
+    const labelWrap = document.createElement("div");
+    labelWrap.className = "setting-row__label";
 
-    if (noticeKey) {
-      const notice = document.createElement("p");
-      notice.className = "setting-row__notice";
-      notice.textContent = getString(noticeKey, noticeSubstitutions);
-      notice.hidden = !currentFlags[flagKey];
-      label.appendChild(notice);
-      noticeRefs.set(flagKey, notice);
-    }
+    const label = document.createElement("span");
+    label.id = `feature-label-${flagKey}`;
+    label.textContent = getString(labelKey);
+    labelWrap.appendChild(label);
 
     const toggle = document.createElement("button");
     toggle.type = "button";
@@ -84,12 +99,25 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
     toggle.ariaChecked = String(currentFlags[flagKey]);
     toggle.setAttribute("aria-labelledby", label.id);
 
+    if (noticeKey) {
+      const notice = document.createElement("p");
+      notice.className = "setting-row__notice";
+      notice.id = `feature-notice-${flagKey}`;
+      notice.textContent = getString(noticeKey, noticeSubstitutions);
+      notice.hidden = !currentFlags[flagKey];
+      labelWrap.appendChild(notice); // sibling of the label, not a child — keeps the accessible name stable
+      noticeRefs.set(flagKey, notice);
+      toggle.setAttribute("aria-describedby", notice.id); // caveat as description, not name
+    }
+
     const thumb = document.createElement("span");
     thumb.className = "feature-toggle__thumb";
     thumb.ariaHidden = "true";
     toggle.appendChild(thumb);
 
     toggle.addEventListener("click", () => {
+      if (toggle.disabled) return;
+
       currentFlags[flagKey] = !currentFlags[flagKey];
       toggle.ariaChecked = String(currentFlags[flagKey]);
 
@@ -97,15 +125,20 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       if (notice) notice.hidden = !currentFlags[flagKey];
 
       // visualizer requires bpmDetect: enforce the dependency in both directions
-      if (flagKey === "visualizer" && currentFlags.visualizer) {
+      if (flagKey === "visualizer" && currentFlags.visualizer && !currentFlags.bpmDetect) {
         currentFlags.bpmDetect = true;
         const bpmBtn = toggleBtns.get("bpmDetect");
         if (bpmBtn) bpmBtn.ariaChecked = "true";
-      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect) {
+        announce(getString("ARIA__FEATURES__BPM_AUTO_ENABLED"));
+      } else if (flagKey === "bpmDetect" && !currentFlags.bpmDetect && currentFlags.visualizer) {
         currentFlags.visualizer = false;
         const vizBtn = toggleBtns.get("visualizer");
         if (vizBtn) vizBtn.ariaChecked = "false";
+        announce(getString("ARIA__FEATURES__VISUALIZER_AUTO_DISABLED"));
       }
+
+      // tracklist-dependent flags: keep them off and locked whenever tracklist itself is off
+      if (flagKey === "tracklist") syncTracklistDependentFlagsAvailability();
 
       persist(currentFlags);
       syncResetVisibility();
@@ -113,7 +146,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
 
     toggleBtns.set(flagKey, toggle);
 
-    row.appendChild(label);
+    row.appendChild(labelWrap);
     row.appendChild(toggle);
 
     return row;
@@ -128,6 +161,8 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       const flagToggleRow = buildToggleRow(flagConfig);
       section.appendChild(flagToggleRow);
     }
+
+    syncTracklistDependentFlagsAvailability();
 
     return section;
   };
@@ -144,6 +179,7 @@ export const createFeatureTab = (storedFlags: FeatureFlags, sender: IMessageSend
       Object.assign(currentFlags, PLUME_DEFAULTS.featureFlags);
       for (const [flagKey, btn] of toggleBtns) btn.ariaChecked = String(currentFlags[flagKey]);
       for (const [flagKey, notice] of noticeRefs) notice.hidden = !currentFlags[flagKey];
+      syncTracklistDependentFlagsAvailability();
       persist(currentFlags);
       syncResetVisibility();
     });

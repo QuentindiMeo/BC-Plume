@@ -10,6 +10,8 @@ import {
   SEEK_JUMP_DURATION_MIN,
   TIME_DISPLAY_METHOD,
   TRACK_RESTART_THRESHOLD_MAX,
+  TRACKLIST_DROPDOWN_HEIGHT_MAX,
+  TRACKLIST_DROPDOWN_HEIGHT_MIN,
   VOLUME_HOTKEY_STEP_MAX,
   VOLUME_HOTKEY_STEP_MIN,
 } from "@/domain/plume";
@@ -427,6 +429,38 @@ describe("AppCoreImpl reducer", () => {
     });
   });
 
+  describe("SET_TRACKLIST_DROPDOWN_HEIGHT", () => {
+    it("accepts a valid value", () => {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(7));
+      expect(appCore.getState().tracklistDropdownHeight).toBe(7);
+    });
+
+    it("accepts the minimum boundary", () => {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(TRACKLIST_DROPDOWN_HEIGHT_MIN));
+      expect(appCore.getState().tracklistDropdownHeight).toBe(TRACKLIST_DROPDOWN_HEIGHT_MIN);
+    });
+
+    it("accepts the maximum boundary", () => {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(TRACKLIST_DROPDOWN_HEIGHT_MAX));
+      expect(appCore.getState().tracklistDropdownHeight).toBe(TRACKLIST_DROPDOWN_HEIGHT_MAX);
+    });
+
+    it("falls back to default when value is below minimum", () => {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(TRACKLIST_DROPDOWN_HEIGHT_MIN - 1));
+      expect(appCore.getState().tracklistDropdownHeight).toBe(PLUME_DEFAULTS.tracklistDropdownHeight);
+    });
+
+    it("falls back to default when value exceeds maximum", () => {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(TRACKLIST_DROPDOWN_HEIGHT_MAX + 1));
+      expect(appCore.getState().tracklistDropdownHeight).toBe(PLUME_DEFAULTS.tracklistDropdownHeight);
+    });
+
+    it("falls back to default for a float", () => {
+      appCore.dispatch(coreActions.setTracklistDropdownHeight(5.5));
+      expect(appCore.getState().tracklistDropdownHeight).toBe(PLUME_DEFAULTS.tracklistDropdownHeight);
+    });
+  });
+
   describe("SET_PLAYBACK_SPEED", () => {
     it("starts at the default speed", () => {
       expect(appCore.getState().playbackSpeed).toBe(PLAYBACK_SPEED_DEFAULT);
@@ -663,5 +697,64 @@ describe("AppCoreImpl — playbackSpeed persist/load integration", () => {
         }),
       })
     );
+  });
+
+  it("starts the tracklist expanded when tracklistExpandedByDefault is enabled", async () => {
+    seedStorage({
+      [PLUME_CACHE_KEYS.FEATURE_FLAGS]: { ...PLUME_DEFAULTS.featureFlags, tracklistExpandedByDefault: true },
+    });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(true);
+  });
+
+  it("keeps the tracklist collapsed when tracklistExpandedByDefault is disabled", async () => {
+    seedStorage({
+      [PLUME_CACHE_KEYS.FEATURE_FLAGS]: { ...PLUME_DEFAULTS.featureFlags, tracklistExpandedByDefault: false },
+    });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(false);
+  });
+
+  it("keeps the tracklist collapsed when no feature flags were persisted", async () => {
+    seedStorage({});
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(false);
+  });
+
+  it("keeps the tracklist collapsed when tracklistExpandedByDefault is on but tracklist itself is off", async () => {
+    seedStorage({
+      [PLUME_CACHE_KEYS.FEATURE_FLAGS]: {
+        ...PLUME_DEFAULTS.featureFlags,
+        tracklist: false,
+        tracklistExpandedByDefault: true,
+      },
+    });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().isTracklistExpanded).toBe(false);
+  });
+
+  it("loads a valid persisted tracklistDropdownHeight on startup", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT]: 8 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().tracklistDropdownHeight).toBe(8);
+  });
+
+  it("falls back to default when the persisted tracklistDropdownHeight is out of range", async () => {
+    seedStorage({ [PLUME_CACHE_KEYS.TRACKLIST_DROPDOWN_HEIGHT]: 11 });
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().tracklistDropdownHeight).toBe(PLUME_DEFAULTS.tracklistDropdownHeight);
+  });
+
+  it("starts at default tracklistDropdownHeight when nothing was persisted", async () => {
+    seedStorage({});
+    const appCore = createAppCoreInstance();
+    await appCore.loadPersistedState();
+    expect(appCore.getState().tracklistDropdownHeight).toBe(PLUME_DEFAULTS.tracklistDropdownHeight);
   });
 });

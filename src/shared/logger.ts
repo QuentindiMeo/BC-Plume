@@ -1,5 +1,6 @@
 import { APP_VERSION } from "@/domain/meta";
 
+// ? Console printing levels for Plume's internal logger
 export enum CPL {
   DEBUG = "debug",
   INFO = "info",

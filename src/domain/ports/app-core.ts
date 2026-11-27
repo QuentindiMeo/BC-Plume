@@ -9,10 +9,11 @@ export interface AppPersistedState {
   loopMode: LoopModeType;
   volume: number;
 
-  hotkeyBindings: Record<HotkeyAction, KeyBinding>;
+  tracklistDropdownHeight: number;
+  trackRestartThreshold: number;
   seekJumpDuration: number;
   volumeHotkeyStep: number;
-  trackRestartThreshold: number;
+  hotkeyBindings: Record<HotkeyAction, KeyBinding>;
   featureFlags: FeatureFlags;
 }
 
@@ -23,8 +24,9 @@ export interface TrackBpmEntry {
 }
 export interface AppTransientState {
   pageType: BcPageType | null;
-  trackTitle: string | null;
   trackNumber: string | null;
+  trackTitle: string | null;
+  isTracklistExpanded: boolean;
   duration: number;
   currentTime: number;
   isPlaying: boolean;
@@ -38,8 +40,9 @@ export interface AppCore extends AppPersistedState, AppTransientState {}
 
 export enum CORE_ACTIONS {
   SET_PAGE_TYPE = "SET_PAGE_TYPE",
-  SET_TRACK_TITLE = "SET_TRACK_TITLE",
   SET_TRACK_NUMBER = "SET_TRACK_NUMBER",
+  SET_TRACK_TITLE = "SET_TRACK_TITLE",
+  SET_IS_TRACKLIST_EXPANDED = "SET_IS_TRACKLIST_EXPANDED",
   SET_DURATION = "SET_DURATION",
   SET_CURRENT_TIME = "SET_CURRENT_TIME",
   SET_IS_PLAYING = "SET_IS_PLAYING",
@@ -56,17 +59,19 @@ export enum CORE_ACTIONS {
   CLEAR_TRACK_BPMS = "CLEAR_TRACK_BPMS",
   SET_IS_FULLSCREEN = "SET_IS_FULLSCREEN",
 
+  SET_TRACKLIST_DROPDOWN_HEIGHT = "SET_TRACKLIST_DROPDOWN_HEIGHT",
+  SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
   SET_SEEK_JUMP_DURATION = "SET_SEEK_JUMP_DURATION",
   SET_VOLUME_HOTKEY_STEP = "SET_VOLUME_HOTKEY_STEP",
-  SET_TRACK_RESTART_THRESHOLD = "SET_TRACK_RESTART_THRESHOLD",
   SET_HOTKEY_BINDINGS = "SET_HOTKEY_BINDINGS",
   SET_FEATURE_FLAGS = "SET_FEATURE_FLAGS",
 }
 
 export type CoreAction =
   | IAction<CORE_ACTIONS.SET_PAGE_TYPE, BcPageType | null>
-  | IAction<CORE_ACTIONS.SET_TRACK_TITLE, string | null>
   | IAction<CORE_ACTIONS.SET_TRACK_NUMBER, string | null>
+  | IAction<CORE_ACTIONS.SET_TRACK_TITLE, string | null>
+  | IAction<CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED, boolean>
   | IAction<CORE_ACTIONS.SET_DURATION, number>
   | IAction<CORE_ACTIONS.SET_CURRENT_TIME, number>
   | IAction<CORE_ACTIONS.SET_IS_PLAYING, boolean>
@@ -82,17 +87,19 @@ export type CoreAction =
   | IAction<CORE_ACTIONS.SET_TRACK_BPM_ERROR, string>
   | IAction<CORE_ACTIONS.CLEAR_TRACK_BPMS>
   | IAction<CORE_ACTIONS.SET_IS_FULLSCREEN, boolean>
+  | IAction<CORE_ACTIONS.SET_TRACKLIST_DROPDOWN_HEIGHT, number>
+  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
   | IAction<CORE_ACTIONS.SET_SEEK_JUMP_DURATION, number>
   | IAction<CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP, number>
-  | IAction<CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD, number>
   | IAction<CORE_ACTIONS.SET_HOTKEY_BINDINGS, Record<HotkeyAction, KeyBinding>>
   | IAction<CORE_ACTIONS.SET_FEATURE_FLAGS, FeatureFlags>;
 
 interface ICoreActions {
   // State
   setPageType: (pageType: BcPageType | null) => CoreAction;
-  setTrackTitle: (title: string | null) => CoreAction;
   setTrackNumber: (number: string | null) => CoreAction;
+  setTrackTitle: (title: string | null) => CoreAction;
+  setIsTracklistExpanded: (isExpanded: boolean) => CoreAction;
   setDuration: (duration: number) => CoreAction;
   setCurrentTime: (time: number) => CoreAction;
   setIsPlaying: (isPlaying: boolean) => CoreAction;
@@ -110,17 +117,22 @@ interface ICoreActions {
   setIsFullscreen: (isFullscreen: boolean) => CoreAction;
 
   // Settings
+  setTracklistDropdownHeight: (height: number) => CoreAction;
+  setTrackRestartThreshold: (threshold: number) => CoreAction;
   setSeekJumpDuration: (duration: number) => CoreAction;
   setVolumeHotkeyStep: (step: number) => CoreAction;
-  setTrackRestartThreshold: (threshold: number) => CoreAction;
   setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>) => CoreAction;
   setFeatureFlags: (flags: FeatureFlags) => CoreAction;
 }
 
 export const coreActions: ICoreActions = {
   setPageType: (pageType: BcPageType | null): CoreAction => ({ type: CORE_ACTIONS.SET_PAGE_TYPE, payload: pageType }),
-  setTrackTitle: (title: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_TITLE, payload: title }),
   setTrackNumber: (number: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_NUMBER, payload: number }),
+  setTrackTitle: (title: string | null): CoreAction => ({ type: CORE_ACTIONS.SET_TRACK_TITLE, payload: title }),
+  setIsTracklistExpanded: (isExpanded: boolean): CoreAction => ({
+    type: CORE_ACTIONS.SET_IS_TRACKLIST_EXPANDED,
+    payload: isExpanded,
+  }),
   setDuration: (duration: number): CoreAction => ({ type: CORE_ACTIONS.SET_DURATION, payload: duration }),
   setCurrentTime: (time: number): CoreAction => ({ type: CORE_ACTIONS.SET_CURRENT_TIME, payload: time }),
   setIsPlaying: (isPlaying: boolean): CoreAction => ({ type: CORE_ACTIONS.SET_IS_PLAYING, payload: isPlaying }),
@@ -158,9 +170,13 @@ export const coreActions: ICoreActions = {
     payload: isFullscreen,
   }),
 
-  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
-    type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
-    payload: bindings,
+  setTracklistDropdownHeight: (height: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACKLIST_DROPDOWN_HEIGHT,
+    payload: height,
+  }),
+  setTrackRestartThreshold: (threshold: number): CoreAction => ({
+    type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
+    payload: threshold,
   }),
   setSeekJumpDuration: (duration: number): CoreAction => ({
     type: CORE_ACTIONS.SET_SEEK_JUMP_DURATION,
@@ -170,9 +186,9 @@ export const coreActions: ICoreActions = {
     type: CORE_ACTIONS.SET_VOLUME_HOTKEY_STEP,
     payload: step,
   }),
-  setTrackRestartThreshold: (threshold: number): CoreAction => ({
-    type: CORE_ACTIONS.SET_TRACK_RESTART_THRESHOLD,
-    payload: threshold,
+  setHotkeyBindings: (bindings: Record<HotkeyAction, KeyBinding>): CoreAction => ({
+    type: CORE_ACTIONS.SET_HOTKEY_BINDINGS,
+    payload: bindings,
   }),
   setFeatureFlags: (flags: FeatureFlags): CoreAction => ({
     type: CORE_ACTIONS.SET_FEATURE_FLAGS,

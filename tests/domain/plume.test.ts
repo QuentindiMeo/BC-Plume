@@ -89,8 +89,8 @@ describe("LOOP_MODE_CYCLE", () => {
 });
 
 describe("PLUME_DEFAULTS", () => {
-  it("has the expected durationDisplayMethod", () => {
-    expect(PLUME_DEFAULTS.durationDisplayMethod).toBe(TIME_DISPLAY_METHOD.DURATION);
+  it("has the expected tracklistDropdownHeight", () => {
+    expect(PLUME_DEFAULTS.tracklistDropdownHeight).toBe(5);
   });
 
   it("has the expected trackRestartThreshold", () => {
@@ -99,6 +99,10 @@ describe("PLUME_DEFAULTS", () => {
 
   it("has the expected seekJumpDuration", () => {
     expect(PLUME_DEFAULTS.seekJumpDuration).toBe(10);
+  });
+
+  it("has the expected durationDisplayMethod", () => {
+    expect(PLUME_DEFAULTS.durationDisplayMethod).toBe(TIME_DISPLAY_METHOD.DURATION);
   });
 
   it("has the expected loopMode", () => {

@@ -44,6 +44,20 @@
     }
   },
   "INFO__BC_HEALTH_CHECK__ALL_FOUND": { "message": "Tous les éléments Bandcamp trouvés" },
+  "INFO__BC_HEALTH_CHECK__ERROR_PAGE": {
+    "message": "Page d'erreur Bandcamp détectée (tralbum inconnu ou supprimé) ; vérification de santé ignorée"
+  },
+  "WARN__DATE_HEALTH_CHECK__UNSUPPORTED_FORMAT": {
+    "message": "Ce navigateur n'interprète pas correctement le format de date de sortie de Bandcamp ($ECHANTILLON$ : $ATTENDU$ attendu, $OBTENU$ obtenu) ; les dates de sortie seront masquées",
+    "placeholders": {
+      "echantillon": { "content": "$1", "example": "12 Apr 2019 00:00:00 GMT" },
+      "attendu": { "content": "$2", "example": "2019-04-12T00:00:00.000Z" },
+      "obtenu": { "content": "$3", "example": "NaN" }
+    }
+  },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Format de date de sortie de Bandcamp correctement interprété par ce navigateur"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Impossible de trouver un conteneur approprié" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Élément parent du lecteur non trouvé" },
@@ -142,6 +156,27 @@
       }
     }
   },
+  "LABEL__RUNTIME__WITH_HOURS": {
+    "message": "$HEURES$ h $MINUTES$ min $SECONDES$ s$LISIBLES$",
+    "placeholders": {
+      "heures": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "secondes": {
+        "content": "$3",
+        "example": "30"
+      },
+      "lisibles": {
+        "content": "$4",
+        "example": " lisibles"
+      }
+    }
+  },
   "LABEL__RUNTIME__PLAYABLE": { "message": " lisibles" },
   "ARIA__RUNTIME__LABEL": {
     "message": "Durée totale : $MINUTES$ minutes et $SECONDES$ secondes",
@@ -152,6 +187,23 @@
       },
       "secondes": {
         "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "ARIA__RUNTIME__LABEL__WITH_HOURS": {
+    "message": "Durée totale : $HEURES$ heures, $MINUTES$ minutes et $SECONDES$ secondes",
+    "placeholders": {
+      "heures": {
+        "content": "$1",
+        "example": "1"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "18"
+      },
+      "secondes": {
+        "content": "$3",
         "example": "30"
       }
     }
@@ -367,6 +419,19 @@
     }
   },
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Lecteur musical en plein écran" },
+  "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Date de sortie non trouvée pour le mode plein écran" },
+  "LABEL__RELEASE_DATE": {
+    "message": "sorti le $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "12 avril 2019" }
+    }
+  },
+  "ARIA__RELEASE_DATE__LABEL": {
+    "message": "La date de sortie est $DATE$",
+    "placeholders": {
+      "date": { "content": "$1", "example": "12 avril 2019" }
+    }
+  },
 
   "LABEL__FEATURES__VISUALIZER": { "message": "Visualiseur audio" },
 
@@ -379,6 +444,7 @@
   "LABEL__TAB__RESET": { "message": "Tout réinitialiser " },
   "META__SECONDS_UNIT": { "message": "s" },
   "META__PERCENT_UNIT": { "message": "%" },
+  "META__TRACKS_UNIT": { "message": "pistes" },
 
   "POPUP__GENERAL__TAB_LABEL": { "message": "Général" },
   "ERROR__FORCED_LANGUAGE__PERSISTENCE": { "message": "Échec de la sauvegarde de la préférence de langue" },
@@ -456,6 +522,8 @@
   "LABEL__FEATURES__RUNTIME": { "message": "Durée totale" },
   "LABEL__FEATURES__GO_TO_TRACK": { "message": "Aller à la piste" },
   "LABEL__FEATURES__TRACKLIST": { "message": "Liste des pistes" },
+  "LABEL__FEATURES__TRACKLIST_EXPANDED_BY_DEFAULT": { "message": "Liste des pistes ouverte par défaut" },
+  "LABEL__FEATURES__TRACKLIST_ALWAYS_LARGE": { "message": "Liste des pistes toujours grande" },
   "LABEL__FEATURES__QUICK_SEEK": { "message": "Déplacement rapide (0 – 9)" },
   "LABEL__FEATURES__WAVEFORM": { "message": "Barre de progression à forme d'onde" },
   "LABEL__FEATURES__WAVEFORM__NOTICE": {
@@ -467,6 +535,12 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Mode plein écran" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Détection de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Échec de la sauvegarde des préférences de fonctionnalités" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Détection de BPM activée automatiquement : requise par le Visualiseur audio"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Visualiseur audio désactivé automatiquement : il nécessite la Détection de BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Doit être un nombre entier" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Doit valoir entre 1 et 300" },
@@ -500,6 +574,18 @@
   "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Seuil de redémarrage de piste" },
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
     "message": "Secondes pendant lesquelles le bouton de piste précédente redémarre la piste actuelle"
+  },
+
+  "ERROR__TRACKLIST_DROPDOWN_HEIGHT__PERSISTENCE": {
+    "message": "Échec de l'enregistrement de la hauteur de la liste des pistes"
+  },
+  "WARN__TRACKLIST_DROPDOWN_HEIGHT__INVALID_VALUE": {
+    "message": "Valeur de hauteur de la liste des pistes invalide, utilisation de la valeur par défaut"
+  },
+  "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Hauteur de la liste des pistes chargée :" },
+  "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Hauteur de la liste des pistes" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": {
+    "message": "Nombre de pistes visibles dans la liste des pistes"
   },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Échec de l'analyse du SVG de l'icône du toast" },
@@ -595,7 +681,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrée personnalisée invalide" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "Ça te chante ?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume est gratuit et le restera. Si ça a rendu ton écoute sur Bandcamp plus agréable, un petit coup de pouce nous ferait vraiment plaisir." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume est gratuit et le restera. Si ça a rendu ton écoute sur Bandcamp plus agréable, un petit coup de pouce nous ferait vraiment plaisir."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Soutenir Plume" },
   "META__TOAST__DONATION": { "message": "donation" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {

@@ -22,6 +22,7 @@ export enum BC_ELEM_SELECTORS {
   unplayableTrackTitle = "tr.track_row_view div.title",
   trackDuration = "span.time",
   coverArt = "div#tralbumArt img",
+  trAlbumData = "[data-tralbum]",
 }
 export type BcElementKey = keyof typeof BC_ELEM_SELECTORS;
 

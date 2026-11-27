@@ -1,6 +1,13 @@
 import type { BcPageType, BcPlayerPort } from "@/domain/ports/bc-player";
 import { BC_ELEM_SELECTORS, BC_PLAYER_SELECTORS } from "@/infra/elements/bandcamp";
 
+// Bandcamp's release date lives in this JSON blob rather than page text, since page text
+// (e.g. div.tralbum-credits "released ...") is rendered in the viewer's display language.
+interface BandcampTrAlbumDates {
+  current?: { release_date?: string | null };
+  album_release_date?: string | null;
+}
+
 export class BcPlayerAdapter implements BcPlayerPort {
   private query<T extends Element>(selector: string): T | null {
     return document.querySelector<T>(selector);
@@ -43,6 +50,19 @@ export class BcPlayerAdapter implements BcPlayerPort {
     if (Number.isNaN(duration) || !Number.isFinite(duration)) return null;
 
     return duration;
+  }
+
+  getReleaseDate(): string | null {
+    const el = this.query<HTMLElement>(BC_ELEM_SELECTORS.trAlbumData);
+    const raw = el?.dataset["tralbum"];
+    if (!raw) return null;
+
+    try {
+      const parsed = JSON.parse(raw) as BandcampTrAlbumDates;
+      return parsed.current?.release_date || parsed.album_release_date || null;
+    } catch {
+      return null;
+    }
   }
 
   isPlaying(): boolean {

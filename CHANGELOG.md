@@ -5,6 +5,15 @@
 
 - Later releases to come with new features!! Learn more about what's next by checking the [issues tab](https://github.com/QuentindiMeo/BC-Plume/issues).
 
+- _**[1.14.0]** Nov 27 2026_: **Scrolling Me Softly With His Song** [#179](https://github.com/QuentindiMeo/BC-Plume/pull/179)  
+The release date of a collection is displayed on the fullscreen view, docked to the cover art; the health check flags non-ISO release date strings in page metadata.  
+Runtimes are displayed in hours when relevant.  
+The tracklist gains settings: collapse state persistence across views, an "open by default" feature flag, an "always large" feature flag, and a height slider.  
+Long collection, track and artist names scroll as a marquee on hover, in the header and in the tracklist, blending into the ellipsis base state.  
+A diagnostic exception is added for pages missing their `tralbum` data.  
+Accessibility is further improved: focus management on the tracklist and on exits, waveform focus visibility, insufficient contrasts, the invalid `lang` tag for
+Brazilian Portuguese is repaired, and a full announcement feature for assistive technologies.  
+
 - _**[1.13.0]** May 15 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)  
 A waveform (toggleable) can replace the regular progress bar, with audio peaks — only for tracks less than 20 minutes.  
 A BPM-driven audio visualizer (toggleable) is added to the fullscreen view: a pulse animation syncs its beat phase to the track.  
@@ -18,8 +27,10 @@ Bare `Error` throws are replaced with typed custom error classes throughout.
 
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)  
 The new Features popup tab allows toggling Plume features on or off.  
-Playback speed control is introduced: a speed button with an integrated slider lets users pick between presets (0.5×, 1×, 1.5×, 2×, 3×) or enter a custom value; a live badge shows the active multiplier at a glance.  
-BPM detection is introduced: a background service worker fetches audio cross-origin, and the web-audio-beat-detector engine analyzes the tempo; the live BPM is displayed on the player and as per-track badges in the tracklist.  
+Playback speed control is introduced: a speed button with an integrated slider lets users pick between presets (0.5×, 1×, 1.5×, 2×, 3×) or
+enter a custom value; a live badge shows the active multiplier at a glance.  
+BPM detection is introduced: a background service worker fetches audio cross-origin, and the web-audio-beat-detector engine analyzes the tempo;
+the live BPM is displayed on the player and as per-track badges in the tracklist.  
 Plume's audio initialization no longer pauses tracks playing in other tabs.  
 Tailwind and Sass are introduced for more efficient and maintainable styling.
 
@@ -27,7 +38,8 @@ Tailwind and Sass are introduced for more efficient and maintainable styling.
 An interactive tracklist dropdown is added to the header: browse a collection's tracks and jump directly to any of them.  
 A "go to track" link button docked to the track title allows navigation to a specific track's single page, on collections.  
 The Playback popup tab becomes General, and allows forcing Plume's display language.  
-Deep accessibility overhaul: focus outlines, reduced-motion and contrast preferences, sliders, a live region, cover art ARIA label, semantics, and the `lang` attribute matching the active locale. `axe-core` is integrated for deep a11y testing.  
+Deep accessibility overhaul: focus outlines, reduced-motion and contrast preferences, sliders, a live region, cover art ARIA label, semantics,
+and the `lang` attribute matching the active locale. `axe-core` is integrated for deep a11y testing.  
 Significant errors and warnings are surfaced, failed hotkey changes show an inline error.  
 The Ko-fi tip link is replaced with the link to the [Plume Linktree](https://linktr.ee/bc_plume).
 
@@ -52,7 +64,8 @@ Various bugs are fixed: layout is now independent on hotkeys, track pages don't 
   The CHANGELOG is fully fleshed with detailed descriptions of each release.
 
 - _**[1.9.0]** Mar 15 2026_: **Sharp As A Feather** [#106](https://github.com/QuentindiMeo/BC-Plume/pull/106)  
-The project's SEO is enhanced with a [promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8), reddit posts ([1](https://www.reddit.com/r/chrome_extensions/comments/1rh0onk/i_revamped_bandcamps_audio_player_ux_ui), [2](https://www.reddit.com/r/extensions/comments/1rh0ngh/i_revamped_bandcamps_audio_player_ux_ui)), and a [Twitter/X account](https://x.com/PlumeBandcamp) to reach a wider audience and keep users updated on new features and releases. The extension is also submitted to the [Product Hunt](https://www.producthunt.com/products/plume-5) and [AlternativeTo](https://alternativeto.net/software/bc-plume).  
+The project's SEO is enhanced with a [promo video](https://www.youtube.com/watch?v=rsXqvNrXYn8), Reddit posts ([1](https://www.reddit.com/r/chrome_extensions/comments/1rh0onk/i_revamped_bandcamps_audio_player_ux_ui), [2](https://www.reddit.com/r/extensions/comments/1rh0ngh/i_revamped_bandcamps_audio_player_ux_ui)),
+and a [Twitter/X account](https://x.com/PlumeBandcamp) to reach a wider audience and keep users updated on new features and releases. The extension is also submitted to the [Product Hunt](https://www.producthunt.com/products/plume-5) and [AlternativeTo](https://alternativeto.net/software/bc-plume).  
 Hotkeys for track seeking are introduced, using digit keys (`0` to `9`) for quick access to specific percentages of the track's duration (e.g. `5` for 50%).  
 A looping mechanism is added, allowing users to cycle through loop modes (none → collection → track → none) with a dedicated button.  
 The extension popup is introduced, allowing users to customize Plume hotkeys.  
@@ -64,12 +77,12 @@ Adjustments are made to match hexagonal architecture principles, following the i
 
 - _**[1.8.0]** Feb 23 2026_: **Silent Robert, Spread The Word!** [#081](https://github.com/QuentindiMeo/BC-Plume/pull/81)  
 Claude Code becomes QDM's assistant for the software architecture reworking phase, helping to fix inconsistencies and security issues.  
-Using Claude, the software architecture is completely rehauled to improve maintainability, scalability, and separation of concerns.  
-A healthcheck mechanism is implemented to alert the user if the extension fails to inject properly.  
+Using Claude, the software architecture is completely re-hauled to improve maintainability, scalability, and separation of concerns.  
+A health check mechanism is implemented to alert the user if the extension fails to inject properly.  
 The project's SEO is revamped with better metadata to improve visibility and attract more users; store pages are updated—a [Linktree](https://linktr.ee/bc_plume) is created.  
 The demo GIF is updated to reflect the latest changes (since version 1.3.0).  
 The need for `Ctrl+Alt+...` on hotkeys is removed to make them easier to use.  
-The mute/unmute mechanism is introduced (hotkey: `M`), allowing users to quickly toggle sound without adjusting the volume slider.  
+The mute/un-mute mechanism is introduced (hotkey: `M`), allowing users to quickly toggle sound without adjusting the volume slider.  
 The Bandcamp release presentation on the fullscreen view is duplicated from the normal view—not created from scratch.  
 English is set as fallback for any unknown message key in a foreign language—the key itself is returned if it's not defined in English either.  
 The app is bundled using esbuild, a pre-commit hook is added to ensure Prettier formatting.

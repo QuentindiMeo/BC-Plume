@@ -1,7 +1,11 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/shared/i18n", () => ({ getString: (k: string) => k, getActiveLocale: () => "en" }));
+vi.mock("@/shared/i18n", () => ({
+  getString: (k: string) => k,
+  getActiveLocale: () => "en",
+  getActiveLangTag: () => "en",
+}));
 vi.mock("@/shared/logger", () => ({ CPL: { WARN: "warn", LOG: "log", ERROR: "error" }, logger: vi.fn() }));
 vi.mock("@/shared/svg", () => ({
   createSafeSvgElement: () => document.createElementNS("http://www.w3.org/2000/svg", "svg"),
