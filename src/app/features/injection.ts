@@ -22,7 +22,7 @@ import { coreActions, IAppCore } from "@/domain/ports/app-core";
 import { guiActions, IGui } from "@/domain/ports/plume-ui";
 import { BC_ELEM_SELECTORS, BC_NAME_SECTION_DEFAULT_WIDTH } from "@/infra/elements/bandcamp";
 import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getActiveLocale, getString } from "@/shared/i18n";
+import { getActiveLangTag, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { applyTitleLang } from "@/shared/script-lang";
 import { createSafeSvgElement } from "@/shared/svg";
@@ -94,7 +94,7 @@ const buildPlumeView = async (isCollectionPage: boolean): Promise<PlumeView> => 
 
   const plumeContainer = document.createElement("div");
   plumeContainer.id = PLUME_ELEM_SELECTORS.plumeContainer.split("#")[1];
-  plumeContainer.lang = getActiveLocale();
+  plumeContainer.lang = getActiveLangTag();
   plumeContainer.role = "region";
   plumeContainer.ariaLabel = getString("ARIA__APP_NAME");
 

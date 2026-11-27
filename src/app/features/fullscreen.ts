@@ -37,7 +37,8 @@ import { LoopModeType, PLUME_CONSTANTS } from "@/domain/plume";
 import { coreActions } from "@/domain/ports/app-core";
 import { guiActions } from "@/domain/ports/plume-ui";
 import { PLUME_CSS_CLASSES, PLUME_ELEM_SELECTORS } from "@/infra/elements/plume";
-import { getActiveLocale, getString } from "@/shared/i18n";
+import { announce } from "@/shared/announce";
+import { getActiveLangTag, getString } from "@/shared/i18n";
 import { CPL, logger } from "@/shared/logger";
 import { presentFormattedTime } from "@/shared/presenters";
 import { applyTitleLang } from "@/shared/script-lang";
@@ -67,22 +68,13 @@ interface FullscreenElements {
 
 let fullscreenCleanupCallback: CleanupCallback | null = null;
 
-let fullscreenLiveRegion: HTMLDivElement | null = null;
-const announceFullscreenState = (messageKey: string): void => {
-  if (!fullscreenLiveRegion) {
-    fullscreenLiveRegion = document.createElement("div");
-    fullscreenLiveRegion.role = "status";
-    fullscreenLiveRegion.ariaLive = "polite";
-    fullscreenLiveRegion.className = "sr-live";
-    fullscreenLiveRegion.lang = getActiveLocale();
-    document.body.appendChild(fullscreenLiveRegion);
-  }
-  // Clear then set to ensure re-announcement even if the same message is sent twice
-  fullscreenLiveRegion.textContent = "";
-  requestAnimationFrame(() => {
-    fullscreenLiveRegion!.textContent = getString(messageKey);
-  });
-};
+// ? The element that had focus right before fullscreen was entered, so exit can restore it
+// ? instead of dropping focus to <body> — fullscreen is reachable by hotkey from anywhere on the page.
+let fullscreenOpener: HTMLElement | null = null;
+
+// ? Bound to `document` (not the overlay) so it still fires even if focus is ever lost to <body>;
+// ? must be explicitly removed on exit or it leaks and re-toggles fullscreen on the next Escape press.
+let fullscreenEscapeListener: ((e: KeyboardEvent) => void) | null = null;
 
 const exitFullscreenMode = (): void => {
   const plumeUi = getGuiInstance();
@@ -111,8 +103,17 @@ const exitFullscreenMode = (): void => {
   );
   plumeUi.dispatch(guiActions.setLoopBtns(plume.loopBtns.filter((btn) => existingOverlay.contains(btn) === false)));
   plumeUi.dispatch(guiActions.setFullscreenOverlay(null));
+
+  if (fullscreenEscapeListener) {
+    document.removeEventListener("keydown", fullscreenEscapeListener);
+    fullscreenEscapeListener = null;
+  }
+
   existingOverlay.remove();
   document.body.style.overflow = "auto";
+
+  fullscreenOpener?.focus();
+  fullscreenOpener = null;
 };
 
 export const cleanupFullscreenMode = exitFullscreenMode;
@@ -500,7 +501,7 @@ const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | nul
   overlay.role = "dialog";
   overlay.ariaModal = "true";
   overlay.ariaLabel = getString("ARIA__FULLSCREEN_OVERLAY");
-  overlay.lang = getActiveLocale();
+  overlay.lang = getActiveLangTag();
 
   // Create background with cover art (blurred and dimmed)
   const background = document.createElement("div");
@@ -599,14 +600,19 @@ const buildFullscreenOverlay = (isCollectionPage: boolean): HTMLDivElement | nul
   return overlay;
 };
 
+// `getClientRects()` is empty for `display:none` (own or ancestor) but, unlike `offsetParent`, stays non-empty
+// for `position: fixed` elements such as the exit button, so they remain part of the focus trap.
+const isVisible = (el: HTMLElement): boolean =>
+  el.getClientRects().length > 0 && !el.closest("[inert]") && getComputedStyle(el).visibility !== "hidden";
+
 // Setup keyboard navigation for fullscreen overlay
 const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {
   const getFocusableElements = () => {
     return Array.from(
       overlay.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
       )
-    );
+    ).filter(isVisible);
   };
 
   const handleTabKey = (e: KeyboardEvent) => {
@@ -635,11 +641,13 @@ const setupFullscreenFocusTrap = (overlay: HTMLDivElement): void => {
   };
 
   overlay.addEventListener("keydown", handleTabKey);
-  overlay.addEventListener("keydown", handleEscapeKey);
+  // Bound to `document`, not `overlay`, so it still closes the dialog even if focus is ever lost to <body>.
+  fullscreenEscapeListener = handleEscapeKey;
+  document.addEventListener("keydown", fullscreenEscapeListener);
 
   setTimeout(() => {
-    const initialFocusable = getFocusableElements()[0];
-    initialFocusable?.focus();
+    const exitBtn = overlay.querySelector<HTMLElement>(PLUME_ELEM_SELECTORS.fullscreenExitBtn);
+    exitBtn?.focus();
   }, 0);
 };
 
@@ -652,15 +660,17 @@ export const toggleFullscreenMode = (): void => {
 
   if (isCurrentlyFullscreen) {
     exitFullscreenMode();
-    announceFullscreenState("ARIA__FULLSCREEN__EXITED");
+    announce(getString("ARIA__FULLSCREEN__EXITED"));
     logger(CPL.INFO, getString("INFO__FULLSCREEN__EXITED"));
     return;
   }
 
   // Enter fullscreen - dispatch state change first, then build DOM
+  fullscreenOpener = document.activeElement as HTMLElement | null;
   const isCollectionPage = appCore.getState().pageType === "album";
   const overlay = buildFullscreenOverlay(isCollectionPage);
   if (!overlay) {
+    fullscreenOpener = null;
     appCore.dispatch(coreActions.setIsFullscreen(false));
     createToast({
       label: getString("META__TOAST__FULLSCREEN_UNAVAILABLE"),
@@ -698,6 +708,6 @@ export const toggleFullscreenMode = (): void => {
   plumeUi.dispatch(guiActions.setFullscreenOverlay(overlay));
   appCore.dispatch(coreActions.setIsFullscreen(true));
 
-  announceFullscreenState("ARIA__FULLSCREEN__ENTERED");
+  announce(getString("ARIA__FULLSCREEN__ENTERED"));
   logger(CPL.INFO, getString("INFO__FULLSCREEN__ENTERED"));
 };

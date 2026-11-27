@@ -55,7 +55,9 @@
       "polucheno": { "content": "$3", "example": "NaN" }
     }
   },
-  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Формат даты выпуска Bandcamp корректно разобран этим браузером" },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Формат даты выпуска Bandcamp корректно разобран этим браузером"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Не удалось найти подходящий контейнер" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Родительский элемент плеера не найден" },
@@ -71,7 +73,9 @@
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== КОНЕЦ DEBUG ===" },
 
   "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Контейнер заголовка или номер трека не найден" },
-  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Контейнер заголовка или название трека не найдено" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": {
+    "message": "Контейнер заголовка или название трека не найдено"
+  },
   "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Элемент предтекста заголовка не найден" },
   "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Элемент заголовка не найден" },
   "DEBUG__TRACK__QUANTIFIERS": {
@@ -324,7 +328,9 @@
   "ARIA__UNMUTE": { "message": "Включить звук" },
 
   "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Кнопка повтора не найдена" },
-  "INFO__LOOP_MODE__COERCED": { "message": "Режим повтора загружен как альбом, но применён как трек (страница одного трека)" },
+  "INFO__LOOP_MODE__COERCED": {
+    "message": "Режим повтора загружен как альбом, но применён как трек (страница одного трека)"
+  },
   "DEBUG__LOOP__CYCLED": { "message": "Режим повтора переключён" },
   "LABEL__LOOP": { "message": "Повтор" },
   "ARIA__LOOP__OFF": { "message": "Повтор: выкл." },
@@ -339,7 +345,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Нажата кнопка скорости" },
-  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Произвольная скорость отклонена (вне диапазона или не числовая)" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": {
+    "message": "Произвольная скорость отклонена (вне диапазона или не числовая)"
+  },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Произвольная скорость" },
   "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Нажмите для ввода произвольной скорости" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Скорость воспроизведения загружена:" },
@@ -349,7 +357,9 @@
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Включить/выключить полноэкранный режим" },
 
-  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Список треков: текущий трек неизвестен, навигация невозможна" },
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": {
+    "message": "Список треков: текущий трек неизвестен, навигация невозможна"
+  },
   "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
     "message": "Список треков: индекс трека $INDEX$ вне диапазона",
     "placeholders": {
@@ -411,7 +421,7 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Полноэкранный музыкальный плеер" },
   "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Дата выпуска не найдена для полноэкранного режима" },
   "LABEL__RELEASE_DATE": {
-    "message": "Выпущено $DATE$",
+    "message": "выпущено $DATE$",
     "placeholders": {
       "date": { "content": "$1", "example": "12 апреля 2019" }
     }
@@ -523,25 +533,37 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Полноэкранный режим" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Определение BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Ошибка сохранения настроек функций" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Определение BPM включено автоматически: требуется Аудио-визуализатором"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Аудио-визуализатор отключён автоматически: требует Определения BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Должно быть целым числом" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Должно быть от 1 до 300" },
   "ERROR__SEEK_JUMP_DURATION__PERSISTENCE": { "message": "Ошибка сохранения длительности перемотки" },
-  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": { "message": "Недопустимое значение длительности перемотки, используется значение по умолчанию" },
+  "WARN__SEEK_JUMP_DURATION__INVALID_VALUE": {
+    "message": "Недопустимое значение длительности перемотки, используется значение по умолчанию"
+  },
   "INFO__SEEK_JUMP_DURATION__LOADED": { "message": "Длительность перемотки загружена:" },
   "LABEL__PLAYBACK__SEEK_JUMP_DURATION": { "message": "Шаг перемотки" },
   "ARIA__PLAYBACK__SEEK_JUMP_DURATION_INPUT": { "message": "Длительность шага перемотки в секундах" },
 
   "ERROR__VOLUME_HOTKEY_STEP__OUT_OF_RANGE": { "message": "Должно быть от 1 до 20" },
   "ERROR__VOLUME_HOTKEY_STEP__PERSISTENCE": { "message": "Ошибка сохранения шага громкости" },
-  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": { "message": "Недопустимое значение шага громкости, используется значение по умолчанию" },
+  "WARN__VOLUME_HOTKEY_STEP__INVALID_VALUE": {
+    "message": "Недопустимое значение шага громкости, используется значение по умолчанию"
+  },
   "INFO__VOLUME_HOTKEY_STEP__LOADED": { "message": "Шаг громкости загружен:" },
   "LABEL__PLAYBACK__VOLUME_HOTKEY_STEP": { "message": "Шаг громкости" },
   "ARIA__PLAYBACK__VOLUME_HOTKEY_STEP_INPUT": { "message": "Процент громкости за одно нажатие клавиши" },
 
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Должно быть от 0 до 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Ошибка сохранения порога перезапуска трека" },
-  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Недопустимое значение порога перезапуска, используется значение по умолчанию" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": {
+    "message": "Недопустимое значение порога перезапуска, используется значение по умолчанию"
+  },
   "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Порог перезапуска трека загружен:" },
   "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Порог перезапуска трека" },
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
@@ -593,11 +615,15 @@
   "META__TOAST__RELEASE": { "message": "обновление" },
 
   "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "Plume не удалось загрузить" },
-  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "Подходящий контейнер плеера не найден на этой странице." },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": {
+    "message": "Подходящий контейнер плеера не найден на этой странице."
+  },
   "META__TOAST__INJECTION_FAILED": { "message": "ошибка загрузки" },
 
   "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Ожидание аудио" },
-  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "Аудиоэлемент не обнаружен. Элементы управления воспроизведением неактивны." },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": {
+    "message": "Аудиоэлемент не обнаружен. Элементы управления воспроизведением неактивны."
+  },
   "META__TOAST__AUDIO_NOT_FOUND": { "message": "аудио не найдено" },
 
   "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Полный экран недоступен" },
@@ -645,7 +671,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "недопустимый ввод" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "Звучит хорошо?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume бесплатен и таким останется. Если он сделал твоё прослушивание на Bandcamp лучше, небольшая поддержка значит очень много." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume бесплатен и таким останется. Если он сделал твоё прослушивание на Bandcamp лучше, небольшая поддержка значит очень много."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Поддержать Plume" },
   "META__TOAST__DONATION": { "message": "пожертвование" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {

@@ -127,11 +127,19 @@ describe("createTracklistToggle", () => {
     expect(dropdownEl.classList.contains("is-open")).toBe(true);
   });
 
-  it("Escape keydown inside the dropdown does not close the panel", () => {
+  it("Escape keydown inside the dropdown closes the panel and refocuses the toggle button", () => {
     const { toggleBtn, dropdownEl } = setup();
-    toggleBtn.click();
-    press(dropdownEl, "Escape");
-    expect(dropdownEl.classList.contains("is-open")).toBe(true);
+    document.body.append(toggleBtn, dropdownEl); // elements must be connected for .focus() to move document.activeElement
+    try {
+      toggleBtn.click();
+      press(dropdownEl, "Escape");
+      expect(dropdownEl.classList.contains("is-open")).toBe(false);
+      expect(dropdownEl.ariaHidden).toBe("true");
+      expect(document.activeElement).toBe(toggleBtn);
+    } finally {
+      toggleBtn.remove();
+      dropdownEl.remove();
+    }
   });
 
   it("cleanup does not close an open panel", () => {

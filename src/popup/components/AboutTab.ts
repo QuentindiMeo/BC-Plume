@@ -10,7 +10,7 @@ import {
   PLUME_LICENSE,
 } from "@/domain/meta";
 import type { TabDefinition } from "@/popup/components/TabBar";
-import { getActiveLocale, getString } from "@/shared/i18n";
+import { getActiveLangTag, getString } from "@/shared/i18n";
 import { createSafeSvgElement } from "@/shared/svg";
 import { PLUME_SVG } from "@/svg/icons";
 
@@ -58,7 +58,7 @@ const buildIdentityBlock = (): HTMLElement => {
   const version = document.createElement("p");
   version.id = "identity__version";
   const shortVersion = APP_VERSION.substring(0, APP_VERSION.lastIndexOf("."));
-  const locale = getActiveLocale().replaceAll("_", "-");
+  const locale = getActiveLangTag();
   const fullReleaseDate = new Date(`${APP_RELEASE_DATE}T12:00:00`);
   const localizedReleaseDate = new Intl.DateTimeFormat(locale, {
     year: "numeric",

@@ -55,7 +55,9 @@
       "obtido": { "content": "$3", "example": "NaN" }
     }
   },
-  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": { "message": "Formato de data de lançamento do Bandcamp interpretado corretamente por este navegador" },
+  "DEBUG__DATE_HEALTH_CHECK__SUPPORTED": {
+    "message": "Formato de data de lançamento do Bandcamp interpretado corretamente por este navegador"
+  },
 
   "ERROR__UNABLE_TO_FIND_CONTAINER": { "message": "Não foi possível encontrar um contêiner adequado" },
   "ERROR__PLAYER_PARENT__NOT_FOUND": { "message": "Elemento pai do player não encontrado" },
@@ -70,8 +72,12 @@
   "DEBUG__CONTROL_ELEMENTS__FOUND": { "message": "Controles potenciais encontrados:" },
   "DEBUG__CONTROL_ELEMENTS__END": { "message": "=== FIM DEBUG ===" },
 
-  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": { "message": "Contêiner do cabeçalho ou número da faixa não encontrado" },
-  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": { "message": "Contêiner do cabeçalho ou título da faixa não encontrado" },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_NUMBER__NOT_FOUND": {
+    "message": "Contêiner do cabeçalho ou número da faixa não encontrado"
+  },
+  "ERROR__HEADER_CONTAINER_OR_TRACK_TITLE__NOT_FOUND": {
+    "message": "Contêiner do cabeçalho ou título da faixa não encontrado"
+  },
   "ERROR__HEADER_PRETEXT__NOT_FOUND": { "message": "Elemento de pré-texto do cabeçalho não encontrado" },
   "ERROR__HEADER_TITLE__NOT_FOUND": { "message": "Elemento de título do cabeçalho não encontrado" },
   "DEBUG__TRACK__QUANTIFIERS": {
@@ -286,7 +292,9 @@
   },
 
   "ERROR__MUTE_BUTTON__NOT_FOUND": { "message": "Botão de silenciar não encontrado" },
-  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": { "message": "Controle de volume ou elemento de exibição não encontrado" },
+  "ERROR__VOLUME_SLIDER_OR_DISPLAY__NOT_FOUND": {
+    "message": "Controle de volume ou elemento de exibição não encontrado"
+  },
   "WARN__VOLUME__INVALID_VALUE": { "message": "Valor de volume inválido:" },
   "WARN__VOLUME__ADJUSTING_WITH_NULL_DELTA": {
     "message": "Ajustar volume com delta nulo pode indicar um erro lógico no código"
@@ -324,7 +332,9 @@
   "ARIA__UNMUTE": { "message": "Ativar som" },
 
   "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Botão de repetição não encontrado" },
-  "INFO__LOOP_MODE__COERCED": { "message": "Modo de repetição carregado como álbum mas aplicado como faixa (página de faixa única)" },
+  "INFO__LOOP_MODE__COERCED": {
+    "message": "Modo de repetição carregado como álbum mas aplicado como faixa (página de faixa única)"
+  },
   "DEBUG__LOOP__CYCLED": { "message": "Modo de repetição alternado" },
   "LABEL__LOOP": { "message": "Repetir" },
   "ARIA__LOOP__OFF": { "message": "Repetir: desativado" },
@@ -339,7 +349,9 @@
     "placeholders": { "speed": { "content": "$1", "example": "1.5×" } }
   },
   "DEBUG__SPEED__CLICKED": { "message": "Botão de velocidade clicado" },
-  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": { "message": "Velocidade personalizada rejeitada (fora do intervalo ou não numérica)" },
+  "DEBUG__SPEED__CUSTOM_INPUT__INVALID": {
+    "message": "Velocidade personalizada rejeitada (fora do intervalo ou não numérica)"
+  },
   "ARIA__SPEED_CUSTOM_INPUT": { "message": "Velocidade personalizada" },
   "LABEL__SPEED__CLICK_TO_EDIT": { "message": "Clique para inserir uma velocidade personalizada" },
   "INFO__PLAYBACK_SPEED__LOADED": { "message": "Velocidade de reprodução carregada:" },
@@ -349,7 +361,9 @@
 
   "LABEL__FULLSCREEN_TOGGLE": { "message": "Alternar tela cheia" },
 
-  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": { "message": "Lista de faixas: faixa atual desconhecida, não é possível navegar" },
+  "ERROR__TRACKLIST__CURRENT_TRACK_UNKNOWN": {
+    "message": "Lista de faixas: faixa atual desconhecida, não é possível navegar"
+  },
   "WARN__TRACKLIST__INDEX_OUT_OF_BOUNDS": {
     "message": "Lista de faixas: índice de faixa $INDEX$ fora dos limites",
     "placeholders": {
@@ -411,7 +425,7 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Reprodutor de música em tela cheia" },
   "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Data de lançamento não encontrada para modo tela cheia" },
   "LABEL__RELEASE_DATE": {
-    "message": "Lançado em $DATA$",
+    "message": "lançado em $DATA$",
     "placeholders": {
       "data": { "content": "$1", "example": "12 de abril de 2019" }
     }
@@ -523,6 +537,12 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Tela cheia" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "Detecção de BPM" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Falha ao salvar preferências de funcionalidades" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "Detecção de BPM ativada automaticamente: exigida pelo Visualizador de áudio"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Visualizador de áudio desativado automaticamente: exige a Detecção de BPM"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Deve ser um número inteiro" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Deve ser entre 1 e 300" },
@@ -541,7 +561,9 @@
 
   "ERROR__TRACK_RESTART_THRESHOLD__OUT_OF_RANGE": { "message": "Deve ser entre 0 e 10" },
   "ERROR__TRACK_RESTART_THRESHOLD__PERSISTENCE": { "message": "Falha ao salvar limite de reinício de faixa" },
-  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": { "message": "Valor de limite de reinício de faixa inválido, usando padrão" },
+  "WARN__TRACK_RESTART_THRESHOLD__INVALID_VALUE": {
+    "message": "Valor de limite de reinício de faixa inválido, usando padrão"
+  },
   "INFO__TRACK_RESTART_THRESHOLD__LOADED": { "message": "Limite de reinício de faixa carregado:" },
   "LABEL__PLAYBACK__TRACK_RESTART_THRESHOLD": { "message": "Limite de reinício de faixa" },
   "ARIA__PLAYBACK__TRACK_RESTART_THRESHOLD_INPUT": {
@@ -593,11 +615,15 @@
   "META__TOAST__RELEASE": { "message": "atualização lançada" },
 
   "LABEL__TOAST__INJECTION_FAILED__TITLE": { "message": "O Plume não carregou" },
-  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": { "message": "Nenhum contêiner de player adequado foi encontrado nesta página." },
+  "LABEL__TOAST__INJECTION_FAILED__DESCRIPTION": {
+    "message": "Nenhum contêiner de player adequado foi encontrado nesta página."
+  },
   "META__TOAST__INJECTION_FAILED": { "message": "falha de injeção" },
 
   "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Aguardando áudio" },
-  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "Nenhum elemento de áudio detectado. Os controles de reprodução estão inativos." },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": {
+    "message": "Nenhum elemento de áudio detectado. Os controles de reprodução estão inativos."
+  },
   "META__TOAST__AUDIO_NOT_FOUND": { "message": "áudio não encontrado" },
 
   "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Tela cheia indisponível" },
@@ -645,7 +671,9 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "entrada personalizada inválida" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "Soa bem pra você?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "O Plume é gratuito e sempre será. Se melhorou sua experiência no Bandcamp, um pequeno apoio significa muito." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "O Plume é gratuito e sempre será. Se melhorou sua experiência no Bandcamp, um pequeno apoio significa muito."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Apoie o Plume" },
   "META__TOAST__DONATION": { "message": "doação" },
   "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
@@ -695,7 +723,7 @@
   "LABEL__ABOUT__LINK__GITHUB": { "message": "Código-fonte" },
   "ARIA__ABOUT__LINK__GITHUB": { "message": "Ver o código-fonte do Plume no GitHub" },
   "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Notas de versão" },
-  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Ver o histórico de versões do Plume no GitHub" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "Ver as notas de versão do Plume no GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Reportar um problema" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Reportar um problema no GitHub" },
   "LABEL__ABOUT__LINK__DONATION": { "message": "Apoie o Plume" },

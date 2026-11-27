@@ -7,12 +7,14 @@ export interface TabDefinition {
 }
 
 interface TabBarInstance {
-  el: HTMLDivElement;
+  el: HTMLElement;
   activate: (id: string) => void;
 }
 
 export const createTabBar = (tabs: TabDefinition[]): TabBarInstance => {
-  const wrapper = document.createElement("div");
+  // <main>, not <div>: popup.html is a document Plume fully owns, and its tab bar + panels
+  // were the only content not contained by a landmark (M11).
+  const wrapper = document.createElement("main");
 
   const tablist = document.createElement("div");
   tablist.role = "tablist";

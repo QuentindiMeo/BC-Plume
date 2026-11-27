@@ -322,7 +322,9 @@
   "ARIA__UNMUTE": { "message": "Unmute" },
 
   "ERROR__LOOP_BUTTON__NOT_FOUND": { "message": "Loop button not found" },
-  "INFO__LOOP_MODE__COERCED": { "message": "Loop mode loaded as album repeat but applied as track repeat (single-track page)" },
+  "INFO__LOOP_MODE__COERCED": {
+    "message": "Loop mode loaded as album repeat but applied as track repeat (single-track page)"
+  },
   "DEBUG__LOOP__CYCLED": { "message": "Loop mode cycled" },
   "LABEL__LOOP": { "message": "Repeat" },
   "ARIA__LOOP__OFF": { "message": "Repeat: off" },
@@ -409,7 +411,7 @@
   "ARIA__FULLSCREEN_OVERLAY": { "message": "Fullscreen music player" },
   "WARN__RELEASE_DATE__NOT_FOUND": { "message": "Release date not found for fullscreen mode" },
   "LABEL__RELEASE_DATE": {
-    "message": "Released $DATE$",
+    "message": "released $DATE$",
     "placeholders": {
       "date": { "content": "$1", "example": "April 12, 2019" }
     }
@@ -521,6 +523,12 @@
   "LABEL__FEATURES__FULLSCREEN": { "message": "Fullscreen mode" },
   "LABEL__FEATURES__BPM_DETECT": { "message": "BPM Detection" },
   "ERROR__FEATURE_FLAGS__PERSISTENCE": { "message": "Failed to save feature preferences" },
+  "ARIA__FEATURES__BPM_AUTO_ENABLED": {
+    "message": "BPM Detection automatically enabled — required by the Audio Visualizer"
+  },
+  "ARIA__FEATURES__VISUALIZER_AUTO_DISABLED": {
+    "message": "Audio Visualizer automatically disabled — it requires BPM Detection"
+  },
 
   "ERROR__SEEK_JUMP_DURATION__NOT_INTEGER": { "message": "Must be a whole number" },
   "ERROR__SEEK_JUMP_DURATION__OUT_OF_RANGE": { "message": "Must be between 1 and 300" },
@@ -552,7 +560,9 @@
   },
   "INFO__TRACKLIST_DROPDOWN_HEIGHT__LOADED": { "message": "Tracklist dropdown height loaded:" },
   "LABEL__GENERAL__TRACKLIST_DROPDOWN_HEIGHT": { "message": "Tracklist dropdown height" },
-  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": { "message": "Number of tracks visible in the tracklist dropdown" },
+  "ARIA__GENERAL__TRACKLIST_DROPDOWN_HEIGHT_SLIDER": {
+    "message": "Number of tracks visible in the tracklist dropdown"
+  },
 
   "WARN__TOAST__SVG_PARSE_FAILED": { "message": "Failed to parse toast icon SVG" },
   "WARN__TOAST__ICON_SVG_INVALID": {
@@ -595,7 +605,9 @@
   "META__TOAST__INJECTION_FAILED": { "message": "injection failure" },
 
   "LABEL__TOAST__AUDIO_NOT_FOUND__TITLE": { "message": "Waiting for audio" },
-  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": { "message": "No audio element detected yet. Playback controls are inactive." },
+  "LABEL__TOAST__AUDIO_NOT_FOUND__DESCRIPTION": {
+    "message": "No audio element detected yet. Playback controls are inactive."
+  },
   "META__TOAST__AUDIO_NOT_FOUND": { "message": "audio not found" },
 
   "LABEL__TOAST__FULLSCREEN_UNAVAILABLE__TITLE": { "message": "Fullscreen unavailable" },
@@ -643,11 +655,19 @@
   "META__TOAST__CUSTOM_INPUT_INVALID": { "message": "invalid custom input" },
 
   "LABEL__TOAST__DONATION__TITLE": { "message": "Sound good to you?" },
-  "LABEL__TOAST__DONATION__DESCRIPTION": { "message": "Plume is free and always will be. If it's made your Bandcamp listening better, a small tip means the world." },
+  "LABEL__TOAST__DONATION__DESCRIPTION": {
+    "message": "Plume is free and always will be. If it's made your Bandcamp listening better, a small tip means the world."
+  },
   "LABEL__TOAST__DONATION__CTA": { "message": "Support Plume" },
   "META__TOAST__DONATION": { "message": "donation" },
-  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": { "message": "Full play count incremented to $COUNT$", "placeholders": { "COUNT": { "content": "$1" } } },
-  "DEBUG__DONATION__THRESHOLD__REACHED": { "message": "Donation toast threshold reached at $COUNT$ plays", "placeholders": { "COUNT": { "content": "$1" } } },
+  "DEBUG__DONATION__PLAY_COUNT__INCREMENTED": {
+    "message": "Full play count incremented to $COUNT$",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
+  "DEBUG__DONATION__THRESHOLD__REACHED": {
+    "message": "Donation toast threshold reached at $COUNT$ plays",
+    "placeholders": { "COUNT": { "content": "$1" } }
+  },
 
   "LABEL__BPM__DISPLAY": { "message": "BPM" },
   "LABEL__BPM__DETECTING": { "message": "..." },
@@ -687,7 +707,7 @@
   "LABEL__ABOUT__LINK__GITHUB": { "message": "Source code" },
   "ARIA__ABOUT__LINK__GITHUB": { "message": "View Plume source code on GitHub" },
   "LABEL__ABOUT__LINK__CHANGELOG": { "message": "Changelog" },
-  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "View Plume release notes on GitHub" },
+  "ARIA__ABOUT__LINK__CHANGELOG": { "message": "View Plume's changelog on GitHub" },
   "LABEL__ABOUT__LINK__REPORT": { "message": "Report an issue" },
   "ARIA__ABOUT__LINK__REPORT": { "message": "Report an issue on GitHub" },
   "LABEL__ABOUT__LINK__DONATION": { "message": "Support Plume" },
