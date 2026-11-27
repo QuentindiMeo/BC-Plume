@@ -63,17 +63,20 @@ A cross-browser web extension that improves the listening experience on Bandcamp
 - **Loop mode**: Cycle through no loop, track loop, and collection loop (remembered across pages)
 - **Tracklist dropdown**: Browse collection tracks from the header and jump directly to any of them
   - **Go to track**: A link button docked to the track title opens the current track's Bandcamp page
+  - **Tweakable layout**: Open it by default, keep it always large, set its height, and have its collapse state remembered across views
 - **Visible volume slider**: Precise volume control with a sleek slider (remembered across pages)
 
 #### Quality of Life
 
 - **Fullscreen mode**: Enjoy the player in fullscreen for an immersive experience
+  - **Release date**: The collection's release date is displayed next to its cover art
   - **Responsive design**: Adapts to different screen sizes and devices
 - **Keyboard shortcuts**: Control playback, volume, seeking, and more without touching the mouse
   - **Customizable hotkeys**: Remap every shortcut to your liking via the extension popup
   - Digit row (0–9), Numpad (0–9 with NumLock), and letter keys all supported
 - **Sticky player behavior**: Player sticks visually while scrolling for quicker access
-- **Accessibility-minded**: Visible focus outlines, ARIA semantics, reduced-motion and contrast preferences, screen reader support
+- **Long names, handled**: Overflowing titles and track names scroll into view as a marquee on hover
+- **Accessibility-minded**: Visible focus outlines, ARIA semantics, reduced-motion and contrast preferences, screen reader support, and live announcements of player changes
 - **BPM detection**: Detects and displays the track's tempo live, with indicators in the tracklist
   - **Beat visualizer**: A BPM-driven animation plays in sync with the music's tempo (toggleable via feature flags, fullscreen view only)
 - **Feature flags**: Toggle individual features on or off from the popup's Features tab
@@ -128,6 +131,7 @@ If the issue persists, [**open an issue**](https://github.com/QuentindiMeo/BC-Pl
 
 Find details about each release in [CHANGELOG.md](https://github.com/QuentindiMeo/BC-Plume/blob/main/CHANGELOG.md).
 
+- _**[1.14.0]** Nov 27 2026_: **Scrolling Me Softly With His Song** [#179](https://github.com/QuentindiMeo/BC-Plume/pull/179)
 - _**[1.13.0]** May 15 2026_: **Ride The Wave** [#166](https://github.com/QuentindiMeo/BC-Plume/pull/166)
 - _**[1.12.0]** Apr 29 2026_: **À la carte** [#152](https://github.com/QuentindiMeo/BC-Plume/pull/152)
 - _**[1.11.0]** Apr 11 2026_: **All Access Pass** [#142](https://github.com/QuentindiMeo/BC-Plume/pull/142)
